@@ -5,6 +5,11 @@ from pour_robust_study import make_plan
 
 
 class PlanTests(unittest.TestCase):
+    def test_actual_saved_parent_material_is_explicit(self):
+        p=Path(__file__).resolve().parents[2]/'evidence/guard-B/frozen-plan.json'
+        base=json.loads(p.read_text())['test'][1]
+        self.assertTrue(all(x['vessel_appearance']=='A' for x in make_plan(base)['test']))
+
     def base(self):
         return dict(spacing=.0018,dt=.0025,vessel_appearance='A',policy_evaluation=True,expert_recovery=False,max_seconds=40.,
             policy_family='visual_guard_hierarchy',threshold_marker={'unchanged':True},isosurface_max_subgrids=32768)

@@ -22,7 +22,7 @@ def make_plan(base):
         source=rng.randint(20,40) if target=='bottle_empty' else rng.randint(85,100)
         cup=rng.randint(3,10) if target=='bottle_empty' else rng.randint(3,14)
         s=copy.deepcopy(base)
-        s.update(name=f'{PREFIX}test_{i:02}',protocol=13,study_split='test',checkpoint=str(ROOT/'best.pt'),
+        s.update(name=f'{PREFIX}test_{i:02}',protocol=13,study_split='test',checkpoint=str(ROOT/'best.pt'),vessel_appearance='A',
             initial_ml=float(source),cup_initial_ml=float(cup),expected_stop=target,
             cup_world=[.49+rng.uniform(-.008,.008),-.15+rng.uniform(-.008,.008),1.04],
             source_xy=[-.12+rng.uniform(-.009,.009),rng.uniform(-.004,.004)])
