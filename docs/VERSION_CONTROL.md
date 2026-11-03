@@ -19,10 +19,13 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 
 | Artifact | Existing location / identity |
 |---|---|
-| Current repaired model | `evidence/guard-B/best.pt`; Ubuntu `learning/A-guard-20261103-v2/best.pt` |
+| Current frozen evaluation model | `evidence/robust-A/best.pt`; Ubuntu `learning/A-robust-20261103-v1/best.pt` |
+| Prior six-case repaired model | `evidence/guard-B/best.pt`; Ubuntu `learning/A-guard-20261103-v2/best.pt` |
 | Current model SHA256 | `b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b` |
-| Current native recordings/labels | `data/material-A-guard-vote/`; nine complete HDF5 and36JSON sidecars, native-checksum-verified |
-| Current integrity/index | Versioned `evidence/guard-B/recording-integrity.json`; local `data/material-A-guard-vote/backup-index.json` |
+| Thirty-case native recordings/labels | `data/material-A-robust/`; 30 complete HDF5 and 120 JSON sidecars, native-checksum-verified |
+| Thirty-case integrity/index | Versioned `evidence/robust-A/recording-integrity.json`; local `data/material-A-robust/backup-index.json` |
+| Prior six-case native recordings/labels | `data/material-A-guard-vote/`; nine complete HDF5 and36JSON sidecars, native-checksum-verified |
+| Prior six-case integrity/index | Versioned `evidence/guard-B/recording-integrity.json`; local `data/material-A-guard-vote/backup-index.json` |
 | First guarded round | `evidence/guard-A/best.pt`, SHA256`f4ddb8b9f288ad2e5e8a9e6ac495f57a94c7413a0cdb4bbb040a89769bd36098`;19HDF5+76sidecars+one interrupted partial under `data/material-A-guard/` |
 | Archived visual-stop study | `evidence/stop-A/best.pt`, SHA256`b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35`;12HDF5+48sidecars under `data/material-A-stop/` |
 | Robot USD | `runtime/assets/FFW_BG2_without_mimic.usd`, SHA256 `82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d` |
@@ -45,3 +48,5 @@ python3 -m unittest discover -s runtime -p test_gpu_priority_guard.py -v
 These checks do not start Isaac Sim, train a model or use the GPU. Native simulation results and their limits are documented separately in `docs/VISUAL_STOP_STUDY.md`.
 
 Current repaired-study verification: `python3 tools/summarize_guard_benchmark.py --study vote`. For the archived first guarded round, use source revision`9a4b8b1` so its source-bound checks match the original controller. The `guard-B` folder denotes repair round2; vessel material remains A.
+
+Thirty-case frozen evaluation verification: `python3 tools/summarize_robust_benchmark.py`; failure analysis: `python3 tools/analyze_robust_outcomes.py`. The unchanged checkpoint was evaluated once on 30 new reserved cases; 25 passed, five failures are retained. See [the full report](ROBUSTNESS_A_30.md). Camera sheets and full/empty/underfill videos live under `evidence/robust-A/` outside Git.
