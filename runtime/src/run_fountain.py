@@ -31,6 +31,7 @@ allowed_commands={'recovery_collect','recovery_train','recovery_val','recovery_t
 allowed_commands.add('recovery_probe')
 allowed_commands.add('release_train')
 allowed_commands.update(('stop_train','stop_val','stop_test'))
+allowed_commands.update(('guard_train','guard_val','guard_regression','guard_development','guard_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -322,7 +323,9 @@ def setup(spec):
                                   cameras=['task','wrist'], resolution=[384,384], control_hz=20, frames=0)
     actor = None
     if spec.get('policy_evaluation'):
-        if spec.get('policy_family')=='visual_stop_hierarchy':
+        if spec.get('policy_family')=='visual_guard_hierarchy':
+            from pour_guard_actor import Actor
+        elif spec.get('policy_family')=='visual_stop_hierarchy':
             from pour_stop_actor import Actor
         else:
             from pour_learning import Actor
@@ -618,7 +621,25 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd=='stop_train':
+                    if cmd=='guard_train':
+                        if current is not None or pending:
+                            state['control_message']='Wait for active trials to finish';continue
+                        try:
+                            from pour_guard_train import train
+                            state['trained_checkpoint']=train(state)
+                        except Exception:
+                            state['learning_error']=traceback.format_exc();state['phase']='Visual-guard training failed'
+                        continue
+                    elif cmd in ('guard_val','guard_regression','guard_development','guard_test'):
+                        from pour_guard_study import plan as guard_plan,ROOT as GUARD_ROOT
+                        if not (GUARD_ROOT/'best.pt').exists():
+                            state['control_message']='Fit visual guard policy first';continue
+                        frozen=guard_plan()
+                        if cmd=='guard_development':pending.extend(frozen['regression']+frozen['validation'])
+                        else:
+                            part={'guard_val':'validation','guard_regression':'regression','guard_test':'test'}[cmd]
+                            pending.extend(frozen[part])
+                    elif cmd=='stop_train':
                         if current is not None or pending:
                             state['control_message']='Wait for active trials to finish';continue
                         try:

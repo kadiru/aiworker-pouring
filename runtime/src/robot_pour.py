@@ -277,13 +277,16 @@ class RobotPour(Pour):
         if self.spec.get('expert_recovery'):
             result['attribution']='Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success'
             result['scene']['observation_source']='RGB/joints before takeover; measured object pose and particle inventory in training-only expert'
-        if self.spec.get('policy_family')=='visual_stop_hierarchy':
+        if self.spec.get('policy_family') in ('visual_stop_hierarchy','visual_guard_hierarchy'):
             result['attribution']='Hierarchical visual imitation: RGB liquid estimator, demonstration-fitted pour/terminal primitives, irreversible stop latch'
             result['scene']['observation_source']='RGB, measured joints/velocities, own motion history; no privileged runtime state'
+        if self.spec.get('policy_family')=='visual_guard_hierarchy':
+            result['attribution']='Image-localized visual servo grasp/retry, normalized supervised cup model, learned pour primitive, settled-level top-ups, monotone terminal sequence'
+            result['scene']['observation_source']='RGB, measured joints/velocities, own history/phase and fixed robot/camera/bench calibration; no runtime object/particle state'
         result['eligible']=not result['gates']
         result['task_success_zero_spill'] = bool(result['eligible'] and result['zero_spill'] and
             (result['expected_stop']!='cup_near_full' or rows[-1]['cup_inventory_fraction']>=.90))
-        if self.spec.get('policy_family')=='visual_stop_hierarchy':
+        if self.spec.get('policy_family') in ('visual_stop_hierarchy','visual_guard_hierarchy'):
             f=rows[-1];empty=f['bottle_ml']<=max(.25,.01*self.spec['initial_ml'])
             goal=(f['stop_reason']=='cup_near_full' and f['cup_fill_fraction']>=.90) or (f['stop_reason']=='bottle_empty' and empty)
             result['surface_task_success_zero_spill']=bool(self.verified and good>=.8 and result['zero_spill'] and goal and

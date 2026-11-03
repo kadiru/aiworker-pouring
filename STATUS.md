@@ -1,7 +1,21 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 3, 2026, 02:55 PST (America/Los_Angeles).
-State: **Requested training and all six fresh tests complete: 4/6 full zero-spill tasks; reliability target still unmet. No training left running.**
+State: **New grasp/rim-normalized repair cycle in progress; previous frozen result4/6. New six tests untouched.**
+
+## Grasp confirmation and settled full-stop — in progress, November 3, 2026
+
+User explicitly authorized fixing the missed grasp/early full stop, retraining on4070, six fresh tests, and committing/pushing. New root`/workspace/learning/A-guard-20261103-v1`. Reserved planSHA**eae551d7eebf42a0f4deb26fae62805e0733c5e47fe3fcf429982c1467a8f10f**, developmentseed20261121 and**six untouched testsseed20261122**, source/cup26/4,91/12,39/8,87/14,20/3,98/6. SameA/1.8mm/400Hz/render budgets/scoring; max40simsec/graspdeadline12allow retry/top-ups. Priorb4754/6resultunchanged.
+
+Current controller: image gradient-template localization + calibrated joint-limitedIK grasp; persistent neck lift, actualTCP rise>35mm andboth encoder-drivenfingerobstruction required before tilt; oneplace/open/retreat/retry. Rim-normalized cupCNN+color-geometrycheck, brakeovercup, settle/check/topup beforefinalfull latch. Finalreturn usesmonotone ownphase-envelope measuredjoint history, excludingprior topup peaks. MotorpathCUDA ridgefitconditionedonmeasuredliftjoints andvisualcupXY (19train/4valpaths). RuntimeRGB/joints/ownhistory/fixedcamera-robot-benchcalibrationonly; no liveobject/contact/particlelabelinputs. Method **visual servoing plus supervised imitation**, not a newly end-to-end grasp network.
+
+CPUdata4711train/2687validation normalizedcupimages;52train/30valinitiallocalizationframes; allG_A_*excludedfromfitting. Latest CUDAfit1800updates/11.29s excludingcached preparation;selectedstep400. Calmnearfullvalidation74frames MAE1.208points,p90error3.862points; broadallframesMAE6.471points (do notcompare differing masks as same metric). Source localizationmax.272mm,cupmax.499mm. Emptyhead frozenfromprior3/3emptytestsuccess. Fitted opposingfingerdeficitthreshold3.213deg; successfulholds~38–39deg vsfailedemptyclosure45deg. **9CPUgate/geometrytests passed**, includingstaticbottle,emptygripper,stalledarm,neck-to-baseheighttransform,andno re-tipaftertopups.
+
+Development retained: initialcoordinatebug(neckheightusedasbase) wascaughtwithoutpour/spill andstopped; earlierNCCtrackingcouldrejecta physicallyheldbottle. Both completefailedattempts andabortedpartial(s)mustremainin audit. Correctedbase transformgavephysicalgrasp; **early-full regression passed primarygoal~93%settledheightwithzero spill**, legacyinventoryfailed. Trackingwasthenrestrictedtoexpectedliftimagewindowwithlow-contrastthreshold.23,12px toleranceandactualTCPencodercheck. Alllearnedweights/paths verifiedbitwiseunchanged duringcontroller-onlyrevision; fitting-sourcehashes retainedseparately.
+
+Current selected candidate SHA **49c03b26d5c7effc3cb09340868428340546f5fa3e1c18b577aba8e2d0c79a61**. The prior9b four-case development completed four verified grasps and zero-spill runs, but one final height was89.2% (failure); primary3/4, legacy1/4. Final controller-only correction sets predicted full target.96, settling1.2s and relative.015 top-up increments; tensors/paths unchanged. Ownedcontainer **47aeef4d9edce8180d4f2209c78a48b62600270956affb926b1bd56a05384049**, run **20261103T131746Z**, is repeating the four development cases before selection. No fresh G_A_test exists yet. See docs/GRASP_AND_FILL_STUDY.md. Need finish development, freeze identity, run all six once without tuning, audit/back up all records including failures/partials, update results, commit and push to kadiru/aiworker-pouring. Do not stop at offline fitting or partial tests.
+
+GPUonly4070UUIDGPU-cde23916-c5fa-f18e-a343-127f732cc2f6; preserve4-corequota/CPUs16–23/shares256/nice10/16GiB/noextraswap andimmutableIDguard. InitialforeignGPUcomputeempty. Onlyexactownedcontainersrestarted/stopped. Nootherjobsmodified. Allfittinginsideexistingsimulatormainprocess;CPUpreparation/auditsinitialize noCUDA. Sourcefilesnewpour_guard_*plusrun_fountain/robot_pour/test_pour_guard; reportsCPUguard_report.py,guard_audit.py. Explicitcontrols guard_train/guard_regression/guard_val/guard_development/guard_test. Currentwatchhashfixedfor4development; final6freezehelper/backupsummary/docs stilltobecompleted.
 
 ## Version control — November 3, 2026
 
