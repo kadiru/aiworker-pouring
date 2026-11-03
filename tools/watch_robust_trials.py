@@ -9,7 +9,7 @@ for _ in range(1080):
     for n,h in selection['runtime_sources'].items():assert hashlib.sha256((root/'src'/n).read_bytes()).hexdigest()==h,n
     try:
         s=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=5));m=s.get('metrics',{})
-        for p in sorted((root/'outputs/fountain').glob('*/*R_A_*/metrics.json')):
+        for p in sorted((root/'outputs/fountain').glob('*/*T30_A_*/metrics.json')):
             spec=json.loads((p.parent/'parameters.json').read_text());name=spec['name']
             if name in seen:continue
             r=json.loads(p.read_text());f=r['bottle_result'];seen.add(name);passed+=bool(r['surface_task_success_zero_spill'])

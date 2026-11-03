@@ -7,7 +7,7 @@ import random
 
 ROOT=Path('/workspace/learning/A-robust-20261103-v1')
 PARENT=Path('/workspace/learning/A-guard-20261103-v2')
-PREFIX='R_A_'
+PREFIX='T30_A_'
 SEED=20261130
 CHECKPOINT_SHA='b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b'
 RUNTIME_SOURCES=('pour_guard_actor.py','pour_guard_train.py','pour_guard_models.py','pour_guard_vision.py',

@@ -2,7 +2,7 @@
 
 Authorized November 3, 2026. Evaluate the current controller without retraining or changing thresholds during the batch. Prior six-case benchmark:6/6 rim-height/empty successes,3/6 legacy nominal-volume successes; those results stay separate.
 
-Reserved study `A-robust-20261103-v1`, prefix `R_A_`, seed **20261130**. Thirty cases are generated once:15 expected near-full and15 expected bottle-empty, in shuffled order. Full-source starts are85–100nominal mL with cup3–14; short-source starts20–40 with cup3–10. Cup XY varies by±8mm, source X±9mm/Y±4mm. These are new cases within the existing calibrated workspace, not an expanded workspace or new vessel material.
+Reserved study `A-robust-20261103-v1`, prefix `T30_A_`, seed **20261130**. Thirty cases are generated once:15 expected near-full and15 expected bottle-empty, in shuffled order. Full-source starts are85–100nominal mL with cup3–14; short-source starts20–40 with cup3–10. Cup XY varies by±8mm, source X±9mm/Y±4mm. These are new cases within the existing calibrated workspace, not an expanded workspace or new vessel material.
 
 Checkpoint remains byte-identical **`b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b`**. Seventeen inherited Actor/model/physics dependencies must match the previous frozen benchmark exactly. The runner adds only a queue command to submit reserved cases; its new hash and the study module are frozen before execution. Material A,1.8mm/400Hz physics, cameras, contact geometry,40s deadline and12s grasp deadline stay fixed. No expert fallback.
 
