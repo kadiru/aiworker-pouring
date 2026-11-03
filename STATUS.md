@@ -1,7 +1,13 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 03, 2026, 07:59 PST (America/Los_Angeles).
-State: **Simulation repair validated: final six fresh tasks passed with zero measured spill. Lab idle; source and final reports versioned on main.**
+State: **Thirty-case frozen robustness evaluation authorized; preparation in progress. Prior six-case benchmark remains6/6.**
+
+## Thirty-case robustness batch — active
+
+User authorized30fresh randomized tests of the frozen material-A controller on4070. Study`A-robust-20261103-v1`, prefixR_A_, seed20261130,15full/15empty, same±8mm cup/±9mm source-X/±4mm source-Y workspace. Current checkpointb80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b byte-identical;17inherited policy/physics files unchanged. Only queue scheduling is added to run_fountain; full runtime hashes frozen before tests. No fitting or threshold changes during30. Three new CPU plan checks pass. [Protocol](docs/ROBUSTNESS_A_30.md).
+
+Need finish identity-checked restart, commit protocol/source, freeze current19source hashes and new30-case plan, snapshot resources, POSTrobust_test once, monitor all30 outcomes without tuning, preserve/diagnose all failures, validate native cameras/backups, update docs/status and commit/push. Keep other jobs untouched and existing4070priority guard/CPU/RAM limits. Do not end at a queued/partial batch. Native/report helperspour_robust_study.py,freeze_robust_study.py,pour_robust_report.py; read-onlywatchtools/watch_robust_trials.py. No new results claimed yet.
 
 ## Completed repair and independent evaluation
 

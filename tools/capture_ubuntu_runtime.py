@@ -16,8 +16,8 @@ def run(*args):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--study',choices=('guard','vote'),default='guard');args=p.parse_args()
-    study='A-guard-20261103-v2' if args.study=='vote' else 'A-guard-20261103-v1'
+    p=argparse.ArgumentParser();p.add_argument('--study',choices=('guard','vote','robust'),default='guard');args=p.parse_args()
+    study={'guard':'A-guard-20261103-v1','vote':'A-guard-20261103-v2','robust':'A-robust-20261103-v1'}[args.study]
     c = json.loads(run('docker', 'inspect', 'aiworker_pouring_4070'))[0]
     cid = c['Id']
     assert c['Config']['Labels']['owner'] == 'aiworker-pouring'
@@ -33,7 +33,8 @@ def main():
         'pour_guard_data.py', 'pour_stop_actor.py', 'pour_stop_models.py',
         'pour_stop_sequence.py', 'run_fountain.py', 'robot_pour.py', 'pour_recording.py',
         'bottle_pour.py', 'pour_fluid.py', 'pour_geometry.py', 'vessel_appearance.py')
-    if args.study=='vote':sources+=('pour_guard_vote_study.py',)
+    if args.study in ('vote','robust'):sources+=('pour_guard_vote_study.py',)
+    if args.study=='robust':sources+=('pour_robust_study.py',)
     result = dict(
         checked_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
         container=cid, owner='aiworker-pouring', limits=limits,

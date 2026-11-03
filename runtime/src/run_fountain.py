@@ -33,6 +33,7 @@ allowed_commands.add('release_train')
 allowed_commands.update(('stop_train','stop_val','stop_test'))
 allowed_commands.update(('guard_train','guard_val','guard_regression','guard_development','guard_test'))
 allowed_commands.update(('vote_development','vote_test'))
+allowed_commands.add('robust_test')
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -631,6 +632,11 @@ try:
                         except Exception:
                             state['learning_error']=traceback.format_exc();state['phase']='Visual-guard training failed'
                         continue
+                    elif cmd=='robust_test':
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before queuing robustness cases';continue
+                        from pour_robust_study import unstarted
+                        pending.extend(unstarted())
                     elif cmd in ('vote_development','vote_test'):
                         from pour_guard_vote_study import plan as vote_plan,ROOT as VOTE_ROOT
                         if not (VOTE_ROOT/'best.pt').exists():
