@@ -2,11 +2,18 @@
 import unittest
 from unittest.mock import patch
 import numpy as np
-from pour_guard_actor import Actor,monotone_return_path,topup_goal
+from pour_guard_actor import Actor,monotone_return_path,topup_goal,trim_expired
 from pour_guard_vision import project,plane_point,bottle_base_from_neck
 
 
 class GuardTests(unittest.TestCase):
+    def test_constant_visual_estimate_cannot_allow_endless_topup(self):
+        self.assertFalse(trim_expired(None,100.,.1))
+        self.assertFalse(trim_expired(8.,8.05,.1))
+        self.assertTrue(trim_expired(8.,8.1,.1))
+        # The total limit also brakes if rate-holding prevents reaching the cap.
+        self.assertTrue(trim_expired(7.2,8.1,.9))
+
     def test_under_target_already_above_old_trigger_can_top_up(self):
         self.assertGreater(topup_goal(.944,.96),.944)
         self.assertLessEqual(topup_goal(.944,.96),.965)

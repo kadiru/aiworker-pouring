@@ -33,6 +33,11 @@ def topup_goal(settled,target,increment=.015):
     return min(target+.005,settled+increment)
 
 
+def trim_expired(start,t,seconds):
+    # A biased or saturated visual estimate must never permit an endless pour.
+    return start is not None and t-start>=seconds-1e-7
+
+
 class Actor:
     def __init__(self,checkpoint):
         torch.set_num_threads(4);self.saved=torch.load(checkpoint,map_location='cuda',weights_only=False)
@@ -46,7 +51,7 @@ class Actor:
         self.qlift=None;self.lift_rotation=None;self.pour_phase=0.;self.peak_phase=0.;self.fill_mode='coarse'
         self.cup_xy=None;self.source_xy=None;self.filtered=None;self.level_history=[];self.empty_votes=0;self.lost_votes=0
         self.full_votes=0;self.pause_count=0;self.pause_start=None;self.brake_phase=None
-        self.trim_goal=None;self.trim_min_phase=None
+        self.trim_goal=None;self.trim_min_phase=None;self.trim_start=None;self.trim_entered=None
         self.outbound=[]
         self.grasp_check=None
 
@@ -168,21 +173,28 @@ class Actor:
                         elif not full and settled>=self.threshold['full_settled_target']:
                             if t-self.pause_start>2.5:self.latch('level_unconfirmed',t,robot)
                         elif not full and (stable or t-self.pause_start>1.6):
-                            if self.pause_count>=6:self.latch('fill_unconfirmed',t,robot)
+                            if self.pause_count>=self.threshold.get('max_pauses',3):self.latch('fill_unconfirmed',t,robot)
                             else:
                                 self.fill_mode='trim'
                                 self.trim_goal=topup_goal(settled,self.threshold['full_settled_target'],self.threshold.get('trim_increment',.015))
                                 self.trim_min_phase=max(95.,self.peak_phase-.5)
+                                self.trim_start=None
+                                self.trim_entered=t
                 else:
                     movement=self.saved['pour_primitive']
                     if self.fill_mode=='coarse':rate=movement['fast_rate_deg_s'] if self.pour_phase<82 else movement['slow_rate_deg_s']
                     else:rate=20. if self.pour_phase<self.peak_phase-2 else 2.
                     if self.filtered>.65 and flow*72.8>6.:rate=0.
                     self.pour_phase=min(movement['phase_cap_deg'],self.pour_phase+.05*rate)
+                    if self.fill_mode=='trim':
+                        self.pour_phase=min(95.,self.pour_phase)
+                        if self.pour_phase>=94.5 and self.trim_start is None:self.trim_start=t
                     self.peak_phase=max(self.peak_phase,self.pour_phase)
                     goal=self.threshold['coarse_brake_target'] if self.fill_mode=='coarse' else self.trim_goal
                     eligible=self.fill_mode=='coarse' or self.pour_phase>=self.trim_min_phase
-                    if eligible and self.filtered>.60 and self.filtered+flow*self.threshold['runoff_seconds']>=goal:
+                    timed_brake=self.fill_mode=='trim' and (trim_expired(self.trim_start,t,self.threshold.get('trim_seconds',.1)) or
+                        trim_expired(self.trim_entered,t,self.threshold.get('trim_total_seconds',.9)))
+                    if timed_brake or (eligible and self.filtered>.60 and self.filtered+flow*self.threshold['runoff_seconds']>=goal):
                         self.fill_mode='brake';self.pause_count+=1;self.full_votes=0
                 if self.terminal is not None:targets,phase=self.terminal.act(t)
                 else:

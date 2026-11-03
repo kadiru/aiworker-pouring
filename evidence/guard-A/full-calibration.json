@@ -1,18 +1,6 @@
 {
-  "parent_checkpoint_sha256": "9b57939c734ca135da1550b74e33680ca30090215c2f9ff87191e569999df8d9",
+  "parent_checkpoint_sha256": "49c03b26d5c7effc3cb09340868428340546f5fa3e1c18b577aba8e2d0c79a61",
   "before": {
-    "full_settled_target": 0.93,
-    "coarse_brake_target": 0.89,
-    "runoff_seconds": 0.25,
-    "empty_probability": 0.97,
-    "source_localization_score": 0.3437801837921143,
-    "cup_localization_score": 0.6314167022705078,
-    "source_present": 0.7,
-    "empty_votes": 12,
-    "settle_seconds": 0.7,
-    "max_attempts": 2
-  },
-  "after": {
     "full_settled_target": 0.96,
     "coarse_brake_target": 0.89,
     "runoff_seconds": 0.25,
@@ -25,9 +13,25 @@
     "max_attempts": 2,
     "trim_increment": 0.015
   },
-  "basis": "Consumed development grasp regression: no spill, final physical height.89203 vs CNN.94241. Six-point predicted-fill margin guards this observed five-point overestimate without changing the >=90% physical scoring goal. Relative trim increments prevent zero-addition pause loops.",
+  "after": {
+    "full_settled_target": 0.94,
+    "coarse_brake_target": 0.89,
+    "runoff_seconds": 0.25,
+    "empty_probability": 0.97,
+    "source_localization_score": 0.3437801837921143,
+    "cup_localization_score": 0.6314167022705078,
+    "source_present": 0.7,
+    "empty_votes": 12,
+    "settle_seconds": 1.2,
+    "max_attempts": 2,
+    "trim_increment": 0.005,
+    "trim_seconds": 0.1,
+    "trim_total_seconds": 0.9,
+    "max_pauses": 3
+  },
+  "basis": "Consumed overflow regression showed the .96 prediction target was unreachable: at physical height .971 the CNN was .944, and repeated trim overflowed. Use reachable .94 target after 1.2s settling; cap trim at95deg and .1s after reaching94.5deg, with at most two micro-topups. Physical >=90% scoring stays unchanged. All failed/aborted development retained.",
   "learned_weights_and_motor_paths_unchanged": true,
-  "calibration_source_sha256": "146b006b884e2bdf919b9cdc5812dcc2f1db1075b4a8d7e12bd468ec7281424d",
-  "selected_checkpoint_sha256": "49c03b26d5c7effc3cb09340868428340546f5fa3e1c18b577aba8e2d0c79a61",
+  "calibration_source_sha256": "e8bdef9194351ab33a0b20cadfd95552b0a4e735df8a87db4b1a5d45ffa25d36",
+  "selected_checkpoint_sha256": "f4ddb8b9f288ad2e5e8a9e6ac495f57a94c7413a0cdb4bbb040a89769bd36098",
   "cuda_initialized": false
 }
