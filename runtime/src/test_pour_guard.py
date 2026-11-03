@@ -46,7 +46,7 @@ class GuardTests(unittest.TestCase):
         a.saved['pour_primitive']={'grasp_closure':{'min_deficit_rad':np.radians(2.)}}
         class FK:
             def fk(self,q):return np.array([0.,0.,.044]),np.eye(3)
-        a.fk=FK();a.grasp_tcp=np.zeros(3);a.grasp_check=None
+        a.fk=FK();a.grasp_tcp=np.zeros(3);a.grasp_check=None;a.physical_votes=0;a.visual_votes=[]
         return a
 
     def test_visual_flicker_can_accumulate_with_continuous_physical_hold(self):
@@ -77,10 +77,13 @@ class GuardTests(unittest.TestCase):
             self.assertFalse(slow_empty_evidence(**dict(args,**change)),change)
 
     def test_static_bottle_cannot_enable_pouring(self):
-        a=self.actor_for_confirmation()
-        with patch('pour_guard_actor.locate',return_value=(np.array([150.,135.]),.99)):
-            for i in range(8):a.grasp_action(np.zeros((4,4,3)),np.zeros(11),i*.05,i*.05)
-        self.assertFalse(a.grasp_confirmed);self.assertEqual(a.confirm_votes,0)
+        for window in (0,12):
+            with self.subTest(window=window):
+                a=self.actor_for_confirmation();a.threshold['grasp_visual_window']=window
+                q=np.zeros(11);q[7:]=np.radians(38.)
+                with patch('pour_guard_actor.locate',return_value=(np.array([150.,135.]),.99)):
+                    for i in range(8):a.grasp_action(np.zeros((4,4,3)),q,i*.05,i*.05)
+                self.assertFalse(a.grasp_confirmed);self.assertEqual(a.confirm_votes,0)
 
     def test_visual_lift_requires_persistent_confirmation(self):
         a=self.actor_for_confirmation()
@@ -92,19 +95,28 @@ class GuardTests(unittest.TestCase):
         self.assertTrue(a.grasp_confirmed)
 
     def test_fully_closed_empty_gripper_cannot_confirm(self):
-        a=self.actor_for_confirmation();q=np.zeros(11);q[7:]=np.pi/4
+        for window in (0,12):
+            with self.subTest(window=window):
+                a=self.actor_for_confirmation();a.threshold['grasp_visual_window']=window;q=np.zeros(11);q[7:]=np.pi/4
+                with patch('pour_guard_actor.locate',return_value=(np.array([150.,70.]),.99)):
+                    for i in range(8):a.grasp_action(np.zeros((4,4,3)),q,i*.05,i*.05)
+                self.assertFalse(a.grasp_confirmed)
+
+    def test_one_finger_obstruction_cannot_confirm(self):
+        a=self.actor_for_confirmation();a.threshold['grasp_visual_window']=12;q=np.zeros(11);q[7:]=np.radians(38.);q[9]=np.pi/4
         with patch('pour_guard_actor.locate',return_value=(np.array([150.,70.]),.99)):
             for i in range(8):a.grasp_action(np.zeros((4,4,3)),q,i*.05,i*.05)
         self.assertFalse(a.grasp_confirmed)
 
     def test_stalled_arm_cannot_confirm(self):
-        a=self.actor_for_confirmation();q=np.zeros(11);q[7:]=np.radians(38.)
         class FK:
             def fk(self,q):return np.array([0.,0.,.01]),np.eye(3)
-        a.fk=FK()
-        with patch('pour_guard_actor.locate',return_value=(np.array([150.,70.]),.99)):
-            for i in range(8):a.grasp_action(np.zeros((4,4,3)),q,i*.05,i*.05)
-        self.assertFalse(a.grasp_confirmed)
+        for window in (0,12):
+            with self.subTest(window=window):
+                a=self.actor_for_confirmation();a.threshold['grasp_visual_window']=window;q=np.zeros(11);q[7:]=np.radians(38.);a.fk=FK()
+                with patch('pour_guard_actor.locate',return_value=(np.array([150.,70.]),.99)):
+                    for i in range(8):a.grasp_action(np.zeros((4,4,3)),q,i*.05,i*.05)
+                self.assertFalse(a.grasp_confirmed)
 
 
 if __name__=='__main__':unittest.main()

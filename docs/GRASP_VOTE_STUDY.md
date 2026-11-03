@@ -1,4 +1,4 @@
-# Transparent-neck grasp confirmation
+# Grasp and empty confirmation
 
 Implemented follow-up to the completed, frozen `A-guard-20261103-v1` evaluation. The entire earlier six-test block finished and was archived before these controller changes.
 
@@ -18,4 +18,4 @@ On the consumed missed-empty trace, the calibrated branch would trigger at12.305
 
 Selected checkpoint SHA256: `b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b`. Plan SHA256: `05a0bec06cf0b54b1ce110e61e0fd44617ea2bcb6e4f756d9235da0d6b52ec2a`. Cup/source tensors and motor paths were verified bitwise identical to the trained parent; this follow-up is controller calibration, not another neural fit. The earlier cup-model retraining used the4070. CPU calibration/audits initialize no CUDA context. [Calibration](../evidence/guard-B/vote-calibration.json).
 
-Status: three native regressions running; no new six-case outcome is claimed yet. Thirteen grasp/stop CPU regressions plus the existing19trial-log/GPU-guard checks pass. All lifecycle operations remain confined to the guarded4070 container with existing CPU/RAM limits.
+All three native regression tasks passed with zero spill and completed return/release. The full control finished at90.97%rim height; both short bottles ended with source0. Legacy score2/3. Fourteen grasp/stop CPU regressions plus the existing19trial-log/GPU-guard checks pass. No new six-case outcome is claimed yet. The `guard-B` artifact folder denotes this second repair round; both vessels still use material A. All lifecycle operations remain confined to the guarded4070 container with existing CPU/RAM limits.
