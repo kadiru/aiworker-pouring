@@ -1,0 +1,93 @@
+{
+  "checked_utc": "2026-11-03T00:23:33.002561+00:00",
+  "container": "1a6beecd207c817c25e030b0cb5f82f362fd0f913758f89a937de696c2b73f10",
+  "owner": "aiworker-pouring",
+  "running": true,
+  "limits": {
+    "NanoCpus": 4000000000,
+    "CpuShares": 256,
+    "CpusetCpus": "16-23",
+    "Memory": 17179869184,
+    "MemorySwap": 17179869184,
+    "DeviceRequests": [
+      {
+        "Driver": "",
+        "Count": 0,
+        "DeviceIDs": [
+          "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+        ],
+        "Capabilities": [
+          [
+            "gpu"
+          ]
+        ],
+        "Options": {}
+      }
+    ]
+  },
+  "guard_processes": [
+    "566175 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 1a6beecd207c817c25e030b0cb5f82f362fd0f913758f89a937de696c2b73f10"
+  ],
+  "owned_processes": "PID                 NI                  COMMAND\n566106              10                  /bin/bash /isaac-sim/python.sh -u /workspace/src/run_fountain.py --allow-root\n566174              10                  /isaac-sim/kit/python/bin/python3 -u /workspace/src/run_fountain.py --allow-root",
+  "gpus": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, NVIDIA GeForce RTX 4090, 72 %, 1335 MiB, 24564 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, NVIDIA GeForce RTX 4070, 28 %, 3618 MiB, 12282 MiB",
+  "gpu_compute_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 660976, 1310 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 566174, 3400 MiB",
+  "health": {
+    "phase": "Trial finished with failed checks",
+    "trial": "BC_A_test_05",
+    "sim_time": 32.0,
+    "queue": [],
+    "recording": {
+      "active": false,
+      "path": "/workspace/outputs/fountain/20261102T232206Z/131-BC_A_test_05-371104/episode.hdf5",
+      "cameras": [
+        "task",
+        "wrist"
+      ],
+      "resolution": [
+        384,
+        384
+      ],
+      "control_hz": 20,
+      "frames": 639
+    },
+    "error": null,
+    "learning_error": null
+  },
+  "completed_reserved_tests": 6,
+  "source_sha256": {
+    "fountain_plan.py": "c47178804253cd245e95f82e8f198d7b953416066aa20a266919d046c86dd910",
+    "check_cloudxr_signaling.py": "9b6f863ed4f0652a52a4d4ddd551a84a013c864f49ec8ab93cff2f813edc179a",
+    "validate_quest_runtime.py": "852553022eb7a7c8d503b6badf52a7009818c97d47c220d7cb83cd670b4bf2ae",
+    "run_aiworker.py": "ca2bb5694d1be1b553029fcd9fc8a1196feafefe67bcb7c4662413f7fb03737a",
+    "inspect_robot.py": "4e75fe6c4edc5f64a66c0178b8383c2554c4a5eb59e6f9e780dbe70d4082a36d",
+    "test_fountain_metrics.py": "7abcfd0b1d031bf0d5c175e385336819890e6b3fb3ba89fb84519553d80fedb8",
+    "test_quest_retargeter.py": "13b88866b3fc45e201f0229681f97f5b5c1b2fa2213667ec712cc6c40f8e1abf",
+    "pour_study.py": "ece5385f042c24f3c85adbbd7e11ccc5129fd1ac0e23d481123e97270b423b29",
+    "test_fountain_hinge.py": "b121d05ecd0d3d3f37719019e56ba2c567ae815469d14f30dab4a9c7c8d7ee46",
+    "study_audit.py": "da6408de4435ffb68b01602ba3ae0c039e63fedfc21bc5962b1967111fb112b9",
+    "run_quest.py": "a5f193b20ea6729d46e2ce995394563b0d6ee0625d0c788a4032ee0cb747c43c",
+    "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
+    "pour_learning.py": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a",
+    "study_report.py": "ab06c113a3d1c4ac1894961c0fc533e4628f1f98e3c07eee036e6a578aeedbcf",
+    "validate_cup_water.py": "a1045e018cf0490dcad5998569ba37d9cf06b8269fc454f86efee321c41d3167",
+    "export_pour_video.py": "a36638a9baee6c678be8f51dd8e0d3086b2c4892a54b3037537047700b19be8a",
+    "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
+    "fountain_metrics.py": "175f411dedf32f5317d81e3653d56b0bb14afd92d4b7deb5e2a6c8c866c183a1",
+    "fountain_hinge_report.py": "8260f2587c816f1ccf7a6ff691ca90b6b97dcfdd805291bc525bb14c9320ff10",
+    "fountain_hinge.py": "719a35b2c345d452c26c5b05e5165a29eba4961161bcdfcdc007407584cc5267",
+    "validate_quest_evidence.py": "046c3db71c3ee2f026b03e75d29489797bea15a4e927baaddd17391089bdb957",
+    "quest_preview.py": "1329dec07115ef76f56f45dd882cf0ec761f836f42e342937816278e21bb4f21",
+    "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
+    "pour_perturbations.py": "3d8b4bc37b87a8c85cb4a433e29ab6ac3c7dd32adf86ba89682974c25e81f515",
+    "robot_pour.py": "e9bb6d243fdfc1e82cfff96b44d2e6a1e52ccc9a4cab00116362cf44224ace67",
+    "validate_pour_recording.py": "056c4818782666a07ebca30f020c63174fe7ea0792fe96d4c12a70194ad0a48a",
+    "launch_cloudxr.py": "0a8efc54f2dcde644f43ff20096a0f82bca35552e3261893d755e2185806cedb",
+    "pour_recording.py": "c98667379f7f784ec33d14a1267f81fcec78126f91b26b868c79c963bc3f0c2f",
+    "fountain_surface_report.py": "54d1b50f8cb5bedb719c846026420f657f2bbe77a727bfd306700f3f0520c1ad",
+    "bottle_pour.py": "d754ccec38627c9b4d17f554e6e0e9a24a171578367788bc657c3ca002cb1f25",
+    "validate_five_liquids.py": "8227df6b0bd4a9a9c4e27474e47176423e706488cd915ed4e94c9a63c9201e51",
+    "fountain_report.py": "f9bc142104e74d065d4ad5a28c7ac03a23fe8fadab45066b0c24e842c8f15393",
+    "validate_quest_recording.py": "ca18eb4db27cc73a4221b6703d062b74d45fb2ece700f21a5bfd41c7425a3d9c",
+    "run_fountain.py": "da9f435e0ab901ed7124cc6f1dbbb191b490cedc9f9f38c97e62431c5722fd36"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "checked_utc": "2026-11-03T10:18:20.383117+00:00",
+  "container": "eddff8172b2c63c14709a455183b39f969e77ab9cc31fe39997fd877703d1cf4",
+  "owner": "aiworker-pouring",
+  "limits": {
+    "NanoCpus": 4000000000,
+    "CpuShares": 256,
+    "CpusetCpus": "16-23",
+    "Memory": 17179869184,
+    "MemorySwap": 17179869184,
+    "DeviceRequests": [
+      {
+        "Driver": "",
+        "Count": 0,
+        "DeviceIDs": [
+          "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+        ],
+        "Capabilities": [
+          [
+            "gpu"
+          ]
+        ],
+        "Options": {}
+      }
+    ]
+  },
+  "guard_processes": [
+    "1423783 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py eddff8172b2c63c14709a455183b39f969e77ab9cc31fe39997fd877703d1cf4"
+  ],
+  "owned_processes": "PID                 NI                  COMMAND\n1423715             10                  /bin/bash /isaac-sim/python.sh -u /workspace/src/run_fountain.py --allow-root\n1423782             10                  /isaac-sim/kit/python/bin/python3 -u /workspace/src/run_fountain.py --allow-root\n",
+  "gpu_compute_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 1383190, 992 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 1423782, 4612 MiB\n",
+  "selected_checkpoint_sha256": "b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35",
+  "health": {
+    "run": "20261103T095357Z",
+    "phase": "Visual hierarchy: Grasping and lifting",
+    "sim_time": 1.5,
+    "queue": [
+      "S_A_test_01",
+      "S_A_test_02",
+      "S_A_test_03",
+      "S_A_test_04",
+      "S_A_test_05"
+    ],
+    "recording": {
+      "active": true,
+      "path": "/workspace/outputs/fountain/20261103T095357Z/156-S_A_test_00-60199/episode.partial.hdf5",
+      "cameras": [
+        "task",
+        "wrist"
+      ],
+      "resolution": [
+        384,
+        384
+      ],
+      "control_hz": 20,
+      "frames": 29
+    },
+    "error": null,
+    "learning_error": null
+  }
+}

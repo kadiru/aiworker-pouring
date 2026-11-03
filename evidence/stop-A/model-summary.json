@@ -1,0 +1,849 @@
+{
+  "model_version": "visual_stop_hierarchy_v9",
+  "method": "Hierarchical supervised imitation: image-only liquid estimation, contextual ridge-regression pouring primitive, demonstration-derived terminal primitive",
+  "training_device": {
+    "name": "NVIDIA GeForce RTX 4070",
+    "visible_cuda_devices": 1
+  },
+  "inputs": [
+    "task RGB",
+    "wrist RGB",
+    "measured joint positions/velocities",
+    "own motion history and latched stop"
+  ],
+  "step": 1600,
+  "detector_step": 100,
+  "detector_validation": {
+    "cup_mae_fraction": 0.0689409077167511,
+    "cup_excluded_label_frames": 623,
+    "cup_valid_frames": 2178,
+    "fullness_label": "surface height / rim height",
+    "cup_bias_correction": 0.024736404418945312,
+    "early_full_false_positives": 5,
+    "low_fill_frames": 2049,
+    "source_mae_nominal_ml": 32.011474609375,
+    "empty_bce": 0.21691042184829712,
+    "empty_balanced_bce": 0.1903575360774994,
+    "presence_bce": 0.12702874839305878,
+    "empty_operating_point": {
+      "threshold": 0.97,
+      "true_positive": 18,
+      "false_positive": 29,
+      "positives": 42,
+      "gated_true_positive": 1,
+      "gated_false_positive": 0,
+      "gated_positives": 1
+    },
+    "empty_threshold_sweep": [
+      {
+        "threshold": 0.1,
+        "true_positive": 42,
+        "false_positive": 493,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.2,
+        "true_positive": 42,
+        "false_positive": 354,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.3,
+        "true_positive": 42,
+        "false_positive": 217,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.4,
+        "true_positive": 41,
+        "false_positive": 152,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.5,
+        "true_positive": 40,
+        "false_positive": 120,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.6,
+        "true_positive": 36,
+        "false_positive": 97,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.7,
+        "true_positive": 35,
+        "false_positive": 79,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.8,
+        "true_positive": 33,
+        "false_positive": 58,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.9,
+        "true_positive": 28,
+        "false_positive": 46,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.95,
+        "true_positive": 20,
+        "false_positive": 36,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 1,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.97,
+        "true_positive": 18,
+        "false_positive": 29,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 0,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.98,
+        "true_positive": 16,
+        "false_positive": 26,
+        "positives": 42,
+        "gated_true_positive": 1,
+        "gated_false_positive": 0,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.99,
+        "true_positive": 6,
+        "false_positive": 22,
+        "positives": 42,
+        "gated_true_positive": 0,
+        "gated_false_positive": 0,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.995,
+        "true_positive": 0,
+        "false_positive": 14,
+        "positives": 42,
+        "gated_true_positive": 0,
+        "gated_false_positive": 0,
+        "gated_positives": 1
+      },
+      {
+        "threshold": 0.999,
+        "true_positive": 0,
+        "false_positive": 0,
+        "positives": 42,
+        "gated_true_positive": 0,
+        "gated_false_positive": 0,
+        "gated_positives": 1
+      }
+    ],
+    "empty_calibration_note": "Tilt/low-flow active-pour proxy gate; very few gated positive validation frames. Native rollouts remain required.",
+    "train_frames": 4663,
+    "validation_frames": 2801,
+    "selected_detector_step": 100,
+    "selected_source_step": 1300
+  },
+  "thresholds": {
+    "cup_bias": 0.024736404418945312,
+    "empty_probability": 0.97,
+    "full_floor": 0.8,
+    "full_future_target": 0.91,
+    "source_present": 0.7
+  },
+  "baseline_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+  "scene_plan_sha256": "a0f6acc52235335719db34ada7a4979596ff2fdbd2eb05f816abeabbb64d69e5",
+  "sources": {
+    "pour_stop_train.py": "a3a586634a45f8f0c3758a31fd6ed7c262621f060ce504ae4c46bbaf3f4147ad",
+    "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
+    "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
+    "pour_stop_sequence.py": "886832a6593cf0c8a084013d14f5e608bcfa49c8d7864fa7b4b239847ca7395b",
+    "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
+    "pour_stop_trajectory.py": "466cfecfba919183a047639f3a80b29230a2a77b38704cdf395113f11e83aef5"
+  },
+  "perception_manifest_sha256": "91016fae7a9c812a9043057935b59badced938e43721d91c6eec04a45b5d3885",
+  "motion_manifest_sha256": "d7942f54de7e7d626565a63fc76c138f0a24326f5b6998d1fbecc5d2b059932a",
+  "perception_correction_sha256": "af397ae80bb881f49269cb77f952a79a940778cb3b2d62f34c8662800b7329db",
+  "perception_label_quality_sha256": "70d300b1c4e4f517cb0a9272bf47f689e7cc651a8c655a20584d59f1c25f14be",
+  "component_selection": {
+    "candidates": [
+      {
+        "path": "/workspace/learning/A-stop-20261103-v1/detector-source-best.pt",
+        "sha256": "885dc65db7d818b05e1d5b7546f890e804a82f4e4a82e72952b1fd1c2536a67c",
+        "step": 1700,
+        "sweep": [
+          {
+            "threshold": 0.1,
+            "true_positive": 42,
+            "false_positive": 480,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.2,
+            "true_positive": 42,
+            "false_positive": 353,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.3,
+            "true_positive": 42,
+            "false_positive": 258,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.4,
+            "true_positive": 42,
+            "false_positive": 194,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.5,
+            "true_positive": 42,
+            "false_positive": 162,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.6,
+            "true_positive": 41,
+            "false_positive": 140,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.7,
+            "true_positive": 34,
+            "false_positive": 110,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.8,
+            "true_positive": 28,
+            "false_positive": 82,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.9,
+            "true_positive": 22,
+            "false_positive": 56,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.95,
+            "true_positive": 17,
+            "false_positive": 45,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.97,
+            "true_positive": 15,
+            "false_positive": 31,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.98,
+            "true_positive": 15,
+            "false_positive": 24,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.99,
+            "true_positive": 8,
+            "false_positive": 17,
+            "positives": 42,
+            "gated_true_positive": 0,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.995,
+            "true_positive": 2,
+            "false_positive": 1,
+            "positives": 42,
+            "gated_true_positive": 0,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.999,
+            "true_positive": 0,
+            "false_positive": 0,
+            "positives": 42,
+            "gated_true_positive": 0,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          }
+        ],
+        "operating_point": null
+      },
+      {
+        "path": "/workspace/learning/A-stop-20261103-v1/surface-fit-before-label-mask/detector-source-best.pt",
+        "sha256": "0591ec57116ca657d29e40d03b61642ed154c1ef249c9782e30451d226168010",
+        "step": 1300,
+        "sweep": [
+          {
+            "threshold": 0.1,
+            "true_positive": 42,
+            "false_positive": 493,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.2,
+            "true_positive": 42,
+            "false_positive": 354,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.3,
+            "true_positive": 42,
+            "false_positive": 217,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.4,
+            "true_positive": 41,
+            "false_positive": 152,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.5,
+            "true_positive": 40,
+            "false_positive": 120,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.6,
+            "true_positive": 36,
+            "false_positive": 97,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.7,
+            "true_positive": 35,
+            "false_positive": 79,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.8,
+            "true_positive": 33,
+            "false_positive": 58,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.9,
+            "true_positive": 28,
+            "false_positive": 46,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.95,
+            "true_positive": 20,
+            "false_positive": 36,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 1,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.97,
+            "true_positive": 18,
+            "false_positive": 29,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.98,
+            "true_positive": 16,
+            "false_positive": 26,
+            "positives": 42,
+            "gated_true_positive": 1,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.99,
+            "true_positive": 6,
+            "false_positive": 22,
+            "positives": 42,
+            "gated_true_positive": 0,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.995,
+            "true_positive": 0,
+            "false_positive": 14,
+            "positives": 42,
+            "gated_true_positive": 0,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          },
+          {
+            "threshold": 0.999,
+            "true_positive": 0,
+            "false_positive": 0,
+            "positives": 42,
+            "gated_true_positive": 0,
+            "gated_false_positive": 0,
+            "gated_positives": 1
+          }
+        ],
+        "operating_point": {
+          "threshold": 0.97,
+          "true_positive": 18,
+          "false_positive": 29,
+          "positives": 42,
+          "gated_true_positive": 1,
+          "gated_false_positive": 0,
+          "gated_positives": 1
+        }
+      }
+    ],
+    "selected_source": "/workspace/learning/A-stop-20261103-v1/surface-fit-before-label-mask/detector-source-best.pt",
+    "method": "Independent visual-head validation selection before any fresh native cases",
+    "caveat": "Only one gated positive frame. Motor readout retained after source-head late fusion; native validation required.",
+    "selection_source_sha256": "ebc1665f9ffaf872d2b30de017096dca45f9bb2a17b6056456bbbd97bf0e727d"
+  },
+  "full_lead_calibration": {
+    "previous_checkpoint_sha256": "07e07c3cefbd19441d40a739e4ef336f5fb1b843b78fa5391225f8a614c04092",
+    "full_floor_before": 0.78,
+    "full_floor_after": 0.8,
+    "method": "pre-test bracketed calibration",
+    "lower": {
+      "floor": 0.78,
+      "final_surface": 0.8810964934966132,
+      "outside_nominal_ml": 0.0
+    },
+    "upper": {
+      "floor": 0.82,
+      "final_surface": 0.9545285042594448,
+      "outside_nominal_ml": 0.02916
+    },
+    "basis": "Midpoint of consumed native underfill/overflow bracket. Scoring and all weights, trajectories, empty settings and frozen scenes remain unchanged.",
+    "prior_calibration": {
+      "previous_checkpoint_sha256": "45163fb4492148d19f555e96c84d71e48c64bf812ec7a7969ab791550faffe2e",
+      "full_floor_before": 0.82,
+      "full_floor_after": 0.78,
+      "basis": "Consumed V9 validation00: actual surface92.13% at stop, five particles escaped during return near98.27% surface. Existing forecast was blocked by the .82 floor. .78 admits approximately .15s more lead in that saved decision trace.",
+      "unchanged": "all learned weights, future target .91, primary and legacy scoring, empty detector/persistence, motion primitives, physics, frozen scenes",
+      "calibration_source_sha256": "6130a22529b4a2049ee9771d6738284a5385d87da1384aea330688e0a1c32bc1"
+    }
+  },
+  "no_privileged_runtime_inputs": true,
+  "checkpoint_sha256": "b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35",
+  "parameter_counts": {
+    "baseline": 337240,
+    "liquid_detector": 152589,
+    "archived_unused_pour_increment": 37383
+  },
+  "pour_primitive": {
+    "method": "Contextual joint-space movement primitive; per-phase CUDA ridge regression",
+    "regularizer": 0.1,
+    "regularizer_validation": [
+      {
+        "regularizer": 0.1,
+        "mse": 0.00014672741121514403,
+        "rmse_deg": [
+          0.9356288373742214,
+          0.4670716105403169,
+          1.0254601351712611,
+          0.44432470569570237,
+          0.653110016858345,
+          0.5824119108630723,
+          0.5132614043088916
+        ]
+      },
+      {
+        "regularizer": 1.0,
+        "mse": 0.00014753256409317687,
+        "rmse_deg": [
+          0.935688177128799,
+          0.47109202917367815,
+          1.0395148679289736,
+          0.4398064068583324,
+          0.6555152335888232,
+          0.5788380240193705,
+          0.5040151656685478
+        ]
+      },
+      {
+        "regularizer": 10.0,
+        "mse": 0.00015182710082072123,
+        "rmse_deg": [
+          0.9116609707802124,
+          0.48882209669932836,
+          1.1202940316416972,
+          0.41333502079290413,
+          0.6753243147030012,
+          0.5625552842500129,
+          0.469493442200146
+        ]
+      },
+      {
+        "regularizer": 100.0,
+        "mse": 0.0001690434325790177,
+        "rmse_deg": [
+          0.8811903069437033,
+          0.5248519936847466,
+          1.2629862236651577,
+          0.396799656853147,
+          0.7573837318992983,
+          0.5424732622472461,
+          0.460543677098329
+        ]
+      }
+    ],
+    "mean": [
+      0.3506975471973419,
+      -0.1847618818283081,
+      -0.013725170865654945,
+      -2.047750473022461,
+      -0.17996440827846527,
+      0.12513630092144012,
+      -0.07312105596065521
+    ],
+    "std": [
+      0.02324884757399559,
+      0.019999999552965164,
+      0.020977744832634926,
+      0.019999999552965164,
+      0.019999999552965164,
+      0.019999999552965164,
+      0.019999999552965164
+    ],
+    "support": [
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      16,
+      16,
+      15,
+      14,
+      14,
+      12,
+      12,
+      12,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      8,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "fast_rate_deg_s": 29.99999999999531,
+    "slow_rate_deg_s": 10.00000000000199,
+    "phase_cap_deg": 131.0,
+    "train_episodes": [
+      "A_train_01",
+      "A_train_02",
+      "A_train_03",
+      "A_train_04",
+      "A_train_05",
+      "A_train_06",
+      "A_train_07",
+      "A_train_08",
+      "A_train_09",
+      "A_train_10",
+      "A_train_11",
+      "A_train_12",
+      "A_train_13",
+      "A_train_14",
+      "A_train_15",
+      "A_train_20",
+      "A_train_21",
+      "A_train_22",
+      "A_train_23"
+    ],
+    "validation_episodes": [
+      "A_validation_16",
+      "A_validation_17",
+      "A_validation_18",
+      "A_validation_19"
+    ],
+    "validation_target_rmse_deg": [
+      0.9356288373742214,
+      0.4670716105403169,
+      1.0254601351712611,
+      0.44432470569570237,
+      0.653110016858345,
+      0.5824119108630723,
+      0.5132614043088916
+    ],
+    "runtime_inputs": "own measured lift joints, own scalar phase; visual flow only advances/holds phase",
+    "training_device": "NVIDIA GeForce RTX 4070"
+  },
+  "supervised_pour_steps": {
+    "train": 3500,
+    "validation": 817
+  },
+  "label_quality": {
+    "train": {
+      "total": 4541,
+      "admitted_reference_frames": 2320,
+      "cup_supervised_frames": 4200,
+      "unobservable_raw_frames": 38,
+      "excluded_unreliable_cup_labels": 315,
+      "source_calibration_gate": "GT tilt>=95 degrees, outflow<3 nominal mL/s, active expert pour; offline proxy for runtime proprio/visual gating"
+    },
+    "validation": {
+      "total": 2801,
+      "admitted_reference_frames": 514,
+      "cup_supervised_frames": 2178,
+      "unobservable_raw_frames": 182,
+      "excluded_unreliable_cup_labels": 450,
+      "source_calibration_gate": "GT tilt>=95 degrees, outflow<3 nominal mL/s, active expert pour; offline proxy for runtime proprio/visual gating"
+    }
+  },
+  "corrective_perception": {
+    "frames": 122,
+    "source": "consumed S_A_validation_00 only",
+    "purpose": "low-cup splash hard negatives; source labels masked; actions unused; six tests excluded"
+  },
+  "method_note": "Supervised visual estimation plus imitation through contextual movement primitives. A programmed irreversible state machine joins the stages. Not end-to-end RL. The prior increment head is retained but inactive when pour_primitive is present.",
+  "cuda_initialized_by_audit": false
+}

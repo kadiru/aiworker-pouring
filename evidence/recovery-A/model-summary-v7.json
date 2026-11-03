@@ -1,0 +1,40 @@
+{
+  "model_version": "release_head_bc_v7",
+  "step": 400,
+  "seed": 20261110,
+  "inputs": [
+    "task RGB",
+    "wrist RGB",
+    "joint position",
+    "joint velocity"
+  ],
+  "train_episodes": 28,
+  "validation_episodes": 5,
+  "full_training_episodes": 19,
+  "corrective_prefixes": 6,
+  "recovery_episodes": 3,
+  "training_device": {
+    "name": "NVIDIA GeForce RTX 4070",
+    "visible_cuda_devices": 1
+  },
+  "full_sequence": true,
+  "expert_prefix_masked": true,
+  "warm_start_checkpoint_sha256": "31eb87ec353c51259b2da79c49a743fe436ee08daa0dbfe6b68cfebd333caeb2",
+  "policy_source_sha256": "3e377bd8f53bdac6498a81de3678a66b5aeb377c7fca4a959f4fc38acd1bd44c",
+  "data_loader_source_sha256": "4a4a816a1a025d9db5cebee7dc1465a596720fabafc344cd6cf51890e35ae547",
+  "actor_source_sha256": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a",
+  "dataset_manifest_sha256": "7494f58c93241ddb1a062ed956ddd6323d13db9f5c9dad8ea4f37b457a618a51",
+  "scene_plan_sha256": "1411c293eb1754e2000106ae6b2060b162f050c9454cc68cdfa78b1050b32555",
+  "trainable_parameters": 2150,
+  "shared_v6_parameters_bitwise_unchanged": true,
+  "release_frame_loss_weight": 12.0,
+  "validation_weighted_grip_bce": 0.0438082180917263,
+  "validation_release_bce": 0.06480447947978973,
+  "initial_validation_weighted_grip_bce": 0.04480987787246704,
+  "initial_validation": {
+    "grip_bce": 0.026730842888355255,
+    "release_bce": 0.06680750101804733
+  },
+  "selection": "Lowest validation release-weighted gripper BCE; all non-gripper weights frozen",
+  "checkpoint_sha256": "14b35969cdefd797997a81a350cb1c529b9be12e549bb5f9d6fa095ca5b02c8a"
+}

@@ -1,0 +1,111 @@
+{
+  "frozen_utc": "2026-11-03T10:17:45.315667+00:00",
+  "selected_checkpoint_sha256": "b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35",
+  "scene_plan_sha256": "a0f6acc52235335719db34ada7a4979596ff2fdbd2eb05f816abeabbb64d69e5",
+  "development_attempts": [
+    {
+      "name": "S_A_validation_00",
+      "path": "/workspace/outputs/fountain/20261103T093924Z/150-S_A_validation_00-832439",
+      "checkpoint_sha256": "1a75210aa0232e31e3e21eb540460a3e81526bcd43ac81ccfc90cd4f00fe4927",
+      "surface_goal_success": false,
+      "legacy_success": false,
+      "final_outside_ml": 13.203648,
+      "source_remaining_ml": 79.02359999999999,
+      "cup_surface_fraction": 0.19609810745014755,
+      "policy_completed": true
+    },
+    {
+      "name": "S_A_validation_01",
+      "path": "/workspace/outputs/fountain/20261103T093924Z/151-S_A_validation_01-878553",
+      "checkpoint_sha256": "1a75210aa0232e31e3e21eb540460a3e81526bcd43ac81ccfc90cd4f00fe4927",
+      "surface_goal_success": false,
+      "legacy_success": false,
+      "final_outside_ml": 0.06998399999999999,
+      "source_remaining_ml": 0.41990399999999994,
+      "cup_surface_fraction": 0.6073124275488002,
+      "policy_completed": true
+    },
+    {
+      "name": "S_A_validation_00",
+      "path": "/workspace/outputs/fountain/20261103T095357Z/152-S_A_validation_00-101246",
+      "checkpoint_sha256": "45163fb4492148d19f555e96c84d71e48c64bf812ec7a7969ab791550faffe2e",
+      "surface_goal_success": false,
+      "legacy_success": false,
+      "final_outside_ml": 0.02916,
+      "source_remaining_ml": 35.126135999999995,
+      "cup_surface_fraction": 0.9545285042594448,
+      "policy_completed": true
+    },
+    {
+      "name": "S_A_validation_01",
+      "path": "/workspace/outputs/fountain/20261103T095357Z/153-S_A_validation_01-18683",
+      "checkpoint_sha256": "45163fb4492148d19f555e96c84d71e48c64bf812ec7a7969ab791550faffe2e",
+      "surface_goal_success": true,
+      "legacy_success": true,
+      "final_outside_ml": 0.0,
+      "source_remaining_ml": 0.0,
+      "cup_surface_fraction": 0.6145774623926936,
+      "policy_completed": true
+    },
+    {
+      "name": "replay_S_A_validation_00",
+      "path": "/workspace/outputs/fountain/20261103T095357Z/154-replay_S_A_validation_00-631257",
+      "checkpoint_sha256": "07e07c3cefbd19441d40a739e4ef336f5fb1b843b78fa5391225f8a614c04092",
+      "surface_goal_success": false,
+      "legacy_success": false,
+      "final_outside_ml": 0.0,
+      "source_remaining_ml": 41.541335999999994,
+      "cup_surface_fraction": 0.8810964934966132,
+      "policy_completed": true
+    },
+    {
+      "name": "replay_S_A_validation_00",
+      "path": "/workspace/outputs/fountain/20261103T095357Z/155-replay_S_A_validation_00-81304",
+      "checkpoint_sha256": "b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35",
+      "surface_goal_success": true,
+      "legacy_success": false,
+      "final_outside_ml": 0.0,
+      "source_remaining_ml": 37.896336,
+      "cup_surface_fraction": 0.927386354698853,
+      "policy_completed": true
+    }
+  ],
+  "selection_reason": "V9 replaces drift-prone pour increments, completes an empty-source zero-spill development task, and uses a native-calibrated anticipatory full stop; all prior failures retained.",
+  "caveat": "Empty-source development used the preceding identical-weights policy with full-floor.82; pre-test calibration changes only full-stop lead. Exact-final-checkpoint full replay is listed above.",
+  "full_lead_calibration": {
+    "previous_checkpoint_sha256": "07e07c3cefbd19441d40a739e4ef336f5fb1b843b78fa5391225f8a614c04092",
+    "full_floor_before": 0.78,
+    "full_floor_after": 0.8,
+    "method": "pre-test bracketed calibration",
+    "lower": {
+      "floor": 0.78,
+      "final_surface": 0.8810964934966132,
+      "outside_nominal_ml": 0.0
+    },
+    "upper": {
+      "floor": 0.82,
+      "final_surface": 0.9545285042594448,
+      "outside_nominal_ml": 0.02916
+    },
+    "basis": "Midpoint of consumed native underfill/overflow bracket. Scoring and all weights, trajectories, empty settings and frozen scenes remain unchanged.",
+    "prior_calibration": {
+      "previous_checkpoint_sha256": "45163fb4492148d19f555e96c84d71e48c64bf812ec7a7969ab791550faffe2e",
+      "full_floor_before": 0.82,
+      "full_floor_after": 0.78,
+      "basis": "Consumed V9 validation00: actual surface92.13% at stop, five particles escaped during return near98.27% surface. Existing forecast was blocked by the .82 floor. .78 admits approximately .15s more lead in that saved decision trace.",
+      "unchanged": "all learned weights, future target .91, primary and legacy scoring, empty detector/persistence, motion primitives, physics, frozen scenes",
+      "calibration_source_sha256": "6130a22529b4a2049ee9771d6738284a5385d87da1384aea330688e0a1c32bc1"
+    },
+    "selected_checkpoint_sha256": "b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35",
+    "cuda_initialized": false
+  },
+  "test_policy": "Run all six frozen cases once. No further model, configuration, actor or physics changes during the block. Report every outcome under both surface-height and original nominal-inventory scoring.",
+  "expected_test_names": [
+    "S_A_test_00",
+    "S_A_test_01",
+    "S_A_test_02",
+    "S_A_test_03",
+    "S_A_test_04",
+    "S_A_test_05"
+  ]
+}

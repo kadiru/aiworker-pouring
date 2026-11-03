@@ -1,0 +1,148 @@
+{
+  "selected_checkpoint": "best-bc-v6.pt",
+  "selected_sha256": "31eb87ec353c51259b2da79c49a743fe436ee08daa0dbfe6b68cfebd333caeb2",
+  "selection_data": "two native validation cases only; fresh tests not run",
+  "reason": "Both candidates have zero complete zero-spill validation tasks. V6 retains more liquid and keeps the bottle controlled in the near-full case; V7 regresses spill and grasp retention.",
+  "comparison": {
+    "v6": {
+      "attempts": 2,
+      "zero_spill_completions": 0,
+      "final_outside_total_ml": 28.979207999999996,
+      "rows": [
+        {
+          "name": "BC6_R_A_validation_00",
+          "path": "/workspace/outputs/fountain/20261103T065336Z/140-BC6_R_A_validation_00-410485",
+          "evidence_kind": "learned_visual_policy",
+          "source_initial_ml": 92.0,
+          "cup_initial_ml": 5.0,
+          "grasp_verified": true,
+          "expert_started": false,
+          "expert_recovery_zero_spill": false,
+          "delivered_to_cup_ml": 60.6528,
+          "cup_final_ml": 65.650824,
+          "cup_fraction": 0.901797032967033,
+          "bottle_remaining_ml": 29.638223999999997,
+          "stop_reason": "cup_near_full",
+          "expected_stop": "cup_near_full",
+          "final_outside_ml": 1.7087759999999999,
+          "ever_below_worktop_ml": 1.7087759999999999,
+          "policy_completed": false,
+          "operational_zero_spill_success": false,
+          "strict_zero_spill_success": false,
+          "checkpoint_sha256": "31eb87ec353c51259b2da79c49a743fe436ee08daa0dbfe6b68cfebd333caeb2",
+          "gates": [
+            "policy_did_not_finish"
+          ],
+          "sim_seconds": 32.005
+        },
+        {
+          "name": "BC6_R_A_validation_01",
+          "path": "/workspace/outputs/fountain/20261103T065336Z/141-BC6_R_A_validation_01-128536",
+          "evidence_kind": "learned_visual_policy",
+          "source_initial_ml": 32.0,
+          "cup_initial_ml": 11.0,
+          "grasp_verified": false,
+          "expert_started": false,
+          "expert_recovery_zero_spill": false,
+          "delivered_to_cup_ml": 0.0,
+          "cup_final_ml": 10.999151999999999,
+          "cup_fraction": 0.15108725274725274,
+          "bottle_remaining_ml": 4.7297519999999995,
+          "stop_reason": null,
+          "expected_stop": "bottle_empty",
+          "final_outside_ml": 27.270431999999996,
+          "ever_below_worktop_ml": 32.000184,
+          "policy_completed": false,
+          "operational_zero_spill_success": false,
+          "strict_zero_spill_success": false,
+          "checkpoint_sha256": "31eb87ec353c51259b2da79c49a743fe436ee08daa0dbfe6b68cfebd333caeb2",
+          "gates": [
+            "wrong_stop_condition",
+            "residual_bottle",
+            "excess_outside",
+            "grip_not_sustained",
+            "set_down_failed",
+            "policy_did_not_finish",
+            "grasp_deadline_exceeded"
+          ],
+          "sim_seconds": 8.005
+        }
+      ]
+    },
+    "v7": {
+      "attempts": 2,
+      "zero_spill_completions": 0,
+      "final_outside_total_ml": 61.096031999999994,
+      "rows": [
+        {
+          "name": "BC6_R_A_validation_00",
+          "path": "/workspace/outputs/fountain/20261103T073425Z/142-BC6_R_A_validation_00-749794",
+          "evidence_kind": "learned_visual_policy",
+          "source_initial_ml": 92.0,
+          "cup_initial_ml": 5.0,
+          "grasp_verified": true,
+          "expert_started": false,
+          "expert_recovery_zero_spill": false,
+          "delivered_to_cup_ml": 58.809887999999994,
+          "cup_final_ml": 63.807911999999995,
+          "cup_fraction": 0.8764823076923076,
+          "bottle_remaining_ml": 0.0,
+          "stop_reason": "cup_near_full",
+          "expected_stop": "cup_near_full",
+          "final_outside_ml": 33.189912,
+          "ever_below_worktop_ml": 33.189912,
+          "policy_completed": false,
+          "operational_zero_spill_success": false,
+          "physical_checks_pass": false,
+          "volume_stop_condition_achieved": true,
+          "stop_label_correct": true,
+          "strict_zero_spill_success": false,
+          "checkpoint_sha256": "14b35969cdefd797997a81a350cb1c529b9be12e549bb5f9d6fa095ca5b02c8a",
+          "gates": [
+            "excess_outside",
+            "grip_not_sustained",
+            "set_down_failed",
+            "policy_did_not_finish"
+          ],
+          "sim_seconds": 32.005
+        },
+        {
+          "name": "BC6_R_A_validation_01",
+          "path": "/workspace/outputs/fountain/20261103T073425Z/143-BC6_R_A_validation_01-529026",
+          "evidence_kind": "learned_visual_policy",
+          "source_initial_ml": 32.0,
+          "cup_initial_ml": 11.0,
+          "grasp_verified": false,
+          "expert_started": false,
+          "expert_recovery_zero_spill": false,
+          "delivered_to_cup_ml": 0.0,
+          "cup_final_ml": 10.999151999999999,
+          "cup_fraction": 0.15108725274725274,
+          "bottle_remaining_ml": 4.0940639999999995,
+          "stop_reason": null,
+          "expected_stop": "bottle_empty",
+          "final_outside_ml": 27.906119999999998,
+          "ever_below_worktop_ml": 32.000184,
+          "policy_completed": false,
+          "operational_zero_spill_success": false,
+          "physical_checks_pass": false,
+          "volume_stop_condition_achieved": false,
+          "stop_label_correct": false,
+          "strict_zero_spill_success": false,
+          "checkpoint_sha256": "14b35969cdefd797997a81a350cb1c529b9be12e549bb5f9d6fa095ca5b02c8a",
+          "gates": [
+            "wrong_stop_condition",
+            "residual_bottle",
+            "excess_outside",
+            "grip_not_sustained",
+            "set_down_failed",
+            "policy_did_not_finish",
+            "grasp_deadline_exceeded"
+          ],
+          "sim_seconds": 8.005
+        }
+      ]
+    }
+  },
+  "model_frozen_for_all_six_tests": true
+}

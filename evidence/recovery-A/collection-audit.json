@@ -1,0 +1,1972 @@
+[
+  {
+    "name": "R_A_train_00",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/132-R_A_train_00-382642/episode.hdf5",
+    "transitions": 159,
+    "control_hz": 20.0,
+    "duration_sim_s": 7.950000001229347,
+    "max_camera_state_skew_s": 1.7892569381672274e-07,
+    "physical_success": false,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 26.699031123408563,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 27.18487322771991,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": false,
+    "metrics": {
+      "eligible": false,
+      "gates": [
+        "wrong_stop_condition",
+        "underfilled_cup",
+        "low_retained_volume",
+        "grip_not_sustained",
+        "grasp_deadline_exceeded",
+        "expert_recovery_did_not_finish"
+      ],
+      "bottle_result": {
+        "t": 8.005,
+        "finite": true,
+        "count": 16804,
+        "bottle_ml": 89.99942399999999,
+        "cup_ml": 8.001503999999999,
+        "airborne_ml": 0.0,
+        "spilled_ml": 0.0,
+        "cup_fill_fraction": 0.1688313491204195,
+        "bottle_pose_xyz": [
+          0.5848527550697327,
+          -0.17112453281879425,
+          1.0399999618530273
+        ],
+        "bottle_quat_xyzw": [
+          3.149897767182875e-08,
+          3.931571870986591e-08,
+          0.7228258257514377,
+          0.6910302639007568
+        ],
+        "bottle_tilt_deg": 7.622252340871057e-07,
+        "stop_command": false,
+        "stop_reason": null,
+        "stop_time": null,
+        "phase": "Visual BC: Pouring from gripper",
+        "initial_ml": 98.00092799999999,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.10991076923076921,
+        "source_outflow_ml_s": 0.0,
+        "predicted_cup_ml": 8.001503999999999,
+        "outside_peak_z_m": null,
+        "ever_table_ml": 0.0,
+        "grasp_verified": false,
+        "contacts": [
+          "Bench"
+        ],
+        "both_fingers": false,
+        "bottle_base_height_m": -3.814697269177714e-08,
+        "joint_targets_deg": [
+          9.918800428974958,
+          -31.652710838078786,
+          24.625008346867478,
+          -111.21130685127052,
+          56.004099137804445,
+          32.404362754611846,
+          -7.021137345186192,
+          45.0,
+          45.0,
+          45.0,
+          45.0
+        ],
+        "joint_positions_deg": [
+          9.905410766601562,
+          -31.689083099365234,
+          24.67395782470703,
+          -111.2004165649414,
+          56.153804779052734,
+          32.454952239990234,
+          -7.016646862030029,
+          44.9999885559082,
+          44.99958801269531,
+          45.00012969970703,
+          45.00026321411133
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "cup_near_full",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": false,
+      "bilateral_fraction_during_pour": 0.0,
+      "hold_height_m": 8.106231685900411e-08,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.49419644151552133,
+          -0.14264157442902298,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 0.0,
+        "ever_table_ml": 0.0,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": true,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": false,
+        "teacher_complete": false,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": null,
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": false
+    }
+  },
+  {
+    "name": "R_A_train_01",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/133-R_A_train_01-23314/episode.hdf5",
+    "transitions": 357,
+    "control_hz": 20.0,
+    "duration_sim_s": 17.850000001229347,
+    "max_camera_state_skew_s": 4.002079379006318e-07,
+    "physical_success": true,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 4.478271484375,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 1.4009715892650463,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": true,
+    "metrics": {
+      "eligible": true,
+      "gates": [],
+      "bottle_result": {
+        "t": 17.905,
+        "finite": true,
+        "count": 5658,
+        "bottle_ml": 0.0,
+        "cup_ml": 32.997456,
+        "airborne_ml": 0.0,
+        "spilled_ml": 0.0,
+        "cup_fill_fraction": 0.5332774632117316,
+        "bottle_pose_xyz": [
+          0.4924170672893524,
+          -0.2792520821094513,
+          1.040000081062317
+        ],
+        "bottle_quat_xyzw": [
+          -5.479848687008557e-08,
+          4.765296503600947e-08,
+          0.038886935714181566,
+          0.9992436170578003
+        ],
+        "bottle_tilt_deg": 6.487041451074977e-06,
+        "stop_command": true,
+        "stop_reason": "bottle_empty",
+        "stop_time": 14.904999998769831,
+        "phase": "Releasing bottle",
+        "initial_ml": 32.997456,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.45326175824175824,
+        "source_outflow_ml_s": 0.0,
+        "predicted_cup_ml": 32.997456,
+        "outside_peak_z_m": null,
+        "ever_table_ml": 0.0,
+        "grasp_verified": true,
+        "contacts": [],
+        "both_fingers": false,
+        "bottle_base_height_m": 8.106231685900411e-08,
+        "joint_targets_deg": [
+          32.01039414431589,
+          -10.422178895925587,
+          -0.4427205175656823,
+          -115.1248546209576,
+          -9.132818732843859,
+          -7.1657939723356145,
+          -4.041423692510174,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "joint_positions_deg": [
+          32.006534576416016,
+          -10.423036575317383,
+          -0.4435274302959442,
+          -115.127685546875,
+          -9.132620811462402,
+          -7.166111469268799,
+          -4.0414228439331055,
+          9.579474863130599e-05,
+          -3.019025371031603e-06,
+          0.00010700712300604209,
+          -1.5056391021062154e-05
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "bottle_empty",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": true,
+      "bilateral_fraction_during_pour": 1.0,
+      "hold_height_m": 0.03685637474060055,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.4915882973343153,
+          -0.15508197742325674,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 0.0,
+        "ever_table_ml": 0.0,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": true,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": true,
+        "teacher_complete": true,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": {
+          "takeover_sim_s": 8.004999998771204,
+          "initial_bottle_angle_deg": 71.03345584483394,
+          "initial_bottle_pose_xyz": [
+            0.5295589566230774,
+            -0.26798149943351746,
+            1.0753878355026245
+          ],
+          "measured_joint_deg": [
+            6.380838394165039,
+            -27.58024024963379,
+            26.713607788085938,
+            -108.96295166015625,
+            45.89284133911133,
+            29.678701400756836,
+            -10.318185806274414,
+            38.08454132080078,
+            46.0369873046875,
+            39.342655181884766,
+            45.41305923461914
+          ],
+          "in_hand_position_m": [
+            -0.050076464667014486,
+            0.000354445514137644,
+            -0.007015119432106696
+          ],
+          "in_hand_rotation": [
+            [
+              -0.010836736288968307,
+              -0.011838113695611385,
+              0.9998712038111374
+            ],
+            [
+              0.05952765687889906,
+              0.99814885384478,
+              0.01246289030922959
+            ],
+            [
+              -0.9981678331889439,
+              0.05965504699924078,
+              -0.010111980736086098
+            ]
+          ],
+          "actuation": "Physical joint drives only; no bottle attachment or pose/particle writes",
+          "supervision": "Expert labels begin at takeover; learned prefix is not an action target"
+        },
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": true
+    }
+  },
+  {
+    "name": "R_A_train_02",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/134-R_A_train_02-862744/episode.hdf5",
+    "transitions": 159,
+    "control_hz": 20.0,
+    "duration_sim_s": 7.950000001229347,
+    "max_camera_state_skew_s": 1.7892569381672274e-07,
+    "physical_success": false,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 17.98161937572338,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 26.09966362847222,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": false,
+    "metrics": {
+      "eligible": false,
+      "gates": [
+        "wrong_stop_condition",
+        "underfilled_cup",
+        "low_retained_volume",
+        "excess_outside",
+        "grip_not_sustained",
+        "set_down_failed",
+        "grasp_deadline_exceeded",
+        "expert_recovery_did_not_finish"
+      ],
+      "bottle_result": {
+        "t": 8.005,
+        "finite": true,
+        "count": 16976,
+        "bottle_ml": 7.715736,
+        "cup_ml": 14.002631999999998,
+        "airborne_ml": 0.0,
+        "spilled_ml": 77.285664,
+        "cup_fill_fraction": 0.2450563108219809,
+        "bottle_pose_xyz": [
+          1.2340809106826782,
+          0.22296923398971558,
+          -13.867929458618164
+        ],
+        "bottle_quat_xyzw": [
+          0.9804323334196968,
+          -0.015573933750097085,
+          -0.13148766780971102,
+          -0.14567390084266663
+        ],
+        "bottle_tilt_deg": 162.57186026723804,
+        "stop_command": false,
+        "stop_reason": null,
+        "stop_time": null,
+        "phase": "Visual BC: Pouring from gripper",
+        "initial_ml": 99.004032,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.19234384615384614,
+        "source_outflow_ml_s": 3.421439999999505,
+        "predicted_cup_ml": 14.96063519999986,
+        "outside_peak_z_m": -8.231699981689452,
+        "ever_table_ml": 85.00139999999999,
+        "grasp_verified": false,
+        "contacts": [],
+        "both_fingers": false,
+        "bottle_base_height_m": -14.907929458618163,
+        "joint_targets_deg": [
+          9.376199947374047,
+          -32.01328098982126,
+          25.60679298119761,
+          -110.80241551982338,
+          57.18587393315303,
+          33.63609256833534,
+          -7.442753588926809,
+          45.0,
+          45.0,
+          45.0,
+          45.0
+        ],
+        "joint_positions_deg": [
+          9.389985084533691,
+          -32.02255630493164,
+          25.604564666748047,
+          -110.8041763305664,
+          57.185665130615234,
+          33.63394546508789,
+          -7.449150562286377,
+          44.99945068359375,
+          44.999629974365234,
+          45.00065994262695,
+          44.999935150146484
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "cup_near_full",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": false,
+      "bilateral_fraction_during_pour": 0.0,
+      "hold_height_m": 8.106231685900411e-08,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.49378683256040695,
+          -0.14434736783881796,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 77.285664,
+        "ever_table_ml": 85.00139999999999,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": false,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": false,
+        "teacher_complete": false,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": null,
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": false
+    }
+  },
+  {
+    "name": "R_A_train_03",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/135-R_A_train_03-931254/episode.hdf5",
+    "transitions": 357,
+    "control_hz": 20.0,
+    "duration_sim_s": 17.850000001229347,
+    "max_camera_state_skew_s": 4.002079379006318e-07,
+    "physical_success": true,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 4.9261474609375,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 1.3673118308738426,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": true,
+    "metrics": {
+      "eligible": true,
+      "gates": [],
+      "bottle_result": {
+        "t": 17.905,
+        "finite": true,
+        "count": 6001,
+        "bottle_ml": 0.0,
+        "cup_ml": 34.997831999999995,
+        "airborne_ml": 0.0,
+        "spilled_ml": 0.0,
+        "cup_fill_fraction": 0.5579196361934428,
+        "bottle_pose_xyz": [
+          0.4903673529624939,
+          -0.2663550078868866,
+          1.040000081062317
+        ],
+        "bottle_quat_xyzw": [
+          3.3596752525278847e-08,
+          -1.1695802470686872e-07,
+          0.015571030691664848,
+          0.9998787641525269
+        ],
+        "bottle_tilt_deg": -4.058126722668065e-06,
+        "stop_command": true,
+        "stop_reason": "bottle_empty",
+        "stop_time": 14.904999998769831,
+        "phase": "Releasing bottle",
+        "initial_ml": 34.997831999999995,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.4807394505494505,
+        "source_outflow_ml_s": 0.0,
+        "predicted_cup_ml": 34.997831999999995,
+        "outside_peak_z_m": null,
+        "ever_table_ml": 0.0,
+        "grasp_verified": true,
+        "contacts": [],
+        "both_fingers": false,
+        "bottle_base_height_m": 8.106231685900411e-08,
+        "joint_targets_deg": [
+          32.01039414431589,
+          -10.422178895925587,
+          -0.4427205175656823,
+          -115.1248546209576,
+          -9.132818732843859,
+          -7.1657939723356145,
+          -4.041423692510174,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "joint_positions_deg": [
+          32.006656646728516,
+          -10.422927856445312,
+          -0.4434303343296051,
+          -115.127685546875,
+          -9.132588386535645,
+          -7.166078090667725,
+          -4.041430473327637,
+          8.865610288921744e-05,
+          -2.212662366218865e-06,
+          0.00010711646609706804,
+          -1.4593929336115252e-05
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "bottle_empty",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": true,
+      "bilateral_fraction_during_pour": 1.0,
+      "hold_height_m": 0.037348470687866175,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.4903576287684,
+          -0.14848871181043743,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 0.0,
+        "ever_table_ml": 0.0,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": true,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": true,
+        "teacher_complete": true,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": {
+          "takeover_sim_s": 8.004999998771204,
+          "initial_bottle_angle_deg": 77.81326640140492,
+          "initial_bottle_pose_xyz": [
+            0.5152230858802795,
+            -0.2771179676055908,
+            1.0822664499282837
+          ],
+          "measured_joint_deg": [
+            8.08364200592041,
+            -29.29283332824707,
+            27.10938835144043,
+            -110.17710876464844,
+            52.96847915649414,
+            31.650325775146484,
+            -7.8087239265441895,
+            38.23785400390625,
+            45.97479248046875,
+            38.584228515625,
+            45.47911834716797
+          ],
+          "in_hand_position_m": [
+            -0.04826974954231235,
+            0.00024537888041570484,
+            -0.002726020048183688
+          ],
+          "in_hand_rotation": [
+            [
+              -0.00610509307516968,
+              -0.001853551101449885,
+              0.9999796458862836
+            ],
+            [
+              0.002947804003155318,
+              0.999993903811617,
+              0.0018715745139004925
+            ],
+            [
+              -0.9999770188809851,
+              0.002959170139821988,
+              -0.006099591952015252
+            ]
+          ],
+          "actuation": "Physical joint drives only; no bottle attachment or pose/particle writes",
+          "supervision": "Expert labels begin at takeover; learned prefix is not an action target"
+        },
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": true
+    }
+  },
+  {
+    "name": "R_A_train_04",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/136-R_A_train_04-842869/episode.hdf5",
+    "transitions": 365,
+    "control_hz": 20.0,
+    "duration_sim_s": 18.250000001229346,
+    "max_camera_state_skew_s": 4.0914863319585493e-07,
+    "physical_success": true,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 7.533103660300926,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 1.8300758644386574,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": true,
+    "metrics": {
+      "eligible": true,
+      "gates": [],
+      "bottle_result": {
+        "t": 18.305,
+        "finite": true,
+        "count": 16804,
+        "bottle_ml": 30.09312,
+        "cup_ml": 67.90780799999999,
+        "airborne_ml": 0.0,
+        "spilled_ml": 0.0,
+        "cup_fill_fraction": 0.9801624985302184,
+        "bottle_pose_xyz": [
+          0.47374042868614197,
+          -0.2652483880519867,
+          1.040000081062317
+        ],
+        "bottle_quat_xyzw": [
+          1.0864325980627482e-08,
+          -3.2151278423650924e-08,
+          -0.006721592848666811,
+          0.9999774098396301
+        ],
+        "bottle_tilt_deg": -1.220167797963199e-06,
+        "stop_command": true,
+        "stop_reason": "cup_near_full",
+        "stop_time": 15.304999998769752,
+        "phase": "Releasing bottle",
+        "initial_ml": 98.00092799999999,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.9327995604395604,
+        "source_outflow_ml_s": 0.0,
+        "predicted_cup_ml": 67.90780799999999,
+        "outside_peak_z_m": null,
+        "ever_table_ml": 0.0,
+        "grasp_verified": true,
+        "contacts": [
+          "Bench"
+        ],
+        "both_fingers": false,
+        "bottle_base_height_m": 8.106231685900411e-08,
+        "joint_targets_deg": [
+          32.01039414431589,
+          -10.422178895925587,
+          -0.4427205175656823,
+          -115.1248546209576,
+          -9.132818732843859,
+          -7.1657939723356145,
+          -4.041423692510174,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "joint_positions_deg": [
+          32.006961822509766,
+          -10.42274284362793,
+          -0.4433228075504303,
+          -115.12773132324219,
+          -9.13253116607666,
+          -7.165988445281982,
+          -4.041440486907959,
+          7.302986341528594e-05,
+          -8.620723974672728e-07,
+          0.0001021497228066437,
+          -1.3111109183228109e-05
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "cup_near_full",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": true,
+      "bilateral_fraction_during_pour": 1.0,
+      "hold_height_m": 0.041488013267517054,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.488122419008227,
+          -0.1539210670360021,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 0.0,
+        "ever_table_ml": 0.0,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": true,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": true,
+        "teacher_complete": true,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": {
+          "takeover_sim_s": 8.004999998771204,
+          "initial_bottle_angle_deg": 86.01171358086351,
+          "initial_bottle_pose_xyz": [
+            0.49559542536735535,
+            -0.29682257771492004,
+            1.0922850370407104
+          ],
+          "measured_joint_deg": [
+            12.036406517028809,
+            -32.0775260925293,
+            26.260520935058594,
+            -112.18592071533203,
+            59.7132453918457,
+            32.909698486328125,
+            -7.531761646270752,
+            38.70546340942383,
+            45.8134880065918,
+            37.86568832397461,
+            45.38530731201172
+          ],
+          "in_hand_position_m": [
+            -0.04963561201847808,
+            -0.0009718704482151782,
+            -0.002731955666448082
+          ],
+          "in_hand_rotation": [
+            [
+              -0.006428229765606648,
+              -0.011793431455416545,
+              0.9999097923495832
+            ],
+            [
+              -0.04431144534338538,
+              0.9989516048427529,
+              0.01149726026791309
+            ],
+            [
+              -0.998997083916495,
+              -0.04423354108133721,
+              -0.006944074433998491
+            ]
+          ],
+          "actuation": "Physical joint drives only; no bottle attachment or pose/particle writes",
+          "supervision": "Expert labels begin at takeover; learned prefix is not an action target"
+        },
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": true
+    }
+  },
+  {
+    "name": "R_A_train_05",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/137-R_A_train_05-638441/episode.hdf5",
+    "transitions": 159,
+    "control_hz": 20.0,
+    "duration_sim_s": 7.950000001229347,
+    "max_camera_state_skew_s": 1.7892569381672274e-07,
+    "physical_success": false,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 19.94757984302662,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 25.882685908564813,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": false,
+    "metrics": {
+      "eligible": false,
+      "gates": [
+        "wrong_stop_condition",
+        "residual_bottle",
+        "excess_outside",
+        "grip_not_sustained",
+        "set_down_failed",
+        "grasp_deadline_exceeded",
+        "expert_recovery_did_not_finish"
+      ],
+      "bottle_result": {
+        "t": 8.005,
+        "finite": true,
+        "count": 5658,
+        "bottle_ml": 6.817607999999999,
+        "cup_ml": 10.999151999999999,
+        "airborne_ml": 0.0,
+        "spilled_ml": 15.180696,
+        "cup_fill_fraction": 0.20076155732659623,
+        "bottle_pose_xyz": [
+          1.2169854640960693,
+          -0.2689845561981201,
+          -4.823598861694336
+        ],
+        "bottle_quat_xyzw": [
+          0.771899661721312,
+          -0.5616494571163347,
+          -0.2043818738462227,
+          0.21667683124542228
+        ],
+        "bottle_tilt_deg": -172.7307418673296,
+        "stop_command": false,
+        "stop_reason": null,
+        "stop_time": null,
+        "phase": "Visual BC: Pouring from gripper",
+        "initial_ml": 32.997456,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.15108725274725274,
+        "source_outflow_ml_s": 11.236319999998377,
+        "predicted_cup_ml": 14.145321599999544,
+        "outside_peak_z_m": -2.917737045288086,
+        "ever_table_ml": 21.998304,
+        "grasp_verified": false,
+        "contacts": [],
+        "both_fingers": false,
+        "bottle_base_height_m": -5.863598861694336,
+        "joint_targets_deg": [
+          9.922298488005396,
+          -32.38953513386219,
+          25.307230320288895,
+          -110.83286739462609,
+          58.35072073308593,
+          33.12421890445004,
+          -7.3815823742246485,
+          45.0,
+          45.0,
+          45.0,
+          45.0
+        ],
+        "joint_positions_deg": [
+          9.93786334991455,
+          -32.397682189941406,
+          25.30457305908203,
+          -110.83879089355469,
+          58.35297775268555,
+          33.123600006103516,
+          -7.386516571044922,
+          44.99939727783203,
+          44.999576568603516,
+          45.000736236572266,
+          44.99996566772461
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "bottle_empty",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": false,
+      "bilateral_fraction_during_pour": 0.0,
+      "hold_height_m": 8.106231685900411e-08,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.49580601757423415,
+          -0.14432287824616274,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 15.180696,
+        "ever_table_ml": 21.998304,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": false,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": false,
+        "teacher_complete": false,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": null,
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": false
+    }
+  },
+  {
+    "name": "R_A_validation_00",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/138-R_A_validation_00-842565/episode.hdf5",
+    "transitions": 354,
+    "control_hz": 20.0,
+    "duration_sim_s": 17.700000001229345,
+    "max_camera_state_skew_s": 3.968551745003879e-07,
+    "physical_success": true,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 7.399172182436343,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 1.7267162181712963,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": false,
+    "metrics": {
+      "eligible": true,
+      "gates": [],
+      "bottle_result": {
+        "t": 17.755,
+        "finite": true,
+        "count": 16632,
+        "bottle_ml": 30.676319999999997,
+        "cup_ml": 66.32150399999999,
+        "airborne_ml": 0.0,
+        "spilled_ml": 0.0,
+        "cup_fill_fraction": 0.9617871929617477,
+        "bottle_pose_xyz": [
+          0.47106191515922546,
+          -0.26806798577308655,
+          1.040000081062317
+        ],
+        "bottle_quat_xyzw": [
+          8.450131388309784e-09,
+          -5.695893585043659e-09,
+          0.039582187682605095,
+          0.9992163181304932
+        ],
+        "bottle_tilt_deg": -9.933902262330647e-07,
+        "stop_command": true,
+        "stop_reason": "cup_near_full",
+        "stop_time": 14.754999998769861,
+        "phase": "Releasing bottle",
+        "initial_ml": 96.997824,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.9110096703296703,
+        "source_outflow_ml_s": 0.0,
+        "predicted_cup_ml": 66.32150399999999,
+        "outside_peak_z_m": null,
+        "ever_table_ml": 0.0,
+        "grasp_verified": true,
+        "contacts": [
+          "Bench"
+        ],
+        "both_fingers": false,
+        "bottle_base_height_m": 8.106231685900411e-08,
+        "joint_targets_deg": [
+          32.01039414431589,
+          -10.422178895925587,
+          -0.4427205175656823,
+          -115.1248546209576,
+          -9.132818732843859,
+          -7.1657939723356145,
+          -4.041423692510174,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "joint_positions_deg": [
+          32.006534576416016,
+          -10.4228515625,
+          -0.44337427616119385,
+          -115.12781524658203,
+          -9.132624626159668,
+          -7.165970802307129,
+          -4.041441917419434,
+          8.422218525083736e-05,
+          -2.1688169908884447e-06,
+          0.000100143370218575,
+          -1.3750830476055853e-05
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "cup_near_full",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": true,
+      "bilateral_fraction_during_pour": 1.0,
+      "hold_height_m": 0.03492196559906002,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.48337796622599877,
+          -0.14805162242295156,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 0.0,
+        "ever_table_ml": 0.0,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": true,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": true,
+        "teacher_complete": true,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": {
+          "takeover_sim_s": 8.004999998771204,
+          "initial_bottle_angle_deg": 74.13362738744078,
+          "initial_bottle_pose_xyz": [
+            0.5239564776420593,
+            -0.2709406018257141,
+            1.0783085823059082
+          ],
+          "measured_joint_deg": [
+            7.406412124633789,
+            -28.851972579956055,
+            26.407812118530273,
+            -109.6879653930664,
+            49.7060661315918,
+            29.83991241455078,
+            -7.9706268310546875,
+            37.9404182434082,
+            46.034114837646484,
+            39.22719192504883,
+            45.400413513183594
+          ],
+          "in_hand_position_m": [
+            -0.04675365924785477,
+            0.0012606719829112035,
+            -0.0056871987241771714
+          ],
+          "in_hand_rotation": [
+            [
+              0.002601785352697346,
+              0.006431981356952388,
+              0.9999759298747157
+            ],
+            [
+              0.057978678790951185,
+              0.9982961891361917,
+              -0.006572028744042724
+            ],
+            [
+              -0.9983144311882071,
+              0.057994382245012625,
+              0.002224434621464032
+            ]
+          ],
+          "actuation": "Physical joint drives only; no bottle attachment or pose/particle writes",
+          "supervision": "Expert labels begin at takeover; learned prefix is not an action target"
+        },
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": true
+    }
+  },
+  {
+    "name": "R_A_validation_01",
+    "valid": true,
+    "path": "/workspace/outputs/fountain/20261103T065336Z/139-R_A_validation_01-412969/episode.hdf5",
+    "transitions": 159,
+    "control_hz": 20.0,
+    "duration_sim_s": 7.950000001229347,
+    "max_camera_state_skew_s": 1.7892569381672274e-07,
+    "physical_success": false,
+    "training_eligible": false,
+    "camera": {
+      "task": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 19.168312355324073,
+        "intrinsics": [
+          [
+            732.999267578125,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            732.999267578125,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "wrist": {
+        "resolution": [
+          384,
+          384
+        ],
+        "rgb_dtype": "uint8",
+        "encoding": "jpeg95",
+        "first_last_mean_pixel_change": 25.87621844256366,
+        "intrinsics": [
+          [
+            128.27487182617188,
+            0.0,
+            192.0
+          ],
+          [
+            0.0,
+            128.27487182617188,
+            192.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "task_scope": "full_pour",
+    "corrective_training_eligible": false,
+    "recovery_training_eligible": false,
+    "metrics": {
+      "eligible": false,
+      "gates": [
+        "wrong_stop_condition",
+        "residual_bottle",
+        "excess_outside",
+        "grip_not_sustained",
+        "set_down_failed",
+        "grasp_deadline_exceeded",
+        "expert_recovery_did_not_finish"
+      ],
+      "bottle_result": {
+        "t": 8.005,
+        "finite": true,
+        "count": 7373,
+        "bottle_ml": 5.785343999999999,
+        "cup_ml": 10.999151999999999,
+        "airborne_ml": 0.0,
+        "spilled_ml": 26.21484,
+        "cup_fill_fraction": 0.1982416657840494,
+        "bottle_pose_xyz": [
+          1.202742338180542,
+          -0.3300965428352356,
+          -7.50958776473999
+        ],
+        "bottle_quat_xyzw": [
+          -0.6149332985864182,
+          0.7534352377366963,
+          -0.22206717247366056,
+          0.06984663009643548
+        ],
+        "bottle_tilt_deg": -164.41305731628415,
+        "stop_command": false,
+        "stop_reason": null,
+        "stop_time": null,
+        "phase": "Visual BC: Pouring from gripper",
+        "initial_ml": 42.999336,
+        "capacity_geometric_ml": 50.991924298457995,
+        "cup_inventory_fraction": 0.15108725274725274,
+        "source_outflow_ml_s": 6.104159999999119,
+        "predicted_cup_ml": 12.708316799999752,
+        "outside_peak_z_m": -4.494624176025391,
+        "ever_table_ml": 32.000184,
+        "grasp_verified": false,
+        "contacts": [],
+        "both_fingers": false,
+        "bottle_base_height_m": -8.54958776473999,
+        "joint_targets_deg": [
+          10.22908037374492,
+          -32.51229766483903,
+          24.600287325413706,
+          -110.97000000153294,
+          57.44317721613566,
+          32.634306412824536,
+          -7.316149020753591,
+          45.0,
+          45.0,
+          45.0,
+          45.0
+        ],
+        "joint_positions_deg": [
+          10.240948677062988,
+          -32.52228927612305,
+          24.606124877929688,
+          -110.9671859741211,
+          57.45903396606445,
+          32.638397216796875,
+          -7.322976112365723,
+          44.99922561645508,
+          44.99967956542969,
+          45.00070571899414,
+          44.9998779296875
+        ],
+        "command_angle_deg": 0.0
+      },
+      "expected_stop": "bottle_empty",
+      "attribution": "Learned RGB/joint prefix followed by privileged scripted expert recovery; not autonomous success",
+      "grasp_verified": false,
+      "bilateral_fraction_during_pour": 0.0,
+      "hold_height_m": 8.106231685900411e-08,
+      "scene": {
+        "bottle_mass_kg": 0.18,
+        "bottle_gravity_enabled": true,
+        "bottle_kinematic": false,
+        "bottle_attachment_joints": [],
+        "robot_arm_gravity_compensation": true,
+        "finger_static_friction": 1.15,
+        "finger_dynamic_friction": 1.0,
+        "arm_control": "Joint position drives with native actuator torque limits",
+        "observation_source": "RGB/joints before takeover; measured object pose and particle inventory in training-only expert",
+        "dof_names": [
+          "arm_r_joint1",
+          "arm_r_joint2",
+          "arm_r_joint3",
+          "arm_r_joint4",
+          "arm_r_joint5",
+          "arm_r_joint6",
+          "arm_r_joint7",
+          "gripper_r_joint1",
+          "gripper_r_joint2",
+          "gripper_r_joint3",
+          "gripper_r_joint4"
+        ],
+        "cup_frame_world": [
+          0.4943655594205765,
+          -0.14925706974767286,
+          1.04
+        ],
+        "cup_frame_rotation": [
+          [
+            2.220446049250313e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.220446049250313e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "spill": {
+        "final_outside_ml": 26.21484,
+        "ever_table_ml": 32.000184,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "zero_spill": false,
+      "task_success_zero_spill": false,
+      "policy": {
+        "checkpoint": "/workspace/learning/A-20261102-v1/best-bc-v5.pt",
+        "steps": 159,
+        "checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "checkpoint_update": 1900,
+        "model_version": "chunked_bc_v5",
+        "bounded_action_steps": 0,
+        "done": false,
+        "inputs": [
+          "task RGB",
+          "wrist RGB",
+          "joint position",
+          "joint velocity"
+        ],
+        "teacher_fallback": true,
+        "autonomous_task_success": false
+      },
+      "recovery": {
+        "started": false,
+        "teacher_complete": false,
+        "prefix_checkpoint_sha256": "6b8287136f67bee224544c8c6c0beeb7fe4b1aaae3278da334d43d00765cc011",
+        "evidence": null,
+        "planning_error": null
+      },
+      "recovery_success_zero_spill": false
+    }
+  }
+]

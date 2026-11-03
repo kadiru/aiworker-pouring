@@ -1,0 +1,76 @@
+{
+  "checked_utc": "2026-11-03T10:51:09.292711+00:00",
+  "container": "eddff8172b2c63c14709a455183b39f969e77ab9cc31fe39997fd877703d1cf4",
+  "owner": "aiworker-pouring",
+  "limits": {
+    "NanoCpus": 4000000000,
+    "CpuShares": 256,
+    "CpusetCpus": "16-23",
+    "Memory": 17179869184,
+    "MemorySwap": 17179869184,
+    "DeviceRequests": [
+      {
+        "Driver": "",
+        "Count": 0,
+        "DeviceIDs": [
+          "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+        ],
+        "Capabilities": [
+          [
+            "gpu"
+          ]
+        ],
+        "Options": {}
+      }
+    ]
+  },
+  "guard_processes": [
+    "1423783 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py eddff8172b2c63c14709a455183b39f969e77ab9cc31fe39997fd877703d1cf4"
+  ],
+  "owned_processes": "PID                 NI                  COMMAND\n1423715             10                  /bin/bash /isaac-sim/python.sh -u /workspace/src/run_fountain.py --allow-root\n1423782             10                  /isaac-sim/kit/python/bin/python3 -u /workspace/src/run_fountain.py --allow-root\n",
+  "gpu_compute_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 1423782, 4678 MiB\n",
+  "gpu_utilization": "NVIDIA GeForce RTX 4090, GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 0 %, 17 MiB, 24564 MiB\nNVIDIA GeForce RTX 4070, GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 26 %, 4896 MiB, 12282 MiB\n",
+  "container_resources": "78.34% 5.695GiB / 16GiB\n",
+  "selected_checkpoint_sha256": "b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35",
+  "sources": {
+    "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
+    "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
+    "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
+    "pour_stop_train.py": "a3a586634a45f8f0c3758a31fd6ed7c262621f060ce504ae4c46bbaf3f4147ad",
+    "pour_stop_sequence.py": "886832a6593cf0c8a084013d14f5e608bcfa49c8d7864fa7b4b239847ca7395b",
+    "pour_stop_trajectory.py": "466cfecfba919183a047639f3a80b29230a2a77b38704cdf395113f11e83aef5",
+    "pour_stop_study.py": "9060fc0af0011e28ed8994cdeacb7649285414a229ab714f2d1048a69999a5c1",
+    "run_fountain.py": "e114bf352d68d163f75a206eadd4bdfe0eb59b4215ae6e512f11eab95d9befe9",
+    "robot_pour.py": "5db4689e8d67ad327d006dee636aa0eb5a0f2aa69a67ba26e4bb00147ce580a7",
+    "pour_recording.py": "8c3ebdb78a48ab599d35a29ecfc56b93972221c09dc402c6115b0df0cac79b67"
+  },
+  "asset_sha256": "82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d",
+  "health": {
+    "run": "20261103T095357Z",
+    "phase": "Complete",
+    "sim_time": 11.95,
+    "queue": [],
+    "recording": {
+      "active": false,
+      "path": "/workspace/outputs/fountain/20261103T095357Z/161-S_A_test_05-517474/episode.hdf5",
+      "cameras": [
+        "task",
+        "wrist"
+      ],
+      "resolution": [
+        384,
+        384
+      ],
+      "control_hz": 20,
+      "frames": 238
+    },
+    "error": null,
+    "learning_error": null,
+    "learning": {
+      "stage": "fit_complete",
+      "detector_updates": 1800,
+      "motion_updates": 1600,
+      "elapsed_s": 58.935612628934905
+    }
+  }
+}
