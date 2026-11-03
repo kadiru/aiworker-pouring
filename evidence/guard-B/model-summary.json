@@ -1,0 +1,851 @@
+{
+  "model_version": "visual_guard_hierarchy_v11",
+  "step": 400,
+  "cup_bias": -0.0047533512115478516,
+  "cup_validation": {
+    "mae": 0.06470707803964615,
+    "calm_near_full_mae": 0.012083843350410461,
+    "bias": -0.0047533512115478516,
+    "calm_near_full_frames": 74,
+    "calm_near_full_p90_error": 0.03862283006310463
+  },
+  "thresholds": {
+    "full_settled_target": 0.94,
+    "coarse_brake_target": 0.89,
+    "runoff_seconds": 0.25,
+    "empty_probability": 0.97,
+    "source_localization_score": 0.3437801837921143,
+    "cup_localization_score": 0.6314167022705078,
+    "source_present": 0.7,
+    "empty_votes": 12,
+    "settle_seconds": 1.2,
+    "max_attempts": 2,
+    "trim_increment": 0.005,
+    "trim_seconds": 0.1,
+    "trim_total_seconds": 0.9,
+    "max_pauses": 3,
+    "grasp_visual_window": 12,
+    "verify_seconds": 1.25,
+    "slow_empty_probability": 0.9,
+    "slow_empty_votes": 24,
+    "empty_cap_dwell_seconds": 0.25,
+    "slow_empty_max_flow_ml_s": 1.0
+  },
+  "method": "Visual servo with continuous physical hold and windowed RGB confirmation; trained normalized cup model and contextual motion; bounded full feedback and calibrated slow empty confirmation",
+  "inputs": [
+    "task RGB",
+    "wrist RGB",
+    "measured joint positions/velocities",
+    "own history/phase",
+    "fixed camera/robot/bench calibration"
+  ],
+  "training_device": {
+    "name": "NVIDIA GeForce RTX 4070",
+    "visible_cuda_devices": 1
+  },
+  "training_frames": {
+    "train": 4711,
+    "validation": 2687
+  },
+  "localization_validation": {
+    "method": "Supervised gradient-template localization, CUDA normalized correlation and subpixel refinement",
+    "source_templates": 16,
+    "cup_templates": 8,
+    "source_training_names": [
+      "A_train_00",
+      "A_train_03",
+      "A_train_07",
+      "A_train_10",
+      "A_train_14",
+      "A_train_21",
+      "A_train_noise_00",
+      "A_train_noise_04",
+      "A_train_noise_07",
+      "BC_A_test_03",
+      "R_A_train_00",
+      "R_A_train_03",
+      "BC6_R_A_test_01",
+      "BC6_R_A_test_04",
+      "S_A_test_02",
+      "S_A_test_05"
+    ],
+    "cup_training_names": [
+      "A_train_00",
+      "A_train_07",
+      "A_train_14",
+      "A_train_noise_00",
+      "A_train_noise_07",
+      "R_A_train_00",
+      "BC6_R_A_test_01",
+      "S_A_test_02"
+    ],
+    "validation": [
+      {
+        "name": "A_validation_16",
+        "source_error_mm": 0.1342916530947658,
+        "source_score": 0.49390050768852234,
+        "cup_error_mm": 0.26133342853210556,
+        "cup_score": 0.8474410772323608
+      },
+      {
+        "name": "A_validation_17",
+        "source_error_mm": 0.21780627167249142,
+        "source_score": 0.4622490704059601,
+        "cup_error_mm": 0.24589496240834255,
+        "cup_score": 0.8583707213401794
+      },
+      {
+        "name": "A_validation_18",
+        "source_error_mm": 0.1476850772383337,
+        "source_score": 0.4718165695667267,
+        "cup_error_mm": 0.2148016252532676,
+        "cup_score": 0.9076579809188843
+      },
+      {
+        "name": "A_validation_19",
+        "source_error_mm": 0.1354801782347871,
+        "source_score": 0.554488480091095,
+        "cup_error_mm": 0.16857067300410028,
+        "cup_score": 0.8049178123474121
+      },
+      {
+        "name": "BC_A_validation_16",
+        "source_error_mm": 0.16602078100409032,
+        "source_score": 0.4947921931743622,
+        "cup_error_mm": 0.21194636360858393,
+        "cup_score": 0.8569263219833374
+      },
+      {
+        "name": "BC_A_validation_17",
+        "source_error_mm": 0.19719408894362334,
+        "source_score": 0.46803349256515503,
+        "cup_error_mm": 0.22517266599837732,
+        "cup_score": 0.8571853041648865
+      },
+      {
+        "name": "BC_A_validation_18",
+        "source_error_mm": 0.037817070699778695,
+        "source_score": 0.4700302183628082,
+        "cup_error_mm": 0.2333213151273156,
+        "cup_score": 0.9067880511283875
+      },
+      {
+        "name": "BC_A_validation_19",
+        "source_error_mm": 0.07619324749360666,
+        "source_score": 0.5489040613174438,
+        "cup_error_mm": 0.22512650737357762,
+        "cup_score": 0.7917605042457581
+      },
+      {
+        "name": "replay_BC_A_validation_16",
+        "source_error_mm": 0.051609282046937266,
+        "source_score": 0.4756146967411041,
+        "cup_error_mm": 0.25435916807991316,
+        "cup_score": 0.8538098335266113
+      },
+      {
+        "name": "replay_BC_A_validation_16",
+        "source_error_mm": 0.1658078596442777,
+        "source_score": 0.48540225625038147,
+        "cup_error_mm": 0.2591591588429912,
+        "cup_score": 0.8477882742881775
+      },
+      {
+        "name": "BC_A_validation_16",
+        "source_error_mm": 0.27157777649054365,
+        "source_score": 0.5091623067855835,
+        "cup_error_mm": 0.31147958128041786,
+        "cup_score": 0.8351152539253235
+      },
+      {
+        "name": "BC_A_validation_17",
+        "source_error_mm": 0.25402559371545935,
+        "source_score": 0.4681592583656311,
+        "cup_error_mm": 0.2769509217244271,
+        "cup_score": 0.8526614308357239
+      },
+      {
+        "name": "BC_A_validation_18",
+        "source_error_mm": 0.13441973447235187,
+        "source_score": 0.468843013048172,
+        "cup_error_mm": 0.2437381211155294,
+        "cup_score": 0.9032676815986633
+      },
+      {
+        "name": "BC_A_validation_19",
+        "source_error_mm": 0.13242817957262887,
+        "source_score": 0.5658775568008423,
+        "cup_error_mm": 0.2056918208365945,
+        "cup_score": 0.7946040034294128
+      },
+      {
+        "name": "BC_A_validation_16",
+        "source_error_mm": 0.04304516096444095,
+        "source_score": 0.485107421875,
+        "cup_error_mm": 0.33452572917958595,
+        "cup_score": 0.8212493062019348
+      },
+      {
+        "name": "BC_A_validation_17",
+        "source_error_mm": 0.16210227081917186,
+        "source_score": 0.45995545387268066,
+        "cup_error_mm": 0.18848612797996042,
+        "cup_score": 0.8785106539726257
+      },
+      {
+        "name": "BC_A_validation_18",
+        "source_error_mm": 0.057141381513605934,
+        "source_score": 0.48913469910621643,
+        "cup_error_mm": 0.2702650193743046,
+        "cup_score": 0.9125250577926636
+      },
+      {
+        "name": "BC_A_validation_19",
+        "source_error_mm": 0.1422753311413272,
+        "source_score": 0.559609055519104,
+        "cup_error_mm": 0.2003560899666964,
+        "cup_score": 0.790840208530426
+      },
+      {
+        "name": "R_A_validation_00",
+        "source_error_mm": 0.09500443181001783,
+        "source_score": 0.46532800793647766,
+        "cup_error_mm": 0.41262182987105456,
+        "cup_score": 0.8001445531845093
+      },
+      {
+        "name": "R_A_validation_01",
+        "source_error_mm": 0.1946060773163008,
+        "source_score": 0.4867629110813141,
+        "cup_error_mm": 0.18423655401554626,
+        "cup_score": 0.8680697083473206
+      },
+      {
+        "name": "BC6_R_A_validation_00",
+        "source_error_mm": 0.2650301096783285,
+        "source_score": 0.4297252297401428,
+        "cup_error_mm": 0.41802617615060506,
+        "cup_score": 0.8033820986747742
+      },
+      {
+        "name": "BC6_R_A_validation_01",
+        "source_error_mm": 0.06877420231330396,
+        "source_score": 0.480276882648468,
+        "cup_error_mm": 0.16213841699861747,
+        "cup_score": 0.8740403652191162
+      },
+      {
+        "name": "BC6_R_A_validation_00",
+        "source_error_mm": 0.0908750858425906,
+        "source_score": 0.45168131589889526,
+        "cup_error_mm": 0.3592515751958144,
+        "cup_score": 0.7892708778381348
+      },
+      {
+        "name": "BC6_R_A_validation_01",
+        "source_error_mm": 0.1318033994607674,
+        "source_score": 0.4975919723510742,
+        "cup_error_mm": 0.18142040785990599,
+        "cup_score": 0.8741594552993774
+      },
+      {
+        "name": "S_A_validation_00",
+        "source_error_mm": 0.0775383550783963,
+        "source_score": 0.44390350580215454,
+        "cup_error_mm": 0.46226433841848663,
+        "cup_score": 0.813374936580658
+      },
+      {
+        "name": "S_A_validation_01",
+        "source_error_mm": 0.14186086144900942,
+        "source_score": 0.4648657739162445,
+        "cup_error_mm": 0.09630207989024368,
+        "cup_score": 0.8198537230491638
+      },
+      {
+        "name": "S_A_validation_00",
+        "source_error_mm": 0.06920222192518949,
+        "source_score": 0.446621298789978,
+        "cup_error_mm": 0.45954949101173614,
+        "cup_score": 0.8133134841918945
+      },
+      {
+        "name": "S_A_validation_01",
+        "source_error_mm": 0.19693183222979208,
+        "source_score": 0.46554040908813477,
+        "cup_error_mm": 0.10501747757926022,
+        "cup_score": 0.8203560709953308
+      },
+      {
+        "name": "replay_S_A_validation_00",
+        "source_error_mm": 0.07666142489011005,
+        "source_score": 0.4693504273891449,
+        "cup_error_mm": 0.47668430522173133,
+        "cup_score": 0.8271201848983765
+      },
+      {
+        "name": "replay_S_A_validation_00",
+        "source_error_mm": 0.0777561149188958,
+        "source_score": 0.4712164103984833,
+        "cup_error_mm": 0.4990051895746456,
+        "cup_score": 0.826921284198761
+      }
+    ],
+    "max_source_error_mm": 0.27157777649054365,
+    "max_cup_error_mm": 0.4990051895746456
+  },
+  "no_privileged_runtime_inputs": true,
+  "parent_checkpoint_sha256": "b47569e3331b39818e3bd04975c7487d9c23ece1e8a51be42133243a1e938b35",
+  "scene_plan_sha256": "05a0bec06cf0b54b1ce110e61e0fd44617ea2bcb6e4f756d9235da0d6b52ec2a",
+  "data_manifest_sha256": "ab74ec4fa00d69fd506c62d22ec70652f956f963acaeb012312627ee05454730",
+  "sources": {
+    "pour_guard_train.py": "f20740ce4eb37a3af529904e5f5b1e2aefc8c7f6668f1e98306620ba066826f1",
+    "pour_guard_data.py": "9ed56d05040a67b9a3503b381c58522f67c081a5cb0bcce4c3d5d64b66652d64",
+    "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
+    "pour_guard_vision.py": "d4af274be0255e37f16c1ac54e6fc332fad916a34ab4438131e1deacdaf8e042",
+    "pour_guard_actor.py": "3f057f1771b2abb3a6f372afe5da00ad0ea55b46b0baaa75b21e74fe8c8ead68",
+    "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1"
+  },
+  "training_sources": {
+    "pour_guard_train.py": "d14e5aeb2d54d959bbbfeb1c17beffec74ede5870c34eb35231d081ca7679871",
+    "pour_guard_data.py": "29d702fc9aa91769aa3f09ff04bdfa2a38d3786effe2bc58655463ad0f8470e3",
+    "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
+    "pour_guard_vision.py": "0f9c3ff09b6e15704aa6b2651155c02bb7cb17e7fbb79bd7e54ee40c784dc872",
+    "pour_guard_actor.py": "170d2d2924e6797d02e43b08416b65c42163d3e34d18f17cd7ad359420c54198",
+    "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1"
+  },
+  "controller_revision_note": "Predicted-window neck tracking, calibrated low-contrast score floor.23, 12px tolerance, and measured TCP rise>35mm; both encoder fingers must show obstruction. No learned weights or trajectories changed after successful early-full development.",
+  "full_calibration": {
+    "parent_checkpoint_sha256": "49c03b26d5c7effc3cb09340868428340546f5fa3e1c18b577aba8e2d0c79a61",
+    "before": {
+      "full_settled_target": 0.96,
+      "coarse_brake_target": 0.89,
+      "runoff_seconds": 0.25,
+      "empty_probability": 0.97,
+      "source_localization_score": 0.3437801837921143,
+      "cup_localization_score": 0.6314167022705078,
+      "source_present": 0.7,
+      "empty_votes": 12,
+      "settle_seconds": 1.2,
+      "max_attempts": 2,
+      "trim_increment": 0.015
+    },
+    "after": {
+      "full_settled_target": 0.94,
+      "coarse_brake_target": 0.89,
+      "runoff_seconds": 0.25,
+      "empty_probability": 0.97,
+      "source_localization_score": 0.3437801837921143,
+      "cup_localization_score": 0.6314167022705078,
+      "source_present": 0.7,
+      "empty_votes": 12,
+      "settle_seconds": 1.2,
+      "max_attempts": 2,
+      "trim_increment": 0.005,
+      "trim_seconds": 0.1,
+      "trim_total_seconds": 0.9,
+      "max_pauses": 3
+    },
+    "basis": "Consumed overflow regression showed the .96 prediction target was unreachable: at physical height .971 the CNN was .944, and repeated trim overflowed. Use reachable .94 target after 1.2s settling; cap trim at95deg and .1s after reaching94.5deg, with at most two micro-topups. Physical >=90% scoring stays unchanged. All failed/aborted development retained.",
+    "learned_weights_and_motor_paths_unchanged": true,
+    "calibration_source_sha256": "e8bdef9194351ab33a0b20cadfd95552b0a4e735df8a87db4b1a5d45ffa25d36"
+  },
+  "vote_calibration": {
+    "parent_checkpoint_sha256": "f4ddb8b9f288ad2e5e8a9e6ac495f57a94c7413a0cdb4bbb040a89769bd36098",
+    "method": "Controller-only temporal and confidence calibration on consumed G_A records",
+    "trained_tensors_and_motor_paths_unchanged": true,
+    "grasp_replays": [
+      {
+        "name": "G_A_regression_grasp",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_regression_full",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_validation_00",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_validation_01",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_test_00",
+        "window_confirmation_time": 3.6549999987705877,
+        "original_confirmed": false
+      },
+      {
+        "name": "G_A_test_01",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_test_02",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_test_03",
+        "window_confirmation_time": 3.304999998770595,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_test_04",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      },
+      {
+        "name": "G_A_test_05",
+        "window_confirmation_time": 3.254999998770596,
+        "original_confirmed": true
+      }
+    ],
+    "slow_empty_sweep": [
+      {
+        "probability": 0.9,
+        "calls": [
+          {
+            "name": "G_A_test_04",
+            "t": 12.304999998770349,
+            "source_ml": 0.0,
+            "correct_empty": true,
+            "latency_from_empty_s": 1.4999999999997016,
+            "bilateral_fraction_until_call": 0.9005524861878453
+          }
+        ],
+        "false_positive": 0,
+        "eligible_negative_frames": 0,
+        "fixes_target": true
+      },
+      {
+        "probability": 0.92,
+        "calls": [
+          {
+            "name": "G_A_test_04",
+            "t": 12.304999998770349,
+            "source_ml": 0.0,
+            "correct_empty": true,
+            "latency_from_empty_s": 1.4999999999997016,
+            "bilateral_fraction_until_call": 0.9005524861878453
+          }
+        ],
+        "false_positive": 0,
+        "eligible_negative_frames": 0,
+        "fixes_target": true
+      },
+      {
+        "probability": 0.93,
+        "calls": [
+          {
+            "name": "G_A_test_04",
+            "t": 12.304999998770349,
+            "source_ml": 0.0,
+            "correct_empty": true,
+            "latency_from_empty_s": 1.4999999999997016,
+            "bilateral_fraction_until_call": 0.9005524861878453
+          }
+        ],
+        "false_positive": 0,
+        "eligible_negative_frames": 0,
+        "fixes_target": true
+      },
+      {
+        "probability": 0.94,
+        "calls": [
+          {
+            "name": "G_A_test_04",
+            "t": 12.304999998770349,
+            "source_ml": 0.0,
+            "correct_empty": true,
+            "latency_from_empty_s": 1.4999999999997016,
+            "bilateral_fraction_until_call": 0.9005524861878453
+          }
+        ],
+        "false_positive": 0,
+        "eligible_negative_frames": 0,
+        "fixes_target": true
+      },
+      {
+        "probability": 0.95,
+        "calls": [],
+        "false_positive": 0,
+        "eligible_negative_frames": 0,
+        "fixes_target": false
+      },
+      {
+        "probability": 0.97,
+        "calls": [],
+        "false_positive": 0,
+        "eligible_negative_frames": 0,
+        "fixes_target": false
+      }
+    ],
+    "selected": {
+      "probability": 0.9,
+      "calls": [
+        {
+          "name": "G_A_test_04",
+          "t": 12.304999998770349,
+          "source_ml": 0.0,
+          "correct_empty": true,
+          "latency_from_empty_s": 1.4999999999997016,
+          "bilateral_fraction_until_call": 0.9005524861878453
+        }
+      ],
+      "false_positive": 0,
+      "eligible_negative_frames": 0,
+      "fixes_target": true
+    },
+    "thresholds": {
+      "full_settled_target": 0.94,
+      "coarse_brake_target": 0.89,
+      "runoff_seconds": 0.25,
+      "empty_probability": 0.97,
+      "source_localization_score": 0.3437801837921143,
+      "cup_localization_score": 0.6314167022705078,
+      "source_present": 0.7,
+      "empty_votes": 12,
+      "settle_seconds": 1.2,
+      "max_attempts": 2,
+      "trim_increment": 0.005,
+      "trim_seconds": 0.1,
+      "trim_total_seconds": 0.9,
+      "max_pauses": 3,
+      "grasp_visual_window": 12,
+      "verify_seconds": 1.25,
+      "slow_empty_probability": 0.9,
+      "slow_empty_votes": 24,
+      "empty_cap_dwell_seconds": 0.25,
+      "slow_empty_max_flow_ml_s": 1.0
+    },
+    "selection": "Lowest slow confidence with zero observed premature cap latches, correct target detection within2s, and >=80% bilateral contact until call;24votes plus physical/cap/flow gates. Support is limited; new native tests are required.",
+    "no_H_A_fit_or_test_data_used": true,
+    "cuda_initialized": false
+  },
+  "controller_parent_checkpoint_sha256": "f4ddb8b9f288ad2e5e8a9e6ac495f57a94c7413a0cdb4bbb040a89769bd36098",
+  "checkpoint_sha256": "b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b",
+  "surface_geometry": {
+    "dimensions": 4,
+    "bias": -0.00478440523147583,
+    "near_full_mae": 0.011405875906348228,
+    "near_full_p90_error": 0.04382867366075516,
+    "near_full_max_error": 0.04575085639953613,
+    "validation_frames": 74
+  },
+  "pour_primitive": {
+    "method": "Contextual movement primitive, own lift joints plus visual cup XY; CUDA ridge imitation",
+    "mean": [
+      0.3506975471973419,
+      -0.1847618818283081,
+      -0.013725170865654945,
+      -2.047750473022461,
+      -0.17996440827846527,
+      0.12513630092144012,
+      -0.07312105596065521,
+      0.4908679127693176,
+      -0.14909754693508148
+    ],
+    "std": [
+      0.02324884757399559,
+      0.019999999552965164,
+      0.020977744832634926,
+      0.019999999552965164,
+      0.019999999552965164,
+      0.019999999552965164,
+      0.019999999552965164,
+      0.0057565802708268166,
+      0.006098202429711819
+    ],
+    "regularizer": 0.001,
+    "support": [
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      16,
+      16,
+      15,
+      14,
+      14,
+      12,
+      12,
+      12,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      8,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "validation_target_rmse_deg": [
+      0.05170919349700911,
+      0.08678666832639537,
+      0.11010064742643642,
+      0.04440171505744988,
+      0.34785610707466796,
+      0.11318950252128321,
+      0.19889282722889925
+    ],
+    "regularizer_validation": [
+      {
+        "ridge": 0.001,
+        "mse": 8.602114067418756e-06,
+        "rmse_deg": [
+          0.05170919349700911,
+          0.08678666832639537,
+          0.11010064742643642,
+          0.04440171505744988,
+          0.34785610707466796,
+          0.11318950252128321,
+          0.19889282722889925
+        ]
+      },
+      {
+        "ridge": 0.01,
+        "mse": 8.632460936425789e-06,
+        "rmse_deg": [
+          0.05606279295201648,
+          0.08672400059511906,
+          0.11363330793806448,
+          0.046380037902377276,
+          0.3471787881581772,
+          0.11322112963306266,
+          0.1982196314302525
+        ]
+      },
+      {
+        "ridge": 0.1,
+        "mse": 1.0262269522784639e-05,
+        "rmse_deg": [
+          0.139338557814933,
+          0.09701961713091457,
+          0.15772182897868509,
+          0.08051849278826283,
+          0.3500312498481681,
+          0.11565233344443579,
+          0.19934523812632796
+        ]
+      },
+      {
+        "ridge": 1.0,
+        "mse": 3.376888685510198e-05,
+        "rmse_deg": [
+          0.48456905515820803,
+          0.22345376432153416,
+          0.43027962675742754,
+          0.24996046768166902,
+          0.4056202905573504,
+          0.17393528369505407,
+          0.22103430450239597
+        ]
+      },
+      {
+        "ridge": 10.0,
+        "mse": 9.217214379070102e-05,
+        "rmse_deg": [
+          0.7313841061679123,
+          0.4267560473716401,
+          0.8387675692732949,
+          0.353977338526501,
+          0.6062466884506433,
+          0.34035685380912933,
+          0.29804501529417193
+        ]
+      }
+    ],
+    "fast_rate_deg_s": 29.99999999999531,
+    "slow_rate_deg_s": 10.00000000000199,
+    "phase_cap_deg": 131.0,
+    "train_episodes": [
+      "A_train_01",
+      "A_train_02",
+      "A_train_03",
+      "A_train_04",
+      "A_train_05",
+      "A_train_06",
+      "A_train_07",
+      "A_train_08",
+      "A_train_09",
+      "A_train_10",
+      "A_train_11",
+      "A_train_12",
+      "A_train_13",
+      "A_train_14",
+      "A_train_15",
+      "A_train_20",
+      "A_train_21",
+      "A_train_22",
+      "A_train_23"
+    ],
+    "validation_episodes": [
+      "A_validation_16",
+      "A_validation_17",
+      "A_validation_18",
+      "A_validation_19"
+    ],
+    "training_device": "NVIDIA GeForce RTX 4070",
+    "grasp_closure": {
+      "min_deficit_rad": 0.05608171597123146,
+      "positive_p01_deficit_rad": 0.11216343194246292,
+      "positive_finger_samples": 304,
+      "method": "Half the first percentile of observed opposing-finger closure deficits in verified expert holds"
+    }
+  },
+  "cup_parameter_count": 58561,
+  "source_detector_frozen": true,
+  "cuda_initialized_by_audit": false
+}

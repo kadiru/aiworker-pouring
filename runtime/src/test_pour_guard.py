@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch
 import numpy as np
-from pour_guard_actor import Actor,monotone_return_path,topup_goal,trim_expired
+from pour_guard_actor import Actor,monotone_return_path,topup_goal,trim_expired,slow_empty_evidence
 from pour_guard_vision import project,plane_point,bottle_base_from_neck
 
 
@@ -48,6 +48,33 @@ class GuardTests(unittest.TestCase):
             def fk(self,q):return np.array([0.,0.,.044]),np.eye(3)
         a.fk=FK();a.grasp_tcp=np.zeros(3);a.grasp_check=None
         return a
+
+    def test_visual_flicker_can_accumulate_with_continuous_physical_hold(self):
+        a=self.actor_for_confirmation();a.threshold.update(grasp_visual_window=12,verify_seconds=1.25)
+        a.visual_votes=[];a.physical_votes=0;q=np.zeros(11);q[7:]=np.radians(38.)
+        scores=[.21,.28]*6
+        with patch('pour_guard_actor.locate',side_effect=[(np.array([150.,70.]),s) for s in scores]):
+            for i in range(11):a.grasp_action(np.zeros((4,4,3)),q,i*.05,i*.05)
+            self.assertFalse(a.grasp_confirmed)
+            a.grasp_action(np.zeros((4,4,3)),q,.55,.55)
+        self.assertTrue(a.grasp_confirmed)
+
+    def test_physical_contact_loss_clears_old_visual_votes(self):
+        a=self.actor_for_confirmation();a.threshold.update(grasp_visual_window=12,verify_seconds=1.25)
+        a.visual_votes=[];a.physical_votes=0;q=np.zeros(11);q[7:]=np.radians(38.)
+        with patch('pour_guard_actor.locate',return_value=(np.array([150.,70.]),.99)):
+            for i in range(5):a.grasp_action(np.zeros((4,4,3)),q,i*.05,i*.05)
+            empty=q.copy();empty[7:]=np.pi/4;a.grasp_action(np.zeros((4,4,3)),empty,.25,.25)
+            self.assertEqual(a.physical_votes,0);self.assertEqual(a.visual_votes,[])
+            for i in range(5):a.grasp_action(np.zeros((4,4,3)),q,.30+i*.05,.30+i*.05)
+            self.assertFalse(a.grasp_confirmed)
+
+    def test_slow_empty_requires_cap_hold_low_flow_and_visible_evidence(self):
+        threshold=dict(empty_cap_dwell_seconds=.25,slow_empty_probability=.90,slow_empty_max_flow_ml_s=1.)
+        args=dict(threshold=threshold,phase=131.,cap=131.,tilt=130.5,cap_age=1.,held=True,present=.99,empty=.95,flow_ml_s=0.)
+        self.assertTrue(slow_empty_evidence(**args))
+        for change in (dict(phase=120.),dict(tilt=110.),dict(cap_age=.1),dict(held=False),dict(present=.2),dict(empty=.8),dict(flow_ml_s=2.)):
+            self.assertFalse(slow_empty_evidence(**dict(args,**change)),change)
 
     def test_static_bottle_cannot_enable_pouring(self):
         a=self.actor_for_confirmation()

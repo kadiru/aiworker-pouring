@@ -38,6 +38,17 @@ def trim_expired(start,t,seconds):
     return start is not None and t-start>=seconds-1e-7
 
 
+def held_gripper(q,gap):
+    driven=np.asarray(q)[[7,9]]
+    return bool(np.min(driven)>.35 and np.min(np.pi/4-driven)>gap)
+
+
+def slow_empty_evidence(threshold,phase,cap,tilt,cap_age,held,present,empty,flow_ml_s):
+    return bool(cap_age is not None and cap_age>=threshold['empty_cap_dwell_seconds'] and
+        phase>=cap-.25 and tilt>=cap-3. and held and present>=.7 and
+        empty>=threshold['slow_empty_probability'] and flow_ml_s<threshold['slow_empty_max_flow_ml_s'])
+
+
 class Actor:
     def __init__(self,checkpoint):
         torch.set_num_threads(4);self.saved=torch.load(checkpoint,map_location='cuda',weights_only=False)
@@ -54,10 +65,11 @@ class Actor:
         self.trim_goal=None;self.trim_min_phase=None;self.trim_start=None;self.trim_entered=None
         self.outbound=[]
         self.grasp_check=None
+        self.visual_votes=[];self.physical_votes=0;self.cap_start=None;self.slow_empty_votes=0
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
-        self.attempt+=1;self.confirm_votes=0
+        self.attempt+=1;self.confirm_votes=0;self.visual_votes=[];self.physical_votes=0
         neck,self.source_score=locate(task,self.saved['source_bank']);rim,self.cup_score=locate(task,self.saved['cup_bank'])
         if self.source_score<self.threshold['source_localization_score'] or self.cup_score<self.threshold['cup_localization_score']:
             self.abort_time=t;self.stop_latched='localization_unconfirmed';self.home=q[:7].copy();return
@@ -94,17 +106,23 @@ class Actor:
             arm=self.lift_path[-1].copy();neck,score=locate(task,self.saved['source_bank'],tracking=True,expected_uv=self.expected_lift_neck)
             moved=self.initial_neck[1]-neck[1]>25.
             follows=np.linalg.norm(neck-self.expected_lift_neck)<12.
-            driven=q[[7,9]];gap=self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']
-            obstructed=np.min(driven)>.35 and np.min(np.pi/4-driven)>gap
+            gap=self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']
+            obstructed=held_gripper(q,gap)
             arm_lift=float(self.fk.fk(q[:7])[0][2]-self.grasp_tcp[2])
             confidence=.23
             self.grasp_check=dict(neck_uv=neck.tolist(),expected_uv=self.expected_lift_neck.tolist(),score=score,
                 moved=bool(moved),follows=bool(follows),finger_obstruction=bool(obstructed),arm_lift_m=arm_lift)
-            self.confirm_votes=self.confirm_votes+1 if score>confidence and moved and follows and obstructed and arm_lift>.035 else 0
+            if self.threshold.get('grasp_visual_window',0):
+                physical=bool(obstructed and arm_lift>.035)
+                self.physical_votes=self.physical_votes+1 if physical else 0
+                self.visual_votes=(self.visual_votes+[bool(score>confidence and moved and follows)])[-self.threshold['grasp_visual_window']:] if physical else []
+                self.confirm_votes=sum(self.visual_votes) if self.physical_votes>=6 else 0
+            else:
+                self.confirm_votes=self.confirm_votes+1 if score>confidence and moved and follows and obstructed and arm_lift>.035 else 0
             if self.confirm_votes>=6:
                 self.grasp_confirmed=True;self.qlift=q[:7].copy();self.lift_rotation=self.fk.fk(self.qlift)[1]
                 self.profile['lift_mark_s']=age;self.grasp_stage='ready'
-            elif elapsed>.65:self.change_grasp_stage('retry_lower',t)
+            elif elapsed>self.threshold.get('verify_seconds',.65):self.change_grasp_stage('retry_lower',t)
         elif stage=='retry_lower':
             arm=path_at(self.lift_path[::-1],ease(elapsed/.7))
             if elapsed>=.7:self.change_grasp_stage('retry_open',t)
@@ -152,8 +170,16 @@ class Actor:
             tilt=float(np.degrees(np.arccos(np.clip(up[2],-1,1))))
             is_empty=empty>=self.threshold['empty_probability'] and present>=.7 and tilt>=95 and flow*72.8<3.
             self.empty_votes=self.empty_votes+1 if is_empty else 0;self.lost_votes=self.lost_votes+1 if present<.05 else 0
+            cap=self.saved['pour_primitive']['phase_cap_deg']
+            if self.pour_phase>=cap-.25 and self.cap_start is None:self.cap_start=t
+            slow=False
+            if 'slow_empty_probability' in self.threshold:
+                gap=self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']
+                slow=slow_empty_evidence(self.threshold,self.pour_phase,cap,tilt,None if self.cap_start is None else t-self.cap_start,
+                    held_gripper(q,gap),present,empty,flow*72.8)
+            self.slow_empty_votes=self.slow_empty_votes+1 if slow else 0
             if self.stop_latched is None:
-                if self.empty_votes>=12:self.latch('bottle_empty',t,robot)
+                if self.empty_votes>=12 or (slow and self.slow_empty_votes>=self.threshold['slow_empty_votes']):self.latch('bottle_empty',t,robot)
                 elif self.lost_votes>=8:self.latch('source_tracking_lost',t,robot)
             if self.terminal is not None:targets,phase=self.terminal.act(t)
             else:
@@ -212,6 +238,8 @@ class Actor:
             grasp_check=self.grasp_check,
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,
+            physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,
+            slow_empty_votes=self.slow_empty_votes,cap_dwell_seconds=None if self.cap_start is None else t-self.cap_start,
             own_pour_phase_deg=self.pour_phase,fill_mode=self.fill_mode,pause_count=self.pause_count,trim_goal=self.trim_goal,
             delta_clamped=bool(clamped),done_probability=float(self.done_votes>=10)))
         return np.degrees(command)

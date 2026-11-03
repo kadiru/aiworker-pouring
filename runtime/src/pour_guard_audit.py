@@ -5,14 +5,14 @@ import numpy as np
 import torch
 from PIL import Image,ImageDraw
 from validate_pour_recording import validate,export_views,decode,h5py
-from pour_guard_study import ROOT
+from pour_guard_study import ROOT,PREFIX
 
 
 def provenance():
     p=ROOT/'best.pt';b=torch.load(p,map_location='cpu',weights_only=False)
     keys=('model_version','step','cup_bias','cup_validation','thresholds','method','inputs','training_device','training_frames',
         'localization_validation','no_privileged_runtime_inputs','parent_checkpoint_sha256','scene_plan_sha256','data_manifest_sha256','sources',
-        'training_sources','controller_revision_note','full_calibration')
+        'training_sources','controller_revision_note','full_calibration','vote_calibration','controller_parent_checkpoint_sha256')
     r={k:b[k] for k in keys if k in b};r['checkpoint_sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
     r['surface_geometry']={k:v for k,v in b['surface_geometry'].items() if k!='coef'}
     r['pour_primitive']={k:v for k,v in b['pour_primitive'].items() if k!='weights'}
@@ -23,7 +23,7 @@ def provenance():
 
 def integrity():
     base=Path('/workspace/outputs/fountain');files=[];sidecars=[];partial=[]
-    for p in sorted(base.glob('*/*G_A_*/episode.hdf5')):
+    for p in sorted(base.glob(f'*/*{PREFIX}*/episode.hdf5')):
         r=validate(p);export_views(p)
         assert r['valid'],str(p)
         files.append(dict(relative_path=str(p.relative_to(base)),bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest(),
@@ -31,7 +31,7 @@ def integrity():
             max_camera_state_skew_s=r['max_camera_state_skew_s']))
         for n in ('metrics.json','parameters.json','samples.json','policy-decisions.json'):
             q=p.parent/n;sidecars.append(dict(relative_path=str(q.relative_to(base)),bytes=q.stat().st_size,sha256=hashlib.sha256(q.read_bytes()).hexdigest()))
-    for p in sorted(base.glob('*/*G_A_*/episode.partial.hdf5')):
+    for p in sorted(base.glob(f'*/*{PREFIX}*/episode.partial.hdf5')):
         with h5py.File(p,'r') as f:status=f.attrs['status'];reason=f.attrs.get('abort_reason',f.attrs.get('error',''))
         assert status in ('aborted','incomplete') and reason,'Unexpected active or unexplained partial recording'
         partial.append(dict(path=str(p),relative_path=str(p.relative_to(base)),bytes=p.stat().st_size,
@@ -54,4 +54,6 @@ def review():
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('mode',choices=('provenance','integrity','review'));args=p.parse_args();globals()[args.mode]()
+    p=argparse.ArgumentParser();p.add_argument('mode',choices=('provenance','integrity','review'));p.add_argument('--study',choices=('guard','vote'),default='guard');args=p.parse_args()
+    if args.study=='vote':from pour_guard_vote_study import ROOT,PREFIX
+    globals()[args.mode]()

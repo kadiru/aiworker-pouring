@@ -13,11 +13,15 @@ def main():
     p.add_argument('--checkpoint', required=True)
     p.add_argument('--split', choices=('development', 'test'), required=True)
     p.add_argument('--interval', type=float, default=40)
+    p.add_argument('--study',choices=('guard','vote'),default='guard')
     args = p.parse_args()
     root = Path('/home/kadir/aiworker-pouring-4070')
-    expected = 6 if args.split == 'test' else 4
+    study='A-guard-20261103-v2' if args.study=='vote' else 'A-guard-20261103-v1'
+    prefix='H_A_' if args.study=='vote' else 'G_A_'
+    plan=json.loads((root/'learning'/study/'frozen-plan.json').read_text())
+    expected = 6 if args.split == 'test' else len(plan['regression'])+len(plan['validation'])
     for _ in range(180):
-        assert hashlib.sha256((root / 'learning/A-guard-20261103-v1/best.pt').read_bytes()).hexdigest() == args.checkpoint
+        assert hashlib.sha256((root / 'learning' / study / 'best.pt').read_bytes()).hexdigest() == args.checkpoint
         s = json.load(urllib.request.urlopen('http://192.168.68.60:8212/health', timeout=5))
         m = s.get('metrics', {})
         print(json.dumps(dict(name=(s.get('trial') or {}).get('name'), phase=s['phase'],
@@ -27,7 +31,7 @@ def main():
             recording_active=s.get('recording', {}).get('active'),
             error=s.get('error'), learning_error=s.get('learning_error'))), flush=True)
         rows = []
-        for name in glob.glob(str(root / 'outputs/fountain/*/*G_A_*/metrics.json')):
+        for name in glob.glob(str(root / f'outputs/fountain/*/*{prefix}*/metrics.json')):
             q = Path(name)
             result = json.loads(q.read_text())
             spec = json.loads((q.parent / 'parameters.json').read_text())

@@ -1,7 +1,13 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 3, 2026, 06:37 PST (America/Los_Angeles).
+Updated: November 3, 2026, 06:58 PST (America/Los_Angeles).
 State: **Frozen guarded-pour round complete: 4/6 full tasks, zero measured spill in all six. Detection follow-up in progress; do not stop at partial validation.**
+
+## Detection follow-up — active
+
+Current root`/workspace/learning/A-guard-20261103-v2`, prefixH_A_, selected checkpoint **b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b**, planSHA**05a0bec06cf0b54b1ce110e61e0fd44617ea2bcb6e4f756d9235da0d6b52ec2a**. Cup/source tensors and fitted paths remain bitwise equal to first-roundf4; earlier4070 retraining is retained. New6-of12RGB grasp votes require six continuous physical checks, resetting on contact loss; verify interval1.25s. A slow empty branch uses p>=.90,24votes, learned131deg cap/.25s dwell, FKtilt>=128deg, continued two-finger obstruction, presence>=.7 and visualflow<1nominalmL/s; oldfast.97/12path unchanged. CPU replay fixes both consumed failure traces; no eligible negative-at-cap frames, so do not claim a validated false-positive rate.13new CPU regressions +19baseline pass.
+
+Owned container **76ed304145f11503596a2996ee85af34d6c4c511b1760345047141a67c684cbc**, run **20261103T145404Z**. Three native regressions (exact G_A_test00 rejected grasp, G_A_test04 missed empty, G_A_test01 good full control) queued once. The grasp scene has confirmed and entered pouring; no completed follow-up outcome yet. Read-only watcher session91175. Controls`vote_development`, `vote_test`; report/audit/freeze tools use`--study vote`. New six tests still untouched; seed20261126, fills27/5,90/13,37/8,88/14,21/3,98/6. Finish all3development, correct any defects before tests, commit source/freeze18hashes, run all6without tuning, audit/back up underdata/material-A-guard-vote, update docs/results and commit/push. First complete round pushed as9a4b8b1; follow-up code/results pending. Do not end early.
 
 ## Grasp confirmation and settled full-stop — November 3, 2026
 

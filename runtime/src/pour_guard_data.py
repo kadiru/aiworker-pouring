@@ -17,7 +17,7 @@ def build_data():
     for p in sorted(Path('/workspace/outputs/fountain').glob('*/*/episode.hdf5')):
         with h5py.File(p,'r') as f:
             spec=json.loads(f.attrs['spec']);name=spec.get('name','');split=spec.get('study_split')
-            if ('G_A_' in name or split not in ('train','validation','test') or
+            if (any(prefix in name for prefix in ('G_A_','H_A_')) or split not in ('train','validation','test') or
                 spec.get('spacing')!=.0018 or spec.get('dt')!=.0025 or f.attrs.get('status')!='complete' or
                 f.attrs.get('camera_rig')!='A_task_wrist_v4' or f.attrs.get('image_encoding')!='jpeg95'):continue
             dest='validation' if split=='validation' else 'train';d=f['data/demo_0'];n=len(d['actions'])

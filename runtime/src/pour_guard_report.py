@@ -1,13 +1,13 @@
 """Fresh guarded-policy benchmark, all development failures retained."""
 import argparse,hashlib,json
 from pathlib import Path
-from pour_guard_study import ROOT
+from pour_guard_study import ROOT,PREFIX
 
 
 def report(require_six=False):
     sha=hashlib.sha256((ROOT/'best.pt').read_bytes()).hexdigest();plan=json.loads((ROOT/'frozen-plan.json').read_text())
     groups={s:[] for s in ('regression','validation','test')};attempts=[]
-    for p in sorted(Path('/workspace/outputs/fountain').glob('*/*G_A_*/metrics.json')):
+    for p in sorted(Path('/workspace/outputs/fountain').glob(f'*/*{PREFIX}*/metrics.json')):
         spec=json.loads((p.parent/'parameters.json').read_text());m=json.loads(p.read_text());f=m['bottle_result'];policy=m['policy']
         assert spec['spacing']==.0018 and spec['dt']==.0025
         rows=json.loads((p.parent/'samples.json').read_text());d=json.loads((p.parent/'policy-decisions.json').read_text())
@@ -35,7 +35,7 @@ def report(require_six=False):
         volume_units='nominal particle count volume; not calibrated mL',
         primary_definition='verified sustained grasp, height>=90%rim OR source<=max(.25 nominal mL,1% initially), correct reason, completed upright set-down/release, zero measured outside/below-worktop particles',
         legacy_definition='Original inventory>=90% plus original physical/completion gates; retained unchanged',
-        test_policy='New seed20261122; one fixed checkpoint, no expert fallback or tuning during six reserved tests',all_attempts=attempts,groups={})
+        test_policy=f'New seed{plan.get("test_seed",20261122)}; one fixed checkpoint, no expert fallback or tuning during six reserved tests',all_attempts=attempts,groups={})
     for split,rs in groups.items():
         result['groups'][split]=dict(attempts=len(rs),verified_grasps=sum(x['grasp_verified'] for x in rs),
             visual_confirmations=sum(x['visual_grasp_confirmed'] for x in rs),
@@ -55,4 +55,6 @@ def report(require_six=False):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--require-six',action='store_true');report(p.parse_args().require_six)
+    p=argparse.ArgumentParser();p.add_argument('--require-six',action='store_true');p.add_argument('--study',choices=('guard','vote'),default='guard');args=p.parse_args()
+    if args.study=='vote':from pour_guard_vote_study import ROOT,PREFIX
+    report(args.require_six)

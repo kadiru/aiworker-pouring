@@ -32,6 +32,7 @@ allowed_commands.add('recovery_probe')
 allowed_commands.add('release_train')
 allowed_commands.update(('stop_train','stop_val','stop_test'))
 allowed_commands.update(('guard_train','guard_val','guard_regression','guard_development','guard_test'))
+allowed_commands.update(('vote_development','vote_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -630,6 +631,12 @@ try:
                         except Exception:
                             state['learning_error']=traceback.format_exc();state['phase']='Visual-guard training failed'
                         continue
+                    elif cmd in ('vote_development','vote_test'):
+                        from pour_guard_vote_study import plan as vote_plan,ROOT as VOTE_ROOT
+                        if not (VOTE_ROOT/'best.pt').exists():
+                            state['control_message']='Select the calibrated confirmation policy first';continue
+                        frozen=vote_plan()
+                        pending.extend(frozen['regression']+frozen['validation'] if cmd=='vote_development' else frozen['test'])
                     elif cmd in ('guard_val','guard_regression','guard_development','guard_test'):
                         from pour_guard_study import plan as guard_plan,ROOT as GUARD_ROOT
                         if not (GUARD_ROOT/'best.pt').exists():

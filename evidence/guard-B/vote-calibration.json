@@ -1,0 +1,179 @@
+{
+  "parent_checkpoint_sha256": "f4ddb8b9f288ad2e5e8a9e6ac495f57a94c7413a0cdb4bbb040a89769bd36098",
+  "method": "Controller-only temporal and confidence calibration on consumed G_A records",
+  "trained_tensors_and_motor_paths_unchanged": true,
+  "grasp_replays": [
+    {
+      "name": "G_A_regression_grasp",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_regression_full",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_validation_00",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_validation_01",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_test_00",
+      "window_confirmation_time": 3.6549999987705877,
+      "original_confirmed": false
+    },
+    {
+      "name": "G_A_test_01",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_test_02",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_test_03",
+      "window_confirmation_time": 3.304999998770595,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_test_04",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    },
+    {
+      "name": "G_A_test_05",
+      "window_confirmation_time": 3.254999998770596,
+      "original_confirmed": true
+    }
+  ],
+  "slow_empty_sweep": [
+    {
+      "probability": 0.9,
+      "calls": [
+        {
+          "name": "G_A_test_04",
+          "t": 12.304999998770349,
+          "source_ml": 0.0,
+          "correct_empty": true,
+          "latency_from_empty_s": 1.4999999999997016,
+          "bilateral_fraction_until_call": 0.9005524861878453
+        }
+      ],
+      "false_positive": 0,
+      "eligible_negative_frames": 0,
+      "fixes_target": true
+    },
+    {
+      "probability": 0.92,
+      "calls": [
+        {
+          "name": "G_A_test_04",
+          "t": 12.304999998770349,
+          "source_ml": 0.0,
+          "correct_empty": true,
+          "latency_from_empty_s": 1.4999999999997016,
+          "bilateral_fraction_until_call": 0.9005524861878453
+        }
+      ],
+      "false_positive": 0,
+      "eligible_negative_frames": 0,
+      "fixes_target": true
+    },
+    {
+      "probability": 0.93,
+      "calls": [
+        {
+          "name": "G_A_test_04",
+          "t": 12.304999998770349,
+          "source_ml": 0.0,
+          "correct_empty": true,
+          "latency_from_empty_s": 1.4999999999997016,
+          "bilateral_fraction_until_call": 0.9005524861878453
+        }
+      ],
+      "false_positive": 0,
+      "eligible_negative_frames": 0,
+      "fixes_target": true
+    },
+    {
+      "probability": 0.94,
+      "calls": [
+        {
+          "name": "G_A_test_04",
+          "t": 12.304999998770349,
+          "source_ml": 0.0,
+          "correct_empty": true,
+          "latency_from_empty_s": 1.4999999999997016,
+          "bilateral_fraction_until_call": 0.9005524861878453
+        }
+      ],
+      "false_positive": 0,
+      "eligible_negative_frames": 0,
+      "fixes_target": true
+    },
+    {
+      "probability": 0.95,
+      "calls": [],
+      "false_positive": 0,
+      "eligible_negative_frames": 0,
+      "fixes_target": false
+    },
+    {
+      "probability": 0.97,
+      "calls": [],
+      "false_positive": 0,
+      "eligible_negative_frames": 0,
+      "fixes_target": false
+    }
+  ],
+  "selected": {
+    "probability": 0.9,
+    "calls": [
+      {
+        "name": "G_A_test_04",
+        "t": 12.304999998770349,
+        "source_ml": 0.0,
+        "correct_empty": true,
+        "latency_from_empty_s": 1.4999999999997016,
+        "bilateral_fraction_until_call": 0.9005524861878453
+      }
+    ],
+    "false_positive": 0,
+    "eligible_negative_frames": 0,
+    "fixes_target": true
+  },
+  "thresholds": {
+    "full_settled_target": 0.94,
+    "coarse_brake_target": 0.89,
+    "runoff_seconds": 0.25,
+    "empty_probability": 0.97,
+    "source_localization_score": 0.3437801837921143,
+    "cup_localization_score": 0.6314167022705078,
+    "source_present": 0.7,
+    "empty_votes": 12,
+    "settle_seconds": 1.2,
+    "max_attempts": 2,
+    "trim_increment": 0.005,
+    "trim_seconds": 0.1,
+    "trim_total_seconds": 0.9,
+    "max_pauses": 3,
+    "grasp_visual_window": 12,
+    "verify_seconds": 1.25,
+    "slow_empty_probability": 0.9,
+    "slow_empty_votes": 24,
+    "empty_cap_dwell_seconds": 0.25,
+    "slow_empty_max_flow_ml_s": 1.0
+  },
+  "selection": "Lowest slow confidence with zero observed premature cap latches, correct target detection within2s, and >=80% bilateral contact until call;24votes plus physical/cap/flow gates. Support is limited; new native tests are required.",
+  "no_H_A_fit_or_test_data_used": true,
+  "cuda_initialized": false,
+  "selected_checkpoint_sha256": "b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b"
+}
