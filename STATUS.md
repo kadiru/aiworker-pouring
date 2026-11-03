@@ -1,13 +1,15 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 03, 2026, 07:59 PST (America/Los_Angeles).
-State: **Thirty-case frozen robustness evaluation authorized; preparation in progress. Prior six-case benchmark remains6/6.**
+State: **Thirty-case frozen material-A evaluation running. No retraining/tuning until all30 complete. Prior six-case benchmark remains6/6.**
 
 ## Thirty-case robustness batch — active
 
 User authorized30fresh randomized tests of the frozen material-A controller on4070. Study`A-robust-20261103-v1`, prefixT30_A_, seed20261130,15full/15empty, same±8mm cup/±9mm source-X/±4mm source-Y workspace. Current checkpointb80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b byte-identical;17inherited policy/physics files unchanged. Only queue scheduling is added to run_fountain; full runtime hashes frozen before tests. No fitting or threshold changes during30. Three new CPU plan checks pass. [Protocol](docs/ROBUSTNESS_A_30.md).
 
-Need finish identity-checked restart, commit protocol/source, freeze current19source hashes and new30-case plan, snapshot resources, POSTrobust_test once, monitor all30 outcomes without tuning, preserve/diagnose all failures, validate native cameras/backups, update docs/status and commit/push. Keep other jobs untouched and existing4070priority guard/CPU/RAM limits. Do not end at a queued/partial batch. Native/report helperspour_robust_study.py,freeze_robust_study.py,pour_robust_report.py; read-onlywatchtools/watch_robust_trials.py. No new results claimed yet.
+Owned container **f783d7a6d1416de3a7b48419a12e3cffa4aba5cff189707ddb2fd1c3393a941b**, current4070 process2251293, only own compute observed before batch. Frozen at2026-11-03T19:30:35.427901+00:00, sourcecommit1a5560362abb640371680f1575f22cbe62c57f1f, planSHA9035a10b7edd75db35246cb65f0a9f5693d2e409194d92c54630a6abd8885c3a, modelSHA unchangedb80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b.19runtime/scheduler/study source hashes match local/deployed,17inherited policy/physics hashes match prior benchmark. All30 queued once via robust_test; read-only watcher session95468. PrefixT30_A_ avoids historical R_A_ recovery records. Four CPU plan checks passed, including the real saved scene schema. Protocol/source commits through1a55603 pushed. Raw/model backups outsideGit underdata/material-A-robust andevidence/robust-A.
+
+Next: finish all30 without policy changes, preserve every outcome, inspect/quantify failures, CPUreport pour_robust_report.py --require-thirty, audit audit_robust_study.py integrity/review, back up30HDF5+120sidecars with SHA checks, capture final resource/source state, runtools/summarize_robust_benchmark.py, review allfive camera sheets, update docs/status andcommit/push. Do not end at queued/partial results. No B/C appearance changes or foreign-job lifecycle actions.
 
 ## Completed repair and independent evaluation
 
