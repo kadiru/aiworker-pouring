@@ -25,13 +25,15 @@ def integrity():
     base=Path('/workspace/outputs/fountain');files=[];sidecars=[];partial=[]
     for p in sorted(base.glob('*/*G_A_*/episode.hdf5')):
         r=validate(p);export_views(p)
+        assert r['valid'],str(p)
         files.append(dict(relative_path=str(p.relative_to(base)),bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest(),
             valid=r['valid'],transitions=r['transitions'],duration_sim_s=r['duration_sim_s'],physical_success=r['physical_success'],
             max_camera_state_skew_s=r['max_camera_state_skew_s']))
         for n in ('metrics.json','parameters.json','samples.json','policy-decisions.json'):
             q=p.parent/n;sidecars.append(dict(relative_path=str(q.relative_to(base)),bytes=q.stat().st_size,sha256=hashlib.sha256(q.read_bytes()).hexdigest()))
     for p in sorted(base.glob('*/*G_A_*/episode.partial.hdf5')):
-        with h5py.File(p,'r') as f:status=f.attrs['status'];reason=f.attrs.get('abort_reason','')
+        with h5py.File(p,'r') as f:status=f.attrs['status'];reason=f.attrs.get('abort_reason',f.attrs.get('error',''))
+        assert status in ('aborted','incomplete') and reason,'Unexpected active or unexplained partial recording'
         partial.append(dict(path=str(p),relative_path=str(p.relative_to(base)),bytes=p.stat().st_size,
             sha256=hashlib.sha256(p.read_bytes()).hexdigest(),status=status,reason=reason,excluded=True))
     result=dict(files=files,sidecar_files=sidecars,valid_recordings=len(files),partial_aborted_excluded=partial,

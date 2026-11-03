@@ -27,6 +27,8 @@ def report(require_six=False):
             stop_prediction=next((x for x in d if x['stop_latched']),None),
             stop_observation=None if stop is None else {k:stop[k] for k in ('t','cup_fill_fraction','cup_inventory_fraction','bottle_ml','spilled_ml','airborne_ml')},
             terminal_modes=list(dict.fromkeys(x['mode'] for x in d if x['stop_latched'])))
+        row['completed_return_release_sequence']=bool(policy['done'] and f['stop_reason'] in ('cup_near_full','bottle_empty') and
+            all(mode in row['terminal_modes'] for mode in ('Returning upright','Setting bottle down','Releasing bottle','Retreating','Holding completed pose')))
         attempts.append(row)
         if policy['checkpoint_sha256']==sha:groups[spec['study_split']].append(row)
     result=dict(checkpoint_sha256=sha,scene_plan_sha256=hashlib.sha256((ROOT/'frozen-plan.json').read_bytes()).hexdigest(),
@@ -39,6 +41,7 @@ def report(require_six=False):
             visual_confirmations=sum(x['visual_grasp_confirmed'] for x in rs),
             liquid_transfers_at_least_1_ml=sum(x['delivered_to_cup_ml']>=1. for x in rs),
             policy_completions=sum(x['policy_completed'] for x in rs),zero_spill_runs=sum(x['zero_spill'] for x in rs),
+            return_release_sequences=sum(x['completed_return_release_sequence'] for x in rs),
             surface_goal_zero_spill_successes=sum(x['surface_goal_zero_spill_success'] for x in rs),
             legacy_inventory_zero_spill_successes=sum(x['legacy_inventory_zero_spill_success'] for x in rs),
             final_outside_mean_ml=sum(x['final_outside_ml'] for x in rs)/len(rs) if rs else None,rows=rs)

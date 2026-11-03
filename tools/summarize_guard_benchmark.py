@@ -15,17 +15,29 @@ def main():
     assert hashlib.sha256((E/'best.pt').read_bytes()).hexdigest()==r['checkpoint_sha256']
     assert hashlib.sha256((E/'frozen-plan.json').read_bytes()).hexdigest()==r['scene_plan_sha256']==m['scene_plan_sha256']
     for n,h in m['sources'].items():assert hashlib.sha256((ROOT/'runtime/src'/n).read_bytes()).hexdigest()==h,n
+    for n,h in selection['runtime_sources'].items():assert hashlib.sha256((ROOT/'runtime/src'/n).read_bytes()).hexdigest()==h,n
+    before=read(E/'runtime-before-tests.json');after=read(E/'runtime-final.json')
+    assert before['container']==after['container']
+    assert before['limits']==after['limits'] and after['guard_processes']
+    assert before['sources']==after['sources']==selection['runtime_sources']
+    assert before['selected_checkpoint_sha256']==after['selected_checkpoint_sha256']==r['checkpoint_sha256']
+    assert before['asset_sha256']==after['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
+    assert not after['health']['queue'] and not after['health']['recording']['active']
+    assert not after['health']['error'] and not after['health']['learning_error']
     rows=r['groups']['test']['rows'];expected={s['name'] for s in read(E/'frozen-plan.json')['test']}
     assert len(rows)==6 and {x['name'] for x in rows}==expected
     assert all(x['checkpoint_sha256']==r['checkpoint_sha256'] and not x['teacher_fallback'] for x in rows)
     integrity=read(E/'recording-integrity.json');files=[];sidecars=[];partials=[]
+    assert all(x['valid'] for x in integrity['files'])
+    native_paths={x['relative_path'] for x in integrity['files']}
+    assert all(str((Path(x['path'])/'episode.hdf5').relative_to('/workspace/outputs/fountain')) in native_paths for x in rows)
     for entries,dest in ((integrity['files'],files),(integrity['sidecar_files'],sidecars)):
         for x in entries:
             p=ROOT/'data/material-A-guard'/x['relative_path']
             assert p.stat().st_size==x['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==x['sha256'],str(p)
             dest.append(dict(x,local_path=str(p)))
     for x in integrity['partial_aborted_excluded']:
-        assert x['status']=='aborted','An active recording remains'
+        assert x['status'] in ('aborted','incomplete') and x['reason'] and x['excluded'],'An active or unexplained recording remains'
         if 'relative_path' in x:
             p=ROOT/'data/material-A-guard'/x['relative_path']
             assert p.stat().st_size==x['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==x['sha256']
@@ -40,7 +52,7 @@ def main():
         verified_native_backups=len(files),aborted_development_retained=len(partials))
     (E/'final-benchmark.json').write_text(json.dumps(summary,indent=2)+'\n')
     with (E/'final-benchmark.csv').open('w',newline='') as f:
-        w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader()
+        w=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n');w.writeheader()
         w.writerows({k:json.dumps(v) if isinstance(v,(dict,list)) else v for k,v in x.items()} for x in rows)
     print(json.dumps(dict(status='complete',test=summary['test'],verified_native_backups=len(files),aborted_development_retained=len(partials)),indent=2))
 

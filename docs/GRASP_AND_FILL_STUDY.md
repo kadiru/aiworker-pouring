@@ -18,15 +18,15 @@ Runtime inputs: task/wrist RGB, joint positions/velocities, own history/phase, a
 
 Training ran inside the existing guarded **RTX 4070** simulator process, with no second CUDA process. CPU data preparation and audits do not initialize CUDA.
 
-- Cup images: **4,711 training / 2,687 validation**. AdamW, 1,800 updates, selected step 400; the final cached fit took 11.29 seconds. The loss is weighted smooth L1: `min_theta Σ w_i Huber(f_theta(image_i) − height_i)`. Near-full and calm frames receive greater weight.
+- Cup CNN: **58,561 parameters**, **4,711 training / 2,687 validation images**. AdamW, 1,800 updates, selected step 400; the final cached fit took 11.29 seconds. The loss is weighted smooth L1: `min_theta Σ w_i Huber(f_theta(image_i) − height_i)`. Near-full and calm frames receive greater weight.
 - Calm near-full validation: **74 frames**, mean absolute error **1.208 percentage points**, 90th-percentile absolute error **3.862 points**. Broad all-frame MAE is **6.471 points**. These masks differ; the smaller near-full metric is not an all-frame accuracy claim.
 - Localization: 52 training / 30 validation initial frames; 16 source-neck and eight cup-rim templates. Maximum validation position errors: source **0.272 mm**, cup **0.499 mm**, within this calibrated simulated camera.
-- Movement primitive: **19 training / four validation** successful original demonstration paths. Ridge regression solves `W = (XᵀX + λI)⁻¹XᵀY`; the input is lift joints plus cup XY, with targets indexed by pour angle. Validation selects λ.
+- Movement primitive: **19 training / four validation** successful original demonstration paths. Ridge regression solves `W = (XᵀX + Λ)⁻¹XᵀY`; the input is lift joints plus cup XY, with targets indexed by pour angle. Validation selects λ=0.001; Λ uses that diagonal penalty and a smaller intercept penalty.
 - Objective at execution: complete a verified grasp and return/release while achieving `height/rim ≥ 0.90 OR residual ≤ max(0.25 nominal mL, 0.01 × initial)`, with the correct stop reason and **zero measured escaped particles**. Nominal mL are particle-count volumes, not calibrated physical volumes.
 
 ## Selection and evaluation protocol
 
-All new `G_A_*` episodes are excluded from fitting. Earlier tests become consumed development evidence; they are never presented as fresh tests again. This study reserves seed **20261122**, six source/cup fills **26/4, 91/12, 39/8, 87/14, 20/3, 98/6 nominal mL**, with the same small position variation. Plan SHA256: `eae551d7eebf42a0f4deb26fae62805e0733c5e47fe3fcf429982c1467a8f10f`.
+All new `G_A_*` episodes are excluded from neural and motor fitting; controller thresholds are selected using development only. Earlier tests become consumed development evidence; they are never presented as fresh tests again. This study reserves seed **20261122**, six source/cup fills **26/4, 91/12, 39/8, 87/14, 20/3, 98/6 nominal mL**, with the same small position variation. Plan SHA256: `eae551d7eebf42a0f4deb26fae62805e0733c5e47fe3fcf429982c1467a8f10f`.
 
 Two exact old failure scenes and two new validation scenes precede selection. The final checkpoint/config/source identity is frozen before the six reserved tests. Run each test once, without tuning during the block. Maximum 40 simulated seconds and a 12-second grasp deadline permit a retry/top-ups; the scoring thresholds and accepted liquid physics stay fixed. Material A, 1.8 mm spacing, 400 Hz physics and existing isosurface capacities remain unchanged.
 
@@ -34,7 +34,26 @@ Development failures remain evidence: an initial neck/base coordinate bug was ca
 
 ## Results
 
-Final development and the six reserved tests are in progress. No six-case success rate is claimed yet. Machine-readable selection, all attempts and final outcomes will be stored in `evidence/guard-A/`; complete HDF5 camera/joint/label records and any aborted development recordings remain external under `data/material-A-guard/` with checksum verification.
+The selected checkpoint passed all four development tasks with zero spill. The three full cases finished at 90.3–91.2% rim height; the short-source case emptied the bottle. Legacy nominal-inventory score: 1/4.
+
+**All six reserved tests then ran once without policy changes:4/6 complete physical tasks, with zero measured spill in all six.** Six initial grasps were physically verified, five passed visual confirmation, five transferred liquid, and four completed the proper full/empty return/release sequence. A safe abort is not a successful pour. Legacy nominal-inventory score: **1/6**, retained separately.
+
+| Test | Source/cup initial nominal mL | Final rim height | Source left nominal mL | Outcome |
+|---|---:|---:|---:|---|
+| G_A_test_00 |26/4|7.1%|25.999|Failed: visual confirmation rejected a physical grasp; retry localization failed |
+| G_A_test_01 |91/12|91.1%|38.864|Pass: full, return/release, zero spill |
+| G_A_test_02 |39/8|70.7%|0|Pass: empty, return/release, zero spill |
+| G_A_test_03 |87/14|90.5%|37.366|Pass: full, return/release, zero spill |
+| G_A_test_04 |20/3|37.9%|0|Failed: empty confidence stayed below .97; 40s timeout without return |
+| G_A_test_05 |98/6|90.7%|40.252|Pass: full, return/release, zero spill |
+
+All three full-cup cases passed; the short-bottle cases expose two remaining detection failures. Test00 had seven supporting image matches in 14 observations but no six-consecutive run. Test04's empty confidence remained around .94–.95 despite source0 and visible-bottle confidence >.99. Neither is counted as a zero-spill task success. The reliability objective is still unmet. [Machine-readable results](../evidence/guard-A/final-benchmark.json), [CSV](../evidence/guard-A/final-benchmark.csv), [all six camera views](../evidence/guard-A/test-contact-sheet.jpg).
+
+Checkpoint SHA256: `f4ddb8b9f288ad2e5e8a9e6ac495f57a94c7413a0cdb4bbb040a89769bd36098`, frozen at 2026-11-03T13:56:40.556375Z. All 17 runtime/physics source hashes, checkpoint, container identity, resource caps and original robot asset stayed unchanged through testing. The separate 4090 process PID 1758861 remained present before/after; no foreign process was signaled or modified. [Isolation comparison](../evidence/guard-A/runtime-comparison.json).
+
+All 19 completed native HDF5 recordings and 76 JSON sidecars match their local backups. One aborted development file retains native status `incomplete` and error `Stopped by user`; its original bytes/checksum are preserved and it is excluded from complete-task data. [Integrity manifest](../evidence/guard-A/recording-integrity.json). Actual completed videos: [full cup](../evidence/guard-A/autonomous-full-test01.mp4), [empty bottle](../evidence/guard-A/autonomous-empty-test02.mp4). Media/models/raw records remain external to Git.
+
+The next repair uses consumed evidence from this batch and a separate fresh test seed; see [transparent-neck/empty confirmation follow-up](GRASP_VOTE_STUDY.md). No result from that follow-up is claimed here.
 
 ## Isolation and verification
 

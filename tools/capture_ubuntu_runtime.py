@@ -28,7 +28,8 @@ def main():
     sources = ('pour_guard_actor.py', 'pour_guard_train.py', 'pour_guard_models.py',
         'pour_guard_vision.py', 'pour_guard_trajectory.py', 'pour_guard_study.py',
         'pour_guard_data.py', 'pour_stop_actor.py', 'pour_stop_models.py',
-        'pour_stop_sequence.py', 'run_fountain.py', 'robot_pour.py', 'pour_recording.py')
+        'pour_stop_sequence.py', 'run_fountain.py', 'robot_pour.py', 'pour_recording.py',
+        'bottle_pour.py', 'pour_fluid.py', 'pour_geometry.py', 'vessel_appearance.py')
     result = dict(
         checked_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
         container=cid, owner='aiworker-pouring', limits=limits,
