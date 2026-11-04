@@ -1,5 +1,19 @@
 # Localization and settled-level correction
 
+## Selected candidate and current state
+
+Development is complete for v15, checkpoint `18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527`. All seven scenarios grasped, transferred, reached the appropriate full/empty goal and completed return/release. **Six of seven passed the unchanged strict zero-spill task.** The six full cases finished at 91.752–94.369% rim height; the empty control finished with zero source particles. All five failure scenes from the prior benchmark now pass. The full control `L30_A_dev_10_r4` lost two particles (0.011664 nominal mL); it remains a failure. An outside reading first appeared before its top-up, and particles were later observed below the table. Saved records do not identify individual particle trajectories, so the origin of both final escaped particles is unproven.
+
+This candidate will be evaluated once on all 30 reserved cases to measure residual spill risk. The freeze command explicitly records a two-particle **development readiness allowance only**; it does not change any development or test score. The default freeze still rejects any strict failure. Checks against retained native outcomes reject underfill, missed grasp and the older eight-particle spill, while the two-particle case remains labeled failed. [Readiness checks](../evidence/settled-A/readiness-checks.json), [round4 outcomes](../evidence/settled-A/round4-settled-results.json).
+
+The final predictor uses a frozen CNN plus 14 vertical color bands, 16 ridge coefficients, lambda 0.1, 37 training/12 validation episodes and 1,301/398 frames. Near-full validation MAE is 1.068 percentage points; p95 overestimate is 2.321 points. The selected target is 0.928209. Cached refitting took 1.112 seconds on the guarded RTX 4070; neural encoders and learned motor primitives remain unchanged. The v15 controller uses at most four short 35-degree/s pulses, immediately brakes at `min(110,max(95,previous_peak+0.25))` degrees, and evaluates settled predictions after each 1.2-second pause. Moving-image predictions cannot terminate a pulse. Twenty-one targeted CPU checks pass.
+
+All 18 complete development recordings, 72 sidecars, three interrupted partials and three partial sidecars match native SHA256 backups. Both round4 task/wrist stop/final camera sheets were inspected. Failures and interrupted attempts from earlier rounds remain archived. None of the reserved 30 tests has started at this selection checkpoint.
+
+The owned container is `47342c463a7c0edcb913a2191bf11bbade77faa20e424825ab1581337fb2fb27`, with 4070-only access, four-core quota, CPUs16–23, shares256, nice10, 16GiB/no extra swap and the immutable-ID GPU-priority guard. A foreign 4090 process changed before the round3 restart for an unverified reason; no foreign process or configuration was modified by this work. Do not interpret snapshots as proof of uninterrupted foreign-job execution.
+
+Freeze after source commit: `AIWORKER_SOURCE_COMMIT=<commit> /isaac-sim/python.sh freeze_settled_study.py --document-known-spill-particles 2`, then POST `settled_test` once. No model/controller/plan tuning is allowed during the 30 cases. Run the final report, native recording audit, backup verification and camera review before reporting completion. The sections below retain the chronological development history; their earlier configurations and pending states are superseded by this selected-candidate record.
+
 Authorized November3,2026: fix localization/settled-level prediction, retrain on the guarded4070, run30fresh tests, commit and push. MaterialA and the existing calibrated workspace/physics remain fixed. All earlier failures remain recorded in the [prior30-case report](ROBUSTNESS_A_30.md).
 
 ## Implemented correction and actual fit

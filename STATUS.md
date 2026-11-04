@@ -1,7 +1,9 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 03, 2026, 17:59 PST (America/Los_Angeles).
-State: **Localization/settled-height correction in progress; new fitting and 30 fresh tests authorized.**
+State: **Development complete; freezing v15 for the authorized 30 fresh tests.**
+
+Latest: round4 finished all seven cases. All five prior failure scenes now pass. Seven verified grasps, correct full/empty stops and completed return/releases; six strict zero-spill successes. Full heights91.752–94.369%; empty source0. Case10 lost two particles(0.011664nominalmL) and remains a failure. Selecting v15 with this documented residual risk for the unchanged strict30-case evaluation, not relabeling it as success. The explicit freeze allowance affects readiness only; checks reject older underfill/missed-grasp/eight-particle spill failures. All18complete+72sidecar+3partial+3partial-sidecar backups match nativeSHA256; both round4 camera sheets reviewed. No reserved test started yet. Next: freeze committed source/model/plan, run all30once without tuning, audit every outcome and push final evidence. See [selected candidate](docs/SETTLED_LEVEL_STUDY.md).
 
 ## Active corrective study
 
