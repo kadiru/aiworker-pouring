@@ -1,0 +1,32 @@
+{
+  "checked_utc": "2026-11-04T03:11:37.631848+00:00",
+  "note": "Read-only inspection. Foreign 4090 PID changed during the batch; reason unverified. No foreign process was signaled or reconfigured by this work. Empty kernel query is not proof of uninterrupted execution.",
+  "checks": [
+    {
+      "command": [
+        "ps",
+        "-o",
+        "pid,ppid,lstart,ni,pcpu,pmem,comm",
+        "-p",
+        "2821907,2891526"
+      ],
+      "returncode": 0,
+      "stdout": "    PID    PPID                  STARTED  NI %CPU %MEM COMMAND\n2821907 2821837 Tue Nov  3 17:56:20 2026  10  114  9.7 python3\n2891526 2503677 Tue Nov  3 18:44:06 2026   0  162  2.6 python\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "journalctl",
+        "-k",
+        "--since",
+        "2026-11-04 02:42:00 UTC",
+        "--no-pager",
+        "-g",
+        "Out of memory|Killed process|NVRM: Xid"
+      ],
+      "returncode": 1,
+      "stdout": "-- No entries --\n",
+      "stderr": ""
+    }
+  ]
+}

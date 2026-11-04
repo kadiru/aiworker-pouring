@@ -17,6 +17,13 @@ def main():
     assert before['sources']==after['sources']==s['runtime_sources']
     for n,h in s['runtime_sources'].items():assert hashlib.sha256((ROOT/'runtime/src'/n).read_bytes()).hexdigest()==h,n
     assert before['container']==after['container'] and before['limits']==after['limits'] and after['guard_processes']
+    snapshots={'before':before}
+    snapshots.update({p.stem:read(p) for p in sorted(E.glob('runtime-after-test*.json'))})
+    snapshots['after']=after
+    for label,snapshot in snapshots.items():
+        for key in ('container','limits','sources','selected_checkpoint_sha256','asset_sha256'):
+            assert snapshot[key]==before[key],(label,key)
+        assert snapshot['guard_processes'],label
     assert not after['health']['queue'] and not after['health']['recording']['active'] and not after['health']['error'] and not after['health']['learning_error']
     assert before['asset_sha256']==after['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
     expected={x['name'] for x in read(E/'frozen-plan.json')['test']};assert {x['name'] for x in r['cases']}==expected
@@ -54,6 +61,14 @@ def main():
     assert all(x['valid'] for x in integrity['files'])
     (DATA/'backup-index.json').write_text(json.dumps(dict(all_native_checksums_match=True,**integrity),indent=2)+'\n')
     (E/'final-benchmark.json').write_text(json.dumps(dict(**r,verified_native_backups=len(integrity['files']),verified_sidecars=len(integrity['sidecar_files']),independently_recomputed_primary_scores=30),indent=2)+'\n')
+    (E/'runtime-comparison.json').write_text(json.dumps(dict(
+        before_utc=before['checked_utc'],after_utc=after['checked_utc'],container=after['container'],
+        same_owned_container=True,same_resource_caps=True,limits=after['limits'],
+        same_runtime_sources=True,runtime_source_count=len(s['runtime_sources']),same_checkpoint=True,same_robot_asset=True,
+        guard_processes=after['guard_processes'],
+        snapshots={label:{k:x[k] for k in ('checked_utc','gpu_compute_processes','gpu_utilization','memory')} for label,x in snapshots.items()},
+        final_health=after['health'],
+        scope='Read-only snapshots verify owned-container isolation and caps. Foreign 4090 process IDs changed; cause unverified. This task did not signal or reconfigure foreign jobs. Snapshots do not establish uninterrupted execution of other workloads.'),indent=2)+'\n')
     print(json.dumps(dict(counts=r['counts'],backups=len(integrity['files']),sidecars=len(integrity['sidecar_files']),source_hashes=len(s['runtime_sources'])),indent=2))
 
 
