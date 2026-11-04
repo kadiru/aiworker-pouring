@@ -25,6 +25,8 @@ Frozen at `2026-11-04T22:48:48.805126Z` from pushed source commit `6697bc1e24576
 
 At the five-case milestone, **5/5 closed tests passed**, with zero final outside and zero sampled near-table loss. Two had transient nonairborne outside readings, at most two particles (0.011664 nominal mL); those were not permanent measured loss. All five HDF5 and 20 sidecars matched their local backup hashes. The resource snapshot matches the pretest container, caps, guard, model, asset and 30 sources. [Five-case observation](evidence/workspace-A/progress-after-05.json).
 
+At eight closed cases, **7/8 strict passes**. `W30_A_test_07` verified grasp, emptied, stopped correctly and returned; two particles remained outside and reached the sampled near-table threshold (0.011664 nominal mL). Two particles were already airborne outside 0.05 simulated seconds before the stop; first near-table detection was 0.10 s after it. Its validated HDF5 and four sidecars are backed up and the failure is retained. [Diagnostic](evidence/workspace-A/first-spill-diagnostic.json).
+
 Next: complete this fixed 30-test run without tuning or retries; no further queue command is needed. Then run `pour_workspace_report.py --require-thirty`, `audit_workspace_study.py integrity` and `audit_workspace_study.py review` in `/workspace/src`. Back up with `tools/backup_workspace_recordings.py`, independently verify using `tools/summarize_workspace_benchmark.py`, analyze using `tools/analyze_robust_outcomes.py --study workspace`, review all camera sheets and preselected cases 00/01, generate the final outcome plot, and commit/push. Native study path: `/workspace/learning/A-workspace-20261104-v1`; local raw backups: `data/material-A-workspace/`.
 
 ## Completed localization and spill repair
