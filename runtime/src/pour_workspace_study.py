@@ -15,7 +15,7 @@ SEED = 20261224
 RANGES = (.024, .024, .027, .012)
 RUNTIME_SOURCES = tuple(dict.fromkeys(PARENT_SOURCES + (
     'pour_workspace_study.py', 'pour_workspace_data.py', 'pour_workspace_train.py',
-    'pour_workspace_motion.py', 'pour_stop_data.py', 'pour_learning.py')))
+    'pour_workspace_motion.py', 'pour_workspace_path.py', 'pour_stop_data.py', 'pour_learning.py')))
 
 
 def scene(base, name, delta, target, rng, split, expert=False):
@@ -73,10 +73,26 @@ def seen():
     return [json.loads(p.read_text()) for p in Path('/workspace/outputs/fountain').glob(f'*/*{PREFIX}*/parameters.json')]
 
 
+def reference_specs():
+    """Retain original attempts; optional repairs have new, explicit names."""
+    original=plan()['demonstrations'];by_name={s['name']:s for s in original}
+    path=ROOT/'reference-repair-plan.json'
+    repairs=json.loads(path.read_text())['demonstrations'] if path.exists() else []
+    names=set(by_name)
+    for s in repairs:
+        base=by_name[s['reference_case']]
+        assert s['name']==base['name']+f"_repair_r{s['reference_repair_round']}"
+        assert s['name'] not in names;names.add(s['name'])
+        assert s['reference_repair_round']>=1 and s['approach_clearance_m']==.04
+        for k,v in base.items():
+            if k!='name':assert s[k]==v,(s['name'],k)
+    return original+repairs
+
+
 def demonstrations():
     assert not (ROOT/'final-selection.json').exists()
     started={s['name'] for s in seen()}
-    return [s for s in plan()['demonstrations'] if s['name'] not in started]
+    return [s for s in reference_specs() if s['name'] not in started]
 
 
 def development():

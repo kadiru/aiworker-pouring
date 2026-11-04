@@ -2,6 +2,9 @@
 import json
 from pathlib import Path
 import unittest
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+import pour_workspace_study as study
 from pour_workspace_study import make_plan,RANGES
 
 
@@ -23,6 +26,25 @@ class PlanTests(unittest.TestCase):
             for k in ('spacing','dt','mouth_z','goal_definition','max_seconds','grasp_deadline'):
                 self.assertEqual(s[k],parent['test'][0][k])
         self.assertEqual(p,make_plan(parent))
+
+    def test_repairs_retain_failed_names_and_cannot_change_scene_or_test_plan(self):
+        root=Path(__file__).resolve().parents[2]
+        p=make_plan(json.loads((root/'evidence/reliable-A/frozen-plan.json').read_text()))
+        base=p['demonstrations'][8]
+        repair=dict(base,name=base['name']+'_repair_r1',reference_case=base['name'],
+            reference_repair_round=1,approach_clearance_m=.04)
+        with TemporaryDirectory() as temporary,patch.object(study,'ROOT',Path(temporary)):
+            frozen=study.ROOT/'frozen-plan.json';frozen.write_text(json.dumps(p));before=frozen.read_bytes()
+            path=study.ROOT/'reference-repair-plan.json'
+            path.write_text(json.dumps(dict(demonstrations=[repair])))
+            self.assertEqual(len(study.reference_specs()),21)
+            self.assertEqual(study.reference_specs()[8],base)
+            self.assertEqual(frozen.read_bytes(),before)
+            bad=dict(repair,cup_world=[.50,-.15,1.04])
+            path.write_text(json.dumps(dict(demonstrations=[bad])))
+            with self.assertRaises(AssertionError):study.reference_specs()
+            path.write_text(json.dumps(dict(demonstrations=[repair,repair])))
+            with self.assertRaises(AssertionError):study.reference_specs()
 
 
 if __name__=='__main__':unittest.main()

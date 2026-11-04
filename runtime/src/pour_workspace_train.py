@@ -79,6 +79,7 @@ def train(state):
         trim_seconds=0.,discrete_topup=True,max_pauses=7)
     saved['thresholds'].update(coarse_flow_min_level=.25,coarse_flow_limit_ml_s=18.)
     saved['pour_primitive']['slow_rate_deg_s']=5.
+    saved['approach_clearance_m']=.04
     saved['training_device'] = dict(name=torch.cuda.get_device_name(0), visible_cuda_devices=1)
     saved['settled_training'] = dict(train_episodes=len(set(tr['episode'])), validation_episodes=len(set(va['episode'])),
         train_frames=len(y), validation_frames=len(vy), learned_parameters=len(chosen['fit']['coef']),
@@ -91,6 +92,7 @@ def train(state):
         device=saved['training_device'], chosen=dict(columns=chosen['fit']['columns'], ridge=chosen['fit']['ridge'], metrics=chosen['metrics']),
         thresholds=saved['thresholds'], localization=loc, localization_consensus=consensus_report, template_fit=template_report, motion=motion_report, empty_detector_coverage=empty_coverage,
         motion_rate_deg_s=dict(fast=saved['pour_primitive']['fast_rate_deg_s'],slow=saved['pour_primitive']['slow_rate_deg_s']), elapsed_s=time.monotonic() - started,
+        approach_clearance_m=saved['approach_clearance_m'],approach_method='Raised Cartesian IK approach/retreat from RGB-localized target, measured home joints and fixed hardware geometry; unchanged collisions and drive limits',
         candidates=[dict(columns=c['fit']['columns'], ridge=c['fit']['ridge'], metrics=c['metrics'], score=c['score']) for c in candidates],
         unchanged_components=['cup CNN weights', 'source detector weights', 'empty confirmation gates', 'fluid and vessel physics', 'primary task scoring'],
         no_privileged_runtime_inputs=True, data_manifest_sha256=saved['settled_training']['data_manifest_sha256'], sources=saved['sources'])

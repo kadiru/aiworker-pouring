@@ -9,13 +9,13 @@ import torch
 from validate_pour_recording import decode,h5py
 from pour_guard_vision import make_bank,project,locate,plane_point,cup_crop
 from pour_temporal_localization import consensus
-from pour_workspace_study import ROOT,PARENT,PARENT_SHA,PREFIX,RANGES,plan
+from pour_workspace_study import ROOT,PARENT,PARENT_SHA,PREFIX,RANGES,plan,reference_specs
 
 PARENT_VALIDATION={f'C30_A_test_{i:02}' for i in (2,7,9,17,21,27)}
 
 
 def sequences():
-    expected={s['name']:s for s in plan()['demonstrations']}; result=[]
+    expected={s['name']:s for s in reference_specs()}; result=[]
     files=sorted(Path('/workspace/outputs/fountain').glob('*/*C30_A_test_*/episode.hdf5'))
     files+=sorted(Path('/workspace/outputs/fountain').glob(f'*/*{PREFIX}demo_*/episode.hdf5'))
     for p in files:
@@ -32,11 +32,14 @@ def sequences():
                 split=s['study_split']
             ix=np.flatnonzero(d['time'][:]-d['time'][0]<=1.+1e-7)
             result.append(dict(name=name,path=str(p),sha256=hashlib.sha256(p.read_bytes()).hexdigest(),
+                reference_case=s.get('reference_case',name),
                 split=split,images=np.stack([decode(d['obs/task_image'][i],'jpeg95') for i in ix]),
                 times=d['time'][:][ix],source_xyz=d['ground_truth/bottle_pose'][0,:3],cup_xyz=np.asarray(s['cup_world']),
                 accepted_reference=bool(m['grasp_verified'] and m['zero_spill'] and not m['gates']),
                 rejection_gates=m['gates'],zero_spill=m['zero_spill']))
-    assert len(result)==50 and {e['name'] for e in result if e['name'].startswith(PREFIX)}==set(expected)
+    assert len(result)==30+len(expected) and {e['name'] for e in result if e['name'].startswith(PREFIX)}==set(expected)
+    accepted={e['reference_case'] for e in result if e['name'].startswith(PREFIX) and e['accepted_reference']}
+    assert accepted=={s['name'] for s in plan()['demonstrations']},'Every planned reference case needs a successful retained original or explicitly named repair before fitting'
     return result
 
 
@@ -59,7 +62,7 @@ def cover_workspace(saved):
 
 @torch.inference_mode()
 def fit_banks(saved,seq):
-    coverage=cover_workspace(saved);train=[e for e in seq if e['name'].startswith(PREFIX) and e['split']=='train']
+    coverage=cover_workspace(saved);train=[e for e in seq if e['name'].startswith(PREFIX) and e['split']=='train' and e['name']==e['reference_case']]
     assert len(train)==16;report={}
     for kind,height in (('source',.135),('cup',.038)):
         anchors=[project(e[kind+'_xyz']+[0,0,height],saved['calibration']) for e in train]

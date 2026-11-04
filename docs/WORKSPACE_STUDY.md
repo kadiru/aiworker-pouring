@@ -1,6 +1,6 @@
 # Expanded-position material-A study
 
-Status: reference demonstrations running; no expanded-position autonomous result yet.
+Status: original reference collection continues. Fitting is held after a rejected grasp; a raised-approach repair is staged for native validation. No expanded-position autonomous result yet.
 
 The user authorized larger bottle/cup position variation, retraining on the RTX 4070, thirty fresh autonomous tests aiming for zero spill, and committing/pushing. This study is separate from the completed 30/30 narrow-workspace evaluation.
 
@@ -21,6 +21,12 @@ The locally generated position comparison is `evidence/workspace-A/position-doma
 Sixteen reference demos cover all corners of the four-dimensional domain, balanced for full/empty goals along each dimension. Four separate interior demos supply validation. Collection uses the privileged scripted joint-drive reference controller, with a 5°/s slow tilt and nominal-volume stop target .88. Reference demos are training evidence, never autonomous successes. All attempts, including rejected demos, must be retained.
 
 CPU preflight solved all wrist paths and confirmed initial bottle/cup matching-patch coverage for **58/58 scenes**. This establishes kinematic reachability and projection coverage, not collision-free motion or successful grasps. [Preflight](../evidence/workspace-A/workspace-preflight.json), [plan](../evidence/workspace-A/frozen-plan.json).
+
+## Approach issue found during collection
+
+Reference `W30_A_demo_train_08` failed its grasp without transferring or losing liquid. Its measured arm missed commanded joints by about 17 degrees. CPU forward-kinematic convex-hull/bench checks find path intersections in six of the twenty original reference layouts; all twenty raised Cartesian approaches (4 cm clearance, 81 sampled poses each) clear that geometric check. Some native original approaches succeeded despite geometric intersections, so this check is diagnostic rather than a contact certificate. The repair preserves both endpoint joint configurations, collision meshes, drive limits, object positions and fills. Native validation is still pending.
+
+Failed original references are never overwritten or relabeled. An optional `reference-repair-plan.json` records separate named repetitions, with strict checks preserving the original scene. Failed trajectories are excluded from motion/height targets; valid initial camera views can still supply localization evidence. The original 58-scene plan and thirty reserved tests remain unchanged.
 
 ## Intended fit and evaluation
 

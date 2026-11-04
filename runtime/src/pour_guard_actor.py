@@ -102,6 +102,11 @@ class Actor:
         self.grasp=np.radians(self.fk.solve_pose(base+[0,0,.048],WRIST))
         self.grasp_tcp=self.fk.fk(self.grasp)[0]
         self.lift_path=np.array([np.radians(self.fk.solve_pose(base+[0,0,.048+z],WRIST)) for z in np.linspace(0,.044,9)])
+        self.approach_path=np.asarray([self.home,self.grasp])
+        if self.saved.get('approach_clearance_m'):
+            from pour_workspace_path import clearance_approach
+            self.approach_path=clearance_approach(self.fk,self.home,self.grasp,
+                clearance_m=self.saved['approach_clearance_m'])
         self.stage_start=t;self.grasp_stage='approach';self.history=[(age,q[:7].copy())]
 
     def change_grasp_stage(self,stage,t):
@@ -114,7 +119,7 @@ class Actor:
         if self.grasp_stage=='initialize':return np.r_[self.home,np.zeros(4)],'Waiting for consistent localization'
         elapsed=t-self.stage_start;grip=np.pi/4;stage=self.grasp_stage
         if stage=='approach':
-            arm=path_at([self.home,self.grasp],ease(elapsed/1.35));grip=0.
+            arm=path_at(self.approach_path,ease(elapsed/1.35));grip=0.
             if elapsed>=1.35:self.change_grasp_stage('close',t)
         elif stage=='close':
             arm=self.grasp.copy();grip*=ease(elapsed/.4)
@@ -151,7 +156,7 @@ class Actor:
             arm=self.grasp.copy();grip*=1-ease(elapsed/.3)
             if elapsed>=.3:self.change_grasp_stage('retry_retreat',t)
         elif stage=='retry_retreat':
-            arm=path_at([self.grasp,self.home],ease(elapsed/.6));grip=0.
+            arm=path_at(self.approach_path[::-1],ease(elapsed/.6));grip=0.
             if elapsed>=.6:
                 if self.attempt<self.threshold['max_attempts']:self.grasp_stage='initialize';self.localization_start=None
                 else:self.abort_time=t;self.stop_latched='grasp_unconfirmed'

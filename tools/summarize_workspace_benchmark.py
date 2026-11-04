@@ -28,7 +28,12 @@ def main():
     assert before['asset_sha256']==after['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
     planned=read(E/'frozen-plan.json')
     expected={x['name'] for x in planned['test']};assert {x['name'] for x in r['cases']}==expected
-    assert len(r['demonstrations'])==20
+    repair_path=E/'reference-repair-plan.json'
+    repairs=read(repair_path)['demonstrations'] if repair_path.exists() else []
+    assert len(r['demonstrations'])==20+len(repairs)
+    original={x['name'] for x in planned['demonstrations']}
+    parent={x['name']:x['reference_case'] for x in repairs}
+    assert {parent.get(x['name'],x['name']) for x in r['demonstrations'] if x['reference_accepted']}==original
     old_ranges=(.008,.008,.009,.004)
     for x in r['cases']:
         delta=(x['cup_world'][0]-.49,x['cup_world'][1]+.15,x['source_xy'][0]+.12,x['source_xy'][1])

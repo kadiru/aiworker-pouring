@@ -73,6 +73,10 @@ def build_path(stage, spec):
     lift_path=np.array([planner.solve(0.,x) for x in np.linspace(0.,1.,9)])
     angles=np.arange(0.,166.,3.)
     tilt=np.array([planner.solve(a) for a in angles])
+    if spec.get('approach_clearance_m'):
+        from pour_workspace_path import clearance_approach
+        approach=np.degrees(clearance_approach(planner,np.radians(home),np.radians(grasp),
+            clearance_m=spec['approach_clearance_m']))
     return approach,lift_path,tilt
 
 
