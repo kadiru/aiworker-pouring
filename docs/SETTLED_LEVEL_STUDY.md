@@ -2,6 +2,8 @@
 
 ## Selected candidate and current state
 
+Frozen-batch interim:22/30complete,21passes. Test19 failed before grasp because source confidence.335436<.343780; cupconfidence.907903 passed. Four-frame CPU replay localizes within0.094–0.407mm of declared initial position, inside the expanded search bounds. The failure is retained and confidence thresholds remain unchanged during the batch. [Native failure](../evidence/settled-A/localization-failure-test19.json),[CPU diagnostic](../evidence/settled-A/localization-failure-test19-replay.json).
+
 The candidate was frozen at2026-11-04T02:42:49Z (November3,18:42PST), sourcecommit27ba46e3bcebd71794d884b93f68ee9753a9a5e8. All30reserved cases were queued once. The read-only watcher verifies model and18runtime hashes every40seconds; outcomes are pending. [Frozen selection](../evidence/settled-A/final-selection.json), [resource snapshot](../evidence/settled-A/runtime-before-tests.json).
 
 Development is complete for v15, checkpoint `18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527`. All seven scenarios grasped, transferred, reached the appropriate full/empty goal and completed return/release. **Six of seven passed the unchanged strict zero-spill task.** The six full cases finished at 91.752–94.369% rim height; the empty control finished with zero source particles. All five failure scenes from the prior benchmark now pass. The full control `L30_A_dev_10_r4` lost two particles (0.011664 nominal mL); it remains a failure. An outside reading first appeared before its top-up, and particles were later observed below the table. Saved records do not identify individual particle trajectories, so the origin of both final escaped particles is unproven.
