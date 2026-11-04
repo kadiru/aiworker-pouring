@@ -67,6 +67,7 @@ class Actor:
         self.grasp_check=None
         self.visual_votes=[];self.physical_votes=0;self.cap_start=None;self.slow_empty_votes=0
         self.settled_history=[]
+        self.trim_cap=95.
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
@@ -216,17 +217,22 @@ class Actor:
                                 self.fill_mode='trim'
                                 self.trim_goal=topup_goal(settled,self.threshold['full_settled_target'],self.threshold.get('trim_increment',.015))
                                 self.trim_min_phase=self.threshold.get('trim_min_phase',max(95.,self.peak_phase-.5))
+                                if self.threshold.get('adaptive_trim'):
+                                    from pour_settled_model import topup_cap
+                                    self.trim_cap=topup_cap(self.peak_phase,self.threshold['trim_extra_deg'],self.threshold['trim_hard_cap_deg'])
                                 self.trim_start=None
                                 self.trim_entered=t
                 else:
                     movement=self.saved['pour_primitive']
                     if self.fill_mode=='coarse':rate=movement['fast_rate_deg_s'] if self.pour_phase<82 else movement['slow_rate_deg_s']
+                    elif self.threshold.get('adaptive_trim'):
+                        rate=self.threshold['trim_fast_rate_deg_s'] if self.pour_phase<self.trim_cap-2. else self.threshold['trim_creep_rate_deg_s']
                     else:rate=20. if self.pour_phase<self.peak_phase-2 else 2.
                     if self.filtered>.65 and flow*72.8>6.:rate=0.
                     self.pour_phase=min(movement['phase_cap_deg'],self.pour_phase+.05*rate)
                     if self.fill_mode=='trim':
-                        self.pour_phase=min(95.,self.pour_phase)
-                        if self.pour_phase>=94.5 and self.trim_start is None:self.trim_start=t
+                        self.pour_phase=min(self.trim_cap,self.pour_phase)
+                        if self.pour_phase>=self.trim_cap-.5 and self.trim_start is None:self.trim_start=t
                     self.peak_phase=max(self.peak_phase,self.pour_phase)
                     goal=self.threshold['coarse_brake_target'] if self.fill_mode=='coarse' else self.trim_goal
                     eligible=self.fill_mode=='coarse' or self.pour_phase>=self.trim_min_phase
@@ -255,6 +261,7 @@ class Actor:
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,
             slow_empty_votes=self.slow_empty_votes,cap_dwell_seconds=None if self.cap_start is None else t-self.cap_start,
             own_pour_phase_deg=self.pour_phase,fill_mode=self.fill_mode,pause_count=self.pause_count,trim_goal=self.trim_goal,
+            trim_cap_deg=self.trim_cap,
             delta_clamped=bool(clamped),done_probability=float(self.done_votes>=10)))
         return np.degrees(command)
 

@@ -18,7 +18,7 @@ def main():
     assert summary['checkpoint_sha256']==r['checkpoint_sha256'] and summary['sources']==sources
     frozen=dict(frozen_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),selected_checkpoint_sha256=r['checkpoint_sha256'],
         scene_plan_sha256=r['scene_plan_sha256'],runtime_sources=sources,source_commit=os.environ['AIWORKER_SOURCE_COMMIT'],
-        development=list(chosen.values()),all_development_attempts=r['all_attempts'],expected_test_names=[x['name'] for x in p['test']],
+        development=list(chosen.values()),all_development_attempts=r['all_attempts'],incomplete_development_attempts=r['incomplete_attempts'],expected_test_names=[x['name'] for x in p['test']],
         test_policy=p['test_policy'],primary_definition=r['primary_definition'],legacy_definition=r['legacy_definition'],volume_units=r['volume_units'])
     (ROOT/'final-selection.json').write_text(json.dumps(frozen,indent=2)+'\n')
     print(json.dumps({k:frozen[k] for k in ('frozen_utc','selected_checkpoint_sha256','scene_plan_sha256','source_commit')},indent=2))

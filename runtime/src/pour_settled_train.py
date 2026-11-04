@@ -93,7 +93,8 @@ def train(state):
         settled_validation=chosen['metrics'], parent_checkpoint_sha256=PARENT_SHA,
         method='Supervised final-settled-height ridge regression on frozen visual features; geometry-bounded RGB localization; retained visual servo, imitation trajectory and empty detector')
     saved['thresholds'].update(full_settled_target=full_target, settled_geometry_tolerance=.10,
-        settled_stability_std=.01, trim_increment=.005, trim_min_phase=95.)
+        settled_stability_std=.01, trim_increment=.005, trim_min_phase=95.,adaptive_trim=True,
+        trim_extra_deg=1.,trim_hard_cap_deg=110.,trim_fast_rate_deg_s=35.,trim_creep_rate_deg_s=4.,trim_total_seconds=1.5)
     saved['training_device'] = dict(name=torch.cuda.get_device_name(0), visible_cuda_devices=1)
     saved['settled_training'] = dict(train_episodes=len(set(tr['episode'])), validation_episodes=len(set(va['episode'])),
         train_frames=len(y), validation_frames=len(vy), learned_parameters=len(chosen['fit']['coef']),

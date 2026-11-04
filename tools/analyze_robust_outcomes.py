@@ -15,13 +15,13 @@ def read(path):
     return json.loads(path.read_text())
 
 
-def main():
-    report = read(EVIDENCE / 'final-benchmark.json')
+def main(evidence=EVIDENCE, data=DATA):
+    report = read(evidence / 'final-benchmark.json')
     assert report['status'] == 'complete' and len(report['cases']) == 30
-    assert read(DATA / 'backup-index.json')['all_native_checksums_match']
+    assert read(data / 'backup-index.json')['all_native_checksums_match']
     full, failures, transient, localization = [], [], [], []
     for row in report['cases']:
-        folder = DATA / Path(row['path']).relative_to(NATIVE)
+        folder = data / Path(row['path']).relative_to(NATIVE)
         decisions = read(folder / 'policy-decisions.json')
         samples = read(folder / 'samples.json')
         stop = next((x for x in decisions if x['stop_latched']), None)
@@ -34,6 +34,8 @@ def main():
                 name=row['name'], success=row['surface_goal_zero_spill_success'],
                 stop_t=stop['t'], measurement_t=at['t'],
                 predicted_height_at_stop=stop['cup_predicted_fraction'],
+                settled_prediction_at_stop=stop.get('settled_prediction'),
+                settled_prediction_error_points=None if stop.get('settled_prediction') is None else 100 * (stop['settled_prediction'] - row['cup_surface_height_fraction']),
                 geometric_estimate_at_stop=stop['surface_geometry_fraction'],
                 measured_height_at_stop=at['cup_fill_fraction'],
                 measured_final_height=row['cup_surface_height_fraction'],
@@ -46,13 +48,13 @@ def main():
                 cup_change_after_stop_nominal_ml=row['cup_final_ml'] - at['cup_ml'],
                 settled_prediction_error_points=100 * (
                     stop['cup_predicted_fraction'] - row['cup_surface_height_fraction']),
-                relative_episode=str((folder / 'episode.hdf5').relative_to(DATA))))
+                relative_episode=str((folder / 'episode.hdf5').relative_to(data))))
         if not row['surface_goal_zero_spill_success']:
             causes = []
             if row['stop_reason'] == 'localization_unconfirmed':
                 causes.append('visual_localization_rejected_before_grasp')
                 localization.append(dict(name=row['name'],
-                    relative_episode=str((folder / 'episode.hdf5').relative_to(DATA)),
+                    relative_episode=str((folder / 'episode.hdf5').relative_to(data)),
                     first_observation_index=0,
                     note='Inspect saved RGB and replay the unchanged template localizer on CPU; no grasp or pour was attempted.'))
             if not row['grasp_verified']:
@@ -85,7 +87,7 @@ def main():
     result = dict(
         checkpoint_sha256=report['checkpoint_sha256'],
         scene_plan_sha256=report['scene_plan_sha256'],
-        training_performed=False, controller_changed=False,
+        analysis_performs_training=False, controller_changed_by_analysis=False,
         failures=failures, full_stop_measurements=full,
         localization_failure_candidates=localization,
         transient_outside_classifications=transient,
@@ -93,17 +95,20 @@ def main():
         spill_definition='Declared success uses zero final outside and zero ever-below-worktop particles. Transient nonairborne outside classifications are reported separately; zero final spill does not prove no particle was ever outside.',
         inference='Compare the image estimate at the decision with the simultaneous particle surface, then compare that surface with the final settled surface. These measurements distinguish estimation error from subsequent surface settling; they do not prove a unique physical cause.',
         next_training=dict(
-            status='candidate data identified; no fit or controller calibration performed',
-            task='Repair localization coverage using rejected initial views. Calibrate a settled-height predictor or stopping margin using successful and underfilled actual pours, then validate bounded top-ups on separate development scenes.',
+            status='post-evaluation candidates identified; this analysis performs no fitting or calibration',
+            task=('Repair remaining localization/settled-level failures using these observed cases as development evidence, followed by new reserved evaluation scenes.' if failures else 'Retain this frozen result and reserve a new evaluation before expanding workspace or vessel appearance.'),
             episodes=[x['relative_episode'] for x in full],
             target='Measured final settled height, with decision-to-final cup-volume change retained to avoid conflating settling with additional incoming liquid.',
             evaluation_rule='All30 cases are now observed development evidence for any successor model. Use new reserved seeds for its final evaluation; retain this frozen benchmark unchanged.'))
-    (EVIDENCE / 'failure-analysis.json').write_text(json.dumps(result, indent=2) + '\n')
+    (evidence / 'failure-analysis.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(dict(failures=failures,
         transient_outside_runs=len(transient),
         full_case_candidates=len(full), localization_candidates=len(localization),
-        training_performed=False), indent=2))
+        analysis_performs_training=False), indent=2))
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    p=argparse.ArgumentParser();p.add_argument('--study',choices=('robust','settled'),default='robust');a=p.parse_args()
+    main(ROOT / ('evidence/settled-A' if a.study=='settled' else 'evidence/robust-A'),
+         ROOT / ('data/material-A-settled' if a.study=='settled' else 'data/material-A-robust'))

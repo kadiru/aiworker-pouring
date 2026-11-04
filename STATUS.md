@@ -15,6 +15,10 @@ Progress:18CPU controller checks passed. Actual4070 fit completed in4.831s:27tra
 
 Current owned container b66b71ee3071919e82210760c909974d6e7e91247b84e92671b2e492ae80639f,4070 PID2680844, guard2680845; foreign4090 PID2630921 still observed. Run20261104T002634Z. Seven development cases queued once as round0; read-only watcher session78986. All18controller/model/physics sources monitored. Prior runtime19files archived under Ubuntu source-backups/before-settled-b2c7600.
 
+Development revision:round0 case03 completed with zero final spill and90.691%height but `fill_unconfirmed`:95degree pulses added no liquid. The assistant stopped the next case08 at4.55simseconds to correct this known limit; its90-transition partial and the complete failure are preserved/checksummed. The five other round0cases never started. Native partial error text is"Stopped by user"; the actual assistant decision is documented in`development-interruption-r0.json`. No reserved test has started.
+
+Round1 candidate SHA1741c5ea37b18f4dfa63246553e23644e7bef9634e7308c823df08cfcbfb8004; repeat cached fit1.067s, same validation errors. Adaptive top-up limit=min(110,max(95,previous peak+1)) degrees, approach35deg/s then4deg/s, cap dwell.1s/total1.5s, at most2pulses.19CPU checks pass. Owned container7abc400e89cc795aa7067399ad17149ad8260c3e4538ef444d20cc0fdc46ec4f,4070 PID2700524,guard2700525; foreign4090 PID2630921 unchanged in snapshot. Run20261104T003804Z; seven round1cases queued, watcher95828. Old watcher78986 intentionally exited when superseded sources changed. Initial source/provenance commit071636b is pushed; revision changes awaiting commit.
+
 Next: finish and inspect all seven development cases, resolve their failures if any before final selection, freeze source/model/new30-case plan, finish all30 tests, validate/back up all recordings, review cameras, update reports, commit/push. Do not end at queued/partial results.
 
 ## Thirty-case robustness evaluation — complete

@@ -9,7 +9,7 @@ from pour_settled_study import ROOT, PREFIX, plan
 
 
 def report(require_thirty=False):
-    sha=hashlib.sha256((ROOT/'best.pt').read_bytes()).hexdigest();p=plan();attempts=[];folders={}
+    sha=hashlib.sha256((ROOT/'best.pt').read_bytes()).hexdigest();p=plan();attempts=[];folders={};incomplete=[]
     for f in sorted(Path('/workspace/outputs/fountain').glob(f'*/*{PREFIX}*/parameters.json')):
         spec=json.loads(f.read_text());folder=f.parent
         assert spec['name'] not in folders, 'Duplicate reserved/attempt name'
@@ -19,6 +19,9 @@ def report(require_thirty=False):
             row=completed_row(folder,m['policy']['checkpoint_sha256'])
             row.update(split=spec['study_split'],development_case=spec.get('development_case'),development_round=spec.get('development_round'))
             attempts.append(row)
+        else:
+            incomplete.append(dict(name=spec['name'],path=str(folder),split=spec['study_split'],status='incomplete',
+                partial_recording=str(folder/'episode.partial.hdf5'),note='Interrupted attempt; spill and task outcome are not imputed.'))
     rows=[]
     for spec in p['test']:
         folder=folders.get(spec['name'])
@@ -45,7 +48,7 @@ def report(require_thirty=False):
     development=[x for x in attempts if x['split']=='regression' and x['checkpoint_sha256']==sha]
     result=dict(status='complete' if len(done)==30 else 'incomplete',counts=counts,groups=groups,cases=rows,
         checkpoint_sha256=sha,scene_plan_sha256=hashlib.sha256((ROOT/'frozen-plan.json').read_bytes()).hexdigest(),
-        development=development,all_attempts=attempts,
+        development=development,all_attempts=attempts,incomplete_attempts=incomplete,
         primary_definition='Sustained verified grasp, final rim height>=90% or source<=max(.25 nominal mL,1% initial), correct reason, completed return/release, zero final outside and ever-below-worktop particles',
         legacy_definition='Original >=90% nominal brim inventory score retained separately',volume_units='Nominal particle-count mL, not calibrated physical volume')
     if (ROOT/'final-selection.json').exists():result['selection']=json.loads((ROOT/'final-selection.json').read_text())

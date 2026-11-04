@@ -10,11 +10,22 @@ from pour_settled_study import ROOT,PREFIX
 def main(mode,development):
     report=json.loads((ROOT/'settled-results.json').read_text())
     if not development:assert report['status']=='complete'
-    rows=report['development'] if development else (report['all_attempts'] if mode=='integrity' else report['cases'])
+    rows=report['all_attempts'] if mode=='integrity' else (report['development'] if development else report['cases'])
     assert rows
     if mode=='integrity':
         base=Path('/workspace/outputs/fountain');files=[];sidecars=[]
-        assert not list(base.glob(f'*/*{PREFIX}*/episode.partial.hdf5')),'Preserve and handle incomplete attempts explicitly'
+        partials=[];partial_sidecars=[]
+        declared={Path(x['partial_recording']):x for x in report.get('incomplete_attempts',[])}
+        assert set(base.glob(f'*/*{PREFIX}*/episode.partial.hdf5'))==set(declared)
+        for p,row in declared.items():
+            with h5py.File(p,'r') as f:
+                status=str(f.attrs.get('status'));error=str(f.attrs.get('error'));assert status=='incomplete'
+                count=len(f['data/demo_0/actions'])
+            partials.append(dict(name=row['name'],relative_path=str(p.relative_to(base)),bytes=p.stat().st_size,
+                sha256=hashlib.sha256(p.read_bytes()).hexdigest(),status=status,error=error,transitions=count,note='Interrupted development, not a valid completed trial or success'))
+            for name in ('parameters.json','metrics.json','samples.json','policy-decisions.json'):
+                q=p.parent/name
+                if q.exists():partial_sidecars.append(dict(relative_path=str(q.relative_to(base)),bytes=q.stat().st_size,sha256=hashlib.sha256(q.read_bytes()).hexdigest()))
         for row in rows:
             p=Path(row['path'])/'episode.hdf5';v=validate(p);assert v['valid'];export_views(p)
             files.append(dict(name=row['name'],relative_path=str(p.relative_to(base)),bytes=p.stat().st_size,
@@ -23,7 +34,7 @@ def main(mode,development):
             for name in ('parameters.json','metrics.json','samples.json','policy-decisions.json'):
                 q=p.parent/name;sidecars.append(dict(relative_path=str(q.relative_to(base)),bytes=q.stat().st_size,sha256=hashlib.sha256(q.read_bytes()).hexdigest()))
         out=ROOT/('development-integrity.json' if development else 'recording-integrity.json')
-        out.write_text(json.dumps(dict(files=files,sidecar_files=sidecars,valid_recordings=len(files),note='Every completed attempt included, including task failures; recording validity is separate.'),indent=2)+'\n')
+        out.write_text(json.dumps(dict(files=files,sidecar_files=sidecars,partial_files=partials,partial_sidecar_files=partial_sidecars,valid_recordings=len(files),note='Every completed attempt and interrupted development file included; recording validity is separate from task success.'),indent=2)+'\n')
         print('Validated',len(files),'HDF5 and',len(sidecars),'sidecars')
     else:
         for page in range((len(rows)+5)//6):

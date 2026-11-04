@@ -2,11 +2,16 @@
 import json
 from pathlib import Path
 import unittest
-from pour_settled_model import assess
+from pour_settled_model import assess,topup_cap
 from pour_settled_study import make_plan
 
 
 class SettledTests(unittest.TestCase):
+    def test_topup_reaches_last_pouring_angle_but_has_hard_cap(self):
+        self.assertEqual(topup_cap(104.),105.)
+        self.assertEqual(topup_cap(94.),95.)
+        self.assertEqual(topup_cap(130.),110.)
+
     def test_high_instantaneous_surface_cannot_override_predicted_underfill(self):
         level, stable, full = assess([.895] * 6, .95, .915, .01, .10, 20)
         self.assertTrue(stable); self.assertFalse(full); self.assertLess(level, .90)

@@ -27,7 +27,8 @@ def main():
     assert not train & val and len(train)==27 and len(val)==8
     integrity=read(E/'recording-integrity.json');assert len(integrity['files'])==len(r['all_attempts'])
     assert len(integrity['sidecar_files'])==4*len(integrity['files']) and {x['name'] for x in integrity['files']}=={x['name'] for x in r['all_attempts']}
-    for x in integrity['files']+integrity['sidecar_files']:
+    assert len(integrity['partial_files'])==len(r['incomplete_attempts'])
+    for x in integrity['files']+integrity['sidecar_files']+integrity['partial_files']+integrity['partial_sidecar_files']:
         p=DATA/x['relative_path'];assert p.stat().st_size==x['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==x['sha256'],str(p)
     assert all(x['valid'] for x in integrity['files'])
     (DATA/'backup-index.json').write_text(json.dumps(dict(all_native_checksums_match=True,**integrity),indent=2)+'\n')

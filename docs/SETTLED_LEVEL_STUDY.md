@@ -31,3 +31,9 @@ Only owned container b66b71ee3071919e82210760c909974d6e7e91247b84e92671b2e492ae8
 Commands: POST`settled_train`, then`settled_development` to the existing `/control` endpoint while idle. Native report:`/isaac-sim/python.sh pour_settled_report.py`. After all seven current-candidate development cases pass, `AIWORKER_SOURCE_COMMIT=<commit> /isaac-sim/python.sh freeze_settled_study.py`, then POST`settled_test`. Final report:`pour_settled_report.py --require-thirty`; CPU audit:`audit_settled_study.py integrity` and`review`. Local backup verification:`python3 tools/summarize_settled_benchmark.py`.
 
 Use prior revision b2c7600 to run the previous robustness study's source-bound verification. Its artifacts and25/30score remain unchanged; current controller files intentionally differ.
+
+## Development revision before reserved tests
+
+Round0case03 grasped/returned with zero final spill and90.691%height, but correctly withheld the target0.915settled prediction:both95degree top-ups produced no flow, leading to `fill_unconfirmed`. The assistant stopped case08at4.55simseconds after diagnosing the motion limit; its90-transition partial and the complete failure are preserved. Five queued cases never started. None of the30reserved tests started. The initial model/summary remains archived as candidate-r0-17010a75.
+
+Round1uses bounded adaptive top-ups:cap=min(110,max(95,previous pouring peak+1))degrees,35deg/s approach then4deg/s creep,0.1s cap dwell/1.5s total pulse, maximum two pulses. It retains the fitted five-coefficient predictor and threshold0.915; the repeated cached fit took1.067s with identical validation metrics. CandidateSHA1741c5ea37b18f4dfa63246553e23644e7bef9634e7308c823df08cfcbfb8004.19CPU checks pass. All seven development cases are now being evaluated with this candidate; their native outcomes are pending.
