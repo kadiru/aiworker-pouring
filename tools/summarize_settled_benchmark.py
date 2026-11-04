@@ -24,13 +24,22 @@ def main():
     manifest=read(E/'data-manifest.json')
     assert all(not x['name'].startswith('L30_A_') for x in manifest)
     train={x['name'] for x in manifest if x['split']=='train'};val={x['name'] for x in manifest if x['split']=='validation'}
-    training=read(E/'model-summary.json')['training']
+    metadata=read(E/'model-summary.json');training=metadata['training']
+    assert metadata['checkpoint_sha256']==sha and metadata['sources']==s['runtime_sources']
+    assert hashlib.sha256((E/'data-manifest.json').read_bytes()).hexdigest()==metadata['data_manifest_sha256']
     assert not train & val and len(train)==training['train_episodes'] and len(val)==training['validation_episodes']
     integrity=read(E/'recording-integrity.json');assert len(integrity['files'])==len(r['all_attempts'])
     assert len(integrity['sidecar_files'])==4*len(integrity['files']) and {x['name'] for x in integrity['files']}=={x['name'] for x in r['all_attempts']}
     assert len(integrity['partial_files'])==len(r['incomplete_attempts'])
     for x in integrity['files']+integrity['sidecar_files']+integrity['partial_files']+integrity['partial_sidecar_files']:
         p=DATA/x['relative_path'];assert p.stat().st_size==x['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==x['sha256'],str(p)
+    indexed={x['relative_path']:x for k in ('files','sidecar_files','partial_files','partial_sidecar_files') for x in integrity[k]}
+    for archive in E.glob('round*-development-integrity.json'):
+        old=read(archive)
+        for k in ('files','sidecar_files','partial_files','partial_sidecar_files'):
+            for x in old[k]:
+                current=indexed[x['relative_path']]
+                assert (current['sha256'],current['bytes'])==(x['sha256'],x['bytes']),str(archive)
     assert all(x['valid'] for x in integrity['files'])
     (DATA/'backup-index.json').write_text(json.dumps(dict(all_native_checksums_match=True,**integrity),indent=2)+'\n')
     (E/'final-benchmark.json').write_text(json.dumps(dict(**r,verified_native_backups=len(integrity['files']),verified_sidecars=len(integrity['sidecar_files'])),indent=2)+'\n')

@@ -92,7 +92,7 @@ def main(evidence=EVIDENCE, data=DATA):
         localization_failure_candidates=localization,
         transient_outside_classifications=transient,
         runs_without_any_sampled_nonairborne_outside_particles=30 - len(transient),
-        spill_definition='Declared success uses zero final outside and zero ever-below-worktop particles. Transient nonairborne outside classifications are reported separately; zero final spill does not prove no particle was ever outside.',
+        spill_definition='Declared success uses zero final outside particles and none ever below cup-frame z=3.5mm (the historical ever_below_worktop_ml field). Transient nonairborne outside classifications are reported separately; zero final spill does not prove no particle was ever outside.',
         inference='Compare the image estimate at the decision with the simultaneous particle surface, then compare that surface with the final settled surface. These measurements distinguish estimation error from subsequent surface settling; they do not prove a unique physical cause.',
         next_training=dict(
             status='post-evaluation candidates identified; this analysis performs no fitting or calibration',

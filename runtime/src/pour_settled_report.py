@@ -49,7 +49,7 @@ def report(require_thirty=False):
     result=dict(status='complete' if len(done)==30 else 'incomplete',counts=counts,groups=groups,cases=rows,
         checkpoint_sha256=sha,scene_plan_sha256=hashlib.sha256((ROOT/'frozen-plan.json').read_bytes()).hexdigest(),
         development=development,all_attempts=attempts,incomplete_attempts=incomplete,
-        primary_definition='Sustained verified grasp, final rim height>=90% or source<=max(.25 nominal mL,1% initial), correct reason, completed return/release, zero final outside and ever-below-worktop particles',
+        primary_definition='Sustained verified grasp, final rim height>=90% or source<=max(.25 nominal mL,1% initial), correct reason, completed return/release, zero final outside particles and none ever below cup-frame z=3.5mm',
         legacy_definition='Original >=90% nominal brim inventory score retained separately',volume_units='Nominal particle-count mL, not calibrated physical volume')
     if (ROOT/'final-selection.json').exists():result['selection']=json.loads((ROOT/'final-selection.json').read_text())
     if require_thirty:assert len(done)==30
