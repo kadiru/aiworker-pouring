@@ -1,7 +1,17 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 03, 2026, 21:31 PST (America/Los_Angeles).
-State: **4070 fitting and all 30 fresh tests complete and audited. Results and residual failures documented.**
+Updated: November 03, 2026, 22:37 PST.
+State: **New reliability repair in development; fresh 30-case evaluation not started.**
+
+## Active localization and spill repair
+
+The user authorized fixing the two localization aborts and one spill from the previous 27/30 study, fitting on the RTX 4070, running 30 new tests, and committing/pushing. New study `A-reliable-20261103-v1`, prefix `C30_A_`, reserved seed `20261217`. Previous results remain unchanged. Candidate adds bounded multi-frame spatial consensus with unchanged per-frame confidence anchors, halves the initial slow tilt rate to 5°/s, and adds an RGB-derived flow limit. These are unvalidated native changes until development runs finish.
+
+Twenty-six native CPU checks and one disjoint-plan check passed. V16 trained on 4070 in 8.812 s: 58/18 episodes, 2,109/634 frames, sixteen ridge coefficients, lambda .001; near-full validation MAE 1.027 points. Checkpoint `7055e32d9bf5a2a67d5018d4443767a3d117885be9215e169fb0426e9fd45333`. Consensus calibration passed 30 consumed positive windows and rejected 30 synthetic neck occlusions; those are not independent tests.
+
+Development r0 is running unchanged. Case 19 still timed out on localization; case 26 localized and lifted. CPU replay found the old bank only reached usable confidence after the two-second deadline, while a bank rebuilt from 24 parent initial views reaches consensus in six frames. V17 template refit is prepared locally, not deployed; finish and preserve r0, then deploy/refit and rerun development under new names. No reserved tests have started. [Current method](docs/RELIABILITY_STUDY.md).
+
+Owned replacement container `286bb260daed24b19f5ae7681f6fb512c3b668fa56bc77a1f18bb81168e66e39`, same 4070-only resource caps and guard. Watcher session 67356 checks the native r0 model and 22 source hashes. Do not stop foreign jobs or alter original study outputs. Next: finish native development, resolve failures, freeze the selected model/source, run all 30 fresh tests once, back up and audit every attempt, then commit/push final evidence.
 
 ## Latest corrective study
 

@@ -35,6 +35,7 @@ allowed_commands.update(('guard_train','guard_val','guard_regression','guard_dev
 allowed_commands.update(('vote_development','vote_test'))
 allowed_commands.add('robust_test')
 allowed_commands.update(('settled_train','settled_development','settled_test'))
+allowed_commands.update(('reliable_train','reliable_development','reliable_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -624,7 +625,23 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd=='settled_train':
+                    if cmd=='reliable_train':
+                        if current is not None or pending:
+                            state['control_message']='Wait for active trials to finish';continue
+                        try:
+                            from pour_reliable_train import train
+                            state['trained_checkpoint']=train(state)
+                        except Exception:
+                            state['learning_error']=traceback.format_exc();state['phase']='Reliable-pour fitting failed'
+                        continue
+                    elif cmd in ('reliable_development','reliable_test'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before queuing reliable-pour cases';continue
+                        from pour_reliable_study import development,unstarted,ROOT as RELIABLE_ROOT
+                        if not (RELIABLE_ROOT/'best.pt').exists():
+                            state['control_message']='Fit reliable-pour predictor first';continue
+                        pending.extend(development() if cmd=='reliable_development' else unstarted())
+                    elif cmd=='settled_train':
                         if current is not None or pending:
                             state['control_message']='Wait for active trials to finish';continue
                         try:

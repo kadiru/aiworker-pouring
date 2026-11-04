@@ -68,12 +68,30 @@ class Actor:
         self.visual_votes=[];self.physical_votes=0;self.cap_start=None;self.slow_empty_votes=0
         self.settled_history=[]
         self.trim_cap=95.
+        self.localization_start=None;self.localization_history={"source":[],"cup":[]};self.localization_check=None
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
-        self.attempt+=1;self.confirm_votes=0;self.visual_votes=[];self.physical_votes=0
+        if self.localization_start is None:
+            self.attempt+=1;self.confirm_votes=0;self.visual_votes=[];self.physical_votes=0
+            self.localization_start=t;self.home=q[:7].copy()
+            self.localization_history={'source':[],'cup':[]}
         neck,self.source_score=locate(task,self.saved['source_bank']);rim,self.cup_score=locate(task,self.saved['cup_bank'])
-        if self.source_score<self.threshold['source_localization_score'] or self.cup_score<self.threshold['cup_localization_score']:
+        config=self.saved.get('localization_consensus')
+        if config:
+            from pour_temporal_localization import consensus
+            accepted={}
+            for kind,uv,score in (('source',neck,self.source_score),('cup',rim,self.cup_score)):
+                self.localization_history[kind].append((uv.tolist(),score))
+                self.localization_history[kind]=self.localization_history[kind][-config[kind]['window']:]
+                accepted[kind]=consensus(self.localization_history[kind],self.threshold[kind+'_localization_score'],config[kind])
+            self.localization_check=dict(elapsed=t-self.localization_start,**accepted)
+            if not all(accepted.values()):
+                if t-self.localization_start>=config['timeout_s']:
+                    self.abort_time=t;self.stop_latched='localization_unconfirmed'
+                return
+            neck=np.asarray(accepted['source']['uv']);rim=np.asarray(accepted['cup']['uv'])
+        elif self.source_score<self.threshold['source_localization_score'] or self.cup_score<self.threshold['cup_localization_score']:
             self.abort_time=t;self.stop_latched='localization_unconfirmed';self.home=q[:7].copy();return
         base=bottle_base_from_neck(neck,self.cal);self.source_xy=base[:2]
         self.cup_xy=plane_point(rim,self.cal['table_z']+.038,self.cal)[:2]
@@ -93,6 +111,7 @@ class Actor:
         if self.abort_time is not None:return np.r_[self.home,np.zeros(4)],'Aborting unconfirmed grasp'
         if self.grasp_stage=='initialize':self.initialize_grasp(task,q,t,age)
         if self.abort_time is not None:return np.r_[self.home,np.zeros(4)],'Aborting unconfirmed grasp'
+        if self.grasp_stage=='initialize':return np.r_[self.home,np.zeros(4)],'Waiting for consistent localization'
         elapsed=t-self.stage_start;grip=np.pi/4;stage=self.grasp_stage
         if stage=='approach':
             arm=path_at([self.home,self.grasp],ease(elapsed/1.35));grip=0.
@@ -134,7 +153,7 @@ class Actor:
         elif stage=='retry_retreat':
             arm=path_at([self.grasp,self.home],ease(elapsed/.6));grip=0.
             if elapsed>=.6:
-                if self.attempt<self.threshold['max_attempts']:self.grasp_stage='initialize'
+                if self.attempt<self.threshold['max_attempts']:self.grasp_stage='initialize';self.localization_start=None
                 else:self.abort_time=t;self.stop_latched='grasp_unconfirmed'
         else:arm=q[:7].copy()
         return np.r_[arm,np.full(4,grip)],'Visual grasp: '+stage
@@ -230,6 +249,7 @@ class Actor:
                     elif self.threshold.get('adaptive_trim'):
                         rate=self.threshold['trim_fast_rate_deg_s'] if self.pour_phase<self.trim_cap-2. else self.threshold['trim_creep_rate_deg_s']
                     else:rate=20. if self.pour_phase<self.peak_phase-2 else 2.
+                    if self.fill_mode=='coarse' and self.filtered>self.threshold.get('coarse_flow_min_level',1.) and flow*72.8>self.threshold.get('coarse_flow_limit_ml_s',float('inf')):rate=0.
                     if self.filtered>.65 and flow*72.8>6. and not (self.fill_mode=='trim' and self.threshold.get('discrete_topup')):rate=0.
                     self.pour_phase=min(movement['phase_cap_deg'],self.pour_phase+.05*rate)
                     if self.fill_mode=='trim':
@@ -263,7 +283,7 @@ class Actor:
         self.done_votes=self.done_votes+1 if holding and released else 0
         self.diagnostics.append(dict(t=t,mode=phase,stop_latched=self.stop_latched,grasp_stage=self.grasp_stage,grasp_attempt=self.attempt,
             visual_grasp_confirmed=self.grasp_confirmed,confirmation_votes=self.confirm_votes,source_xy=None if self.source_xy is None else self.source_xy.tolist(),
-            grasp_check=self.grasp_check,
+            grasp_check=self.grasp_check,localization_consensus=self.localization_check,
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
             settled_prediction=settled_prediction,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,

@@ -1,0 +1,31 @@
+# Temporal localization and spill repair
+
+Status: development in progress. The prior 27/30 benchmark is unchanged. The new reserved 30-case evaluation has not started. V16 development case 19 retained a localization timeout; case 26 localized and lifted. CPU diagnostics indicate that refitting the bottle templates can address the remaining timeout; v17 is prepared locally and has not yet been deployed.
+
+## Candidate and method
+
+Study `A-reliable-20261103-v1`, prefix `C30_A_`, reserved seed `20261217`. All 30 new scene specifications are generated deterministically before evaluation, with fifteen full and fifteen empty targets. They are disjoint from both earlier 30-case batches. Material A, vessel geometry, 1.8 mm particles, 400 Hz physics, fixed scene ranges, deadlines and scoring remain unchanged.
+
+Initial localization now holds the robot at home while collecting detections. It requires six detections within one pixel, at least 60% support in a rolling twenty-frame window, and an anchor above the original confidence threshold. The median location drives grasp planning; isolated inconsistent estimates are excluded. The source support floor is 0.24, while the original source anchor threshold remains 0.343780; the cup threshold remains 0.631417. A two-second timeout aborts without grasping if support never arrives. This is temporal consensus, not a blanket lowering of the acceptance threshold.
+
+Consensus calibration considered eighteen configurations on all thirty consumed parent windows. Selected settings gave maximum source error 0.514 mm and mean decision latency 0.27 s. All thirty synthetic neck occlusions were rejected. These are calibration results, not independent localization validation or real absent-object tests. Native development and the reserved task evaluation measure subsequent behavior.
+
+The settled-height head was refitted on frozen visual features with weighted ridge regression: `min_beta sum_i w_i (y_i - phi_i^T beta)^2 + lambda ||beta_nonbias||^2`. Labels are final settled height divided by rim height; episode weights avoid domination by long recordings and near-full samples receive threefold weight. Twenty feature/regularization candidates were compared. The selected head has sixteen coefficients and lambda 0.001. Data comprise 58 training and 18 validation episodes (2,109/634 frames), including completed parent recordings; every C30 recording is excluded. Neural cup/source encoders and motion-path coefficients remain unchanged. The planned v17 additionally refits the normalized-gradient bottle templates from 24 consumed parent initial views, with six views excluded from template construction; runtime still uses only RGB and fixed calibration. The method is supervised calibration within a visual servo/imitation/feedback controller, not reinforcement learning.
+
+The initial RTX 4070 fit took 8.812 seconds. Near-full validation MAE was 1.027 percentage points, p95 overestimate 1.637 points and maximum overestimate 2.130 points. The settled target is `0.90 + 0.016371106 + 0.005 = 0.921371106`. This margin is empirical, not a reliability guarantee. Some episodes were used for earlier encoder training, so validation is not independent for the entire perception stack.
+
+The candidate reduces initial slow tilt from 10 to 5 degrees/second and holds further tilt when the RGB-derived flow estimate exceeds 18 nominal mL/s above estimated level 0.25. The existing tighter near-full hold, discrete top-ups, empty confirmation and upright return/release remain. This flow estimate uses the existing visual derivative and nominal scale, not live particle counts. The motion adjustments are engineering controls; only the regression coefficients and consensus settings are fitted/calibrated.
+
+## Development and verification
+
+Development replays parent cases 19 and 26 (localization aborts), 29 (one-particle loss), and full/empty controls 1, 14, 0 and 10. Every attempted recording, failure and incomplete trial must remain identifiable. New tests start only after candidate selection; no tuning or repeated attempts during that batch.
+
+Twenty-six native CPU checks passed: fourteen grasp/stop, seven settled-level and five temporal-consensus checks. A separate local check verified thirty balanced, disjoint scene specifications with unchanged physical parameters. These checks are not simulated pouring successes.
+
+The owned simulator was restarted only while idle, after checking its immutable identity. The launcher retains RTX 4070-only visibility, four CPU cores of quota on CPUs 16–23, CPU shares 256, nice 10, 16 GiB RAM/no extra swap and a guard that yields only this container if another 4070 workload appears. No foreign job is signaled or reconfigured. Foreign process continuity must be assessed honestly from snapshots, not assumed.
+
+## Evidence and reproduction
+
+Small reports live in `evidence/reliable-A/`; native files in `/workspace/learning/A-reliable-20261103-v1`, and future local raw backups in `data/material-A-reliable/`. Images, videos, checkpoints and raw records remain outside Git. Runtime source and model hashes will be frozen before the thirty-case evaluation.
+
+Native report: `/isaac-sim/python.sh pour_reliable_report.py --require-thirty`. Recording audit/review: `/isaac-sim/python.sh audit_reliable_study.py integrity` and `review`. Local verification: `python3 tools/summarize_reliable_benchmark.py`; failure analysis: `python3 tools/analyze_robust_outcomes.py --study reliable`. These final commands are pending until the evaluation finishes.
