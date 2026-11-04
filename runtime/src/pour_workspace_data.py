@@ -76,7 +76,9 @@ def fit_banks(saved,seq):
             # the wider domain. Use unsigned gradients and a view-local maximum;
             # a higher confidence anchor rejects the measured synthetic negatives.
             assert len(views)==40
-            saved[kind+'_bank']=bank;families=[]
+            families=[copy.deepcopy(prior)]
+            saved[kind+'_bank']=dict(bank,alternatives=families+[bank],initial_score_maps=[
+                dict(offset=.70,scale=.75,anchor=.40),dict(offset=0.,scale=1.,anchor=0.)])
             saved['thresholds']['source_localization_score']=.70
         else:
             families=copy.deepcopy(prior.get('alternatives',[prior]))
@@ -84,7 +86,9 @@ def fit_banks(saved,seq):
         report[kind]=dict(new_templates=len(views),retained_families=len(families),training_names=[e['name'] for e in views],
             bounds=bank['bounds'],original_anchor_threshold=original_threshold,
             anchor_threshold=saved['thresholds'][kind+'_localization_score'],aggregation=bank['aggregation'],
-            absolute_gradients=bank['absolute_gradients'],anchor_radius_px=bank['anchor_radius_px'])
+            absolute_gradients=bank['absolute_gradients'],anchor_radius_px=bank['anchor_radius_px'],
+            initial_score_maps=saved[kind+'_bank'].get('initial_score_maps'),
+            retained_source_effective_anchor=.40 if kind=='source' else None)
     return dict(coverage=coverage,families=report,validation_excluded_from_templates=True)
 
 

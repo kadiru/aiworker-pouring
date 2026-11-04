@@ -41,7 +41,7 @@ def gradients(image):
         F.pad((gray[:,:,2:,:]-gray[:,:,:-2,:])*.5,(0,0,1,1))],1)
 
 
-def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gradients=False,anchor_radius_px=None):
+def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gradients=False,anchor_radius_px=None,anchor_penalty=0.):
     # Only the neck outline or glass rim is matched, not liquid volume.
     width,height,dx,dy=(48,64,-24,-12) if kind=='source' else (80,28,-40,-14)
     feat=gradients(torch.as_tensor(np.stack(images),device=device));n=len(images)
@@ -60,7 +60,7 @@ def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gr
     kernels*=mask  # numerator weights both observations; denominator uses mask²
     lo=np.floor(np.min(anchors,axis=0)-9).astype(int);hi=np.ceil(np.max(anchors,axis=0)+9).astype(int)
     return dict(kernels=kernels.cpu(),mask=mask.cpu(),offset=[dx,dy],bounds=[*lo.tolist(),*hi.tolist()],kind=kind,
-        aggregation=aggregation,absolute_gradients=absolute_gradients,anchors=np.asarray(anchors).tolist(),anchor_radius_px=anchor_radius_px)
+        aggregation=aggregation,absolute_gradients=absolute_gradients,anchors=np.asarray(anchors).tolist(),anchor_radius_px=anchor_radius_px,anchor_penalty=anchor_penalty)
 
 
 @torch.inference_mode()
@@ -68,6 +68,9 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
     if bank.get('alternatives'):
         # Each family retains robust median matching; keep older appearance coverage.
         matches=[locate(image,b,tracking,device,expected_uv) for b in bank['alternatives']]
+        if bank.get('initial_score_maps') and not tracking and expected_uv is None:
+            maps=bank['initial_score_maps'];assert len(maps)==len(matches)
+            matches=[(uv,m['offset']+m['scale']*(score-m['anchor'])) for (uv,score),m in zip(matches,maps)]
         return max(matches,key=lambda x:x[1])
     a=torch.as_tensor(image,device=device);feat=gradients(a)
     if bank.get('absolute_gradients'):feat=feat.abs()
@@ -88,6 +91,7 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
         xx,yy=torch.meshgrid(torch.arange(ww,device=device),torch.arange(hh,device=device),indexing='xy')
         anchors=torch.as_tensor(bank['anchors'],device=device)
         distance=(xx[None]+startx-dx-anchors[:,0,None,None]).square()+(yy[None]+starty-dy-anchors[:,1,None,None]).square()
+        scores=scores-bank.get('anchor_penalty',0.)*distance[None]/bank['anchor_radius_px']**2
         scores=scores.masked_fill(distance[None]>bank['anchor_radius_px']**2,-1.)
     aggregation=bank.get('aggregation','median')
     if aggregation=='median':field=scores.median(1).values[0]

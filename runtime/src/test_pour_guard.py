@@ -3,10 +3,22 @@ import unittest
 from unittest.mock import patch
 import numpy as np
 from pour_guard_actor import Actor,monotone_return_path,topup_goal,trim_expired,slow_empty_evidence
-from pour_guard_vision import project,plane_point,bottle_base_from_neck
+from pour_guard_vision import project,plane_point,bottle_base_from_neck,locate
 
 
 class GuardTests(unittest.TestCase):
+    def test_initial_family_calibration_does_not_change_lift_tracking_scores(self):
+        old,new={'family':'retained'},{'family':'outline'}
+        bank=dict(alternatives=[old,new],initial_score_maps=[
+            dict(offset=.7,scale=.75,anchor=.4),dict(offset=0.,scale=1.,anchor=0.)])
+        def match(image,b,*args):
+            return (np.array([10.,20.]),.6) if b is old else (np.array([30.,40.]),.8)
+        with patch('pour_guard_vision.locate',side_effect=match):
+            uv,score=locate(None,bank,device='cpu')
+            np.testing.assert_array_equal(uv,[10.,20.]);self.assertAlmostEqual(score,.85)
+            uv,score=locate(None,bank,tracking=True,device='cpu',expected_uv=[30.,40.])
+            np.testing.assert_array_equal(uv,[30.,40.]);self.assertEqual(score,.8)
+
     def approach_actor(self):
         a=object.__new__(Actor);a.abort_time=None;a.abort_path=None;a.grasp_stage='approach';a.stage_start=0.
         a.home=np.full(7,.1);a.grasp=np.zeros(7);a.approach_path=np.asarray([a.home,a.grasp])
