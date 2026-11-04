@@ -84,6 +84,13 @@ def main(evidence=EVIDENCE, data=DATA):
                 final_outside_nominal_ml=row['final_outside_ml'],
                 ever_below_worktop_nominal_ml=row['ever_below_worktop_ml']))
     assert sum(x['expected_stop'] == 'cup_near_full' for x in report['cases']) == 15
+    if failures and len(localization)==len(failures):
+        next_task=('Calibrate initial localization using multiple camera frames and positive/negative examples; '
+                   'retain the frozen settled-level benchmark and reserve new scenes for any successor evaluation.')
+    elif failures:
+        next_task='Repair the measured remaining failures using these observed cases as development evidence, followed by new reserved evaluation scenes.'
+    else:
+        next_task='Retain this frozen result and reserve a new evaluation before expanding workspace or vessel appearance.'
     result = dict(
         checkpoint_sha256=report['checkpoint_sha256'],
         scene_plan_sha256=report['scene_plan_sha256'],
@@ -96,7 +103,7 @@ def main(evidence=EVIDENCE, data=DATA):
         inference='Compare the image estimate at the decision with the simultaneous particle surface, then compare that surface with the final settled surface. These measurements distinguish estimation error from subsequent surface settling; they do not prove a unique physical cause.',
         next_training=dict(
             status='post-evaluation candidates identified; this analysis performs no fitting or calibration',
-            task=('Repair remaining localization/settled-level failures using these observed cases as development evidence, followed by new reserved evaluation scenes.' if failures else 'Retain this frozen result and reserve a new evaluation before expanding workspace or vessel appearance.'),
+            task=next_task,
             episodes=[x['relative_episode'] for x in full],
             target='Measured final settled height, with decision-to-final cup-volume change retained to avoid conflating settling with additional incoming liquid.',
             evaluation_rule='All30 cases are now observed development evidence for any successor model. Use new reserved seeds for its final evaluation; retain this frozen benchmark unchanged.'))

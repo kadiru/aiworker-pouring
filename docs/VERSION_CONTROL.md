@@ -21,8 +21,8 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 |---|---|
 | Current corrective evaluation model | `evidence/settled-A/best.pt`; Ubuntu `learning/A-settled-20261103-v1/best.pt` |
 | Current corrective model SHA256 | `18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527` |
-| Corrective study records | `data/material-A-settled/`; all completed and interrupted development attempts preserved; fresh30-case evaluation running |
-| Corrective provenance | `evidence/settled-A/final-selection.json`, `model-summary.json`, `data-manifest.json`, round-specific reports and integrity hashes |
+| Corrective study records | `data/material-A-settled/`; 48 complete HDF5 files, 192 sidecars, three partial recordings and three partial sidecars, native-checksum-verified |
+| Corrective provenance | `evidence/settled-A/final-selection.json`, `model-summary.json`, `data-manifest.json`, final 27/30 report, all failed attempts and integrity hashes |
 | Prior frozen evaluation model | `evidence/robust-A/best.pt`; Ubuntu `learning/A-robust-20261103-v1/best.pt` |
 | Prior six-case repaired model | `evidence/guard-B/best.pt`; Ubuntu `learning/A-guard-20261103-v2/best.pt` |
 | Prior evaluation model SHA256 | `b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b` |
@@ -54,3 +54,5 @@ These checks do not start Isaac Sim, train a model or use the GPU. Native simula
 Current repaired-study verification: `python3 tools/summarize_guard_benchmark.py --study vote`. For the archived first guarded round, use source revision`9a4b8b1` so its source-bound checks match the original controller. The `guard-B` folder denotes repair round2; vessel material remains A.
 
 Thirty-case frozen evaluation verification: `python3 tools/summarize_robust_benchmark.py`; failure analysis: `python3 tools/analyze_robust_outcomes.py`. The unchanged checkpoint was evaluated once on 30 new reserved cases; 25 passed, five failures are retained. See [the full report](ROBUSTNESS_A_30.md). Camera sheets and full/empty/underfill videos live under `evidence/robust-A/` outside Git.
+
+Corrective 30-case verification: `python3 tools/summarize_settled_benchmark.py`; analysis: `python3 tools/analyze_robust_outcomes.py --study settled`. All 30 ran once after the frozen source commit `27ba46e`: 27 passes, two localization aborts and one one-particle spill. Model, 18 runtime sources, asset and complete/partial backups are verified. [Final corrective study](SETTLED_LEVEL_STUDY.md). Use archived source revision `b2c7600` for source-bound checks of the previous robustness study; current controller files intentionally differ. Raw media/models are backed up locally and natively, not uploaded to GitHub.
