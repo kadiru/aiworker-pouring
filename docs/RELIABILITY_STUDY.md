@@ -1,6 +1,6 @@
 # Temporal localization and spill repair
 
-Status: v17 passed 7/7 development tasks. The prior 27/30 benchmark is unchanged, and the new reserved 30-case evaluation has not started. The first development candidate passed 3/7 tasks; every failure and recording is retained.
+Status: v17 passed 7/7 development tasks. The prior 27/30 benchmark is unchanged; all thirty reserved test cases are queued on the frozen candidate. The first development candidate passed 3/7 tasks; every failure and recording is retained.
 
 ## Candidate and method
 
@@ -28,6 +28,6 @@ The owned simulator was restarted only while idle, after checking its immutable 
 
 ## Evidence and reproduction
 
-Small reports live in `evidence/reliable-A/`; native files in `/workspace/learning/A-reliable-20261103-v1`, and local raw backups in `data/material-A-reliable/`. Images, videos, checkpoints and raw records remain outside Git. Runtime source and model hashes will be frozen before the thirty-case evaluation.
+Small reports live in `evidence/reliable-A/`; native files in `/workspace/learning/A-reliable-20261103-v1`, and local raw backups in `data/material-A-reliable/`. Images, videos, checkpoints and raw records remain outside Git. Frozen at `2026-11-04T08:33:11Z`: source commit `76c726ea0dfb17392d879959ca9ad844e7a2334e`, selected checkpoint `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101`, scene plan `47346bfdc0bb7e85cf4d08778b9d07f021f967ae48afd3e8e6b7ed796f2b6074`. All 22 native/local runtime files match; zero spill-readiness allowance was used. [Frozen selection](../evidence/reliable-A/final-selection.json). No tuning or retry is permitted during these thirty attempts.
 
 Native report: `/isaac-sim/python.sh pour_reliable_report.py --require-thirty`. Recording audit/review: `/isaac-sim/python.sh audit_reliable_study.py integrity` and `review`. Local verification: `python3 tools/summarize_reliable_benchmark.py`; failure analysis: `python3 tools/analyze_robust_outcomes.py --study reliable`. These final commands are pending until the evaluation finishes.
