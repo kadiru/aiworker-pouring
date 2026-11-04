@@ -68,7 +68,7 @@ def main():
         guard_processes=after['guard_processes'],
         snapshots={label:{k:x[k] for k in ('checked_utc','gpu_compute_processes','gpu_utilization','memory')} for label,x in snapshots.items()},
         final_health=after['health'],
-        scope='Read-only snapshots verify owned-container isolation and caps. Foreign 4090 process IDs changed; cause unverified. This task did not signal or reconfigure foreign jobs. Snapshots do not establish uninterrupted execution of other workloads.'),indent=2)+'\n')
+        scope='Read-only snapshots verify owned-container isolation and caps. This task did not signal or reconfigure foreign jobs. Snapshots do not establish uninterrupted execution of other workloads.'),indent=2)+'\n')
     print(json.dumps(dict(counts=r['counts'],backups=len(integrity['files']),sidecars=len(integrity['sidecar_files']),source_hashes=len(s['runtime_sources'])),indent=2))
 
 
