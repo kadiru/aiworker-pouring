@@ -66,6 +66,7 @@ class Actor:
         self.outbound=[]
         self.grasp_check=None
         self.visual_votes=[];self.physical_votes=0;self.cap_start=None;self.slow_empty_votes=0
+        self.settled_history=[]
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
@@ -147,7 +148,7 @@ class Actor:
         if self.start is None:self.start=t;Hardware.hardware(self,robot)
         age=t-self.start;q=observation['joint_pos'];v=observation['joint_vel'];self.history.append((age,q[:7].copy()))
         task=decode(observation['task_encoded'],'jpeg95');wrist=decode(observation['wrist_encoded'],'jpeg95')
-        geo=cnn=flow=empty=present=tilt=0.;mass=0.
+        geo=cnn=flow=empty=present=tilt=0.;mass=0.;settled_prediction=None
         if not self.grasp_confirmed and self.terminal is None:
             targets,phase=self.grasp_action(task,q,t,age)
             if self.abort_time is not None:robot.reason=self.stop_latched;robot.stop_time=self.abort_time
@@ -161,6 +162,10 @@ class Actor:
             geo=float(np.clip(geo,0,1));cnn=float(np.clip(cnn,0,1))
             self.filtered=cnn if self.filtered is None else .6*self.filtered+.4*cnn
             self.level_history.append((t,geo,cnn,self.filtered))
+            if 'settled_regressor' in self.saved:
+                from pour_settled_model import features,predict
+                settled_prediction=float(predict(features(a,a.new_tensor([cnn],dtype=torch.float32),self.cup_xy),self.saved['settled_regressor'])[0])
+                self.settled_history.append((t,settled_prediction))
             if len(self.level_history)>=9:
                 newer=np.median([x[3] for x in self.level_history[-3:]]);older=np.median([x[3] for x in self.level_history[-9:-6]])
                 flow=float(np.clip((newer-older)/.3,0,.45))
@@ -191,9 +196,16 @@ class Actor:
                     self.pour_phase=80.
                     if t-self.pause_start>=self.threshold['settle_seconds']:
                         last=[x for x in self.level_history if x[0]>=self.pause_start+.35][-6:]
-                        settled=float(np.quantile([x[2] for x in last],.25));other=float(np.median([x[1] for x in last]))
-                        stable=np.std([x[2] for x in last])<.012
-                        full=settled>=self.threshold['full_settled_target'] and abs(other-settled)<.06 and stable and mass>1.
+                        other=float(np.median([x[1] for x in last]))
+                        if 'settled_regressor' in self.saved:
+                            from pour_settled_model import assess
+                            levels=[x[1] for x in self.settled_history if x[0]>=self.pause_start+.35][-6:]
+                            settled,stable,full=assess(levels,other,self.threshold['full_settled_target'],
+                                self.threshold['settled_stability_std'],self.threshold['settled_geometry_tolerance'],mass)
+                        else:
+                            settled=float(np.quantile([x[2] for x in last],.25))
+                            stable=np.std([x[2] for x in last])<.012
+                            full=settled>=self.threshold['full_settled_target'] and abs(other-settled)<.06 and stable and mass>1.
                         self.full_votes=self.full_votes+1 if full else 0
                         if self.full_votes>=3:self.latch('cup_near_full',t,robot)
                         elif not full and settled>=self.threshold['full_settled_target']:
@@ -203,7 +215,7 @@ class Actor:
                             else:
                                 self.fill_mode='trim'
                                 self.trim_goal=topup_goal(settled,self.threshold['full_settled_target'],self.threshold.get('trim_increment',.015))
-                                self.trim_min_phase=max(95.,self.peak_phase-.5)
+                                self.trim_min_phase=self.threshold.get('trim_min_phase',max(95.,self.peak_phase-.5))
                                 self.trim_start=None
                                 self.trim_entered=t
                 else:
@@ -220,7 +232,8 @@ class Actor:
                     eligible=self.fill_mode=='coarse' or self.pour_phase>=self.trim_min_phase
                     timed_brake=self.fill_mode=='trim' and (trim_expired(self.trim_start,t,self.threshold.get('trim_seconds',.1)) or
                         trim_expired(self.trim_entered,t,self.threshold.get('trim_total_seconds',.9)))
-                    if timed_brake or (eligible and self.filtered>.60 and self.filtered+flow*self.threshold['runoff_seconds']>=goal):
+                    feedback=settled_prediction if self.fill_mode=='trim' and settled_prediction is not None else self.filtered
+                    if timed_brake or (eligible and feedback>.60 and feedback+flow*self.threshold['runoff_seconds']>=goal):
                         self.fill_mode='brake';self.pause_count+=1;self.full_votes=0
                 if self.terminal is not None:targets,phase=self.terminal.act(t)
                 else:
@@ -237,6 +250,7 @@ class Actor:
             visual_grasp_confirmed=self.grasp_confirmed,confirmation_votes=self.confirm_votes,source_xy=None if self.source_xy is None else self.source_xy.tolist(),
             grasp_check=self.grasp_check,
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
+            settled_prediction=settled_prediction,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,
             slow_empty_votes=self.slow_empty_votes,cap_dwell_seconds=None if self.cap_start is None else t-self.cap_start,

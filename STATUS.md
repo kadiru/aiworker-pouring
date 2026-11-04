@@ -1,7 +1,21 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 03, 2026, 14:10 PST (America/Los_Angeles).
-State: **Thirty-case frozen material-A evaluation completed: 25/30 primary successes, five failures preserved. Lab idle; no training running.**
+Updated: November 03, 2026, 16:26 PST (America/Los_Angeles).
+State: **Localization/settled-height correction in progress; new fitting and 30 fresh tests authorized.**
+
+## Active corrective study
+
+Study `A-settled-20261103-v1`, prefix `L30_A_`, fresh reserved seed20261203. Keep material A, physics and primary/legacy scoring unchanged. Train a supervised final-settled-height ridge predictor using frozen visual features from35consumed H_A/T30_A episodes, split27train/eight validation by episode. Source/cup search bounds cover all corners of the declared fixture domain plus6pixel margin; keep template kernels and confidence thresholds. Runtime still uses RGB/joints/own history/fixed calibration only. New test cases are excluded from data admission.
+
+Run all five previous failures plus one successful full and one empty control as seven development cases before final freezing. Preserve every development attempt and every new test. After selection, execute30new15full/15empty cases once with no tuning. Aim for zero spill; report final/below-worktop and transient outside classifications separately.
+
+Baseline owned4070 container f783d7a6d1416de3a7b48419a12e3cffa4aba5cff189707ddb2fd1c3393a941b, PID2251293; foreign4090 PID2630921 present. Preserve foreign jobs. Four-core quota, CPUs16–23, shares256,nice10,16GiB/no extra swap and immutable-ID GPU guard retained. [Before-change snapshot](evidence/settled-A/runtime-before-change.json).
+
+Progress:18CPU controller checks passed. Actual4070 fit completed in4.831s:27train/eight validation episodes,1,070/307frames, five ridge coefficients, lambda.001. Validation near-full MAE.709points/p95absolute1.093points/maxoverestimate.903points. Source bounds now[98,118,174,156], cup[234,201,275,228];36/36initial views accepted with maxsource.743mm/cup.544mmerror. CandidateSHA17010a756b59751744a57b6cd665bdef1d87d3a624b33d9675a8a5c5f0b6564f; predicted-settled target.915. No fresh test has started.
+
+Current owned container b66b71ee3071919e82210760c909974d6e7e91247b84e92671b2e492ae80639f,4070 PID2680844, guard2680845; foreign4090 PID2630921 still observed. Run20261104T002634Z. Seven development cases queued once as round0; read-only watcher session78986. All18controller/model/physics sources monitored. Prior runtime19files archived under Ubuntu source-backups/before-settled-b2c7600.
+
+Next: finish and inspect all seven development cases, resolve their failures if any before final selection, freeze source/model/new30-case plan, finish all30 tests, validate/back up all recordings, review cameras, update reports, commit/push. Do not end at queued/partial results.
 
 ## Thirty-case robustness evaluation — complete
 

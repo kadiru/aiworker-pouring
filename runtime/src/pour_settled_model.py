@@ -1,0 +1,28 @@
+"""Image-derived features for a supervised final-settled-height regressor."""
+import numpy as np
+import torch
+from pour_guard_vision import surface_features
+
+
+def features(image, cnn, cup_xy):
+    f, _, mass = surface_features(image)
+    xy = torch.as_tensor(cup_xy, device=image.device, dtype=f.dtype)
+    if xy.ndim == 1:
+        xy = xy[None].expand(len(image), -1)
+    return torch.stack((f[:, 0], f[:, 1], f[:, 2], f[:, 3], cnn,
+        (xy[:, 0] - .49) / .008, (xy[:, 1] + .15) / .008), 1)
+
+
+def predict(x, fitted):
+    columns = fitted['columns']
+    a = (x[:, columns] - x.new_tensor(fitted['mean'])) / x.new_tensor(fitted['scale'])
+    return (a @ x.new_tensor(fitted['coef'])).clamp(0., 1.)
+
+
+def assess(levels, other, target, deviation, tolerance, mass):
+    values = np.asarray(levels, dtype=float)
+    if len(values) < 6 or not np.isfinite(values).all():
+        return 0., False, False
+    level = float(np.quantile(values, .25))
+    stable = bool(np.std(values) < deviation)
+    return level, stable, bool(level >= target and abs(other - level) < tolerance and stable and mass > 1.)

@@ -4,10 +4,10 @@ from pathlib import Path
 from pour_robust_study import ROOT,PREFIX,CHECKPOINT_SHA,plan
 
 
-def completed_row(folder):
+def completed_row(folder, checkpoint_sha=CHECKPOINT_SHA):
     s=json.loads((folder/'parameters.json').read_text());m=json.loads((folder/'metrics.json').read_text())
     f=m['bottle_result'];p=m['policy'];d=json.loads((folder/'policy-decisions.json').read_text());samples=json.loads((folder/'samples.json').read_text())
-    assert p['checkpoint_sha256']==CHECKPOINT_SHA and not p['teacher_fallback']
+    assert p['checkpoint_sha256']==checkpoint_sha and not p['teacher_fallback']
     assert s['spacing']==.0018 and s['dt']==.0025 and s['vessel_appearance']=='A'
     q=s['spacing']**3*1e6;baseline=round(s['cup_initial_ml']/q)*q
     modes=list(dict.fromkeys(x['mode'] for x in d if x['stop_latched']))

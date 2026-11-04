@@ -1,0 +1,80 @@
+{
+  "checked_utc": "2026-11-04T00:19:08.306927+00:00",
+  "container": "f783d7a6d1416de3a7b48419a12e3cffa4aba5cff189707ddb2fd1c3393a941b",
+  "owner": "aiworker-pouring",
+  "limits": {
+    "NanoCpus": 4000000000,
+    "CpuShares": 256,
+    "CpusetCpus": "16-23",
+    "Memory": 17179869184,
+    "MemorySwap": 17179869184,
+    "DeviceRequests": [
+      {
+        "Driver": "",
+        "Count": 0,
+        "DeviceIDs": [
+          "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+        ],
+        "Capabilities": [
+          [
+            "gpu"
+          ]
+        ],
+        "Options": {}
+      }
+    ]
+  },
+  "guard_processes": [
+    "2251294 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py f783d7a6d1416de3a7b48419a12e3cffa4aba5cff189707ddb2fd1c3393a941b"
+  ],
+  "owned_processes": "PID                 NI                  COMMAND\n2251224             10                  /bin/bash /isaac-sim/python.sh -u /workspace/src/run_fountain.py --allow-root\n2251293             10                  /isaac-sim/kit/python/bin/python3 -u /workspace/src/run_fountain.py --allow-root\n",
+  "gpu_compute_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 2630921, 960 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 2251293, 4606 MiB\n",
+  "gpu_utilization": "NVIDIA GeForce RTX 4090, GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 0 %, 985 MiB, 24564 MiB\nNVIDIA GeForce RTX 4070, GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 36 %, 4840 MiB, 12282 MiB\n",
+  "memory": "               total        used        free      shared  buff/cache   available\nMem:           64128       11368        8894         194       43866       51852\nSwap:           2047           1        2046\n",
+  "selected_checkpoint_sha256": "b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b",
+  "sources": {
+    "pour_guard_actor.py": "3f057f1771b2abb3a6f372afe5da00ad0ea55b46b0baaa75b21e74fe8c8ead68",
+    "pour_guard_train.py": "f20740ce4eb37a3af529904e5f5b1e2aefc8c7f6668f1e98306620ba066826f1",
+    "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
+    "pour_guard_vision.py": "d4af274be0255e37f16c1ac54e6fc332fad916a34ab4438131e1deacdaf8e042",
+    "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
+    "pour_guard_study.py": "b77668a502b83ed32d174d16cc60d7366fee570b183ab1f62848532c250366cd",
+    "pour_guard_data.py": "9ed56d05040a67b9a3503b381c58522f67c081a5cb0bcce4c3d5d64b66652d64",
+    "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
+    "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
+    "pour_stop_sequence.py": "886832a6593cf0c8a084013d14f5e608bcfa49c8d7864fa7b4b239847ca7395b",
+    "run_fountain.py": "d3f3474d50ac1beae0d1afdec5cff84e565de16cf714858fc856b13a6df33e51",
+    "robot_pour.py": "fe35b06a71a84b50994c693bda310e0e522c6f7f42926ddd59ba566cef9f5d72",
+    "pour_recording.py": "8c3ebdb78a48ab599d35a29ecfc56b93972221c09dc402c6115b0df0cac79b67",
+    "bottle_pour.py": "09d7efcb3ad545a18810bf236a226661fa50a96c481e3f7d59e4216b612e3ad6",
+    "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
+    "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
+    "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
+    "pour_guard_vote_study.py": "6bed6818bd79b04b2abb401814b6be455149fac51fc60dad1701dcd370103b5a",
+    "pour_robust_study.py": "eb37c9d2982d6a43f9c69aed1c2a69a5b70254f381665ffa79f95157f0344f87"
+  },
+  "asset_sha256": "82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d",
+  "health": {
+    "run": "20261103T192830Z",
+    "phase": "Trial finished with failed checks",
+    "sim_time": 1.1,
+    "queue": [],
+    "recording": {
+      "active": false,
+      "path": "/workspace/outputs/fountain/20261103T192830Z/219-T30_A_test_29-282301/episode.hdf5",
+      "cameras": [
+        "task",
+        "wrist"
+      ],
+      "resolution": [
+        384,
+        384
+      ],
+      "control_hz": 20,
+      "frames": 21
+    },
+    "error": null,
+    "learning_error": null,
+    "learning": null
+  }
+}
