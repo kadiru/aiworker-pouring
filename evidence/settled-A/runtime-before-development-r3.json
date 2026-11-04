@@ -1,0 +1,99 @@
+{
+  "checked_utc": "2026-11-04T01:39:55.335982+00:00",
+  "container": "8b4d87b59be0623f4894f801da4b441288018679b6d60e8720d6ef8505cbc7c8",
+  "owner": "aiworker-pouring",
+  "limits": {
+    "NanoCpus": 4000000000,
+    "CpuShares": 256,
+    "CpusetCpus": "16-23",
+    "Memory": 17179869184,
+    "MemorySwap": 17179869184,
+    "DeviceRequests": [
+      {
+        "Driver": "",
+        "Count": 0,
+        "DeviceIDs": [
+          "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+        ],
+        "Capabilities": [
+          [
+            "gpu"
+          ]
+        ],
+        "Options": {}
+      }
+    ]
+  },
+  "guard_processes": [
+    "2795261 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 8b4d87b59be0623f4894f801da4b441288018679b6d60e8720d6ef8505cbc7c8"
+  ],
+  "owned_processes": "PID                 NI                  COMMAND\n2795193             10                  /bin/bash /isaac-sim/python.sh -u /workspace/src/run_fountain.py --allow-root\n2795260             10                  /isaac-sim/kit/python/bin/python3 -u /workspace/src/run_fountain.py --allow-root\n",
+  "gpu_compute_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 2761818, 960 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 2795260, 4809 MiB\n",
+  "gpu_utilization": "NVIDIA GeForce RTX 4090, GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 0 %, 985 MiB, 24564 MiB\nNVIDIA GeForce RTX 4070, GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 88 %, 5073 MiB, 12282 MiB\n",
+  "memory": "               total        used        free      shared  buff/cache   available\nMem:           64128       11372        6945         194       45810       51848\nSwap:           2047           1        2046\n",
+  "selected_checkpoint_sha256": "a570bb051e4d005c914dbe9bc834a6ef30bfb28d86d1810949b7b6e4ed2baaa4",
+  "sources": {
+    "pour_guard_actor.py": "834a6c6b0bb140783528dd1c808e889e40ae90b0fe343fa932cafb37a99936ad",
+    "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
+    "pour_guard_vision.py": "d4af274be0255e37f16c1ac54e6fc332fad916a34ab4438131e1deacdaf8e042",
+    "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
+    "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
+    "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
+    "pour_stop_sequence.py": "886832a6593cf0c8a084013d14f5e608bcfa49c8d7864fa7b4b239847ca7395b",
+    "run_fountain.py": "d9b7c039f30fc180c3556330070c77b901215b9cb934b7d5e8208c85c0fd65d5",
+    "robot_pour.py": "fe35b06a71a84b50994c693bda310e0e522c6f7f42926ddd59ba566cef9f5d72",
+    "pour_recording.py": "8c3ebdb78a48ab599d35a29ecfc56b93972221c09dc402c6115b0df0cac79b67",
+    "bottle_pour.py": "09d7efcb3ad545a18810bf236a226661fa50a96c481e3f7d59e4216b612e3ad6",
+    "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
+    "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
+    "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
+    "pour_settled_model.py": "094a7e1f2c64baf19e892aa76419c15de47ec2dfc44e71c6342e8e0fc49b2cb4",
+    "pour_settled_data.py": "c18409bffa1d49a0783174aa0bad95cfe6e22115bc81331ce1c894a7fe7d1fa7",
+    "pour_settled_train.py": "5a82d9243317246ec845ba48d1bc10ad2ef6d9edc357dc9b4a4696814e993550",
+    "pour_settled_study.py": "61b827f1c1dc64e5c48bb27ddd49936da5ac44a8252ffed22e15866a7d85a8c7"
+  },
+  "asset_sha256": "82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d",
+  "health": {
+    "run": "20261104T013852Z",
+    "phase": "Visual guard: Visual grasp: approach",
+    "sim_time": 0.2,
+    "queue": [
+      "L30_A_dev_03_r3",
+      "L30_A_dev_08_r3",
+      "L30_A_dev_20_r3",
+      "L30_A_dev_27_r3",
+      "L30_A_dev_10_r3",
+      "L30_A_dev_26_r3"
+    ],
+    "recording": {
+      "active": true,
+      "path": "/workspace/outputs/fountain/20261104T013852Z/229-L30_A_dev_29_r3-577655/episode.partial.hdf5",
+      "cameras": [
+        "task",
+        "wrist"
+      ],
+      "resolution": [
+        384,
+        384
+      ],
+      "control_hz": 20,
+      "frames": 3
+    },
+    "error": null,
+    "learning_error": null,
+    "learning": {
+      "stage": "fit_complete",
+      "elapsed_s": 1.118559645023197,
+      "metrics": {
+        "mae": 0.00843987859488232,
+        "near_full_mae": 0.010677685384322875,
+        "near_full_p95_abs": 0.023208898885586898,
+        "near_full_p95_overestimate": 0.023208898885586898,
+        "near_full_max_overestimate": 0.028529712391017203,
+        "validation_episodes": 12,
+        "validation_frames": 398,
+        "near_full_frames": 258
+      }
+    }
+  }
+}

@@ -31,5 +31,10 @@ def assess(levels, other, target, deviation, tolerance, mass):
     return level, stable, bool(level >= target and abs(other - level) < tolerance and stable and mass > 1.)
 
 
-def topup_cap(previous_peak, extra=1., hard_limit=110.):
+def topup_cap(previous_peak, extra=.5, hard_limit=110.):
     return min(hard_limit, max(95., previous_peak + extra))
+
+
+def topup_feedback_eligible(phase, cap):
+    # RGB changes as the bottle moves are not proof that a top-up has flowed.
+    return phase >= cap - .25

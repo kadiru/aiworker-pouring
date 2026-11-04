@@ -59,7 +59,10 @@ def development():
     assert not (ROOT / 'final-selection.json').exists(), 'Final controller already frozen'
     prior = seen()
     round_id = max((s.get('development_round', -1) for s in prior), default=-1) + 1
-    return [dict(s, name=s['name'] + f'_r{round_id}', development_round=round_id) for s in plan()['development']]
+    cases = [dict(s, name=s['name'] + f'_r{round_id}', development_round=round_id) for s in plan()['development']]
+    # The repaired-localization scene exposed nonflow top-ups; check it first.
+    # This changes development scheduling only, never the reserved test plan.
+    return sorted(cases, key=lambda s: s['development_case'] != 29)
 
 
 def unstarted():

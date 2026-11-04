@@ -2,15 +2,22 @@
 import json
 from pathlib import Path
 import unittest
-from pour_settled_model import assess,topup_cap
+from pour_settled_model import assess,topup_cap,topup_feedback_eligible
 from pour_settled_study import make_plan
 
 
 class SettledTests(unittest.TestCase):
     def test_topup_reaches_last_pouring_angle_but_has_hard_cap(self):
-        self.assertEqual(topup_cap(104.),105.)
+        self.assertEqual(topup_cap(104.),104.5)
         self.assertEqual(topup_cap(94.),95.)
         self.assertEqual(topup_cap(130.),110.)
+
+    def test_image_change_before_pouring_angle_cannot_end_topup(self):
+        # Retained failed localization case braked at these two nonflow angles.
+        cap=topup_cap(106.)
+        for phase in (95.75,97.5,102.75,106.):
+            self.assertFalse(topup_feedback_eligible(phase,cap))
+        self.assertTrue(topup_feedback_eligible(106.25,cap))
 
     def test_high_instantaneous_surface_cannot_override_predicted_underfill(self):
         level, stable, full = assess([.895] * 6, .95, .915, .01, .10, 20)

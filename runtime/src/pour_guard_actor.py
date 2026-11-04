@@ -236,6 +236,9 @@ class Actor:
                     self.peak_phase=max(self.peak_phase,self.pour_phase)
                     goal=self.threshold['coarse_brake_target'] if self.fill_mode=='coarse' else self.trim_goal
                     eligible=self.fill_mode=='coarse' or self.pour_phase>=self.trim_min_phase
+                    if self.fill_mode=='trim' and self.threshold.get('adaptive_trim'):
+                        from pour_settled_model import topup_feedback_eligible
+                        eligible=topup_feedback_eligible(self.pour_phase,self.trim_cap)
                     timed_brake=self.fill_mode=='trim' and (trim_expired(self.trim_start,t,self.threshold.get('trim_seconds',.1)) or
                         trim_expired(self.trim_entered,t,self.threshold.get('trim_total_seconds',.9)))
                     feedback=settled_prediction if self.fill_mode=='trim' and settled_prediction is not None else self.filtered

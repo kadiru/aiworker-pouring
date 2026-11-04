@@ -1,6 +1,6 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 03, 2026, 16:56 PST (America/Los_Angeles).
+Updated: November 03, 2026, 17:41 PST (America/Los_Angeles).
 State: **Localization/settled-height correction in progress; new fitting and 30 fresh tests authorized.**
 
 ## Active corrective study
@@ -14,6 +14,12 @@ Development failures retained: r0 case03 returned without spill at90.691%height 
 Round2 candidate `5ae9e3d0004df6578e6df2a1fa97d516739203b6c6af50d7f05a8cf8666b720a`: broadened calibration with14 existing high-fill episodes, total37train/12validation episodes,1301/398frames. Frozen CNN plus14 vertical color bands;16-coefficient ridge fit, lambda.1,20candidate models. Actual4070fit5.656s. Near-full validation MAE1.068points,p95absolute/overestimate2.321points; derived stop target.928209. CPU replay now predicts96.7–97.0% at the r1 high plateau, versus old91.3%. Replay is diagnostic, not autonomous success.
 
 Nineteen controller checks passed. Seven native round2 development cases queued once, watcher83408. Current owned container `0e137672e7f5c13e690ab7ec07c460a004a0902aece8249af58d1b340109a97a`, run20261104T005413Z,4070PID2728955,guard2728956. Four-core quota/CPUs16–23/shares256/nice10/16GiB no extra swap. Foreign4090PID2630921 observed unchanged; no foreign lifecycle/configuration action. [Snapshot](evidence/settled-A/runtime-before-development-r2.json).
+
+Round2 complete:6/7 passed, all7zero final spill. Case29 now grasps successfully but fails full-stop at89.485%height: top-ups braked at97.5/102.75degrees before the prior106degree pouring angle. Four cases had transient outside readings (peak0.169128nominalmL) that returned to zero; keep them separate from final spill. All9completed attempts across r0/r1/r2 +36sidecars +2partials +2partial sidecars are SHA256-backed locally; both round2 camera sheets reviewed. Candidate r2 archived natively and locally.
+
+Round3 now running, watcher62034, case29 first then03/08/20/27/10/26. Twenty CPU checks pass. New control: image feedback may brake only at adaptive-cap-minus0.25degree; cap increment0.5degree, dwell0.05s,total pulse1.5s,max two top-ups. Same49episodes and16coefficient fit; actual4070 cached refit1.119s, identical validation metrics. Model SHA a570bb051e4d005c914dbe9bc834a6ef30bfb28d86d1810949b7b6e4ed2baaa4. No reserved test started.
+
+Owned container8b4d87b59be0623f4894f801da4b441288018679b6d60e8720d6ef8505cbc7c8,run20261104T013852Z,4070PID2795260,guard2795261,same resource caps. Foreign4090PID changed from2630921 to2761818 before this restart; currentprocess start17:16:18PST, causeunverified. No matching OOM/NVIDIA-Xid kernel entries returned and no foreign signals/configuration actions taken. [Snapshot](evidence/settled-A/runtime-before-development-r3.json),[read-only check](evidence/settled-A/other-job-check-r3.json).
 
 Next: inspect and resolve all seven development cases before freeze. Then run all30 reserved tests once without tuning; validate/back up every recording including failures/partials, review cameras, report actual outcomes, commit and push. Do not end at queued/partial results.
 

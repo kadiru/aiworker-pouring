@@ -1,0 +1,33 @@
+{
+  "status": "20_cpu_checks_passed_native_development_running",
+  "basis": "Retained L30_A_dev_29_r2 camera/control trajectory",
+  "observed": {
+    "grasp_verified": true,
+    "stop_reason": "fill_unconfirmed",
+    "final_rim_height": 0.8948549985885608,
+    "final_spill_ml": 0.0,
+    "coarse_peak_deg": 105.99999999999186,
+    "premature_topup_brake_deg": [
+      97.5,
+      102.75
+    ],
+    "topup_total_transfer_ml": 0.472392
+  },
+  "correction": {
+    "feedback_eligibility": "phase >= adaptive cap - 0.25 degree",
+    "cap": "min(110, max(95, previous peak + 0.5)) degrees",
+    "cap_dwell_s": 0.05,
+    "total_pulse_limit_s": 1.5,
+    "max_topups": 2
+  },
+  "retained": [
+    "37 training and 12 validation episodes",
+    "16 fitted visual coefficients and all neural weights",
+    "physical success threshold >=90% rim height",
+    "empty detection",
+    "all 30 reserved scenes remain unstarted"
+  ],
+  "next": "Finish round2 controls, deploy/re-fit on4070, verify failed case first then all seven development scenes before freezing",
+  "checkpoint_sha256": "a570bb051e4d005c914dbe9bc834a6ef30bfb28d86d1810949b7b6e4ed2baaa4",
+  "cached_refit_s": 1.118559645023197
+}
