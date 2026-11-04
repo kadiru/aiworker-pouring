@@ -19,9 +19,9 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 
 | Artifact | Existing location / identity |
 |---|---|
-| Expanded-position candidate (evaluation pending) | Ubuntu `learning/A-workspace-20261104-v1/best.pt`, SHA256 `ea5bf6177c02ab03987ce2fa4bb01d88327541c2ea9a4ec1fc7976f871913e64` |
-| Expanded candidate archive | Ubuntu `learning/A-workspace-20261104-v1/candidates/v18-r0/`; model, fit reports and exact 29-file runtime snapshot |
-| Expanded references | `data/material-A-workspace/`; 22 HDF5 plus 66 sidecars checksum-verified, including two failed originals and two same-scene repairs |
+| Expanded-position candidate (evaluation pending) | Ubuntu `learning/A-workspace-20261104-v1/best.pt`, SHA256 `a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b` |
+| Expanded candidate archive | Ubuntu `learning/A-workspace-20261104-v1/candidates/v18-r0/`; model, fit reports and exact 29-file runtime snapshot; repaired `candidates/v18-r1/` has the new model and 30 sources |
+| Expanded references | `data/material-A-workspace/`; 26 HDF5 plus 82 sidecars checksum-verified, including 22 reference attempts and four r0 development cases |
 | Expanded study evidence | `evidence/workspace-A/`; frozen scene plan, all reference outcomes, rejected-fit diagnostics, candidate calibration and resource snapshots |
 | Completed narrow-workspace reliability model | `evidence/reliable-A/best.pt`; Ubuntu `learning/A-reliable-20261103-v1/best.pt` |
 | Completed reliability model SHA256 | `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101` |

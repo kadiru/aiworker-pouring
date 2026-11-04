@@ -1,7 +1,7 @@
 {
-  "checkpoint_sha256": "ea5bf6177c02ab03987ce2fa4bb01d88327541c2ea9a4ec1fc7976f871913e64",
+  "checkpoint_sha256": "a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b",
   "parent_checkpoint_sha256": "40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101",
-  "method": "Expanded-position gradient template calibration, supervised settled-height ridge regression and contextual joint-target behavioral cloning; retained visual servo, frozen cup/source neural encoders and feedback stopping",
+  "method": "Expanded-position gradient template calibration, supervised settled-height ridge regression and contextual joint-target behavioral cloning; visual servo, frozen neural weights with raw/cup-aligned source recognition and bounded feedback stopping",
   "training": {
     "train_episodes": 98,
     "validation_episodes": 28,
@@ -64,7 +64,7 @@
     "trim_increment": 0.005,
     "trim_seconds": 0.0,
     "trim_total_seconds": 1.5,
-    "max_pauses": 7,
+    "max_pauses": 10,
     "grasp_visual_window": 12,
     "verify_seconds": 1.25,
     "slow_empty_probability": 0.9,
@@ -75,7 +75,7 @@
     "settled_stability_std": 0.01,
     "trim_min_phase": 95.0,
     "adaptive_trim": true,
-    "trim_extra_deg": 0.25,
+    "trim_extra_deg": 0.5,
     "trim_hard_cap_deg": 110.0,
     "trim_fast_rate_deg_s": 35.0,
     "trim_creep_rate_deg_s": 35.0,
@@ -897,18 +897,24 @@
     "serialized_weight_entries": 11620
   },
   "empty_detector_coverage": {
-    "method": "Frozen parent empty/presence detector replay on recorded views; no fitting or threshold selection",
+    "method": "Frozen parent empty/presence weights, raw and RGB-cup-aligned views; maximum empty confidence only from views with presence>=0.7; no neural fitting or threshold reduction",
+    "excluded_failed_reference_episodes": [
+      "W30_A_demo_train_08",
+      "W30_A_demo_train_14"
+    ],
+    "source_frame_normalization": "raw_and_cup_aligned_v1",
     "validation_positive_frames": 28,
     "validation_negative_frames": 86,
-    "validation_positive_above_090": 21,
-    "validation_negative_above_090": 1,
+    "validation_positive_above_090": 24,
+    "validation_negative_above_090": 2,
     "caveat": "Offline tilt/outflow filtering uses labels. Sparse frame counts and reference motions do not replace closed-loop development or the reserved task evaluation."
   },
   "motion_rate_deg_s": {
     "fast": 30.0,
     "slow": 5.0
   },
-  "elapsed_s": 33.40088289300911,
+  "elapsed_s": 39.90926537802443,
+  "source_frame_normalization": "raw_and_cup_aligned_v1",
   "approach_clearance_m": 0.04,
   "approach_method": "Raised Cartesian IK approach/retreat from RGB-localized target, measured home joints and fixed hardware geometry; unchanged collisions and drive limits",
   "reference_repair_plan_sha256": "9089b619eec50fe64b8b04be8bc1682a6baefa415c57e32b3b3b02a8a3e431e8",
@@ -1622,7 +1628,7 @@
   "no_privileged_runtime_inputs": true,
   "data_manifest_sha256": "b3089002d0c16a474b78456ed74880ba28a20fa02d9e1e17cb9425b7306743eb",
   "sources": {
-    "pour_guard_actor.py": "7f028b71d1c4bc03ac0d6ace5278f736dfe8356837ffb74f7e0986d85b37f398",
+    "pour_guard_actor.py": "ba0afe6bfada83d7faed4ad98f391dd2a76c6e049b35ca07e7e39e91ef6cb99e",
     "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
     "pour_guard_vision.py": "50cf5962478fb5db143b3b3b602937fbb35def8976d3e8d6633cb79c7aa98c62",
     "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
@@ -1644,11 +1650,12 @@
     "pour_reliable_train.py": "fa7fdb54eeae126fc2a99cfc0bf01b8b1f7becd46853e5ee2dd7bc471cbfeee3",
     "pour_reliable_study.py": "84478b6db7cbb6a2ca4bc7fad325822be93ab72a00610b9225eb1b215fffcc63",
     "pour_reliable_data.py": "0a5a06a66a141fc07ef666cdbcb9a0a1732a0746af850dd5718be1cc5ddaa524",
-    "pour_workspace_study.py": "da1fe75fef63d84fd12ffb197e5d1887bba870b873aa542a950ad706d42beeb2",
-    "pour_workspace_data.py": "fc77f6a49ef261f04f82292c42be6d45be2011934b4c165f424bb851893fccf3",
-    "pour_workspace_train.py": "d96fa7d5d6339bf47a4ab855372c8e8b813d21613b5fad3070e7928b6b50b366",
+    "pour_workspace_study.py": "2f46291cce308ab04305f8b2895d5f2f460a06c1fd0ecc662d3aad9cc1b67759",
+    "pour_workspace_data.py": "7c2deb5619b24e4c17fde76cab8c74c4b4d81d8fa72009572c5be4d12258e84e",
+    "pour_workspace_train.py": "79f457202ad069f22044a34c38e0927dfb3b1217fcc347d6e3e958b2ca6fa561",
     "pour_workspace_motion.py": "61923ff44820817bfd8fb6b79784f92d8b8f7ad3e6efe96654928cd324c895e4",
     "pour_workspace_path.py": "19bb136683fc6ef40d280c006e0f33cd0d721d369e93530c30b7938746fdb93e",
+    "pour_source_alignment.py": "d3ee053e6ecc4b79eacb7e779855e200bab6da5f2df66d9f224fd5921a5939f7",
     "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
     "pour_learning.py": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a"
   }
