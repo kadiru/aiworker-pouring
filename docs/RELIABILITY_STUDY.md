@@ -1,6 +1,6 @@
 # Temporal localization and spill repair
 
-Status: v17 development round 1 is running. The prior 27/30 benchmark is unchanged, and the new reserved 30-case evaluation has not started. The first development candidate passed 3/7 tasks; every failure and recording is retained.
+Status: v17 passed 7/7 development tasks. The prior 27/30 benchmark is unchanged, and the new reserved 30-case evaluation has not started. The first development candidate passed 3/7 tasks; every failure and recording is retained.
 
 ## Candidate and method
 
@@ -20,7 +20,7 @@ The candidate reduces initial slow tilt from 10 to 5 degrees/second and holds fu
 
 Development replays parent cases 19 and 26 (localization aborts), 29 (one-particle loss), and full/empty controls 1, 14, 0 and 10. Every attempted recording, failure and incomplete trial must remain identifiable. Round 0 completed 3/7 strict tasks: the three empty-bottle tasks passed, one localization attempt aborted, and three full pours reached 90.35–90.80% final height but returned `fill_unconfirmed` after exhausting four top-ups. All seven had zero final/near-table loss; the three full pours each had a transient one-particle outside reading. Seven HDF5 recordings and 28 sidecars match native SHA256 backups, and both task/wrist camera sheets were reviewed. [r0 outcomes](../evidence/reliable-A/round0-reliable-results.json), [r0 audit](../evidence/reliable-A/round0-development-integrity.json), [review](../evidence/reliable-A/round0-review-summary.json).
 
-V17 checkpoint `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101` is being tested on all seven scenes under r1 names. Native sources match the local 22-file manifest. New tests start only after candidate selection; no tuning or repeated attempts during that batch.
+V17 checkpoint `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101` passed all seven scenes under r1 names. Full targets ended at 90.638–92.675% rim height; all three short sources emptied, with complete return/release and zero final/near-table loss in every case. Four cases had transient outside classifications (one to three particles) that returned to zero. Both camera sheets were inspected; all fourteen r0/r1 HDF5 files and 56 sidecars match native checksums, with no partials. [r1 outcomes](../evidence/reliable-A/round1-reliable-results.json), [review](../evidence/reliable-A/round1-review-summary.json). Native sources match the local 22-file manifest. New tests start only after candidate selection; no tuning or repeated attempts during that batch.
 
 Twenty-six native CPU checks passed: fourteen grasp/stop, seven settled-level and five temporal-consensus checks. A separate local check verified thirty balanced, disjoint scene specifications with unchanged physical parameters. These checks are not simulated pouring successes.
 
@@ -28,6 +28,6 @@ The owned simulator was restarted only while idle, after checking its immutable 
 
 ## Evidence and reproduction
 
-Small reports live in `evidence/reliable-A/`; native files in `/workspace/learning/A-reliable-20261103-v1`, and future local raw backups in `data/material-A-reliable/`. Images, videos, checkpoints and raw records remain outside Git. Runtime source and model hashes will be frozen before the thirty-case evaluation.
+Small reports live in `evidence/reliable-A/`; native files in `/workspace/learning/A-reliable-20261103-v1`, and local raw backups in `data/material-A-reliable/`. Images, videos, checkpoints and raw records remain outside Git. Runtime source and model hashes will be frozen before the thirty-case evaluation.
 
 Native report: `/isaac-sim/python.sh pour_reliable_report.py --require-thirty`. Recording audit/review: `/isaac-sim/python.sh audit_reliable_study.py integrity` and `review`. Local verification: `python3 tools/summarize_reliable_benchmark.py`; failure analysis: `python3 tools/analyze_robust_outcomes.py --study reliable`. These final commands are pending until the evaluation finishes.

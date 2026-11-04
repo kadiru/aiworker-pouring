@@ -1,0 +1,215 @@
+{
+  "valid": true,
+  "path": "/workspace/outputs/fountain/20261104T073202Z/275-C30_A_dev_19_r1-18205/episode.hdf5",
+  "transitions": 605,
+  "control_hz": 20.0,
+  "duration_sim_s": 30.250000001229346,
+  "max_camera_state_skew_s": 6.773695346851127e-07,
+  "physical_success": true,
+  "training_eligible": false,
+  "camera": {
+    "task": {
+      "resolution": [
+        384,
+        384
+      ],
+      "rgb_dtype": "uint8",
+      "encoding": "jpeg95",
+      "first_last_mean_pixel_change": 7.832587348090278,
+      "intrinsics": [
+        [
+          732.999267578125,
+          0.0,
+          192.0
+        ],
+        [
+          0.0,
+          732.999267578125,
+          192.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "wrist": {
+      "resolution": [
+        384,
+        384
+      ],
+      "rgb_dtype": "uint8",
+      "encoding": "jpeg95",
+      "first_last_mean_pixel_change": 1.6728199146412037,
+      "intrinsics": [
+        [
+          128.27487182617188,
+          0.0,
+          192.0
+        ],
+        [
+          0.0,
+          128.27487182617188,
+          192.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "task_scope": "full_pour",
+  "corrective_training_eligible": false,
+  "recovery_training_eligible": false,
+  "metrics": {
+    "eligible": true,
+    "gates": [],
+    "bottle_result": {
+      "t": 30.305,
+      "finite": true,
+      "count": 15775,
+      "bottle_ml": 26.593919999999997,
+      "cup_ml": 65.40588,
+      "airborne_ml": 0.0,
+      "spilled_ml": 0.0,
+      "cup_fill_fraction": 0.9267484096919777,
+      "bottle_pose_xyz": [
+        0.4779963493347168,
+        -0.2828376889228821,
+        1.040000081062317
+      ],
+      "bottle_quat_xyzw": [
+        5.844476764480996e-08,
+        -1.2705911450654316e-07,
+        -0.029809846706073603,
+        0.9995555877685547
+      ],
+      "bottle_tilt_deg": -6.260272242241037e-06,
+      "stop_command": true,
+      "stop_reason": "cup_near_full",
+      "stop_time": 27.004999998775244,
+      "phase": "Visual guard: Holding completed pose",
+      "initial_ml": 91.9998,
+      "capacity_geometric_ml": 50.991924298457995,
+      "cup_inventory_fraction": 0.8984324175824175,
+      "source_outflow_ml_s": 0.0,
+      "predicted_cup_ml": 65.40588,
+      "outside_peak_z_m": null,
+      "ever_table_ml": 0.0,
+      "grasp_verified": true,
+      "contacts": [
+        "Bench"
+      ],
+      "both_fingers": false,
+      "bottle_base_height_m": 8.106231685900411e-08,
+      "joint_targets_deg": [
+        32.010395300033025,
+        -10.422178824333287,
+        -0.44271984195212116,
+        -115.12486019655924,
+        -9.132819255274239,
+        -7.165788807334035,
+        -4.041427200764776,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint_positions_deg": [
+        32.012115478515625,
+        -10.421751976013184,
+        -0.4423809051513672,
+        -115.12692260742188,
+        -9.132828712463379,
+        -7.165735244750977,
+        -4.041385173797607,
+        -6.495200068457052e-05,
+        3.7520330806728452e-06,
+        -4.8090663767652586e-05,
+        8.279565008706413e-06
+      ],
+      "command_angle_deg": 0.0
+    },
+    "expected_stop": "cup_near_full",
+    "attribution": "Image-localized visual servo grasp/retry, normalized supervised cup model, learned pour primitive, settled-level top-ups, monotone terminal sequence",
+    "grasp_verified": true,
+    "bilateral_fraction_during_pour": 1.0,
+    "hold_height_m": 0.025258741378784144,
+    "scene": {
+      "bottle_mass_kg": 0.18,
+      "bottle_gravity_enabled": true,
+      "bottle_kinematic": false,
+      "bottle_attachment_joints": [],
+      "robot_arm_gravity_compensation": true,
+      "finger_static_friction": 1.15,
+      "finger_dynamic_friction": 1.0,
+      "arm_control": "Joint position drives with native actuator torque limits",
+      "observation_source": "RGB, measured joints/velocities, own history/phase and fixed robot/camera/bench calibration; no runtime object/particle state",
+      "dof_names": [
+        "arm_r_joint1",
+        "arm_r_joint2",
+        "arm_r_joint3",
+        "arm_r_joint4",
+        "arm_r_joint5",
+        "arm_r_joint6",
+        "arm_r_joint7",
+        "gripper_r_joint1",
+        "gripper_r_joint2",
+        "gripper_r_joint3",
+        "gripper_r_joint4"
+      ],
+      "cup_frame_world": [
+        0.4897224888339268,
+        -0.15609991508835827,
+        1.04
+      ],
+      "cup_frame_rotation": [
+        [
+          2.220446049250313e-16,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          2.220446049250313e-16,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "spill": {
+      "final_outside_ml": 0.0,
+      "ever_table_ml": 0.0,
+      "particle_quantum_ml": 0.0058319999999999995
+    },
+    "zero_spill": true,
+    "task_success_zero_spill": false,
+    "surface_task_success_zero_spill": true,
+    "primary_goal": "measured surface height >=90% rim OR source empty, sustained grasp, upright set-down/release, zero escaped particles",
+    "legacy_inventory_task_success_zero_spill": false,
+    "policy": {
+      "checkpoint": "/workspace/learning/A-reliable-20261103-v1/best.pt",
+      "steps": 605,
+      "checkpoint_sha256": "40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101",
+      "checkpoint_update": 0,
+      "model_version": "visual_reliable_hierarchy_v17",
+      "bounded_action_steps": 10,
+      "done": true,
+      "inputs": [
+        "task RGB",
+        "wrist RGB",
+        "measured joint positions/velocities",
+        "own history/phase",
+        "fixed camera/robot/bench calibration"
+      ],
+      "teacher_fallback": false
+    }
+  }
+}
