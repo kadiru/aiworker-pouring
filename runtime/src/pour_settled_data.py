@@ -6,14 +6,19 @@ import numpy as np
 import torch
 from validate_pour_recording import decode, h5py
 from pour_guard_vision import cup_crop
+from pour_guard_vision import locate, plane_point
 from pour_settled_study import ROOT, PARENT, PARENT_SHA
 
 VALIDATION = {'T30_A_test_01', 'T30_A_test_08', 'T30_A_test_13', 'T30_A_test_21',
-    'T30_A_test_04', 'T30_A_test_14', 'T30_A_test_26', 'H_A_test_00'}
+    'T30_A_test_04', 'T30_A_test_14', 'T30_A_test_26', 'H_A_test_00',
+    'R_A_validation_00', 'S_A_test_05', 'A_validation_18', 'A_validation_16'}
+HIGH_FILL = {'R_A_train_04', 'R_A_validation_00', 'S_A_test_05', 'A_train_20',
+    'A_train_06', 'A_validation_18', 'A_train_08', 'A_train_02', 'A_train_10',
+    'A_train_04', 'A_train_12', 'A_train_14', 'A_train_21', 'A_validation_16'}
 
 
 def build_data(saved):
-    cache = ROOT / 'settled-cache.pt'
+    cache = ROOT / 'settled-cache-v2-high-fill.pt'
     if cache.exists():
         return torch.load(cache, map_location='cpu', weights_only=False)
     assert hashlib.sha256((PARENT / 'best.pt').read_bytes()).hexdigest() == PARENT_SHA
@@ -22,21 +27,33 @@ def build_data(saved):
     for p in sorted(Path('/workspace/outputs/fountain').glob('*/*/episode.hdf5')):
         with h5py.File(p, 'r') as f:
             spec = json.loads(f.attrs['spec']); name = spec.get('name', '')
-            if not (name.startswith('T30_A_test_') or name.startswith('H_A_test_')):
+            parent_case = name.startswith('T30_A_test_') or name.startswith('H_A_test_')
+            if not (parent_case or name in HIGH_FILL):
                 continue
             assert spec['spacing'] == .0018 and spec['dt'] == .0025
             assert f.attrs['status'] == 'complete' and f.attrs['camera_rig'] == 'A_task_wrist_v4'
             metrics = json.loads(f.attrs['metrics'])
-            assert metrics['policy']['checkpoint_sha256'] == PARENT_SHA
+            if parent_case:
+                assert metrics['policy']['checkpoint_sha256'] == PARENT_SHA
             d = f['data/demo_0']; n = len(d['actions'])
             rows = json.loads((p.parent / 'samples.json').read_text())
-            decisions = json.loads((p.parent / 'policy-decisions.json').read_text())
-            assert len(rows) == n and len(decisions) == n
-            initial.append(dict(name=name, image=decode(d['obs/task_image'][0], 'jpeg95').copy(),
-                source_xyz=d['ground_truth/bottle_pose'][0, :3], cup_xyz=np.asarray(spec['cup_world'])))
+            decision_path = p.parent / 'policy-decisions.json'
+            decisions = json.loads(decision_path.read_text()) if decision_path.exists() else []
+            assert len(rows) == n
+            # Recovery episodes switch to an expert, so their policy log is shorter.
+            # It is used only for the fixed image-localized crop, never row labels.
+            if parent_case:
+                assert len(decisions) == n
+            if parent_case:
+                initial.append(dict(name=name, image=decode(d['obs/task_image'][0], 'jpeg95').copy(),
+                    source_xyz=d['ground_truth/bottle_pose'][0, :3], cup_xyz=np.asarray(spec['cup_world'])))
             if not metrics['grasp_verified'] or not metrics['zero_spill']:
                 continue
-            xy = next(x['cup_xy'] for x in decisions if x.get('cup_xy') is not None)
+            xy = next((x['cup_xy'] for x in decisions if x.get('cup_xy') is not None), None)
+            if xy is None:
+                uv, score = locate(decode(d['obs/task_image'][0], 'jpeg95'), saved['cup_bank'])
+                assert score >= saved['thresholds']['cup_localization_score'], (name, score)
+                xy = plane_point(uv, 1.078, saved['calibration'])[:2].tolist()
             final = rows[-1]
             changed = [x['t'] for x in rows if abs(x['cup_ml'] - final['cup_ml']) > .5 * .0018**3 * 1e6]
             stable_after = max(changed, default=0.) + .35
@@ -54,8 +71,8 @@ def build_data(saved):
                 split=split, frames=len(used), indices=used, stable_inventory_after_s=stable_after,
                 target_final_height=final['cup_fill_fraction'], cup_crop_xy=xy,
                 label='final settled particle surface; only frames after final cup inventory stabilizes',
-                consumed_previous_test=True))
-    assert len(initial) == 36 and len(manifest) == 35
+                consumed_previous_episode=True, high_fill_calibration=name in HIGH_FILL))
+    assert len(initial) == 36 and len(manifest) == 49
     assert {x['name'] for x in manifest if x['split'] == 'validation'} == VALIDATION
     data = {s: {k: v if k == 'episode' else torch.from_numpy(np.asarray(v, dtype=np.uint8 if k == 'image' else np.float32))
         for k, v in a.items()} for s, a in arrays.items()}

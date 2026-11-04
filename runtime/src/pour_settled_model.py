@@ -5,12 +5,15 @@ from pour_guard_vision import surface_features
 
 
 def features(image, cnn, cup_xy):
-    f, _, mass = surface_features(image)
+    f, hist, mass = surface_features(image)
     xy = torch.as_tensor(cup_xy, device=image.device, dtype=f.dtype)
     if xy.ndim == 1:
         xy = xy[None].expand(len(image), -1)
-    return torch.stack((f[:, 0], f[:, 1], f[:, 2], f[:, 3], cnn,
+    base = torch.stack((f[:, 0], f[:, 1], f[:, 2], f[:, 3], cnn,
         (xy[:, 0] - .49) / .008, (xy[:, 1] + .15) / .008), 1)
+    # Keep the vertical color distribution: a mean alone loses rim-level detail.
+    bands = hist[:, 14:84].reshape(len(image), 14, 5).mean(2)
+    return torch.cat((base, bands), 1)
 
 
 def predict(x, fitted):

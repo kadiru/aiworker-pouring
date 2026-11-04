@@ -39,7 +39,7 @@ def train(state):
     assert hashlib.sha256((PARENT / 'best.pt').read_bytes()).hexdigest() == PARENT_SHA
     saved = torch.load(PARENT / 'best.pt', map_location='cpu', weights_only=False)
     state.update(phase='Loading consumed camera episodes for settled-height fitting', learning=dict(stage='loading'))
-    bundle = build_data(saved); coverage = cover_workspace(saved); localization = []
+    coverage = cover_workspace(saved); bundle = build_data(saved); localization = []
     for e in bundle['initial']:
         row = dict(name=e['name'])
         for kind, z, actual in (('source', 1.175, e['source_xyz'][:2]), ('cup', 1.078, e['cup_xyz'][:2])):
@@ -70,7 +70,8 @@ def train(state):
     weights = y.new_tensor([1. / counts[n] for n in tr['episode']]) * torch.where(y > .8, 3., 1.)
     weights /= weights.mean()
     candidates = []
-    for columns in ([0, 1, 2, 3], [0, 1, 2, 3, 4], list(range(7))):
+    for columns in ([0, 1, 2, 3], [0, 1, 2, 3, 4], list(range(7)),
+            [0, 4] + list(range(7, 21)), list(range(21))):
         a = x[:, columns]; mean = a.mean(0); scale = a.std(0).clamp(min=.001); mean[0] = 0.; scale[0] = 1.
         a = (a - mean) / scale
         for ridge in (.001, .01, .1, 1.):
@@ -89,7 +90,7 @@ def train(state):
     full_target = .90 + max(.01, chosen['metrics']['near_full_p95_overestimate']) + .005
     assert full_target <= .93, 'Settled prediction uncertainty needs improvement before native use'
     saved['parent_training_step']=saved.get('step');saved['step']=0
-    saved.update(model_version='visual_settled_hierarchy_v12', settled_regressor=chosen['fit'],
+    saved.update(model_version='visual_settled_hierarchy_v13', settled_regressor=chosen['fit'],
         settled_validation=chosen['metrics'], parent_checkpoint_sha256=PARENT_SHA,
         method='Supervised final-settled-height ridge regression on frozen visual features; geometry-bounded RGB localization; retained visual servo, imitation trajectory and empty detector')
     saved['thresholds'].update(full_settled_target=full_target, settled_geometry_tolerance=.10,

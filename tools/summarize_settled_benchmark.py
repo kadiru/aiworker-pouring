@@ -24,7 +24,8 @@ def main():
     manifest=read(E/'data-manifest.json')
     assert all(not x['name'].startswith('L30_A_') for x in manifest)
     train={x['name'] for x in manifest if x['split']=='train'};val={x['name'] for x in manifest if x['split']=='validation'}
-    assert not train & val and len(train)==27 and len(val)==8
+    training=read(E/'model-summary.json')['training']
+    assert not train & val and len(train)==training['train_episodes'] and len(val)==training['validation_episodes']
     integrity=read(E/'recording-integrity.json');assert len(integrity['files'])==len(r['all_attempts'])
     assert len(integrity['sidecar_files'])==4*len(integrity['files']) and {x['name'] for x in integrity['files']}=={x['name'] for x in r['all_attempts']}
     assert len(integrity['partial_files'])==len(r['incomplete_attempts'])

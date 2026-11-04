@@ -1,25 +1,21 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 03, 2026, 16:26 PST (America/Los_Angeles).
+Updated: November 03, 2026, 16:56 PST (America/Los_Angeles).
 State: **Localization/settled-height correction in progress; new fitting and 30 fresh tests authorized.**
 
 ## Active corrective study
 
-Study `A-settled-20261103-v1`, prefix `L30_A_`, fresh reserved seed20261203. Keep material A, physics and primary/legacy scoring unchanged. Train a supervised final-settled-height ridge predictor using frozen visual features from35consumed H_A/T30_A episodes, split27train/eight validation by episode. Source/cup search bounds cover all corners of the declared fixture domain plus6pixel margin; keep template kernels and confidence thresholds. Runtime still uses RGB/joints/own history/fixed calibration only. New test cases are excluded from data admission.
+Study `A-settled-20261103-v1`, prefix `L30_A_`, reserved seed20261203. User authorized localization/settled-level repair, 4070 retraining, 30 fresh tests and GitHub commit/push. Material A, geometry, physics, primary >=90% rim-height/empty success and legacy scoring remain unchanged. No new reserved test has started.
 
-Run all five previous failures plus one successful full and one empty control as seven development cases before final freezing. Preserve every development attempt and every new test. After selection, execute30new15full/15empty cases once with no tuning. Aim for zero spill; report final/below-worktop and transient outside classifications separately.
+Localization bounds now cover all fixture-domain corners plus6pixels; unchanged confidence thresholds. 36/36 consumed initial views accepted, maxsource .743mm/cup .544mm error. Runtime uses RGB, measured joints, own history and fixed calibration only.
 
-Baseline owned4070 container f783d7a6d1416de3a7b48419a12e3cffa4aba5cff189707ddb2fd1c3393a941b, PID2251293; foreign4090 PID2630921 present. Preserve foreign jobs. Four-core quota, CPUs16–23, shares256,nice10,16GiB/no extra swap and immutable-ID GPU guard retained. [Before-change snapshot](evidence/settled-A/runtime-before-change.json).
+Development failures retained: r0 case03 returned without spill at90.691%height but `fill_unconfirmed`;95degree pulses added nothing. r1 case03's adaptive top-up reached the pouring angle, but the narrow-range predictor failed to recognize the higher fill and allowed a second top-up: final spill6.281064nominalmL, task failure. The assistant stopped the next case08 in each round; partial HDF5s remain, with interruption notes identifying the actual actor despite native text "Stopped by user". Five other cases per round never started. Original models are archived natively under candidate-r0-17010a75 and candidate-r1-1741c5ea.
 
-Progress:18CPU controller checks passed. Actual4070 fit completed in4.831s:27train/eight validation episodes,1,070/307frames, five ridge coefficients, lambda.001. Validation near-full MAE.709points/p95absolute1.093points/maxoverestimate.903points. Source bounds now[98,118,174,156], cup[234,201,275,228];36/36initial views accepted with maxsource.743mm/cup.544mmerror. CandidateSHA17010a756b59751744a57b6cd665bdef1d87d3a624b33d9675a8a5c5f0b6564f; predicted-settled target.915. No fresh test has started.
+Round2 candidate `5ae9e3d0004df6578e6df2a1fa97d516739203b6c6af50d7f05a8cf8666b720a`: broadened calibration with14 existing high-fill episodes, total37train/12validation episodes,1301/398frames. Frozen CNN plus14 vertical color bands;16-coefficient ridge fit, lambda.1,20candidate models. Actual4070fit5.656s. Near-full validation MAE1.068points,p95absolute/overestimate2.321points; derived stop target.928209. CPU replay now predicts96.7–97.0% at the r1 high plateau, versus old91.3%. Replay is diagnostic, not autonomous success.
 
-Current owned container b66b71ee3071919e82210760c909974d6e7e91247b84e92671b2e492ae80639f,4070 PID2680844, guard2680845; foreign4090 PID2630921 still observed. Run20261104T002634Z. Seven development cases queued once as round0; read-only watcher session78986. All18controller/model/physics sources monitored. Prior runtime19files archived under Ubuntu source-backups/before-settled-b2c7600.
+Nineteen controller checks passed. Seven native round2 development cases queued once, watcher83408. Current owned container `0e137672e7f5c13e690ab7ec07c460a004a0902aece8249af58d1b340109a97a`, run20261104T005413Z,4070PID2728955,guard2728956. Four-core quota/CPUs16–23/shares256/nice10/16GiB no extra swap. Foreign4090PID2630921 observed unchanged; no foreign lifecycle/configuration action. [Snapshot](evidence/settled-A/runtime-before-development-r2.json).
 
-Development revision:round0 case03 completed with zero final spill and90.691%height but `fill_unconfirmed`:95degree pulses added no liquid. The assistant stopped the next case08 at4.55simseconds to correct this known limit; its90-transition partial and the complete failure are preserved/checksummed. The five other round0cases never started. Native partial error text is"Stopped by user"; the actual assistant decision is documented in`development-interruption-r0.json`. No reserved test has started.
-
-Round1 candidate SHA1741c5ea37b18f4dfa63246553e23644e7bef9634e7308c823df08cfcbfb8004; repeat cached fit1.067s, same validation errors. Adaptive top-up limit=min(110,max(95,previous peak+1)) degrees, approach35deg/s then4deg/s, cap dwell.1s/total1.5s, at most2pulses.19CPU checks pass. Owned container7abc400e89cc795aa7067399ad17149ad8260c3e4538ef444d20cc0fdc46ec4f,4070 PID2700524,guard2700525; foreign4090 PID2630921 unchanged in snapshot. Run20261104T003804Z; seven round1cases queued, watcher95828. Old watcher78986 intentionally exited when superseded sources changed. Initial source/provenance commit071636b is pushed; revision changes awaiting commit.
-
-Next: finish and inspect all seven development cases, resolve their failures if any before final selection, freeze source/model/new30-case plan, finish all30 tests, validate/back up all recordings, review cameras, update reports, commit/push. Do not end at queued/partial results.
+Next: inspect and resolve all seven development cases before freeze. Then run all30 reserved tests once without tuning; validate/back up every recording including failures/partials, review cameras, report actual outcomes, commit and push. Do not end at queued/partial results.
 
 ## Thirty-case robustness evaluation — complete
 
