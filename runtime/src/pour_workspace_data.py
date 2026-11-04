@@ -140,22 +140,35 @@ def probe_empty_detector(saved,seq):
     """Measure the retained empty detector on new views; this performs no fit."""
     from pour_stop_models import LiquidDetector
     from pour_stop_data import crops
+    from pour_source_alignment import aligned_crops,combine_evidence
     model=LiquidDetector().cuda().eval();model.load_state_dict(saved['source_detector'])
-    episodes=[]
+    localized={r['name']:r.get('cup_crop_xy') for r in json.loads((ROOT/'data-manifest.json').read_text())}
+    episodes=[];excluded=[]
     for e in seq:
+        if not e['accepted_reference']:excluded.append(e['name']);continue
+        xy=localized[e['name']];assert xy is not None
         p=Path(e['path']);rows=json.loads((p.parent/'samples.json').read_text());samples=[]
         with h5py.File(p,'r') as f:
             d=f['data/demo_0']
             for i in range(0,len(rows),3):
                 r=rows[i]
                 if r['bottle_tilt_deg']<95 or r['source_outflow_ml_s']>=3:continue
-                c,s,w=crops(decode(d['next_obs/task_image'][i],'jpeg95'),decode(d['next_obs/wrist_image'][i],'jpeg95'))
+                task=decode(d['next_obs/task_image'][i],'jpeg95');wrist=decode(d['next_obs/wrist_image'][i],'jpeg95')
+                c,s,w=crops(task,wrist)
                 pred=model(*[torch.as_tensor(x,device='cuda')[None] for x in (c,s,w)])
-                samples.append(dict(t=r['t'],source_ml=r['bottle_ml'],empty_probability=float(pred['empty_logit'][0].sigmoid()),present_probability=float(pred['present_logit'][0].sigmoid())))
+                empty=float(pred['empty_logit'][0].sigmoid());present=float(pred['present_logit'][0].sigmoid());views=None
+                if saved.get('source_frame_normalization')=='raw_and_cup_aligned_v1':
+                    ac,asc,aw=aligned_crops(task,wrist,xy,saved['calibration'])
+                    ap=model(*[torch.as_tensor(x,device='cuda')[None] for x in (ac,asc,aw)])
+                    ae=float(ap['empty_logit'][0].sigmoid());apr=float(ap['present_logit'][0].sigmoid())
+                    views=dict(raw_empty=empty,raw_present=present,aligned_empty=ae,aligned_present=apr)
+                    empty,present=combine_evidence(empty,present,ae,apr)
+                samples.append(dict(t=r['t'],source_ml=r['bottle_ml'],empty_probability=empty,present_probability=present,views=views))
         episodes.append(dict(name=e['name'],split=e['split'],samples=samples))
     valid=[s for e in episodes if e['split']=='validation' for s in e['samples']]
     positive=[s for s in valid if s['source_ml']<=.12];negative=[s for s in valid if s['source_ml']>=.5]
-    report=dict(method='Frozen parent empty/presence detector replay on recorded views; no fitting or threshold selection',episodes=episodes,
+    report=dict(method='Frozen parent empty/presence weights, raw and RGB-cup-aligned views; maximum empty confidence only from views with presence>=0.7; no neural fitting or threshold reduction',episodes=episodes,
+        excluded_failed_reference_episodes=excluded,source_frame_normalization=saved.get('source_frame_normalization'),
         validation_positive_frames=len(positive),validation_negative_frames=len(negative),
         validation_positive_above_090=sum(s['empty_probability']>=.90 and s['present_probability']>=.7 for s in positive),
         validation_negative_above_090=sum(s['empty_probability']>=.90 and s['present_probability']>=.7 for s in negative),

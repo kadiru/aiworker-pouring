@@ -188,7 +188,7 @@ class Actor:
         if self.start is None:self.start=t;Hardware.hardware(self,robot)
         age=t-self.start;q=observation['joint_pos'];v=observation['joint_vel'];self.history.append((age,q[:7].copy()))
         task=decode(observation['task_encoded'],'jpeg95');wrist=decode(observation['wrist_encoded'],'jpeg95')
-        geo=cnn=flow=empty=present=tilt=0.;mass=0.;settled_prediction=None
+        geo=cnn=flow=empty=present=tilt=0.;mass=0.;settled_prediction=None;empty_views=None
         if not self.grasp_confirmed and self.terminal is None:
             targets,phase=self.grasp_action(task,q,t,age)
             if self.abort_time is not None:robot.reason=self.stop_latched;robot.stop_time=self.abort_time
@@ -211,6 +211,13 @@ class Actor:
                 flow=float(np.clip((newer-older)/.3,0,.45))
             c,s,w=crops(task,wrist);p=self.detector(*[torch.as_tensor(x,device='cuda')[None] for x in (c,s,w)])
             empty=float(p['empty_logit'][0].sigmoid());present=float(p['present_logit'][0].sigmoid())
+            if self.saved.get('source_frame_normalization')=='raw_and_cup_aligned_v1':
+                from pour_source_alignment import aligned_crops,combine_evidence
+                ac,asc,aw=aligned_crops(task,wrist,self.cup_xy,self.cal)
+                ap=self.detector(*[torch.as_tensor(x,device='cuda')[None] for x in (ac,asc,aw)])
+                ae=float(ap['empty_logit'][0].sigmoid());apr=float(ap['present_logit'][0].sigmoid())
+                empty_views=dict(raw_empty=empty,raw_present=present,aligned_empty=ae,aligned_present=apr)
+                empty,present=combine_evidence(empty,present,ae,apr)
             rotation=self.fk.fk(q[:7])[1];up=rotation@self.lift_rotation.T@np.array([0.,0.,1.])
             tilt=float(np.degrees(np.arccos(np.clip(up[2],-1,1))))
             is_empty=empty>=self.threshold['empty_probability'] and present>=.7 and tilt>=95 and flow*72.8<3.
@@ -306,7 +313,7 @@ class Actor:
             grasp_check=self.grasp_check,localization_consensus=self.localization_check,
             approach_tracking=self.approach_check,
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
-            settled_prediction=settled_prediction,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
+            settled_prediction=settled_prediction,empty_views=empty_views,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,
             slow_empty_votes=self.slow_empty_votes,cap_dwell_seconds=None if self.cap_start is None else t-self.cap_start,

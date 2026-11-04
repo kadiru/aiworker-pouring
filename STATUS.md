@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 04, 2026, 12:45 PST.
-State: **Expanded-position fitting completed on the RTX 4070. Eight development scenes are running; thirty reserved tests have not begun.**
+Updated: November 04, 2026, 13:30 PST.
+State: **Development r0 exposed two stopping problems. Four cases closed: one strict pass, three failures, all with zero measured loss. Four unstarted r0 cases were cancelled after the last recording closed. Repairs are staged but not deployed. Thirty reserved tests remain untouched.**
 
 ## Active expanded-position study
 
@@ -15,9 +15,11 @@ The first two fits stopped before producing a checkpoint: no temporal-consensus 
 
 Owned container: `c3664ae2500d7d0d2696a4042761e9ca96ad2bf34f67b18e4ae48859c4675bb8`, run `20261104T204046Z`. It replaced only the verified idle AIWorker repair container after both repaired recordings closed and failed-fit diagnostics were archived. All 29 deployed source hashes match locally. 4070-only visibility, four CPU cores of quota, CPUs 16–23, shares 256, nice 10, 16 GiB RAM/no extra swap and identity-bound priority guard remain. No foreign job has been signaled or reconfigured. Both reference watchers completed; the initial finite continuation exited on the first rejected original and must not be restarted blindly.
 
-Candidate `ea5bf6177c02ab03987ce2fa4bb01d88327541c2ea9a4ec1fc7976f871913e64` and its exact 29-file source snapshot are archived in `candidates/v18-r0`; local model backup matches its SHA. Eight development cases were queued once; watcher session 55155 checks identity without mutations. The first case has visually confirmed grasp/lift and is pouring, with no completed outcome yet.
+Candidate `ea5bf6177c02ab03987ce2fa4bb01d88327541c2ea9a4ec1fc7976f871913e64` and its exact 29-file source snapshot are archived in `candidates/v18-r0`; local model backup matches its SHA. Eight development cases were queued once; watcher session 55155 checks identity without mutations. The first closed development case (`W30_A_dev_00_r0`) failed strictly: verified grasp and complete return, zero loss, but `fill_unconfirmed` after six top-ups and 89.664% final rim height. Its stop-time prediction was 89.354%, only −0.310 percentage points from the final level. The seven-pause budget, not an erroneous full-stop, ended this attempt. Its HDF5 and four sidecars are checksum-verified locally; final task/wrist views reviewed. Case01 emptied but never confirmed empty and timed out at40 seconds. Case02 ended at91.460% but also exhausted top-ups and reported `fill_unconfirmed`; it remains a strict failure. Case03 passed with an empty bottle and completed return/release. The closure watcher (43214) exited0 after its HDF5 closed, then cleared the four unstarted r0 cases. No partial recording remains. The r0 read-only watcher was intentionally terminated after queue closure (exit255); it is not active. All26 HDF5 and82 sidecars are validated, and all four development camera rows are reviewed. [Diagnostic](evidence/workspace-A/development00-r0-diagnostic.json).
 
-Next: finish and inspect development, freeze a passing candidate, run thirty reserved tests once, audit/back up/review all outcomes, commit/push. Commands: POST `workspace_train`, then `workspace_development`, and `workspace_test` only after `freeze_workspace_study.py`; native directory `/workspace/src`. Preserve failures and do not launch a competing GPU process.
+Staged r1: .50-degree top-up increments (previously .25), ten-pause maximum (previously7), unchanged110-degree hard cap and40-second deadline; frozen source classifier evaluated on raw and cup-aligned RGB, requiring source presence in the view supplying empty evidence. All original vote/tilt/flow/grasp thresholds remain. A CPU replay on34 consumed prefixes preserves all16 recorded empty stops, adds a correct stop for case01 at15.405s with0.02916 nominalmL remaining, and has no premature empty stops. This is counterfactual evidence, not a native success. Thirty-four native CPU checks and two local plan checks pass. The30-file candidate is staged separately under `candidate-checks/workspace-r1-deploy/src`; active29-file r0 source and checkpoint remain unchanged.
+
+Next: finish backup verification, deploy/refit r1 on the owned4070 and run all eight development layouts, then freeze, run thirty reserved tests once, audit/back up/review and commit/push. Commands: POST `workspace_train`, then `workspace_development`, and `workspace_test` only after `freeze_workspace_study.py`; native directory `/workspace/src`. Preserve failures and do not launch a competing GPU process.
 
 ## Completed localization and spill repair
 

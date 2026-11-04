@@ -1,10 +1,12 @@
 # Isolated AIWorker runtime
 
-**Current profile:** the Quest/pouring setup runs with `--profile quest --fluid`, using the read-only native Isaac Sim 5.1 installation, recovered Lab 2.3, original robot collisions, three cameras and a [five-cup liquid comparison](../docs/LIQUID_COMPARISON.md). See [the Quest runbook](../docs/QUEST_RESTORE.md) for connection, controls, validation, data and identity-checked restart commands. Quest video and right-only controller input are operator/runtime confirmed; a successful grasp or pour remains unverified.
+**Current experiment profile:** `--profile fountain` runs the material-A bottle/cup benchmark through `src/run_fountain.py`, with 400 Hz physics and synchronized task/wrist observations at 20 Hz. The completed narrow-workspace study passed thirty simulated grasp/pour/stop/return tasks; the separate threefold-position study is now in development. See [current status](../STATUS.md), [expanded-position protocol](../docs/WORKSPACE_STUDY.md) and [completed baseline](../docs/RELIABILITY_STUDY.md) for exact model/source identities and limits. Physical-robot transfer remains untested.
+
+The earlier Quest setup uses `--profile quest --fluid`. The [Quest runbook](../docs/QUEST_RESTORE.md) retains connection and teleoperation instructions, including the operator-confirmed headset stream and right-controller input. Switching profiles replaces the owned simulator, so first check the current study and use the identity-checked idle-container restart procedure; do not interrupt an active benchmark.
 
 ## Earlier Sim 6 baseline (historical fallback)
 
-The remainder describes `--profile baseline`; it is not the currently running Quest profile. Use the current runbook for active container identity and restart instructions.
+The remainder describes the historical `--profile baseline`, not the current pouring benchmark. Use current status for the active container identity and study phase.
 
 This is a standalone dry scene built from the recovered FFW-BG2 USD and empty cups. It does not restore the complete historical Isaac Lab task, Quest teleoperation, learned policies, or liquid simulation. Current verification status is in `../STATUS.md`.
 

@@ -29,6 +29,7 @@ def train(state):
     validation={e['name'] for e in seq if e['split']=='validation'}
     consensus,consensus_report=calibrate_localization(saved,seq,root=ROOT,validation=validation)
     saved['localization_consensus']=consensus
+    saved['source_frame_normalization']='raw_and_cup_aligned_v1'
     bundle=build_data(saved,seq)
     empty_coverage=probe_empty_detector(saved,seq)
     loc=dict(template_fit=template_report,consensus=consensus_report,
@@ -72,11 +73,11 @@ def train(state):
     saved['parent_training_step']=saved.get('step');saved['step']=0
     saved.update(model_version='visual_workspace_hierarchy_v18', settled_regressor=chosen['fit'],
         settled_validation=chosen['metrics'], parent_checkpoint_sha256=PARENT_SHA,
-        method='Expanded-position gradient template calibration, supervised settled-height ridge regression and contextual joint-target behavioral cloning; retained visual servo, frozen cup/source neural encoders and feedback stopping')
+        method='Expanded-position gradient template calibration, supervised settled-height ridge regression and contextual joint-target behavioral cloning; visual servo, frozen neural weights with raw/cup-aligned source recognition and bounded feedback stopping')
     saved['thresholds'].update(full_settled_target=full_target, settled_geometry_tolerance=.10,
         settled_stability_std=.01, trim_increment=.005, trim_min_phase=95.,adaptive_trim=True,
-        trim_extra_deg=.25,trim_hard_cap_deg=110.,trim_fast_rate_deg_s=35.,trim_creep_rate_deg_s=35.,trim_total_seconds=1.5,
-        trim_seconds=0.,discrete_topup=True,max_pauses=7)
+        trim_extra_deg=.50,trim_hard_cap_deg=110.,trim_fast_rate_deg_s=35.,trim_creep_rate_deg_s=35.,trim_total_seconds=1.5,
+        trim_seconds=0.,discrete_topup=True,max_pauses=10)
     saved['thresholds'].update(coarse_flow_min_level=.25,coarse_flow_limit_ml_s=18.)
     saved['thresholds'].update(approach_tracking_tolerance_rad=.02,approach_tracking_wait_s=.75)
     saved['pour_primitive']['slow_rate_deg_s']=5.
@@ -97,6 +98,7 @@ def train(state):
         device=saved['training_device'], chosen=dict(columns=chosen['fit']['columns'], ridge=chosen['fit']['ridge'], metrics=chosen['metrics']),
         thresholds=saved['thresholds'], localization=loc, localization_consensus=consensus_report, template_fit=template_report, motion=motion_report, empty_detector_coverage=empty_coverage,
         motion_rate_deg_s=dict(fast=saved['pour_primitive']['fast_rate_deg_s'],slow=saved['pour_primitive']['slow_rate_deg_s']), elapsed_s=time.monotonic() - started,
+        source_frame_normalization=saved['source_frame_normalization'],
         approach_clearance_m=saved['approach_clearance_m'],approach_method='Raised Cartesian IK approach/retreat from RGB-localized target, measured home joints and fixed hardware geometry; unchanged collisions and drive limits',
         reference_repair_plan_sha256=saved['reference_repair_plan_sha256'],reference_acceptance=reference_acceptance,
         candidates=[dict(columns=c['fit']['columns'], ridge=c['fit']['ridge'], metrics=c['metrics'], score=c['score']) for c in candidates],

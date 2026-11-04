@@ -15,7 +15,7 @@ SEED = 20261224
 RANGES = (.024, .024, .027, .012)
 RUNTIME_SOURCES = tuple(dict.fromkeys(PARENT_SOURCES + (
     'pour_workspace_study.py', 'pour_workspace_data.py', 'pour_workspace_train.py',
-    'pour_workspace_motion.py', 'pour_workspace_path.py', 'pour_stop_data.py', 'pour_learning.py')))
+    'pour_workspace_motion.py', 'pour_workspace_path.py', 'pour_source_alignment.py', 'pour_stop_data.py', 'pour_learning.py')))
 
 
 def scene(base, name, delta, target, rng, split, expert=False):
