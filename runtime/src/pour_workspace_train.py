@@ -78,8 +78,13 @@ def train(state):
         trim_extra_deg=.25,trim_hard_cap_deg=110.,trim_fast_rate_deg_s=35.,trim_creep_rate_deg_s=35.,trim_total_seconds=1.5,
         trim_seconds=0.,discrete_topup=True,max_pauses=7)
     saved['thresholds'].update(coarse_flow_min_level=.25,coarse_flow_limit_ml_s=18.)
+    saved['thresholds'].update(approach_tracking_tolerance_rad=.02,approach_tracking_wait_s=.75)
     saved['pour_primitive']['slow_rate_deg_s']=5.
     saved['approach_clearance_m']=.04
+    repair_plan=ROOT/'reference-repair-plan.json'
+    saved['reference_repair_plan_sha256']=hashlib.sha256(repair_plan.read_bytes()).hexdigest() if repair_plan.exists() else None
+    reference_acceptance=[dict(name=e['name'],reference_case=e['reference_case'],split=e['split'],
+        accepted=e['accepted_reference'],gates=e['rejection_gates']) for e in seq if e['name'].startswith(PREFIX)]
     saved['training_device'] = dict(name=torch.cuda.get_device_name(0), visible_cuda_devices=1)
     saved['settled_training'] = dict(train_episodes=len(set(tr['episode'])), validation_episodes=len(set(va['episode'])),
         train_frames=len(y), validation_frames=len(vy), learned_parameters=len(chosen['fit']['coef']),
@@ -93,6 +98,7 @@ def train(state):
         thresholds=saved['thresholds'], localization=loc, localization_consensus=consensus_report, template_fit=template_report, motion=motion_report, empty_detector_coverage=empty_coverage,
         motion_rate_deg_s=dict(fast=saved['pour_primitive']['fast_rate_deg_s'],slow=saved['pour_primitive']['slow_rate_deg_s']), elapsed_s=time.monotonic() - started,
         approach_clearance_m=saved['approach_clearance_m'],approach_method='Raised Cartesian IK approach/retreat from RGB-localized target, measured home joints and fixed hardware geometry; unchanged collisions and drive limits',
+        reference_repair_plan_sha256=saved['reference_repair_plan_sha256'],reference_acceptance=reference_acceptance,
         candidates=[dict(columns=c['fit']['columns'], ridge=c['fit']['ridge'], metrics=c['metrics'], score=c['score']) for c in candidates],
         unchanged_components=['cup CNN weights', 'source detector weights', 'empty confirmation gates', 'fluid and vessel physics', 'primary task scoring'],
         no_privileged_runtime_inputs=True, data_manifest_sha256=saved['settled_training']['data_manifest_sha256'], sources=saved['sources'])

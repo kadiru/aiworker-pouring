@@ -1,13 +1,15 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 04, 2026, 11:12 PST.
+Updated: November 04, 2026, 11:41 PST.
 State: **Expanded-position reference collection continues; fitting is held after a rejected grasp. A raised-approach repair is staged but not yet deployed. Thirty fresh tests remain pending.**
 
 ## Active expanded-position study
 
 Authorized: vary bottle/cup positions more, retrain on the 4070, run thirty fresh tests aiming for zero spill, preserve other jobs, commit/push. Study `A-workspace-20261104-v1`, prefix `W30_A_`, test seed `20261224`. Cup X/Y half-ranges expand from ±8 to ±24 mm; bottle relative X/Y from ±9/4 to ±27/12 mm. All development/test scenes extend beyond the old domain. Material A, fill ranges, geometry, physics and success criteria remain unchanged.
 
-Ten of twenty original references have completed: nine accepted and one rejected (`W30_A_demo_train_08`, no liquid transferred or lost). The failed arm missed its joint target by about 17 degrees and never contacted the bottle. The finite continuation stopped before fitting. All remaining original reference attempts continue unchanged. CPU convex-hull/bench checks find intersections along six original approaches; a 4 cm raised Cartesian approach has zero sampled intersections in all twenty reference layouts. This is geometric evidence, not native validation of the repair. Seven recordings and 21 sidecars are already checksum-verified locally; seven references have been visually reviewed. Failed originals will remain preserved, and repairs will have distinct names with the same positions/fills. Two local plan/separation checks pass.
+All sixteen original corner references have completed: fourteen accepted, two rejected (`W30_A_demo_train_08` and `_14`). Case 08 never grasped or transferred liquid. Case 14 never verified a grasp and spilled 37.190664 nominal mL at completion; sampled near-table loss reached 40.001688 nominal mL. Closing arm errors peaked at 17.41 and 16.84 degrees respectively. The finite continuation stopped before fitting. Four independent validation references are now running.
+
+CPU convex-hull/bench checks find intersections along six original approaches; a 4 cm raised Cartesian approach has zero sampled intersections in all twenty reference layouts. This is geometric evidence, not native validation of the repair. The candidate also requires arm arrival before finger closure, aborting with open fingers if tracking stays unconfirmed. Twenty-nine native CPU checks (17 controller, 7 settled-level, 5 temporal-localization) and two local plan/separation checks pass. The exact eight original collection sources are archived under the native study's `reference-round0/src`; failed recordings will remain intact, with distinct same-scene repair names. Seven recordings and 21 sidecars are already checksum-verified locally; seven references have been visually reviewed.
 
 **58/58 planned scenes pass CPU kinematic and initial camera-coverage preflight.** Twenty scripted reference demonstrations (sixteen corners for training, four independent validation scenes) are now queued; these use privileged training-only state and are not autonomous successes. Eight separate development scenes follow fitting; thirty reserved test scenes (15 full/15 empty) follow candidate freeze. No expanded-position task result is claimed yet. [Plan](docs/WORKSPACE_STUDY.md), [preflight](evidence/workspace-A/workspace-preflight.json).
 

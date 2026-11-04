@@ -7,6 +7,37 @@ from pour_guard_vision import project,plane_point,bottle_base_from_neck
 
 
 class GuardTests(unittest.TestCase):
+    def approach_actor(self):
+        a=object.__new__(Actor);a.abort_time=None;a.abort_path=None;a.grasp_stage='approach';a.stage_start=0.
+        a.home=np.full(7,.1);a.grasp=np.zeros(7);a.approach_path=np.asarray([a.home,a.grasp])
+        a.threshold=dict(approach_tracking_tolerance_rad=.02,approach_tracking_wait_s=.75)
+        a.history=[(0.,a.home.copy()),(1.35,np.zeros(7))];a.approach_check=None
+        return a
+
+    def test_untracked_approach_keeps_fingers_open(self):
+        a=self.approach_actor();q=np.zeros(11);q[0]=np.radians(17.4)
+        targets,_=a.grasp_action(None,q,1.5,1.5)
+        self.assertEqual(a.grasp_stage,'approach');self.assertIsNone(a.abort_time)
+        np.testing.assert_array_equal(targets[7:],0.)
+        self.assertFalse(a.approach_check['arrived'])
+
+    def test_reached_approach_can_close(self):
+        a=self.approach_actor();q=np.zeros(11)
+        a.grasp_action(None,q,1.4,1.4)
+        self.assertEqual(a.grasp_stage,'close')
+        targets,_=a.grasp_action(None,q,1.6,1.6)
+        self.assertTrue((targets[7:]>0).all())
+
+    def test_blocked_approach_aborts_without_grasping_and_reverses_measured_path(self):
+        a=self.approach_actor();q=np.zeros(11);q[0]=np.radians(17.4)
+        targets,_=a.grasp_action(None,q,2.11,2.11)
+        self.assertEqual(a.stop_latched,'approach_unconfirmed')
+        np.testing.assert_array_equal(targets[7:],0.)
+        np.testing.assert_array_equal(a.abort_path[0],q[:7])
+        targets,_=a.grasp_action(None,q,3.2,3.2)
+        np.testing.assert_array_equal(targets[:7],a.home)
+        np.testing.assert_array_equal(targets[7:],0.)
+
     def test_constant_visual_estimate_cannot_allow_endless_topup(self):
         self.assertFalse(trim_expired(None,100.,.1))
         self.assertFalse(trim_expired(8.,8.05,.1))

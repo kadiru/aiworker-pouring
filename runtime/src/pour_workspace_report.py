@@ -1,4 +1,4 @@
-"""All corrective attempts and the thirty new frozen outcomes."""
+"""Expanded-position references, development, and thirty frozen test outcomes."""
 import argparse
 import csv
 import hashlib
@@ -11,6 +11,8 @@ from pour_workspace_study import ROOT, PREFIX, plan
 def reference_row(folder,spec,m):
     f=m['bottle_result']
     return dict(name=spec['name'],status='complete',path=str(folder),expected_stop=spec['expected_stop'],
+        reference_case=spec.get('reference_case',spec['name']),reference_repair_round=spec.get('reference_repair_round',0),
+        approach_clearance_m=spec.get('approach_clearance_m',0.),
         checkpoint_sha256=None,reference_only=True,source_initial_ml=spec['initial_ml'],cup_initial_ml=spec['cup_initial_ml'],
         cup_world=spec['cup_world'],source_xy=spec['source_xy'],grasp_verified=m['grasp_verified'],
         cup_surface_height_fraction=f['cup_fill_fraction'],source_remaining_ml=f['bottle_ml'],stop_reason=f['stop_reason'],

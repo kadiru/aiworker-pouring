@@ -69,6 +69,7 @@ class Actor:
         self.settled_history=[]
         self.trim_cap=95.
         self.localization_start=None;self.localization_history={"source":[],"cup":[]};self.localization_check=None
+        self.approach_check=None;self.abort_path=None
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
@@ -113,14 +114,28 @@ class Actor:
         self.grasp_stage=stage;self.stage_start=t
 
     def grasp_action(self,task,q,t,age):
-        if self.abort_time is not None:return np.r_[self.home,np.zeros(4)],'Aborting unconfirmed grasp'
+        if self.abort_time is not None:
+            path=getattr(self,'abort_path',None)
+            arm=self.home if path is None else path_at(path,ease((t-self.abort_time)/1.))
+            return np.r_[arm,np.zeros(4)],'Aborting unconfirmed grasp'
         if self.grasp_stage=='initialize':self.initialize_grasp(task,q,t,age)
         if self.abort_time is not None:return np.r_[self.home,np.zeros(4)],'Aborting unconfirmed grasp'
         if self.grasp_stage=='initialize':return np.r_[self.home,np.zeros(4)],'Waiting for consistent localization'
         elapsed=t-self.stage_start;grip=np.pi/4;stage=self.grasp_stage
         if stage=='approach':
             arm=path_at(self.approach_path,ease(elapsed/1.35));grip=0.
-            if elapsed>=1.35:self.change_grasp_stage('close',t)
+            if elapsed>=1.35:
+                tolerance=self.threshold.get('approach_tracking_tolerance_rad')
+                error=float(np.max(abs(q[:7]-self.grasp)))
+                arrived=tolerance is None or (np.isfinite(error) and error<=tolerance)
+                self.approach_check=dict(max_joint_error_rad=error,arrived=bool(arrived),elapsed=elapsed)
+                if arrived:self.change_grasp_stage('close',t)
+                elif elapsed>=1.35+self.threshold.get('approach_tracking_wait_s',.75):
+                    # Reverse this attempt's measured motion with open fingers.
+                    # A blocked approach must not close and then lurch into a bottle.
+                    self.abort_time=t;self.stop_latched='approach_unconfirmed'
+                    self.abort_path=np.vstack([q[:7]]+[v.copy() for _,v in self.history[::-1]]+[self.home])
+                    arm=q[:7].copy()
         elif stage=='close':
             arm=self.grasp.copy();grip*=ease(elapsed/.4)
             if elapsed>=.4:
@@ -289,6 +304,7 @@ class Actor:
         self.diagnostics.append(dict(t=t,mode=phase,stop_latched=self.stop_latched,grasp_stage=self.grasp_stage,grasp_attempt=self.attempt,
             visual_grasp_confirmed=self.grasp_confirmed,confirmation_votes=self.confirm_votes,source_xy=None if self.source_xy is None else self.source_xy.tolist(),
             grasp_check=self.grasp_check,localization_consensus=self.localization_check,
+            approach_tracking=self.approach_check,
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
             settled_prediction=settled_prediction,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,

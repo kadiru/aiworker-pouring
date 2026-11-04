@@ -56,6 +56,12 @@ def main():
     assert all(not x['name'].startswith(('W30_A_test','W30_A_dev')) for x in manifest)
     train={x['name'] for x in manifest if x['split']=='train'};val={x['name'] for x in manifest if x['split']=='validation'}
     metadata=read(E/'model-summary.json');training=metadata['training']
+    repair_sha=hashlib.sha256(repair_path.read_bytes()).hexdigest() if repair_path.exists() else None
+    assert metadata['reference_repair_plan_sha256']==repair_sha
+    accepted={x['name'] for x in r['demonstrations'] if x['reference_accepted']}
+    assert all(not x['name'].startswith('W30_A_demo') or x['name'] in accepted for x in manifest)
+    for names in (metadata['motion']['train_episodes'],metadata['motion']['validation_episodes']):
+        assert all(not n.startswith(('W30_A_test','W30_A_dev')) and (not n.startswith('W30_A_demo') or n in accepted) for n in names)
     assert metadata['checkpoint_sha256']==sha and metadata['sources']==s['runtime_sources']
     assert hashlib.sha256((E/'data-manifest.json').read_bytes()).hexdigest()==metadata['data_manifest_sha256']
     assert not train & val and len(train)==training['train_episodes'] and len(val)==training['validation_episodes']
