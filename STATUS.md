@@ -1,7 +1,17 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 04, 2026, 04:57 PST.
-State: **Localization/spill repair complete: 30/30 fresh native tasks passed; all recordings and backups audited.**
+Updated: November 04, 2026, 10:11 PST.
+State: **Expanded-position reference collection running on the guarded RTX 4070; training and thirty fresh tests pending.**
+
+## Active expanded-position study
+
+Authorized: vary bottle/cup positions more, retrain on the 4070, run thirty fresh tests aiming for zero spill, preserve other jobs, commit/push. Study `A-workspace-20261104-v1`, prefix `W30_A_`, test seed `20261224`. Cup X/Y half-ranges expand from ±8 to ±24 mm; bottle relative X/Y from ±9/4 to ±27/12 mm. All development/test scenes extend beyond the old domain. Material A, fill ranges, geometry, physics and success criteria remain unchanged.
+
+**58/58 planned scenes pass CPU kinematic and initial camera-coverage preflight.** Twenty scripted reference demonstrations (sixteen corners for training, four independent validation scenes) are now queued; these use privileged training-only state and are not autonomous successes. Eight separate development scenes follow fitting; thirty reserved test scenes (15 full/15 empty) follow candidate freeze. No expanded-position task result is claimed yet. [Plan](docs/WORKSPACE_STUDY.md), [preflight](evidence/workspace-A/workspace-preflight.json).
+
+Owned container is `697166fd9ca8f803f339097137f1d47fc80ff560d43bf71f0ab6d77869474cbd`, run `20261104T180803Z`; it replaced only the identity-verified idle AIWorker container. Same 4070-only visibility, four CPU cores of quota, CPUs 16–23, shares 256, nice 10, 16 GiB RAM/no extra swap and priority guard. No foreign jobs signaled or reconfigured. Read-only collection watcher session 27773 is active. Initial host snapshot found only owned 4070 compute and about 51.8 GiB RAM available.
+
+Next: inspect/retain every reference attempt, fit expanded template families and contextual movement plus settled-height regression, validate development behavior, freeze, run all thirty once, audit/back up all records, review cameras and commit/push. Commands: POST `workspace_collect`, then `workspace_train`, `workspace_development`, and `workspace_test` only after `freeze_workspace_study.py`; native working directory `/workspace/src`. Watch with `python3 /home/kadir/aiworker-pouring-4070/watch_workspace_trials.py --part demonstrations`. Reference collection is ongoing; do not launch a second simulator or competing fit.
 
 ## Completed localization and spill repair
 

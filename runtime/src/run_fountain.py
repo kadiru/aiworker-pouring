@@ -36,6 +36,7 @@ allowed_commands.update(('vote_development','vote_test'))
 allowed_commands.add('robust_test')
 allowed_commands.update(('settled_train','settled_development','settled_test'))
 allowed_commands.update(('reliable_train','reliable_development','reliable_test'))
+allowed_commands.update(('workspace_collect','workspace_train','workspace_development','workspace_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -625,7 +626,24 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd=='reliable_train':
+                    if cmd=='workspace_train':
+                        if current is not None or pending:
+                            state['control_message']='Wait for active trials to finish';continue
+                        try:
+                            from pour_workspace_train import train
+                            state['trained_checkpoint']=train(state)
+                            state.pop('learning_error',None)
+                        except Exception:
+                            state['learning_error']=traceback.format_exc();state['phase']='Expanded-workspace fitting failed'
+                        continue
+                    elif cmd in ('workspace_collect','workspace_development','workspace_test'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before queuing expanded-workspace cases';continue
+                        from pour_workspace_study import demonstrations,development,unstarted,ROOT as WORKSPACE_ROOT
+                        if cmd!='workspace_collect' and not (WORKSPACE_ROOT/'best.pt').exists():
+                            state['control_message']='Fit expanded-workspace model first';continue
+                        pending.extend({'workspace_collect':demonstrations,'workspace_development':development,'workspace_test':unstarted}[cmd]())
+                    elif cmd=='reliable_train':
                         if current is not None or pending:
                             state['control_message']='Wait for active trials to finish';continue
                         try:

@@ -116,5 +116,5 @@ def main(evidence=EVIDENCE, data=DATA):
 
 if __name__ == '__main__':
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('--study',choices=('robust','settled','reliable'),default='robust');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--study',choices=('robust','settled','reliable','workspace'),default='robust');a=p.parse_args()
     main(ROOT / f'evidence/{a.study}-A', ROOT / f'data/material-A-{a.study}')

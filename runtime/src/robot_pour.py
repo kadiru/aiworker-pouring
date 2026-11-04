@@ -193,7 +193,7 @@ class RobotPour(Pour):
                 flow=row.get('source_outflow_ml_s',0.)
                 fill=row.get('cup_inventory_fraction',0.)
                 limit=6. if fill>.65 else 12.
-                rate=30. if self.command_angle<82. else (10. if flow<limit else 0.)
+                rate=30. if self.command_angle<82. else (self.spec.get('expert_slow_rate_deg_s',10.) if flow<limit else 0.)
                 self.command_angle=min(165.,self.command_angle+rate*self.spec.get('control_period',.05))
             else:
                 self.command_angle=min(165.,max(0.,(t-TILT_START)*33.)) if self.verified else 0.

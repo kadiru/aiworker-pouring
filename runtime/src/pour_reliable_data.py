@@ -76,13 +76,13 @@ def refit_source_bank(saved, sequences):
 
 
 @torch.inference_mode()
-def calibrate_localization(saved,sequences):
+def calibrate_localization(saved,sequences,root=ROOT,validation=VALIDATION):
     """Choose consensus support on consumed episodes, with synthetic absence checks."""
     from pour_temporal_localization import consensus
     from pour_guard_vision import bottle_base_from_neck, project
     observations=[];negatives=[]
     for e in sequences:
-        row=dict(name=e['name'],sha256=e['sha256'],split='validation' if e['name'] in VALIDATION else 'train',detections=[])
+        row=dict(name=e['name'],sha256=e['sha256'],split='validation' if e['name'] in validation else 'train',detections=[])
         for i,image in enumerate(e['images']):
             item=dict(time=float(e['times'][i]-e['times'][0]))
             for kind in ('source','cup'):
@@ -113,6 +113,8 @@ def calibrate_localization(saved,sequences):
         candidates.append(dict(settings=config,misses=misses,false_accepts=false_accepts,synthetic_accepts=synthetic_accepts,
             max_error_mm=max(errors,default=999.),mean_latency_s=float(np.mean(latencies)) if latencies else 999.))
     # These are calibration episodes, not the new reserved task evaluation.
+    (root/'localization-candidates.json').write_text(json.dumps(dict(candidates=candidates,
+        observations=observations,synthetic_negatives=negatives),indent=2)+'\n')
     eligible=[x for x in candidates if not x['misses'] and not x['false_accepts'] and not x['synthetic_accepts']]
     assert eligible,'No consensus calibration meets accuracy and synthetic rejection gates'
     best=min(eligible,key=lambda x:(x['max_error_mm'],x['mean_latency_s']))
@@ -128,6 +130,6 @@ def calibrate_localization(saved,sequences):
         assert error<2.,(e['name'],error)
     settings=dict(source=source,cup=cup,timeout_s=2.)
     report=dict(settings=settings,candidates=candidates,chosen=best,observations=observations,synthetic_negatives=negatives,
-        note='All episodes are consumed parent evidence. Candidate selection uses these calibration windows; no independent localization-generalization claim. Synthetic occlusions are not real absent-object tests. Original per-frame anchor thresholds are unchanged; consensus rejects isolated spatial outliers.')
-    (ROOT/'localization-calibration.json').write_text(json.dumps(report,indent=2)+'\n')
+        note='All episodes are consumed calibration evidence. Candidate selection uses these windows; no independent localization-generalization claim. Synthetic occlusions are not real absent-object tests. Original per-frame anchor thresholds are unchanged; consensus rejects isolated spatial outliers.')
+    (root/'localization-calibration.json').write_text(json.dumps(report,indent=2)+'\n')
     return settings,dict(chosen=best,positive_windows=len(observations),synthetic_negative_windows=len(negatives))
