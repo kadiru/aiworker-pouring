@@ -59,6 +59,23 @@ def build_data(saved):
 
 
 @torch.inference_mode()
+def refit_source_bank(saved, sequences):
+    from pour_guard_vision import make_bank, project
+    train=[e for e in sequences if e['name'] not in VALIDATION]
+    assert len(train)==24
+    previous=saved['source_bank']
+    anchors=[project(e['source_xyz']+[0,0,.135],saved['calibration']) for e in train]
+    bank=make_bank([e['images'][0] for e in train],anchors,'source',device='cuda')
+    bank['bounds']=previous['bounds']
+    saved['source_bank']=dict(previous,alternatives=[previous,bank])
+    return dict(method='Two normalized-gradient template families: retained parent plus24 consumed initial camera views; best family score, median within each family; ground-truth anchors are training labels only',
+        train_episodes=[e['name'] for e in train],held_out_template_episodes=sorted(VALIDATION),
+        training_views=[dict(name=e['name'],path=e['path'],sha256=e['sha256'],anchor_uv=uv.tolist()) for e,uv in zip(train,anchors)],
+        original_template_count=len(previous['kernels']),new_template_count=len(bank['kernels']),retained_parent_family=True,
+        anchor_threshold_unchanged=saved['thresholds']['source_localization_score'],bounds=bank['bounds'])
+
+
+@torch.inference_mode()
 def calibrate_localization(saved,sequences):
     """Choose consensus support on consumed episodes, with synthetic absence checks."""
     from pour_temporal_localization import consensus

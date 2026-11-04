@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from pour_guard_models import CupEstimator
 from pour_guard_vision import locate, plane_point, project
-from pour_reliable_data import build_data, calibrate_localization
+from pour_reliable_data import build_data, calibrate_localization, refit_source_bank
 from pour_settled_model import features, predict
 from pour_reliable_study import ROOT, PARENT, PARENT_SHA, PREFIX, plan, RUNTIME_SOURCES
 
@@ -27,7 +27,7 @@ def cover_workspace(saved):
         bank['bounds'] = [min(before[kind][0], int(lo[0])), min(before[kind][1], int(lo[1])),
             max(before[kind][2], int(hi[0])), max(before[kind][3], int(hi[1]))]
     return dict(before=before, after={k: saved[k + '_bank']['bounds'] for k in points},
-        rule='Project all16 corners of the declared fixture domain, add6pixel margin, union with previous search bounds; template kernels and acceptance thresholds unchanged.')
+        rule='Project all16 fixture-domain corners, add6pixel margin and union with prior search bounds. This coverage operation preserves templates; the separate source-family refit is documented in source_template_fit. Anchor thresholds are unchanged.')
 
 
 @torch.inference_mode()
@@ -40,6 +40,8 @@ def train(state):
     saved = torch.load(PARENT / 'best.pt', map_location='cpu', weights_only=False)
     state.update(phase='Loading consumed camera episodes for settled-height fitting', learning=dict(stage='loading'))
     coverage = cover_workspace(saved); bundle = build_data(saved); localization = []
+    template_report=refit_source_bank(saved,bundle['localization_sequences'])
+    saved['source_template_fit']=template_report
     for e in bundle['initial']:
         row = dict(name=e['name'])
         for kind, z, actual in (('source', 1.175, e['source_xyz'][:2]), ('cup', 1.078, e['cup_xyz'][:2])):
@@ -92,13 +94,13 @@ def train(state):
     full_target = .90 + max(.01, chosen['metrics']['near_full_p95_overestimate']) + .005
     assert full_target <= .93, 'Settled prediction uncertainty needs improvement before native use'
     saved['parent_training_step']=saved.get('step');saved['step']=0
-    saved.update(model_version='visual_reliable_hierarchy_v16', settled_regressor=chosen['fit'],
+    saved.update(model_version='visual_reliable_hierarchy_v17', settled_regressor=chosen['fit'],
         settled_validation=chosen['metrics'], parent_checkpoint_sha256=PARENT_SHA,
-        method='Supervised final-settled-height ridge regression on frozen visual features; temporally confirmed RGB localization and flow-limited tilt; retained visual servo, imitation trajectory and empty detector')
+        method='Supervised final-settled-height ridge regression on frozen visual features; refitted bottle templates with temporally confirmed RGB localization and flow-limited tilt; retained visual servo, imitation trajectory and empty detector')
     saved['thresholds'].update(full_settled_target=full_target, settled_geometry_tolerance=.10,
         settled_stability_std=.01, trim_increment=.005, trim_min_phase=95.,adaptive_trim=True,
         trim_extra_deg=.25,trim_hard_cap_deg=110.,trim_fast_rate_deg_s=35.,trim_creep_rate_deg_s=35.,trim_total_seconds=1.5,
-        trim_seconds=0.,discrete_topup=True,max_pauses=5)
+        trim_seconds=0.,discrete_topup=True,max_pauses=7)
     saved['thresholds'].update(coarse_flow_min_level=.25,coarse_flow_limit_ml_s=18.)
     saved['pour_primitive']['slow_rate_deg_s']=5.
     saved['training_device'] = dict(name=torch.cuda.get_device_name(0), visible_cuda_devices=1)
@@ -111,10 +113,10 @@ def train(state):
     summary = dict(checkpoint_sha256=hashlib.sha256((ROOT / 'best.pt').read_bytes()).hexdigest(),
         parent_checkpoint_sha256=PARENT_SHA, method=saved['method'], training=saved['settled_training'],
         device=saved['training_device'], chosen=dict(columns=chosen['fit']['columns'], ridge=chosen['fit']['ridge'], metrics=chosen['metrics']),
-        thresholds=saved['thresholds'], localization=loc, localization_consensus=consensus_report,
+        thresholds=saved['thresholds'], localization=loc, localization_consensus=consensus_report, source_template_fit=template_report,
         motion_rate_deg_s=dict(fast=saved['pour_primitive']['fast_rate_deg_s'],slow=saved['pour_primitive']['slow_rate_deg_s']), elapsed_s=time.monotonic() - started,
         candidates=[dict(columns=c['fit']['columns'], ridge=c['fit']['ridge'], metrics=c['metrics'], score=c['score']) for c in candidates],
-        unchanged_components=['cup CNN weights', 'source detector weights', 'template kernels', 'motor primitive path weights (tilt rate reduced)', 'empty confirmation gates'],
+        unchanged_components=['cup CNN weights', 'source detector weights', 'cup template kernels', 'motor primitive path weights (tilt rate reduced)', 'empty confirmation gates'],
         no_privileged_runtime_inputs=True, data_manifest_sha256=saved['settled_training']['data_manifest_sha256'], sources=saved['sources'])
     (ROOT / 'model-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     state.update(phase='Settled-height fitting complete', learning=dict(stage='fit_complete', elapsed_s=summary['elapsed_s'], metrics=chosen['metrics']))

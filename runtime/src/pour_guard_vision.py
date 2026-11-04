@@ -63,6 +63,10 @@ def make_bank(images,anchors,kind,device='cuda'):
 
 @torch.inference_mode()
 def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
+    if bank.get('alternatives'):
+        # Each family retains robust median matching; keep older appearance coverage.
+        matches=[locate(image,b,tracking,device,expected_uv) for b in bank['alternatives']]
+        return max(matches,key=lambda x:x[1])
     a=torch.as_tensor(image,device=device);feat=gradients(a)
     kernels=bank['kernels'].to(device);mask=bank['mask'].to(device);h,w=kernels.shape[-2:];dx,dy=bank['offset']
     x0,y0,x1,y1=bank['bounds']

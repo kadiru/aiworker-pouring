@@ -1,6 +1,6 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 03, 2026, 22:37 PST.
+Updated: November 03, 2026, 23:35 PST.
 State: **New reliability repair in development; fresh 30-case evaluation not started.**
 
 ## Active localization and spill repair
@@ -9,9 +9,11 @@ The user authorized fixing the two localization aborts and one spill from the pr
 
 Twenty-six native CPU checks and one disjoint-plan check passed. V16 trained on 4070 in 8.812 s: 58/18 episodes, 2,109/634 frames, sixteen ridge coefficients, lambda .001; near-full validation MAE 1.027 points. Checkpoint `7055e32d9bf5a2a67d5018d4443767a3d117885be9215e169fb0426e9fd45333`. Consensus calibration passed 30 consumed positive windows and rejected 30 synthetic neck occlusions; those are not independent tests.
 
-Development r0 is running unchanged. Case 19 still timed out on localization; case 26 localized and lifted. CPU replay found the old bank only reached usable confidence after the two-second deadline, while a bank rebuilt from 24 parent initial views reaches consensus in six frames. V17 template refit is prepared locally, not deployed; finish and preserve r0, then deploy/refit and rerun development under new names. No reserved tests have started. [Current method](docs/RELIABILITY_STUDY.md).
+Development r0 completed **3/7 strict successes**: all three empty-bottle tasks passed, one initial localization abort and three `fill_unconfirmed` outcomes remained. All seven had zero final/near-table loss. The full attempts ended at 90.35–90.80% rim height; each had a one-particle transient outside reading that returned to zero loss. All seven HDF5 files and 28 sidecars match native SHA256 backups. Both camera sheets were reviewed; archived r0 reports, model and native source remain preserved. [r0 evidence](evidence/reliable-A/round0-reliable-results.json), [review](evidence/reliable-A/round0-review-summary.json).
 
-Owned replacement container `286bb260daed24b19f5ae7681f6fb512c3b668fa56bc77a1f18bb81168e66e39`, same 4070-only resource caps and guard. Watcher session 67356 checks the native r0 model and 22 source hashes. Do not stop foreign jobs or alter original study outputs. Next: finish native development, resolve failures, freeze the selected model/source, run all 30 fresh tests once, back up and audit every attempt, then commit/push final evidence.
+V17 refit completed on the 4070 in 4.716 s; round 1 is running on the same seven development scenes. Checkpoint `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101`. Selected consensus requires eight frames within one pixel, unchanged anchor thresholds and a two-second deadline; all 30 consumed windows accepted, all 30 synthetic negatives rejected. The settled regressor retains the same coefficients/metrics, target .921371. It retains the original source template family and adds 24 parent views; replacement-only templates rejected three older views, while combined CPU replay accepts all 66 initial views with maximum error 0.793 mm. It permits six unchanged small top-ups, keeping the full-confidence target and 40-second deadline. All 26 native CPU checks pass again. No fresh tests have started. Next: finish the seven r1 scenes under watcher session 27356, resolve any remaining failures, then freeze only after strict success and run all thirty fresh cases once. [Current method](docs/RELIABILITY_STUDY.md).
+
+Owned v17 container is `ab3c1746ade52e0a1e9b874c3df6572b5100f2f3de5cf0e90371729430d4b8e8`, preserving 4070-only resource caps and guard. The r0 watcher and audit exited successfully. A later resource snapshot no longer listed the foreign 4090 process; cause unverified and no foreign job was signaled or configured. Preserve every failure, compare source/model/asset identities, back up and audit recordings, then commit/push final evidence.
 
 ## Latest corrective study
 

@@ -61,7 +61,7 @@ def development():
     prior = seen()
     round_id = max((s.get('development_round', -1) for s in prior), default=-1) + 1
     cases = [dict(s, name=s['name'] + f'_r{round_id}', development_round=round_id) for s in plan()['development']]
-    # Prioritize the surge and nonflow counterexamples in development.
+    # Replay both localization aborts and the spill before the controls.
     # This changes development scheduling only, never the reserved test plan.
     return sorted(cases, key=lambda s: {19:0,26:1,29:2}.get(s['development_case'],2))
 

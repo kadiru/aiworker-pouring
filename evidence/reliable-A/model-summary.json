@@ -1,7 +1,7 @@
 {
-  "checkpoint_sha256": "7055e32d9bf5a2a67d5018d4443767a3d117885be9215e169fb0426e9fd45333",
+  "checkpoint_sha256": "40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101",
   "parent_checkpoint_sha256": "18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527",
-  "method": "Supervised final-settled-height ridge regression on frozen visual features; temporally confirmed RGB localization and flow-limited tilt; retained visual servo, imitation trajectory and empty detector",
+  "method": "Supervised final-settled-height ridge regression on frozen visual features; refitted bottle templates with temporally confirmed RGB localization and flow-limited tilt; retained visual servo, imitation trajectory and empty detector",
   "training": {
     "train_episodes": 58,
     "validation_episodes": 18,
@@ -62,7 +62,7 @@
     "trim_increment": 0.005,
     "trim_seconds": 0.0,
     "trim_total_seconds": 1.5,
-    "max_pauses": 5,
+    "max_pauses": 7,
     "grasp_visual_window": 12,
     "verify_seconds": 1.25,
     "slow_empty_probability": 0.9,
@@ -111,13 +111,13 @@
           228
         ]
       },
-      "rule": "Project all16 corners of the declared fixture domain, add6pixel margin, union with previous search bounds; template kernels and acceptance thresholds unchanged."
+      "rule": "Project all16 fixture-domain corners, add6pixel margin and union with prior search bounds. This coverage operation preserves templates; the separate source-family refit is documented in source_template_fit. Anchor thresholds are unchanged."
     },
     "observations": [
       {
         "name": "H_A_test_00",
-        "source_score": 0.5189207196235657,
-        "source_error_mm": 0.10166516656261679,
+        "source_score": 0.6120056509971619,
+        "source_error_mm": 0.10683653299165823,
         "source_accepted": true,
         "cup_score": 0.9068042635917664,
         "cup_error_mm": 0.5359373703260163,
@@ -125,8 +125,8 @@
       },
       {
         "name": "H_A_test_01",
-        "source_score": 0.4606681764125824,
-        "source_error_mm": 0.1515957346806495,
+        "source_score": 0.6681261658668518,
+        "source_error_mm": 0.2436931440056607,
         "source_accepted": true,
         "cup_score": 0.828766942024231,
         "cup_error_mm": 0.14322207145128105,
@@ -152,8 +152,8 @@
       },
       {
         "name": "H_A_test_04",
-        "source_score": 0.4731074571609497,
-        "source_error_mm": 0.16080011039787717,
+        "source_score": 0.6520403027534485,
+        "source_error_mm": 0.16200287475922132,
         "source_accepted": true,
         "cup_score": 0.8369951248168945,
         "cup_error_mm": 0.33699074075337976,
@@ -161,8 +161,8 @@
       },
       {
         "name": "H_A_test_05",
-        "source_score": 0.4959088861942291,
-        "source_error_mm": 0.09491159153006494,
+        "source_score": 0.6983947157859802,
+        "source_error_mm": 0.09243035320844858,
         "source_accepted": true,
         "cup_score": 0.9062108993530273,
         "cup_error_mm": 0.21116524101978795,
@@ -170,8 +170,8 @@
       },
       {
         "name": "T30_A_test_00",
-        "source_score": 0.5094858407974243,
-        "source_error_mm": 0.11436270531042249,
+        "source_score": 0.7090132236480713,
+        "source_error_mm": 0.27247941245607965,
         "source_accepted": true,
         "cup_score": 0.8249728083610535,
         "cup_error_mm": 0.09632557875699345,
@@ -197,8 +197,8 @@
       },
       {
         "name": "T30_A_test_03",
-        "source_score": 0.49787694215774536,
-        "source_error_mm": 0.16739299420287224,
+        "source_score": 0.6541985869407654,
+        "source_error_mm": 0.052626090814531096,
         "source_accepted": true,
         "cup_score": 0.9110286831855774,
         "cup_error_mm": 0.3131336704075073,
@@ -206,8 +206,8 @@
       },
       {
         "name": "T30_A_test_04",
-        "source_score": 0.44839897751808167,
-        "source_error_mm": 0.08485078513726763,
+        "source_score": 0.6144309639930725,
+        "source_error_mm": 0.21074081094901959,
         "source_accepted": true,
         "cup_score": 0.8673923015594482,
         "cup_error_mm": 0.08481469296545094,
@@ -215,8 +215,8 @@
       },
       {
         "name": "T30_A_test_05",
-        "source_score": 0.3654693067073822,
-        "source_error_mm": 0.17083523496105565,
+        "source_score": 0.5481577515602112,
+        "source_error_mm": 0.06973439841252047,
         "source_accepted": true,
         "cup_score": 0.807919442653656,
         "cup_error_mm": 0.32558827140759133,
@@ -233,8 +233,8 @@
       },
       {
         "name": "T30_A_test_07",
-        "source_score": 0.479515939950943,
-        "source_error_mm": 0.2136704448300656,
+        "source_score": 0.7136244773864746,
+        "source_error_mm": 0.2369629703813498,
         "source_accepted": true,
         "cup_score": 0.8010783195495605,
         "cup_error_mm": 0.28335274717499886,
@@ -242,8 +242,8 @@
       },
       {
         "name": "T30_A_test_08",
-        "source_score": 0.42421624064445496,
-        "source_error_mm": 0.16461917945002535,
+        "source_score": 0.6317628622055054,
+        "source_error_mm": 0.43729487492565317,
         "source_accepted": true,
         "cup_score": 0.8308770656585693,
         "cup_error_mm": 0.5031748955554771,
@@ -260,8 +260,8 @@
       },
       {
         "name": "T30_A_test_10",
-        "source_score": 0.4923875629901886,
-        "source_error_mm": 0.12776308613515,
+        "source_score": 0.7089849710464478,
+        "source_error_mm": 0.14033569941968288,
         "source_accepted": true,
         "cup_score": 0.9218640923500061,
         "cup_error_mm": 0.035206430615458556,
@@ -269,8 +269,8 @@
       },
       {
         "name": "T30_A_test_11",
-        "source_score": 0.5412321090698242,
-        "source_error_mm": 0.3430358283674079,
+        "source_score": 0.5788252353668213,
+        "source_error_mm": 0.31442199133801924,
         "source_accepted": true,
         "cup_score": 0.7900110483169556,
         "cup_error_mm": 0.10432946279543781,
@@ -296,8 +296,8 @@
       },
       {
         "name": "T30_A_test_14",
-        "source_score": 0.5540451407432556,
-        "source_error_mm": 0.1999436849012148,
+        "source_score": 0.5692000389099121,
+        "source_error_mm": 0.393899664096394,
         "source_accepted": true,
         "cup_score": 0.8507706522941589,
         "cup_error_mm": 0.5260533411959901,
@@ -305,8 +305,8 @@
       },
       {
         "name": "T30_A_test_15",
-        "source_score": 0.3990989625453949,
-        "source_error_mm": 0.14545894723177621,
+        "source_score": 0.609622597694397,
+        "source_error_mm": 0.40261211836728905,
         "source_accepted": true,
         "cup_score": 0.9112741947174072,
         "cup_error_mm": 0.23794984905990632,
@@ -314,8 +314,8 @@
       },
       {
         "name": "T30_A_test_16",
-        "source_score": 0.47218814492225647,
-        "source_error_mm": 0.2540059254100199,
+        "source_score": 0.7047516107559204,
+        "source_error_mm": 0.2694759688761255,
         "source_accepted": true,
         "cup_score": 0.8992103934288025,
         "cup_error_mm": 0.32309090260715556,
@@ -323,8 +323,8 @@
       },
       {
         "name": "T30_A_test_17",
-        "source_score": 0.4283391833305359,
-        "source_error_mm": 0.3156896594792724,
+        "source_score": 0.5720903873443604,
+        "source_error_mm": 0.09693268668077529,
         "source_accepted": true,
         "cup_score": 0.808470606803894,
         "cup_error_mm": 0.5435469434147575,
@@ -350,8 +350,8 @@
       },
       {
         "name": "T30_A_test_20",
-        "source_score": 0.5144296884536743,
-        "source_error_mm": 0.08529597047017261,
+        "source_score": 0.701782763004303,
+        "source_error_mm": 0.13243722076604406,
         "source_accepted": true,
         "cup_score": 0.8974735140800476,
         "cup_error_mm": 0.20537563479130913,
@@ -359,8 +359,8 @@
       },
       {
         "name": "T30_A_test_21",
-        "source_score": 0.47073158621788025,
-        "source_error_mm": 0.18155543268277152,
+        "source_score": 0.6240154504776001,
+        "source_error_mm": 0.10117944825015812,
         "source_accepted": true,
         "cup_score": 0.8988581895828247,
         "cup_error_mm": 0.26351377308604396,
@@ -368,8 +368,8 @@
       },
       {
         "name": "T30_A_test_22",
-        "source_score": 0.4748877286911011,
-        "source_error_mm": 0.17782912059501538,
+        "source_score": 0.7199392318725586,
+        "source_error_mm": 0.19348040767010466,
         "source_accepted": true,
         "cup_score": 0.8456112146377563,
         "cup_error_mm": 0.17048191883700173,
@@ -377,8 +377,8 @@
       },
       {
         "name": "T30_A_test_23",
-        "source_score": 0.44003215432167053,
-        "source_error_mm": 0.15034329067669136,
+        "source_score": 0.6049816012382507,
+        "source_error_mm": 0.4385697030357385,
         "source_accepted": true,
         "cup_score": 0.8554679155349731,
         "cup_error_mm": 0.3529843411983051,
@@ -404,8 +404,8 @@
       },
       {
         "name": "T30_A_test_26",
-        "source_score": 0.43997421860694885,
-        "source_error_mm": 0.09551870413635388,
+        "source_score": 0.7043807506561279,
+        "source_error_mm": 0.25144393648495306,
         "source_accepted": true,
         "cup_score": 0.8910627961158752,
         "cup_error_mm": 0.15218605315160488,
@@ -413,8 +413,8 @@
       },
       {
         "name": "T30_A_test_27",
-        "source_score": 0.34415048360824585,
-        "source_error_mm": 0.3837028941885576,
+        "source_score": 0.5368467569351196,
+        "source_error_mm": 0.2890185319455111,
         "source_accepted": true,
         "cup_score": 0.9149044156074524,
         "cup_error_mm": 0.2717047989031889,
@@ -422,8 +422,8 @@
       },
       {
         "name": "T30_A_test_28",
-        "source_score": 0.5030019283294678,
-        "source_error_mm": 0.021425222303756177,
+        "source_score": 0.645634651184082,
+        "source_error_mm": 0.4243313306207794,
         "source_accepted": true,
         "cup_score": 0.8294144868850708,
         "cup_error_mm": 0.31362121912445734,
@@ -431,8 +431,8 @@
       },
       {
         "name": "T30_A_test_29",
-        "source_score": 0.3893510103225708,
-        "source_error_mm": 0.1335268287075812,
+        "source_score": 0.5301076769828796,
+        "source_error_mm": 0.13477225268784712,
         "source_accepted": true,
         "cup_score": 0.8923262357711792,
         "cup_error_mm": 0.17808487752306879,
@@ -447,7 +447,7 @@
     "chosen": {
       "settings": {
         "window": 20,
-        "votes": 6,
+        "votes": 8,
         "radius_px": 1.0,
         "fraction": 0.6,
         "score_floor": 0.24
@@ -455,17 +455,282 @@
       "misses": [],
       "false_accepts": 0,
       "synthetic_accepts": 0,
-      "max_error_mm": 0.5144278764576617,
-      "mean_latency_s": 0.2700000000000001
+      "max_error_mm": 0.6227980226185347,
+      "mean_latency_s": 0.3500000000000002
     },
     "positive_windows": 30,
     "synthetic_negative_windows": 30
+  },
+  "source_template_fit": {
+    "method": "Two normalized-gradient template families: retained parent plus24 consumed initial camera views; best family score, median within each family; ground-truth anchors are training labels only",
+    "train_episodes": [
+      "L30_A_test_00",
+      "L30_A_test_02",
+      "L30_A_test_03",
+      "L30_A_test_04",
+      "L30_A_test_05",
+      "L30_A_test_07",
+      "L30_A_test_08",
+      "L30_A_test_09",
+      "L30_A_test_10",
+      "L30_A_test_12",
+      "L30_A_test_13",
+      "L30_A_test_14",
+      "L30_A_test_16",
+      "L30_A_test_17",
+      "L30_A_test_18",
+      "L30_A_test_19",
+      "L30_A_test_20",
+      "L30_A_test_22",
+      "L30_A_test_23",
+      "L30_A_test_24",
+      "L30_A_test_25",
+      "L30_A_test_26",
+      "L30_A_test_28",
+      "L30_A_test_29"
+    ],
+    "held_out_template_episodes": [
+      "L30_A_test_01",
+      "L30_A_test_06",
+      "L30_A_test_11",
+      "L30_A_test_15",
+      "L30_A_test_21",
+      "L30_A_test_27"
+    ],
+    "training_views": [
+      {
+        "name": "L30_A_test_00",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/238-L30_A_test_00-470676/episode.hdf5",
+        "sha256": "4323cb212fd617ddba01f63ea430cb54fe11d301c4f53d276b28ef876b95bb00",
+        "anchor_uv": [
+          153.92483264764638,
+          138.91100122607185
+        ]
+      },
+      {
+        "name": "L30_A_test_02",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/240-L30_A_test_02-308888/episode.hdf5",
+        "sha256": "612c77b19703f3e812cdb1715edd8923fff4e5970ba5f6651fe1f0a576825789",
+        "anchor_uv": [
+          128.0253309042302,
+          135.14673387660827
+        ]
+      },
+      {
+        "name": "L30_A_test_03",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/241-L30_A_test_03-491709/episode.hdf5",
+        "sha256": "4ea4fb35a97d7f35450ce8038f1b9215b40060556e8ae8136eccae3e4e671912",
+        "anchor_uv": [
+          130.34111598451952,
+          137.11508287446688
+        ]
+      },
+      {
+        "name": "L30_A_test_04",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/242-L30_A_test_04-156268/episode.hdf5",
+        "sha256": "7e841d8069165ec37fddbcad45b5e8a23c724f463f1b4b0f904ead0cda24732a",
+        "anchor_uv": [
+          126.46971976911418,
+          137.4899116959788
+        ]
+      },
+      {
+        "name": "L30_A_test_05",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/243-L30_A_test_05-696809/episode.hdf5",
+        "sha256": "23097a4cd90e3369f7fd1d4de395a3e6a8ca0303b9524c1967e5d98607857719",
+        "anchor_uv": [
+          138.82333170542927,
+          136.3377863144291
+        ]
+      },
+      {
+        "name": "L30_A_test_07",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/245-L30_A_test_07-724778/episode.hdf5",
+        "sha256": "c8527d8cf5ec2ef68a82642a3345c5dbf741291869f11aa178030ee9c92dcf31",
+        "anchor_uv": [
+          124.68932151727735,
+          135.96326969163155
+        ]
+      },
+      {
+        "name": "L30_A_test_08",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/246-L30_A_test_08-907329/episode.hdf5",
+        "sha256": "d1c187e0f05e6a2e291a24df91263fe51c870e5e62a4e3a80df6196a1069f95a",
+        "anchor_uv": [
+          140.34470996101086,
+          140.51108716453575
+        ]
+      },
+      {
+        "name": "L30_A_test_09",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/247-L30_A_test_09-544171/episode.hdf5",
+        "sha256": "bebf6456750ab6b235f51be9da79cf3dc56ba7d2b74971520ce1f65145c2e2b5",
+        "anchor_uv": [
+          138.85338823845336,
+          139.7036518502961
+        ]
+      },
+      {
+        "name": "L30_A_test_10",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/248-L30_A_test_10-511559/episode.hdf5",
+        "sha256": "4624fa337ac078eb2e6908f5127d9baffae89523de9567427644b6be13c56d00",
+        "anchor_uv": [
+          139.18551893181353,
+          140.95056552514686
+        ]
+      },
+      {
+        "name": "L30_A_test_12",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/250-L30_A_test_12-304276/episode.hdf5",
+        "sha256": "f2fa94aa704917ab799dbca456f3f9b88501f4c9c2c2f59710c075b79667bac7",
+        "anchor_uv": [
+          145.34803320429282,
+          143.69725875422688
+        ]
+      },
+      {
+        "name": "L30_A_test_13",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/251-L30_A_test_13-505383/episode.hdf5",
+        "sha256": "3f6d1654997af49d16c301f9f0abc34d0af3640754dcd92dfe9f7a70fc5889b6",
+        "anchor_uv": [
+          132.228386844338,
+          141.81400969903115
+        ]
+      },
+      {
+        "name": "L30_A_test_14",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/252-L30_A_test_14-962971/episode.hdf5",
+        "sha256": "6023a9471eee09924ceed472b0ca5e94eb945fc12ae8d795114386e0a5d48444",
+        "anchor_uv": [
+          117.09397473101258,
+          141.5754893060245
+        ]
+      },
+      {
+        "name": "L30_A_test_16",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/254-L30_A_test_16-913006/episode.hdf5",
+        "sha256": "4c608c65b6066fecb2409ef3a33d20021f760a1407e61040227f6f31838c2863",
+        "anchor_uv": [
+          137.50994000107923,
+          141.98679432057617
+        ]
+      },
+      {
+        "name": "L30_A_test_17",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/255-L30_A_test_17-637465/episode.hdf5",
+        "sha256": "911fe7a9227d3afa9ec7529bd181311aa7edbef75d89a3d930da31f778f16d50",
+        "anchor_uv": [
+          122.18664405925179,
+          142.14596383323564
+        ]
+      },
+      {
+        "name": "L30_A_test_18",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/256-L30_A_test_18-23653/episode.hdf5",
+        "sha256": "7c0c22f76dc3abeef2d0ce4d88cb4c7857670a342eea147631340704c3fcf523",
+        "anchor_uv": [
+          126.17892280513924,
+          139.83449290108655
+        ]
+      },
+      {
+        "name": "L30_A_test_19",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/257-L30_A_test_19-694933/episode.hdf5",
+        "sha256": "b4a8560104a8e3b08cad92252b90fbfc72716c980405b4dc3f721b54088e23bc",
+        "anchor_uv": [
+          121.9329735073496,
+          144.26896174765005
+        ]
+      },
+      {
+        "name": "L30_A_test_20",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/258-L30_A_test_20-822490/episode.hdf5",
+        "sha256": "b6f8f3f3c551a379d6395c5c0c63b8024b67cd0fa08920541bdae163c59b7f3d",
+        "anchor_uv": [
+          137.89615211366385,
+          135.71628444066226
+        ]
+      },
+      {
+        "name": "L30_A_test_22",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/260-L30_A_test_22-525874/episode.hdf5",
+        "sha256": "ac6159e56b334af097106bce471049af70eb06f162f41186c04db74b428c2768",
+        "anchor_uv": [
+          146.39307896630868,
+          139.9279911215611
+        ]
+      },
+      {
+        "name": "L30_A_test_23",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/261-L30_A_test_23-568759/episode.hdf5",
+        "sha256": "09d363c9f8811e1605a4309c1416761eb8e4c45ba9e5935f6f72c500317585be",
+        "anchor_uv": [
+          138.7767845913499,
+          139.94950367021102
+        ]
+      },
+      {
+        "name": "L30_A_test_24",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/262-L30_A_test_24-66200/episode.hdf5",
+        "sha256": "f8a766eacb0605a88b35afab580e3e02d51f2c3a723b1fdb0a8d76bc39f949bf",
+        "anchor_uv": [
+          141.274352979478,
+          132.95636852086272
+        ]
+      },
+      {
+        "name": "L30_A_test_25",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/263-L30_A_test_25-789220/episode.hdf5",
+        "sha256": "980e5ec3869a9738a9180be10ad1e467b733cfff0668c9631fdf0183b995c973",
+        "anchor_uv": [
+          142.6089661433137,
+          137.64266762081465
+        ]
+      },
+      {
+        "name": "L30_A_test_26",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/264-L30_A_test_26-670116/episode.hdf5",
+        "sha256": "074b384d743dc62e9d79f13f9791bddb3a1445d25df901288ce95e8d0b599738",
+        "anchor_uv": [
+          121.71788558602269,
+          141.81034644408766
+        ]
+      },
+      {
+        "name": "L30_A_test_28",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/266-L30_A_test_28-173989/episode.hdf5",
+        "sha256": "4b7096e36aa805ea8676c4d1cfbbe213721fad7c7cef79da4331ff4bec5a7d09",
+        "anchor_uv": [
+          147.81134125916188,
+          142.85032077986972
+        ]
+      },
+      {
+        "name": "L30_A_test_29",
+        "path": "/workspace/outputs/fountain/20261104T015621Z/267-L30_A_test_29-927295/episode.hdf5",
+        "sha256": "50781ecf4c6996d8474aabd5d4a6eb4a8af0c89419cf432ccdb9ee9a4c810656",
+        "anchor_uv": [
+          136.8264227327513,
+          135.75936873570024
+        ]
+      }
+    ],
+    "original_template_count": 16,
+    "new_template_count": 24,
+    "retained_parent_family": true,
+    "anchor_threshold_unchanged": 0.3437801837921143,
+    "bounds": [
+      98,
+      118,
+      174,
+      156
+    ]
   },
   "motion_rate_deg_s": {
     "fast": 29.99999999999531,
     "slow": 5.0
   },
-  "elapsed_s": 8.811684243031777,
+  "elapsed_s": 4.715939458925277,
   "candidates": [
     {
       "columns": [
@@ -1003,7 +1268,7 @@
   "unchanged_components": [
     "cup CNN weights",
     "source detector weights",
-    "template kernels",
+    "cup template kernels",
     "motor primitive path weights (tilt rate reduced)",
     "empty confirmation gates"
   ],
@@ -1012,7 +1277,7 @@
   "sources": {
     "pour_guard_actor.py": "bda8615f4b3eda4c4a13641d2587060770f0804e922f09715dc0230b4aed82a2",
     "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
-    "pour_guard_vision.py": "d4af274be0255e37f16c1ac54e6fc332fad916a34ab4438131e1deacdaf8e042",
+    "pour_guard_vision.py": "7c168fb230503992eaf65c66cfe269ffca1d627017df6f0d2746be31e716bc86",
     "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
     "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
     "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
@@ -1029,8 +1294,8 @@
     "pour_settled_train.py": "144494fe6c3b29dcdc4969cb2630902e9054e7ab8287256c9a033c724dbba5a5",
     "pour_settled_study.py": "60e33261bc28546b5907d2e5573e4b38fcb4b8b6bd8bb573221ab127be386e2c",
     "pour_temporal_localization.py": "9edb27f9889b1e312ea908a45179663e18dde25256eee36f1716441662036374",
-    "pour_reliable_train.py": "27b79c69501ebd4c80b6d196df5a1eae00349d9149ad1324cf1990716fcaafb0",
-    "pour_reliable_study.py": "d117d2de1de719b767253dde1aa0f234e927d12ecf0422f1d9ad240c7bf434ef",
-    "pour_reliable_data.py": "49ccec53b66ee6946f1b846e26d4272a2afd66d7529ca8981822179883353366"
+    "pour_reliable_train.py": "fa7fdb54eeae126fc2a99cfc0bf01b8b1f7becd46853e5ee2dd7bc471cbfeee3",
+    "pour_reliable_study.py": "84478b6db7cbb6a2ca4bc7fad325822be93ab72a00610b9225eb1b215fffcc63",
+    "pour_reliable_data.py": "0ddb66ea2dd1994c15165d8c8fd05a9339ce3d62d999eff760c83eba06bf4bff"
   }
 }
