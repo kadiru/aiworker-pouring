@@ -16,6 +16,8 @@ Study `A-workspace-20261104-v1`, prefix `W30_A_`, reserved test seed `20261224`.
 
 The bottle position is relative to the cup; these four independent variations also change its absolute world position. All twenty reference demos, eight development scenes and thirty tests are distinct. Every development/test scene exceeds the old half-range by at least 25% in one coordinate. Material A, fixed task/wrist cameras, vessel geometry, 1.8 mm particles, 400 Hz physics, 20 Hz observations, fill ranges and the 40-second autonomous deadline remain unchanged.
 
+The locally generated position comparison is `evidence/workspace-A/position-domains.png` (and PDF); the quantitative plot shows planned positions rather than outcomes. Its source is `tools/plot_workspace_positions.py`.
+
 Sixteen reference demos cover all corners of the four-dimensional domain, balanced for full/empty goals along each dimension. Four separate interior demos supply validation. Collection uses the privileged scripted joint-drive reference controller, with a 5°/s slow tilt and nominal-volume stop target .88. Reference demos are training evidence, never autonomous successes. All attempts, including rejected demos, must be retained.
 
 CPU preflight solved all wrist paths and confirmed initial bottle/cup matching-patch coverage for **58/58 scenes**. This establishes kinematic reachability and projection coverage, not collision-free motion or successful grasps. [Preflight](../evidence/workspace-A/workspace-preflight.json), [plan](../evidence/workspace-A/frozen-plan.json).
