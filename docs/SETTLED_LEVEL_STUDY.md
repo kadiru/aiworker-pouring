@@ -53,3 +53,10 @@ Frozen CNN plus14 vertical red-color bands gives a16-coefficient selected ridge 
 Round2 completed6/7primary tasks; all7had zero final outside/below-table loss. Case29 now grasped, but finalheight89.485%and `fill_unconfirmed` remain a failure. Its top-ups braked at97.5/102.75degrees on RGB changes before reaching the prior106degree pouring angle; total added only0.472392nominalmL. Other cases exposed larger surges with the old+1degree allowance. Round2 failures/partials, model, report and camera review are preserved.
 
 Feedback braking now requires phase>=adaptive cap minus0.25degree. Cap=min(110,max(95,previous peak+0.5))degrees; capdwell0.05seconds,total1.5seconds,max two top-ups. Twenty CPU checks include the actual premature-braking angles. The same49episode ridge fit was rerun on4070 in1.119seconds, with identical errors and unchanged neural weights. NewmodelSHA a570bb051e4d005c914dbe9bc834a6ef30bfb28d86d1810949b7b6e4ed2baaa4. Seven development scenes are being rerun, prioritizing29; the reserved30scene plan is unchanged and unstarted.
+
+
+## Pulse-and-settle control — round4 running
+
+Round3 repaired29(96.091%height,zero final spill), but03overflowed(final0.046656nominalmL,everbelowworktop0.029160). A lower cap with slow creep increased the duration of flow. The two completed attempts and stopped08partial are retained; the r3 camera sheet visibly shows the spilled bead.
+
+The v15controller separates measurement from motion. During top-ups it ramps35deg/s to min(110,max(95,previous peak+0.25))degrees and immediately brakes; there is no creep/cap dwell, and a1.5second timeout remains. Full/underfull decisions use the learned settled model after each1.2second pause, never its out-of-distribution moving/flowing predictions. At most four pulses fit inside the unchanged40second trial limit.21CPUchecks pass. Actual4070cached refit1.112s, same16coefficient predictor and data. Model18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527. Native round4 prioritizes03and29; no fresh tests have started.

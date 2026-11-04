@@ -2,22 +2,33 @@
 import json
 from pathlib import Path
 import unittest
-from pour_settled_model import assess,topup_cap,topup_feedback_eligible
+from pour_settled_model import assess,topup_cap,topup_feedback_eligible,pulse_finished
 from pour_settled_study import make_plan
 
 
 class SettledTests(unittest.TestCase):
     def test_topup_reaches_last_pouring_angle_but_has_hard_cap(self):
-        self.assertEqual(topup_cap(104.),104.5)
+        self.assertEqual(topup_cap(104.),104.25)
         self.assertEqual(topup_cap(94.),95.)
         self.assertEqual(topup_cap(130.),110.)
 
     def test_image_change_before_pouring_angle_cannot_end_topup(self):
         # Retained failed localization case braked at these two nonflow angles.
-        cap=topup_cap(106.)
+        cap=topup_cap(106.,extra=.5)
         for phase in (95.75,97.5,102.75,106.):
             self.assertFalse(topup_feedback_eligible(phase,cap))
         self.assertTrue(topup_feedback_eligible(106.25,cap))
+
+    def test_discrete_pulse_has_no_creep_or_cap_dwell(self):
+        cap=topup_cap(104.)
+        phase=80.;steps=0
+        while not pulse_finished(phase,cap,steps*.05,1.5):
+            phase=min(cap,phase+35*.05);steps+=1
+        self.assertEqual(phase,cap)
+        self.assertEqual(steps,14)
+        self.assertTrue(pulse_finished(cap,cap,.7,1.5))
+        self.assertFalse(pulse_finished(102.75,cap,.65,1.5))
+        self.assertTrue(pulse_finished(95.,cap,1.5,1.5))
 
     def test_high_instantaneous_surface_cannot_override_predicted_underfill(self):
         level, stable, full = assess([.895] * 6, .95, .915, .01, .10, 20)

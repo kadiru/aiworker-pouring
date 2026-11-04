@@ -35,7 +35,7 @@ def main(evidence=EVIDENCE, data=DATA):
                 stop_t=stop['t'], measurement_t=at['t'],
                 predicted_height_at_stop=stop['cup_predicted_fraction'],
                 settled_prediction_at_stop=stop.get('settled_prediction'),
-                settled_prediction_error_points=None if stop.get('settled_prediction') is None else 100 * (stop['settled_prediction'] - row['cup_surface_height_fraction']),
+                settled_model_error_points=None if stop.get('settled_prediction') is None else 100 * (stop['settled_prediction'] - row['cup_surface_height_fraction']),
                 geometric_estimate_at_stop=stop['surface_geometry_fraction'],
                 measured_height_at_stop=at['cup_fill_fraction'],
                 measured_final_height=row['cup_surface_height_fraction'],

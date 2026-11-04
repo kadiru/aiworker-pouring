@@ -1,5 +1,5 @@
 {
-  "checkpoint_sha256": "a570bb051e4d005c914dbe9bc834a6ef30bfb28d86d1810949b7b6e4ed2baaa4",
+  "checkpoint_sha256": "18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527",
   "parent_checkpoint_sha256": "b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b",
   "method": "Supervised final-settled-height ridge regression on frozen visual features; geometry-bounded RGB localization; retained visual servo, imitation trajectory and empty detector",
   "training": {
@@ -60,9 +60,9 @@
     "settle_seconds": 1.2,
     "max_attempts": 2,
     "trim_increment": 0.005,
-    "trim_seconds": 0.05,
+    "trim_seconds": 0.0,
     "trim_total_seconds": 1.5,
-    "max_pauses": 3,
+    "max_pauses": 5,
     "grasp_visual_window": 12,
     "verify_seconds": 1.25,
     "slow_empty_probability": 0.9,
@@ -73,10 +73,11 @@
     "settled_stability_std": 0.01,
     "trim_min_phase": 95.0,
     "adaptive_trim": true,
-    "trim_extra_deg": 0.5,
+    "trim_extra_deg": 0.25,
     "trim_hard_cap_deg": 110.0,
     "trim_fast_rate_deg_s": 35.0,
-    "trim_creep_rate_deg_s": 4.0
+    "trim_creep_rate_deg_s": 35.0,
+    "discrete_topup": true
   },
   "localization": {
     "coverage": {
@@ -440,7 +441,7 @@
     "max_source_error_mm": 0.7429813354498309,
     "max_cup_error_mm": 0.5435469434147575
   },
-  "elapsed_s": 1.118559645023197,
+  "elapsed_s": 1.112148785032332,
   "candidates": [
     {
       "columns": [
@@ -985,7 +986,7 @@
   "no_privileged_runtime_inputs": true,
   "data_manifest_sha256": "33d8396aea0c7ec25b53e6533dc82912fe0d34ba752ffc753abcb7e623723823",
   "sources": {
-    "pour_guard_actor.py": "834a6c6b0bb140783528dd1c808e889e40ae90b0fe343fa932cafb37a99936ad",
+    "pour_guard_actor.py": "04aa395ed6f062d2be039b389c90916b5335628b5c5783fa67b5800b7540f54d",
     "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
     "pour_guard_vision.py": "d4af274be0255e37f16c1ac54e6fc332fad916a34ab4438131e1deacdaf8e042",
     "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
@@ -999,9 +1000,9 @@
     "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
     "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
     "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
-    "pour_settled_model.py": "094a7e1f2c64baf19e892aa76419c15de47ec2dfc44e71c6342e8e0fc49b2cb4",
+    "pour_settled_model.py": "9ea083db882986d2da42e220564084d651ca8912cc1696d4e9348279bc0c651c",
     "pour_settled_data.py": "c18409bffa1d49a0783174aa0bad95cfe6e22115bc81331ce1c894a7fe7d1fa7",
-    "pour_settled_train.py": "5a82d9243317246ec845ba48d1bc10ad2ef6d9edc357dc9b4a4696814e993550",
-    "pour_settled_study.py": "61b827f1c1dc64e5c48bb27ddd49936da5ac44a8252ffed22e15866a7d85a8c7"
+    "pour_settled_train.py": "144494fe6c3b29dcdc4969cb2630902e9054e7ab8287256c9a033c724dbba5a5",
+    "pour_settled_study.py": "60e33261bc28546b5907d2e5573e4b38fcb4b8b6bd8bb573221ab127be386e2c"
   }
 }

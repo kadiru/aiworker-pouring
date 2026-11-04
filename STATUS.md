@@ -1,6 +1,6 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 03, 2026, 17:41 PST (America/Los_Angeles).
+Updated: November 03, 2026, 17:59 PST (America/Los_Angeles).
 State: **Localization/settled-height correction in progress; new fitting and 30 fresh tests authorized.**
 
 ## Active corrective study
@@ -17,9 +17,11 @@ Nineteen controller checks passed. Seven native round2 development cases queued 
 
 Round2 complete:6/7 passed, all7zero final spill. Case29 now grasps successfully but fails full-stop at89.485%height: top-ups braked at97.5/102.75degrees before the prior106degree pouring angle. Four cases had transient outside readings (peak0.169128nominalmL) that returned to zero; keep them separate from final spill. All9completed attempts across r0/r1/r2 +36sidecars +2partials +2partial sidecars are SHA256-backed locally; both round2 camera sheets reviewed. Candidate r2 archived natively and locally.
 
-Round3 now running, watcher62034, case29 first then03/08/20/27/10/26. Twenty CPU checks pass. New control: image feedback may brake only at adaptive-cap-minus0.25degree; cap increment0.5degree, dwell0.05s,total pulse1.5s,max two top-ups. Same49episodes and16coefficient fit; actual4070 cached refit1.119s, identical validation metrics. Model SHA a570bb051e4d005c914dbe9bc834a6ef30bfb28d86d1810949b7b6e4ed2baaa4. No reserved test started.
+Round3 stopped after two completed cases:29passed at96.091%height with zero final spill;03overflowed(final0.046656nominalmL,everbelowworktop0.029160). Slowing near a lower angle cap increased time spent flowing. Assistant stopped08at5.0simseconds; its partial and stop note are preserved. All11complete attempts+44sidecars+3partials+3partialsidecars are SHA256-backed locally; round3 camera sheet reviewed, including visible spilled bead. r3 candidate archived as a570bb05.
 
-Owned container8b4d87b59be0623f4894f801da4b441288018679b6d60e8720d6ef8505cbc7c8,run20261104T013852Z,4070PID2795260,guard2795261,same resource caps. Foreign4090PID changed from2630921 to2761818 before this restart; currentprocess start17:16:18PST, causeunverified. No matching OOM/NVIDIA-Xid kernel entries returned and no foreign signals/configuration actions taken. [Snapshot](evidence/settled-A/runtime-before-development-r3.json),[read-only check](evidence/settled-A/other-job-check-r3.json).
+Round4 now running, watcher44254, order03/29/08/20/27/10/26. Twenty-one CPU checks pass. Control now uses short triangular pulses:35deg/s toward min(110,max(95,previous peak+0.25)), immediately brake at cap, no slow creep or extra dwell,1.5s absolute timeout. At most four pulses, each separated by1.2s settling and learned full confirmation. Motion cannot end from a moving-image level estimate; the settled model is used for decisions at rest. Same37train/12validation episodes and16coefficient fit; cached4070refit1.112s, identical errors. Current model18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527. No reserved test started.
+
+Owned container47342c463a7c0edcb913a2191bf11bbade77faa20e424825ab1581337fb2fb27, same4070-only caps and immutable-ID guard. Foreign4090PID changed before r3 restart, causeunverified; no foreign job was signaled/reconfigured. [Round4 snapshot](evidence/settled-A/runtime-before-development-r4.json),[read-only foreign-job check](evidence/settled-A/other-job-check-r3.json).
 
 Next: inspect and resolve all seven development cases before freeze. Then run all30 reserved tests once without tuning; validate/back up every recording including failures/partials, review cameras, report actual outcomes, commit and push. Do not end at queued/partial results.
 

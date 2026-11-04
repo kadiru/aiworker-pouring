@@ -225,10 +225,12 @@ class Actor:
                 else:
                     movement=self.saved['pour_primitive']
                     if self.fill_mode=='coarse':rate=movement['fast_rate_deg_s'] if self.pour_phase<82 else movement['slow_rate_deg_s']
+                    elif self.threshold.get('discrete_topup'):
+                        rate=self.threshold['trim_fast_rate_deg_s']
                     elif self.threshold.get('adaptive_trim'):
                         rate=self.threshold['trim_fast_rate_deg_s'] if self.pour_phase<self.trim_cap-2. else self.threshold['trim_creep_rate_deg_s']
                     else:rate=20. if self.pour_phase<self.peak_phase-2 else 2.
-                    if self.filtered>.65 and flow*72.8>6.:rate=0.
+                    if self.filtered>.65 and flow*72.8>6. and not (self.fill_mode=='trim' and self.threshold.get('discrete_topup')):rate=0.
                     self.pour_phase=min(movement['phase_cap_deg'],self.pour_phase+.05*rate)
                     if self.fill_mode=='trim':
                         self.pour_phase=min(self.trim_cap,self.pour_phase)
@@ -241,6 +243,10 @@ class Actor:
                         eligible=topup_feedback_eligible(self.pour_phase,self.trim_cap)
                     timed_brake=self.fill_mode=='trim' and (trim_expired(self.trim_start,t,self.threshold.get('trim_seconds',.1)) or
                         trim_expired(self.trim_entered,t,self.threshold.get('trim_total_seconds',.9)))
+                    if self.fill_mode=='trim' and self.threshold.get('discrete_topup'):
+                        from pour_settled_model import pulse_finished
+                        timed_brake=pulse_finished(self.pour_phase,self.trim_cap,t-self.trim_entered,self.threshold['trim_total_seconds'])
+                        eligible=False
                     feedback=settled_prediction if self.fill_mode=='trim' and settled_prediction is not None else self.filtered
                     if timed_brake or (eligible and feedback>.60 and feedback+flow*self.threshold['runoff_seconds']>=goal):
                         self.fill_mode='brake';self.pause_count+=1;self.full_votes=0
