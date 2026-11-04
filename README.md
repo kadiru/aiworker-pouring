@@ -2,7 +2,7 @@
 
 Native Isaac Sim experiments for a stationary ROBOTIS FFW-BG2 learning to grasp a bottle, pour a colored drink, and stop near full or when empty. The historical companion explores Al-Jazari's drink-serving automata.
 
-**Active expanded-position study:** cup and relative bottle position ranges are three times wider. The new candidate was fitted on the RTX 4070 using 98 training / 28 validation episodes for settled level and 35 / 8 for movement imitation. The initial development round exposed stopping failures; repairs were refitted on the 4070 in 39.909 seconds and a complete eight-layout development round is running. Thirty reserved tests have not begun. [Study](docs/WORKSPACE_STUDY.md), [current status](STATUS.md).
+**Active expanded-position study:** cup and relative bottle position ranges are three times wider. The new candidate was fitted on the RTX 4070 using 98 training / 28 validation episodes for settled level and 35 / 8 for movement imitation. The initial development round exposed stopping failures; after the 39.909-second repaired fit, all eight separate development layouts passed with zero measured loss. Thirty reserved tests have not begun. [Study](docs/WORKSPACE_STUDY.md), [current status](STATUS.md).
 
 **Completed narrow-workspace benchmark, November 4, 2026: 30/30 fresh tasks passed.** Temporal localization, additional bottle templates, slower initial tilt and bounded top-ups address the previous two localization failures and one spill. After fitting on the RTX 4070, all thirty new tasks verified grasp, liquid transfer, the correct stop, and complete upright return/release. All fifteen full-cup tasks ended at **91.33–92.87% of rim height**; all fifteen empty-bottle tasks ended with **zero source particles**.
 
