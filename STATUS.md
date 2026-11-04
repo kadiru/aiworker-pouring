@@ -1,7 +1,9 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 03, 2026, 17:59 PST (America/Los_Angeles).
-State: **Development complete; freezing v15 for the authorized 30 fresh tests.**
+Updated: November 03, 2026, 18:43 PST (America/Los_Angeles).
+State: **V15 frozen; the authorized 30 fresh tests are running.**
+
+Frozen at2026-11-04T02:42:49Z from sourcecommit27ba46e3bcebd71794d884b93f68ee9753a9a5e8, model18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527, scenepland30146de48db51711ec3a45ce3ba52541b16450b0159822e348344925d8ec8ea. POSTsettled_test accepted once; native watcher60700 checks model+18sources every40seconds. No tuning/retraining/restarts during the batch. [Selection](evidence/settled-A/final-selection.json), [before-test snapshot](evidence/settled-A/runtime-before-tests.json). Completion requires all30outcomes, final integrity/backup/camera audit and final commit/push; do not end at a partial score.
 
 Latest: round4 finished all seven cases. All five prior failure scenes now pass. Seven verified grasps, correct full/empty stops and completed return/releases; six strict zero-spill successes. Full heights91.752–94.369%; empty source0. Case10 lost two particles(0.011664nominalmL) and remains a failure. Selecting v15 with this documented residual risk for the unchanged strict30-case evaluation, not relabeling it as success. The explicit freeze allowance affects readiness only; checks reject older underfill/missed-grasp/eight-particle spill failures. All18complete+72sidecar+3partial+3partial-sidecar backups match nativeSHA256; both round4 camera sheets reviewed. No reserved test started yet. Next: freeze committed source/model/plan, run all30once without tuning, audit every outcome and push final evidence. See [selected candidate](docs/SETTLED_LEVEL_STUDY.md).
 

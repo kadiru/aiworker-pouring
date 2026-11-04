@@ -21,6 +21,17 @@ def main():
     assert before['asset_sha256']==after['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
     expected={x['name'] for x in read(E/'frozen-plan.json')['test']};assert {x['name'] for x in r['cases']}==expected
     assert all(x['checkpoint_sha256']==sha and not x['teacher_fallback'] for x in r['cases'])
+    # Independently check the declared whole-task score against saved evidence.
+    # A metric flag alone cannot credit a wrong stop, missing transfer or return.
+    for x in r['cases']:
+        zero=x['final_outside_ml']==0 and x['ever_below_worktop_ml']==0
+        goal=(x['cup_surface_height_fraction']>=.90 if x['expected_stop']=='cup_near_full'
+              else x['source_remaining_ml']<=max(.25,.01*x['source_initial_ml']))
+        primary=bool(x['grasp_verified'] and x['visual_grasp_confirmed'] and
+            x['sustained_grasp_fraction']>=.8 and x['delivered_to_cup_ml']>=1 and
+            x['policy_completed'] and x['completed_return_release_sequence'] and
+            x['stop_reason']==x['expected_stop'] and not x['gates'] and goal and zero)
+        assert x['zero_spill']==zero and x['surface_goal_zero_spill_success']==primary, x['name']
     manifest=read(E/'data-manifest.json')
     assert all(not x['name'].startswith('L30_A_') for x in manifest)
     train={x['name'] for x in manifest if x['split']=='train'};val={x['name'] for x in manifest if x['split']=='validation'}
@@ -42,7 +53,7 @@ def main():
                 assert (current['sha256'],current['bytes'])==(x['sha256'],x['bytes']),str(archive)
     assert all(x['valid'] for x in integrity['files'])
     (DATA/'backup-index.json').write_text(json.dumps(dict(all_native_checksums_match=True,**integrity),indent=2)+'\n')
-    (E/'final-benchmark.json').write_text(json.dumps(dict(**r,verified_native_backups=len(integrity['files']),verified_sidecars=len(integrity['sidecar_files'])),indent=2)+'\n')
+    (E/'final-benchmark.json').write_text(json.dumps(dict(**r,verified_native_backups=len(integrity['files']),verified_sidecars=len(integrity['sidecar_files']),independently_recomputed_primary_scores=30),indent=2)+'\n')
     print(json.dumps(dict(counts=r['counts'],backups=len(integrity['files']),sidecars=len(integrity['sidecar_files']),source_hashes=len(s['runtime_sources'])),indent=2))
 
 

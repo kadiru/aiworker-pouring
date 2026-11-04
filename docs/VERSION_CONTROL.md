@@ -19,9 +19,13 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 
 | Artifact | Existing location / identity |
 |---|---|
-| Current frozen evaluation model | `evidence/robust-A/best.pt`; Ubuntu `learning/A-robust-20261103-v1/best.pt` |
+| Current corrective evaluation model | `evidence/settled-A/best.pt`; Ubuntu `learning/A-settled-20261103-v1/best.pt` |
+| Current corrective model SHA256 | `18f0064ea9f1503488ba606a863a8047bf1f3cd8ff05dfb95a81b53e24121527` |
+| Corrective study records | `data/material-A-settled/`; all completed and interrupted development attempts preserved; fresh30-case evaluation running |
+| Corrective provenance | `evidence/settled-A/final-selection.json`, `model-summary.json`, `data-manifest.json`, round-specific reports and integrity hashes |
+| Prior frozen evaluation model | `evidence/robust-A/best.pt`; Ubuntu `learning/A-robust-20261103-v1/best.pt` |
 | Prior six-case repaired model | `evidence/guard-B/best.pt`; Ubuntu `learning/A-guard-20261103-v2/best.pt` |
-| Current model SHA256 | `b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b` |
+| Prior evaluation model SHA256 | `b80ff58388e8f2516975f1925b20aa98c5720ab395bba3fe04dfb508fac64b1b` |
 | Thirty-case native recordings/labels | `data/material-A-robust/`; 30 complete HDF5 and 120 JSON sidecars, native-checksum-verified |
 | Thirty-case integrity/index | Versioned `evidence/robust-A/recording-integrity.json`; local `data/material-A-robust/backup-index.json` |
 | Prior six-case native recordings/labels | `data/material-A-guard-vote/`; nine complete HDF5 and36JSON sidecars, native-checksum-verified |
