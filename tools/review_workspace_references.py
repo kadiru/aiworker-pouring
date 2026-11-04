@@ -28,13 +28,13 @@ def main():
                 times = d['next_time'][:]; stop = np.flatnonzero(d['ground_truth/stop_command'][:])
                 assert len(stop), spec['name']
                 stages = ((0, 'task', 'initial task'),
-                    (int(np.argmin(abs(times-3.))), 'wrist', 'grasp wrist'),
-                    (int(np.argmin(abs(times-8.))), 'wrist', 'pour wrist'),
+                    (int(np.argmin(abs(times-3.))), 'wrist', '3s wrist'),
+                    (int(np.argmin(abs(times-8.))), 'wrist', '8s or final wrist'),
                     (int(stop[0]), 'task', 'stop task'),
                     (len(times)-1, 'task', 'final task'))
                 draw.text((8, n*370+5), f'{spec["name"]} | SCRIPTED REFERENCE | loss={metrics["spill"]["final_outside_ml"]:.4f}', fill='white')
                 for col, (ix, cam, label) in enumerate(stages):
-                    draw.text((col*320+8, n*370+26), label, fill='white')
+                    draw.text((col*320+8, n*370+26), f'{label} ({times[ix]:.2f}s)', fill='white')
                     image = Image.fromarray(decode(d['next_obs/'+cam+'_image'][ix], f.attrs['image_encoding']))
                     image.thumbnail((320, 320))
                     sheet.paste(image, (col*320, n*370+48))

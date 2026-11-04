@@ -130,6 +130,7 @@ def calibrate_localization(saved,sequences,root=ROOT,validation=VALIDATION):
         assert error<2.,(e['name'],error)
     settings=dict(source=source,cup=cup,timeout_s=2.)
     report=dict(settings=settings,candidates=candidates,chosen=best,observations=observations,synthetic_negatives=negatives,
-        note='All episodes are consumed calibration evidence. Candidate selection uses these windows; no independent localization-generalization claim. Synthetic occlusions are not real absent-object tests. Original per-frame anchor thresholds are unchanged; consensus rejects isolated spatial outliers.')
+        anchor_thresholds={k:saved['thresholds'][k+'_localization_score'] for k in ('source','cup')},
+        note='All episodes are consumed calibration evidence. Candidate selection uses these windows; no independent localization-generalization claim. Synthetic occlusions are not real absent-object tests. Consensus rejects isolated spatial outliers; actual per-frame anchor thresholds are recorded explicitly.')
     (root/'localization-calibration.json').write_text(json.dumps(report,indent=2)+'\n')
     return settings,dict(chosen=best,positive_windows=len(observations),synthetic_negative_windows=len(negatives))

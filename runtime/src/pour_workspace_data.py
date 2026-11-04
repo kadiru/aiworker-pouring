@@ -65,14 +65,26 @@ def fit_banks(saved,seq):
     coverage=cover_workspace(saved);train=[e for e in seq if e['name'].startswith(PREFIX) and e['split']=='train' and e['name']==e['reference_case']]
     assert len(train)==16;report={}
     for kind,height in (('source',.135),('cup',.038)):
-        anchors=[project(e[kind+'_xyz']+[0,0,height],saved['calibration']) for e in train]
-        bank=make_bank([e['images'][0] for e in train],anchors,kind)
+        views=([e for e in seq if e['split']=='train' and e['name']==e['reference_case']] if kind=='source' else train)
+        anchors=[project(e[kind+'_xyz']+[0,0,height],saved['calibration']) for e in views]
+        bank=make_bank([e['images'][0] for e in views],anchors,kind,aggregation='max',
+            absolute_gradients=kind=='source',anchor_radius_px=28. if kind=='source' else None)
         prior=saved[kind+'_bank'];bank['bounds']=prior['bounds']
-        # Flatten the retained families so future domain updates reach every leaf.
-        families=copy.deepcopy(prior.get('alternatives',[prior]))
-        saved[kind+'_bank']=dict(prior,alternatives=families+[bank])
-        report[kind]=dict(new_templates=len(train),retained_families=len(families),training_names=[e['name'] for e in train],
-            bounds=bank['bounds'],original_anchor_threshold=saved['thresholds'][kind+'_localization_score'])
+        original_threshold=saved['thresholds'][kind+'_localization_score']
+        if kind=='source':
+            # Glass edges reverse contrast against the robot/background across
+            # the wider domain. Use unsigned gradients and a view-local maximum;
+            # a higher confidence anchor rejects the measured synthetic negatives.
+            assert len(views)==40
+            saved[kind+'_bank']=bank;families=[]
+            saved['thresholds']['source_localization_score']=.70
+        else:
+            families=copy.deepcopy(prior.get('alternatives',[prior]))
+            saved[kind+'_bank']=dict(prior,alternatives=families+[bank])
+        report[kind]=dict(new_templates=len(views),retained_families=len(families),training_names=[e['name'] for e in views],
+            bounds=bank['bounds'],original_anchor_threshold=original_threshold,
+            anchor_threshold=saved['thresholds'][kind+'_localization_score'],aggregation=bank['aggregation'],
+            absolute_gradients=bank['absolute_gradients'],anchor_radius_px=bank['anchor_radius_px'])
     return dict(coverage=coverage,families=report,validation_excluded_from_templates=True)
 
 

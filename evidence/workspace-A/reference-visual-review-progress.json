@@ -1,5 +1,5 @@
 {
-  "reviewed_utc": "2026-11-04T18:55:15.197715+00:00",
+  "reviewed_utc": "2026-11-04T19:55:15.389351+00:00",
   "reviewed_names": [
     "W30_A_demo_train_00",
     "W30_A_demo_train_01",
@@ -7,7 +7,16 @@
     "W30_A_demo_train_03",
     "W30_A_demo_train_04",
     "W30_A_demo_train_05",
-    "W30_A_demo_train_06"
+    "W30_A_demo_train_06",
+    "W30_A_demo_train_07",
+    "W30_A_demo_train_08",
+    "W30_A_demo_train_09",
+    "W30_A_demo_train_10",
+    "W30_A_demo_train_11",
+    "W30_A_demo_train_12",
+    "W30_A_demo_train_13",
+    "W30_A_demo_train_14",
+    "W30_A_demo_train_15"
   ],
   "sheets": [
     {
@@ -16,14 +25,22 @@
     },
     {
       "file": "reference-camera-review-02.jpg",
-      "sha256": "90fe7eec9a8cce3ba531db8fa75067e45a182346f059864065affe136aab0fcd"
+      "sha256": "5aebb7148616125e16a6e9dabf1c524f44efa49217231aa13d5ff8e081ce3d41"
+    },
+    {
+      "file": "reference-camera-review-03.jpg",
+      "sha256": "e9d8ead93f77d5dbb1295b478070ac28a631add7814afff13c844c9cd2780ffd"
+    },
+    {
+      "file": "reference-camera-review-04.jpg",
+      "sha256": "5751a447734da94fbc7b01b5256d10c040c48c2a45c446374c76208b6c4879d3"
     }
   ],
   "observations": [
-    "Initial neck and cup features remain visible in all seven reviewed references.",
-    "The initial task view partly clips the bottle body in train_01; the neck remains visible.",
-    "Wrist views show the bottle between the fingers at grasp and pour.",
-    "Full and empty references show appropriate relative final cup levels and an upright returned bottle."
+    "All sixteen original corner reference sheets inspected. Fourteen show a held bottle, liquid delivered to the cup, and upright return.",
+    "train_08 never holds the bottle; it remains near the initial location while the empty gripper closes.",
+    "train_14 has no bottle held at the scheduled grasp view; the bottle later leaves the task camera view. It remains rejected, with the numerical spill measurements retained.",
+    "train_01 initial task view partly clips the bottle body, while the neck and cup remain visible."
   ],
-  "limits": "Five selected frames per completed scripted reference. This is not proof of uninterrupted grasp or zero spill; numerical metrics and subsequent autonomous tests are separate."
+  "limits": "Five selected frames per scripted reference, not proof of continuous grasp or zero spill. The first renderer used nominal grasp/pour captions for 3s/8s samples, clamped to the last frame on failed short attempts; those captions do not assert that grasp/pour occurred. The renderer is corrected to show actual sample times for subsequent exports."
 }

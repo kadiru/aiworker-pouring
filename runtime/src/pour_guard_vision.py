@@ -41,10 +41,11 @@ def gradients(image):
         F.pad((gray[:,:,2:,:]-gray[:,:,:-2,:])*.5,(0,0,1,1))],1)
 
 
-def make_bank(images,anchors,kind,device='cuda'):
+def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gradients=False,anchor_radius_px=None):
     # Only the neck outline or glass rim is matched, not liquid volume.
     width,height,dx,dy=(48,64,-24,-12) if kind=='source' else (80,28,-40,-14)
     feat=gradients(torch.as_tensor(np.stack(images),device=device));n=len(images)
+    if absolute_gradients:feat=feat.abs()
     xx,yy=torch.meshgrid(torch.arange(width,device=device),torch.arange(height,device=device),indexing='xy')
     uv=torch.tensor(np.asarray(anchors),device=device,dtype=torch.float32)
     grid=torch.stack([(xx[None]+uv[:,0,None,None]+dx)/383*2-1,
@@ -58,7 +59,8 @@ def make_bank(images,anchors,kind,device='cuda'):
     kernels*=mask;kernels/=kernels.square().sum((1,2,3),keepdim=True).sqrt().clamp(min=1e-6)
     kernels*=mask  # numerator weights both observations; denominator uses mask²
     lo=np.floor(np.min(anchors,axis=0)-9).astype(int);hi=np.ceil(np.max(anchors,axis=0)+9).astype(int)
-    return dict(kernels=kernels.cpu(),mask=mask.cpu(),offset=[dx,dy],bounds=[*lo.tolist(),*hi.tolist()],kind=kind)
+    return dict(kernels=kernels.cpu(),mask=mask.cpu(),offset=[dx,dy],bounds=[*lo.tolist(),*hi.tolist()],kind=kind,
+        aggregation=aggregation,absolute_gradients=absolute_gradients,anchors=np.asarray(anchors).tolist(),anchor_radius_px=anchor_radius_px)
 
 
 @torch.inference_mode()
@@ -68,6 +70,7 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
         matches=[locate(image,b,tracking,device,expected_uv) for b in bank['alternatives']]
         return max(matches,key=lambda x:x[1])
     a=torch.as_tensor(image,device=device);feat=gradients(a)
+    if bank.get('absolute_gradients'):feat=feat.abs()
     kernels=bank['kernels'].to(device);mask=bank['mask'].to(device);h,w=kernels.shape[-2:];dx,dy=bank['offset']
     x0,y0,x1,y1=bank['bounds']
     if tracking:y0=max(14,y0-95);x0=max(24,x0-12);x1=min(355,x1+12)
@@ -78,8 +81,20 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
     numerator=F.conv2d(region,kernels)
     norm=F.conv2d(region.square(),mask.square()).clamp(min=1e-10).sqrt()
     scores=numerator/norm
-    # A single coincidental background-edge match cannot win the whole bank.
-    field=scores.median(1).values[0];hh,ww=field.shape;flat=int(field.argmax());y,x=divmod(flat,ww);sub=[]
+    if bank.get('anchor_radius_px') is not None and not tracking and expected_uv is None:
+        # A template's view-specific background is valid only near its labeled
+        # training view. This restriction uses stored calibration, not live poses.
+        hh,ww=scores.shape[-2:]
+        xx,yy=torch.meshgrid(torch.arange(ww,device=device),torch.arange(hh,device=device),indexing='xy')
+        anchors=torch.as_tensor(bank['anchors'],device=device)
+        distance=(xx[None]+startx-dx-anchors[:,0,None,None]).square()+(yy[None]+starty-dy-anchors[:,1,None,None]).square()
+        scores=scores.masked_fill(distance[None]>bank['anchor_radius_px']**2,-1.)
+    aggregation=bank.get('aggregation','median')
+    if aggregation=='median':field=scores.median(1).values[0]
+    elif aggregation=='max':field=scores.max(1).values[0]
+    elif aggregation=='top3':field=scores.topk(min(3,len(kernels)),dim=1).values.mean(1)[0]
+    else:raise ValueError(aggregation)
+    hh,ww=field.shape;flat=int(field.argmax());y,x=divmod(flat,ww);sub=[]
     for axis,index,limit in ((1,x,ww),(0,y,hh)):
         if 0<index<limit-1:
             left=field[y,x-1] if axis==1 else field[y-1,x];right=field[y,x+1] if axis==1 else field[y+1,x]
