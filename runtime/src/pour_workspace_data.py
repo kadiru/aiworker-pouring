@@ -114,3 +114,33 @@ def build_data(saved,seq):
     result=dict(data=data,manifest=manifest)
     torch.save(result,ROOT/'workspace-cache.pt')
     return result
+
+
+@torch.inference_mode()
+def probe_empty_detector(saved,seq):
+    """Measure the retained empty detector on new views; this performs no fit."""
+    from pour_stop_models import LiquidDetector
+    from pour_stop_data import crops
+    model=LiquidDetector().cuda().eval();model.load_state_dict(saved['source_detector'])
+    episodes=[]
+    for e in seq:
+        p=Path(e['path']);rows=json.loads((p.parent/'samples.json').read_text());samples=[]
+        with h5py.File(p,'r') as f:
+            d=f['data/demo_0']
+            for i in range(0,len(rows),3):
+                r=rows[i]
+                if r['bottle_tilt_deg']<95 or r['source_outflow_ml_s']>=3:continue
+                c,s,w=crops(decode(d['next_obs/task_image'][i],'jpeg95'),decode(d['next_obs/wrist_image'][i],'jpeg95'))
+                pred=model(*[torch.as_tensor(x,device='cuda')[None] for x in (c,s,w)])
+                samples.append(dict(t=r['t'],source_ml=r['bottle_ml'],empty_probability=float(pred['empty_logit'][0].sigmoid()),present_probability=float(pred['present_logit'][0].sigmoid())))
+        episodes.append(dict(name=e['name'],split=e['split'],samples=samples))
+    valid=[s for e in episodes if e['split']=='validation' for s in e['samples']]
+    positive=[s for s in valid if s['source_ml']<=.12];negative=[s for s in valid if s['source_ml']>=.5]
+    report=dict(method='Frozen parent empty/presence detector replay on recorded views; no fitting or threshold selection',episodes=episodes,
+        validation_positive_frames=len(positive),validation_negative_frames=len(negative),
+        validation_positive_above_090=sum(s['empty_probability']>=.90 and s['present_probability']>=.7 for s in positive),
+        validation_negative_above_090=sum(s['empty_probability']>=.90 and s['present_probability']>=.7 for s in negative),
+        caveat='Offline tilt/outflow filtering uses labels. Sparse frame counts and reference motions do not replace closed-loop development or the reserved task evaluation.')
+    (ROOT/'empty-detector-coverage.json').write_text(json.dumps(report,indent=2)+'\n')
+    del model;torch.cuda.empty_cache()
+    return {k:v for k,v in report.items() if k!='episodes'}

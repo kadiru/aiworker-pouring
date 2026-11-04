@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 from pour_guard_models import CupEstimator
 from pour_reliable_data import calibrate_localization
-from pour_workspace_data import sequences, fit_banks, build_data
+from pour_workspace_data import sequences, fit_banks, build_data, probe_empty_detector
 from pour_workspace_motion import fit as fit_motion
 from pour_settled_model import features, predict
 from pour_workspace_study import ROOT, PARENT, PARENT_SHA, PREFIX, plan, RUNTIME_SOURCES
@@ -30,6 +30,7 @@ def train(state):
     consensus,consensus_report=calibrate_localization(saved,seq,root=ROOT,validation=validation)
     saved['localization_consensus']=consensus
     bundle=build_data(saved,seq)
+    empty_coverage=probe_empty_detector(saved,seq)
     loc=dict(template_fit=template_report,consensus=consensus_report,
         note='Consumed parent and expanded reference calibration windows; independent task evaluation remains reserved.')
     (ROOT/'localization-validation.json').write_text(json.dumps(loc,indent=2)+'\n')
@@ -88,7 +89,7 @@ def train(state):
     summary = dict(checkpoint_sha256=hashlib.sha256((ROOT / 'best.pt').read_bytes()).hexdigest(),
         parent_checkpoint_sha256=PARENT_SHA, method=saved['method'], training=saved['settled_training'],
         device=saved['training_device'], chosen=dict(columns=chosen['fit']['columns'], ridge=chosen['fit']['ridge'], metrics=chosen['metrics']),
-        thresholds=saved['thresholds'], localization=loc, localization_consensus=consensus_report, template_fit=template_report, motion=motion_report,
+        thresholds=saved['thresholds'], localization=loc, localization_consensus=consensus_report, template_fit=template_report, motion=motion_report, empty_detector_coverage=empty_coverage,
         motion_rate_deg_s=dict(fast=saved['pour_primitive']['fast_rate_deg_s'],slow=saved['pour_primitive']['slow_rate_deg_s']), elapsed_s=time.monotonic() - started,
         candidates=[dict(columns=c['fit']['columns'], ridge=c['fit']['ridge'], metrics=c['metrics'], score=c['score']) for c in candidates],
         unchanged_components=['cup CNN weights', 'source detector weights', 'empty confirmation gates', 'fluid and vessel physics', 'primary task scoring'],
