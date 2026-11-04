@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 04, 2026, 14:46 PST.
-State: **All eight expanded-position development layouts passed on the repaired candidate, with zero measured loss. All 34 recordings / 114 sidecars are validated and backed up, and all eight camera rows are reviewed. The thirty reserved tests have not started.**
+Updated: November 04, 2026, 14:49 PST.
+State: **All eight expanded-position development layouts passed on the repaired candidate, with zero measured loss. All 34 recordings / 114 sidecars are validated and backed up, and all eight camera rows are reviewed. The model and sources are frozen and all thirty reserved tests are queued once on the 4070.**
 
 ## Active expanded-position study
 
@@ -21,7 +21,9 @@ All eight r1 layouts passed strictly: four full cups at **92.281–92.792% final
 
 [Development results](evidence/workspace-A/round1-workspace-results.json), [camera review](evidence/workspace-A/round1-review-summary.json), [verified backups](evidence/workspace-A/round1-backup-verification.json).
 
-Next: freeze using `freeze_workspace_study.py` with zero spill allowance; POST `workspace_test` once and monitor `watch_workspace_trials.py --part test --record-test-snapshots`. No source/model tuning or restarts during the reserved benchmark. Afterward run `pour_workspace_report.py --require-thirty`, recording audits, local verification and GitHub push. Native study path: `/workspace/learning/A-workspace-20261104-v1`; local backups: `data/material-A-workspace/`.
+Frozen at `2026-11-04T22:48:48.805126Z` from pushed source commit `6697bc1e24576e8e21c5c25e140c637eec5e1f82`; scene-plan SHA256 `0cff1999ae950aa707a181dbf916d7ab56cf23d17946ec9167cf6c7426841777`. Zero readiness spill allowance. Thirty verified unstarted scenes were queued with one accepted `workspace_test` command. Read-only watcher session **56770** checks all 30 source hashes and the checkpoint every 40 seconds. It saves observations at 5, 15, 25 and 30 closures to Ubuntu `study-snapshots/W30-a909abb318ecc980/`. [Selection](evidence/workspace-A/final-selection.json), [pretest isolation](evidence/workspace-A/runtime-before-tests.json).
+
+Next: complete this fixed 30-test run without tuning or retries; no further queue command is needed. Then run `pour_workspace_report.py --require-thirty`, `audit_workspace_study.py integrity` and `audit_workspace_study.py review` in `/workspace/src`. Back up with `tools/backup_workspace_recordings.py`, independently verify using `tools/summarize_workspace_benchmark.py`, analyze using `tools/analyze_robust_outcomes.py --study workspace`, review all camera sheets and preselected cases 00/01, generate the final outcome plot, and commit/push. Native study path: `/workspace/learning/A-workspace-20261104-v1`; local raw backups: `data/material-A-workspace/`.
 
 ## Completed localization and spill repair
 

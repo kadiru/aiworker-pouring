@@ -1,6 +1,6 @@
 # Expanded-position material-A study
 
-Status: all twenty planned reference cases have an accepted demonstration across 22 preserved attempts. The combined fit completed on the RTX 4070 in 33.401 seconds; the initial development round ended after four completed cases and exposed stopping failures. The repaired r1 candidate was refitted in 39.909 seconds; all eight development layouts passed with zero measured loss. Thirty reserved tests have not begun.
+Status: all twenty planned reference cases have an accepted demonstration across 22 preserved attempts. The combined fit completed on the RTX 4070 in 33.401 seconds; the initial development round ended after four completed cases and exposed stopping failures. The repaired r1 candidate was refitted in 39.909 seconds; all eight development layouts passed with zero measured loss. The candidate is frozen and the thirty reserved tests are running once.
 
 The user authorized larger bottle/cup position variation, retraining on the RTX 4070, thirty fresh autonomous tests aiming for zero spill, and committing/pushing. This study is separate from the completed 30/30 narrow-workspace evaluation.
 
@@ -53,6 +53,10 @@ R1 raises the angular increment from .25 to .50 degrees and pause limit from7 to
 ## Development r1 result
 
 All eight layouts ran with the same repaired candidate and all eight met the strict goal. Four full cases finished at 92.281–92.792% rim height; three empty cases had zero source particles and the fourth retained 0.23328 nominal mL, inside its 0.30 nominal mL allowance. Every case sustained its grasp, transferred liquid, stopped for the correct reason, returned upright, released and recorded zero final outside and zero sampled near-table loss. All four newly attempted layouts and the four repeated r0 layouts are included. The native audit validated 34 recordings and 114 sidecars across both development rounds and all references; all hashes and sizes match the local backup, with no partials. Both camera sheets (all eight r1 rows) were inspected. [Development outcomes](../evidence/workspace-A/round1-workspace-results.json), [camera review](../evidence/workspace-A/round1-review-summary.json). This is development evidence; the reserved evaluation remains separate.
+
+## Frozen evaluation
+
+The model was frozen at `2026-11-04T22:48:48.805126Z` from source commit `6697bc1e24576e8e21c5c25e140c637eec5e1f82`, with unchanged 30-file runtime, model SHA `a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b`, plan SHA `0cff1999ae950aa707a181dbf916d7ab56cf23d17946ec9167cf6c7426841777`, and zero readiness spill allowance. The native guard verified all thirty names were unstarted. One accepted `workspace_test` request queued the complete 15/15 batch. No training, tuning or retries are allowed during it. [Selection](../evidence/workspace-A/final-selection.json), [pretest runtime](../evidence/workspace-A/runtime-before-tests.json).
 
 ## Resources and artifacts
 
