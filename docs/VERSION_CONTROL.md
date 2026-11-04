@@ -19,8 +19,12 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 
 | Artifact | Existing location / identity |
 |---|---|
-| Current reliability evaluation model | `evidence/reliable-A/best.pt`; Ubuntu `learning/A-reliable-20261103-v1/best.pt` |
-| Current model SHA256 | `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101` |
+| Expanded-position candidate (evaluation pending) | Ubuntu `learning/A-workspace-20261104-v1/best.pt`, SHA256 `ea5bf6177c02ab03987ce2fa4bb01d88327541c2ea9a4ec1fc7976f871913e64` |
+| Expanded candidate archive | Ubuntu `learning/A-workspace-20261104-v1/candidates/v18-r0/`; model, fit reports and exact 29-file runtime snapshot |
+| Expanded references | `data/material-A-workspace/`; 22 HDF5 plus 66 sidecars checksum-verified, including two failed originals and two same-scene repairs |
+| Expanded study evidence | `evidence/workspace-A/`; frozen scene plan, all reference outcomes, rejected-fit diagnostics, candidate calibration and resource snapshots |
+| Completed narrow-workspace reliability model | `evidence/reliable-A/best.pt`; Ubuntu `learning/A-reliable-20261103-v1/best.pt` |
+| Completed reliability model SHA256 | `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101` |
 | Reliability study records | `data/material-A-reliable/`; 44 complete HDF5 files and 176 sidecars, no partials, native-checksum-verified |
 | Reliability provenance | `evidence/reliable-A/final-selection.json`, `model-summary.json`, `data-manifest.json`, final 30/30 report, both development rounds, integrity hashes and final review |
 | Archived development candidates | Ubuntu `learning/A-reliable-20261103-v1/candidates/v16-r0/` and `candidates/v17-r1/`; models, metadata and exact 22-file source snapshots |
@@ -56,7 +60,7 @@ python3 -m unittest discover -s runtime -p test_gpu_priority_guard.py -v
 
 These checks do not start Isaac Sim, train a model or use the GPU. Native simulation results and their limits are documented separately in `docs/VISUAL_STOP_STUDY.md`.
 
-Current reliability-study verification: `python3 tools/summarize_reliable_benchmark.py`; analysis: `python3 tools/analyze_robust_outcomes.py --study reliable`. All thirty scenes ran once after frozen source commit `76c726ea0dfb17392d879959ca9ad844e7a2334e`, with **30/30 strict passes**, fifteen full and fifteen empty. Model, 22 runtime sources, asset, resource caps and all 44 development/test recordings plus 176 sidecars are verified. [Completed study](RELIABILITY_STUDY.md). Actual full/empty videos and all five review sheets live under `evidence/reliable-A/` outside Git.
+Completed narrow-workspace reliability verification (use source revision `4f8c141f5db96e9b706f2e6f705baf6e9295a1c7`, or its archived source files, for source-bound checks; the expanded controller intentionally differs): `python3 tools/summarize_reliable_benchmark.py`; analysis: `python3 tools/analyze_robust_outcomes.py --study reliable`. All thirty scenes ran once after frozen source commit `76c726ea0dfb17392d879959ca9ad844e7a2334e`, with **30/30 strict passes**, fifteen full and fifteen empty. Model, 22 runtime sources, asset, resource caps and all 44 development/test recordings plus 176 sidecars are verified. [Completed study](RELIABILITY_STUDY.md). Actual full/empty videos and all five review sheets live under `evidence/reliable-A/` outside Git.
 
 Prior six-case repaired-study verification: `python3 tools/summarize_guard_benchmark.py --study vote`. For the archived first guarded round, use source revision `9a4b8b1` so its source-bound checks match the original controller. The `guard-B` folder denotes repair round 2; vessel material remains A.
 
