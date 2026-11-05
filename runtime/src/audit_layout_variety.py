@@ -123,7 +123,7 @@ def main():
         partial_files=[],native_checks_passed=True,recordings=len(files),transitions=sum(c['transitions'] for c in checks)),indent=2)+'\n')
     with (ROOT/'final-benchmark.csv').open('w',newline='') as f:
         keys=['name','layout_label','strict_pass','expected_stop','stop_reason','grasp_verified','delivered_to_cup_ml','cup_surface_height_fraction','source_remaining_ml','final_outside_ml','failure_reasons']
-        writer=csv.DictWriter(f,fieldnames=keys);writer.writeheader();writer.writerows({k:json.dumps(r[k]) if isinstance(r[k],list) else r[k] for k in keys} for r in rows)
+        writer=csv.DictWriter(f,fieldnames=keys,lineterminator='\n');writer.writeheader();writer.writerows({k:json.dumps(r[k]) if isinstance(r[k],list) else r[k] for k in keys} for r in rows)
     print(json.dumps(counts),flush=True)
 
 if __name__=='__main__': main()
