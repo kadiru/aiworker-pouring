@@ -19,10 +19,10 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 
 | Artifact | Existing location / identity |
 |---|---|
-| Expanded-position candidate (evaluation pending) | Ubuntu `learning/A-workspace-20261104-v1/best.pt`, SHA256 `a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b` |
+| Frozen expanded-position candidate | Ubuntu `learning/A-workspace-20261104-v1/best.pt`, SHA256 `a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b` |
 | Expanded candidate archive | Ubuntu `learning/A-workspace-20261104-v1/candidates/v18-r0/`; model, fit reports and exact 29-file runtime snapshot; repaired `candidates/v18-r1/` has the new model and 30 sources |
-| Expanded references | `data/material-A-workspace/`; 34 HDF5 plus 114 sidecars checksum-verified: 22 reference attempts, four r0 and eight r1 development cases |
-| Expanded study evidence | `evidence/workspace-A/`; frozen scene plan, all reference outcomes, rejected-fit diagnostics, candidate calibration and resource snapshots |
+| Expanded study recordings | `data/material-A-workspace/`; 64 HDF5 and 234 sidecars checksum-verified: 22 references, four r0 development attempts, eight r1 development attempts and thirty fresh tests |
+| Expanded study evidence | `evidence/workspace-A/`; verified 23/30 report and CSV, particle conservation, split/fit manifests, resource snapshots and camera review hashes; local outcome PDF and the two MP4s are external to Git |
 | Completed narrow-workspace reliability model | `evidence/reliable-A/best.pt`; Ubuntu `learning/A-reliable-20261103-v1/best.pt` |
 | Completed reliability model SHA256 | `40b5506bc4bceb51f1bf8ab8a5df93525933da0b03dea4c7e3fc66b63ba62101` |
 | Reliability study records | `data/material-A-reliable/`; 44 complete HDF5 files and 176 sidecars, no partials, native-checksum-verified |

@@ -1,0 +1,396 @@
+{
+  "sustained_grips": 26,
+  "missed_empty_after_actual_drain": [
+    {
+      "name": "W30_A_test_24",
+      "observed_empty_without_any_stop_s": 24.150000000000002,
+      "max_post_cap_dwell_empty_score": 0.5311657190322876
+    },
+    {
+      "name": "W30_A_test_26",
+      "observed_empty_without_any_stop_s": 24.6,
+      "max_post_cap_dwell_empty_score": 0.8902278542518616
+    }
+  ],
+  "reviewed_utc": "2026-11-05T02:58:48.637767+00:00",
+  "checkpoint_sha256": "a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b",
+  "plan_sha256": "0cff1999ae950aa707a181dbf916d7ab56cf23d17946ec9167cf6c7426841777",
+  "source_commit": "6697bc1e24576e8e21c5c25e140c637eec5e1f82",
+  "scope": "Fresh native simulation, one attempt per reserved scene. No teacher or refit during evaluation.",
+  "counts": {
+    "planned": 30,
+    "completed": 30,
+    "pending": 0,
+    "incomplete": 0,
+    "verified_grasps": 29,
+    "visual_confirmations": 29,
+    "return_release_sequences": 27,
+    "primary_successes": 23,
+    "legacy_successes": 12,
+    "zero_spill_runs": 28,
+    "liquid_transfers_at_least_1_ml": 29,
+    "final_outside_mean_ml": 0.0017496,
+    "final_outside_max_ml": 0.040824
+  },
+  "by_goal": {
+    "cup_near_full": {
+      "planned": 15,
+      "completed": 15,
+      "successes": 14,
+      "stop_reason_errors": 0
+    },
+    "bottle_empty": {
+      "planned": 15,
+      "completed": 15,
+      "successes": 9,
+      "stop_reason_errors": 3
+    }
+  },
+  "correct_stop_reasons": 27,
+  "teacher_fallbacks": 0,
+  "grasp_attempts": {
+    "1": 30
+  },
+  "reject_gates_by_case": {
+    "W30_A_test_16": [
+      "wrong_stop_condition",
+      "residual_bottle",
+      "grip_not_sustained"
+    ],
+    "W30_A_test_24": [
+      "wrong_stop_condition",
+      "grip_not_sustained",
+      "set_down_failed",
+      "policy_did_not_finish"
+    ],
+    "W30_A_test_26": [
+      "wrong_stop_condition",
+      "grip_not_sustained",
+      "set_down_failed",
+      "policy_did_not_finish"
+    ],
+    "W30_A_test_27": [
+      "grip_not_sustained"
+    ]
+  },
+  "full": {
+    "all_assigned_final_rim_range": [
+      0.8979834886158203,
+      0.9390765084939833
+    ],
+    "correct_full_stops": 15,
+    "correct_stop_final_rim_range": [
+      0.8979834886158203,
+      0.9390765084939833
+    ],
+    "all_meeting_height": 14,
+    "settled_prediction_mae_points": 1.2877685743220724,
+    "max_prediction_overestimate_points": 2.4959984246423317,
+    "prediction_count": 15
+  },
+  "empty": {
+    "exact_zero": 13,
+    "within_allowance": 14,
+    "remaining_nominal_ml_range": [
+      0.0,
+      40.001687999999994
+    ],
+    "last_drain_pose_measured": 13
+  },
+  "positions": {
+    "distinct_placements_across_58_even_ignoring_fills": 58,
+    "axes": [
+      "cup-world X",
+      "cup-world Y",
+      "bottle-relative X",
+      "bottle-relative Y"
+    ],
+    "realized_min_max_mm": [
+      [
+        -20.896706941210986,
+        22.894527140917997
+      ],
+      [
+        -17.971933129088736,
+        23.764704639031077
+      ],
+      [
+        -23.11865608859304,
+        26.729349786938528
+      ],
+      [
+        -11.613336871739484,
+        9.701508761361794
+      ]
+    ],
+    "cases_by_number_of_axes_outside_old_range": {
+      "1": 1,
+      "2": 7,
+      "3": 16,
+      "4": 6
+    }
+  },
+  "loss": {
+    "particle_quantum_nominal_ml": 0.0058319999999999995,
+    "at_20hz_samples": 13927,
+    "all_sampled_particle_totals_conserved": true,
+    "cases_with_nonairborne_outside": 16,
+    "max_nonairborne_outside_particles": 7,
+    "cases_with_measured_loss": [
+      {
+        "name": "W30_A_test_07",
+        "final_outside_particles": 2,
+        "ever_near_table_particles": 2,
+        "first_near_table_s": 15.705,
+        "last_drain_geometry": {
+          "t": 15.555,
+          "radial_offset_mm": 13.735661342122366,
+          "height_above_rim_mm": 11.621194756252123,
+          "tilt_deg": 127.26002234469055,
+          "airborne_outside_particles": 2,
+          "nonairborne_outside_particles": 0
+        },
+        "loss_timing": {
+          "stop_s": 15.604999998769692,
+          "stop_reason": "bottle_empty",
+          "at_stop": {
+            "t": 15.605,
+            "radial_offset_mm": 13.757873219089022,
+            "height_above_rim_mm": 11.91650665083391,
+            "tilt_deg": 127.57498655426691,
+            "phase": "Visual guard: Pour control: coarse",
+            "source_particles": 0,
+            "cup_particles": 5657,
+            "airborne_outside": 2,
+            "nonairborne_outside": 0,
+            "ever_near_table": 0
+          },
+          "first_near_table": {
+            "t": 15.705,
+            "radial_offset_mm": 13.882353535154158,
+            "height_above_rim_mm": 10.177127259007918,
+            "tilt_deg": 127.59917110252472,
+            "phase": "Visual guard: Returning upright",
+            "source_particles": 0,
+            "cup_particles": 5657,
+            "airborne_outside": 0,
+            "nonairborne_outside": 2,
+            "ever_near_table": 2
+          },
+          "first_near_table_minus_stop_s": 0.10000000123030794
+        }
+      },
+      {
+        "name": "W30_A_test_17",
+        "final_outside_particles": 7,
+        "ever_near_table_particles": 7,
+        "first_near_table_s": 15.705,
+        "last_drain_geometry": null,
+        "loss_timing": {
+          "stop_s": 15.204999998769772,
+          "stop_reason": "bottle_empty",
+          "at_stop": {
+            "t": 15.205,
+            "radial_offset_mm": 14.015033925815167,
+            "height_above_rim_mm": 12.235939222723715,
+            "tilt_deg": 125.49854029046496,
+            "phase": "Visual guard: Pour control: coarse",
+            "source_particles": 74,
+            "cup_particles": 5921,
+            "airborne_outside": 6,
+            "nonairborne_outside": 0,
+            "ever_near_table": 0
+          },
+          "first_near_table": {
+            "t": 15.705,
+            "radial_offset_mm": 8.08022216115917,
+            "height_above_rim_mm": 74.82378612934804,
+            "tilt_deg": 91.80242665173243,
+            "phase": "Visual guard: Returning upright",
+            "source_particles": 5,
+            "cup_particles": 5989,
+            "airborne_outside": 0,
+            "nonairborne_outside": 7,
+            "ever_near_table": 7
+          },
+          "first_near_table_minus_stop_s": 0.5000000012302284
+        }
+      }
+    ]
+  },
+  "failures": [
+    {
+      "name": "W30_A_test_07",
+      "causes": [
+        "escaped_liquid"
+      ],
+      "settled_height": 0.5335255237186646,
+      "shortfall_percentage_points": null
+    },
+    {
+      "name": "W30_A_test_16",
+      "causes": [
+        "visual_localization_rejected_before_grasp",
+        "grasp_not_verified",
+        "insufficient_transfer",
+        "incomplete_return_release",
+        "source_not_empty",
+        "incorrect_stop_reason"
+      ],
+      "settled_height": 0.1759753865354191,
+      "shortfall_percentage_points": null
+    },
+    {
+      "name": "W30_A_test_17",
+      "causes": [
+        "escaped_liquid"
+      ],
+      "settled_height": 0.5481015766368182,
+      "shortfall_percentage_points": null
+    },
+    {
+      "name": "W30_A_test_22",
+      "causes": [
+        "settled_cup_below_90_percent"
+      ],
+      "settled_height": 0.8979834886158203,
+      "shortfall_percentage_points": 0.20165113841796867
+    },
+    {
+      "name": "W30_A_test_24",
+      "causes": [
+        "grip_not_sustained",
+        "incomplete_return_release",
+        "no_stop_command_after_transfer",
+        "incorrect_stop_reason"
+      ],
+      "settled_height": 0.4707102572216697,
+      "shortfall_percentage_points": null
+    },
+    {
+      "name": "W30_A_test_26",
+      "causes": [
+        "grip_not_sustained",
+        "incomplete_return_release",
+        "no_stop_command_after_transfer",
+        "incorrect_stop_reason"
+      ],
+      "settled_height": 0.5644032366135531,
+      "shortfall_percentage_points": null
+    },
+    {
+      "name": "W30_A_test_27",
+      "causes": [
+        "grip_not_sustained"
+      ],
+      "settled_height": 0.4370186265777129,
+      "shortfall_percentage_points": null
+    }
+  ],
+  "recording_integrity": {
+    "all_attempts": 64,
+    "sidecars": 234,
+    "partial_recordings": 0,
+    "transitions": 26993,
+    "test_transitions": 13927,
+    "max_camera_state_skew_s": 8.941814328977671e-07,
+    "all_native_hashes_and_sizes_match": true
+  },
+  "resource_snapshots": [
+    "before",
+    "runtime-after-test05",
+    "runtime-after-test15",
+    "runtime-after-test25",
+    "after"
+  ],
+  "runtime_sources_matched": 30,
+  "prespecified_videos": {
+    "full": {
+      "name": "W30_A_test_00",
+      "source_sha256": "f602493b8efe78fcf6e3cbecad60e1e30d9bde222185c715db2d246c93cb4ea3",
+      "video_sha256": "98b5a445edae582864d656e52e439ff89897555a83e9bf14bd92db2607c495c8",
+      "frames": 478
+    },
+    "empty": {
+      "name": "W30_A_test_01",
+      "source_sha256": "4527ef52a620f76550f6e553307d0f1f5bbb1900b5e13325552d0d64d8695924",
+      "video_sha256": "c79ab1b302cbb371c6ecfc9b4aa8dd3a75eb20cb39896f46fb3b96a56c96cf9a",
+      "frames": 383
+    }
+  },
+  "camera_sheets": [
+    {
+      "name": "camera-review-01.jpg",
+      "sha256": "ceb52398ad3b2faa441a45bf8383ce859fdd9037cb3fed6a19a6388498ec284a",
+      "rows": [
+        "W30_A_test_00",
+        "W30_A_test_01",
+        "W30_A_test_02",
+        "W30_A_test_03",
+        "W30_A_test_04",
+        "W30_A_test_05"
+      ]
+    },
+    {
+      "name": "camera-review-02.jpg",
+      "sha256": "ef727337e4b06bf3e8ab8cf49df7166ba74782e1183b3ef19b52f7015b18db13",
+      "rows": [
+        "W30_A_test_06",
+        "W30_A_test_07",
+        "W30_A_test_08",
+        "W30_A_test_09",
+        "W30_A_test_10",
+        "W30_A_test_11"
+      ]
+    },
+    {
+      "name": "camera-review-03.jpg",
+      "sha256": "d339ecac03a72315831900d91ff3af8efee59a194bfab3e42678463fb283a543",
+      "rows": [
+        "W30_A_test_12",
+        "W30_A_test_13",
+        "W30_A_test_14",
+        "W30_A_test_15",
+        "W30_A_test_16",
+        "W30_A_test_17"
+      ]
+    },
+    {
+      "name": "camera-review-04.jpg",
+      "sha256": "b5312d1672624ca74c3a02ef600373dc8a07ee5db947e5a5301a7e99e3046da2",
+      "rows": [
+        "W30_A_test_18",
+        "W30_A_test_19",
+        "W30_A_test_20",
+        "W30_A_test_21",
+        "W30_A_test_22",
+        "W30_A_test_23"
+      ]
+    },
+    {
+      "name": "camera-review-05.jpg",
+      "sha256": "9aa4a3446b05365c4ad3d8a421eeae2044c612ccd1bed9efb57869a11e066881",
+      "rows": [
+        "W30_A_test_24",
+        "W30_A_test_25",
+        "W30_A_test_26",
+        "W30_A_test_27",
+        "W30_A_test_28",
+        "W30_A_test_29"
+      ]
+    }
+  ],
+  "outcome_figure": {
+    "workspace-test-outcomes.png": "a747936cc59ab79817be3a9e446dfa5c3c68b140f5002bbdfdfc2c2f71e4ff4c",
+    "workspace-test-outcomes.pdf": "d87dae59ab16841cdbede38ed5f05ccfe4284a02aa87a8327e3c97da12d4ca18"
+  },
+  "observation_limit": "20 Hz observations at 400 Hz physics; not a guarantee against between-sample excursions. No physical-robot validation.",
+  "visual_observations": [
+    "Inspected all five sheets (30 rows, fixed task and wrist views at stop or peak cup and at the final observation). The 23 passing rows show the bottle at the cup at the stop and upright beside the cup at finish, with the gripper open and clear.",
+    "The localization rejection (case 16) shows the upright bottle, low initial cup and open gripper in essentially the same positions at the abort and finish.",
+    "In cases 24 and 26 there was no stop; both final views still show the bottle tilted above the cup. The peak-cup frames are labeled as such, not as stop commands.",
+    "Cases 07 and 17 returned upright despite measured spills. Case 22 appears nearly full, and case 27 returned upright despite insufficient sampled bilateral contact. Still images cannot establish the exact spill count, 0.20-point height shortfall, or contact duration; the recorded particle and contact measurements determine those outcomes.",
+    "The red surface is visible through the cup. An empty bottle can still have a dark-looking base; exact remaining quantities come from the particle inventory. Both prespecified paired-camera videos were checked against their original HDF5 hashes and reviewed using recorded frame indices."
+  ],
+  "outcome_figure_visual_review": "Inspected the final four-panel rendering. The expanded and previous position bounds, goal symbols, strict outcomes and 90% line are visible. The empty-bottle panel preserves both the 40 mL nonpickup and sub-mL allowances with a labeled linear/log scale. Captions and axes are legible without clipping."
+}

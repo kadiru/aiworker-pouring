@@ -68,7 +68,17 @@ def main(report, output, development):
             vals = [x['source_remaining_ml'] for _, x in group]
             limits = [max(.25, .01*x['source_initial_ml']) for _, x in group]
             for (i, _), lim in zip(group, limits): ax.hlines(lim, i-.45, i+.45, colors='#556777', linewidth=1.5)
-            ymax = max([.4]+vals+limits); ax.set_ylim(-.04*ymax, 1.12*ymax)
+            ymax = max([.4]+vals+limits)
+            if ymax > 5 * max([.4]+limits):
+                # A bottle never picked up can still contain tens of mL.
+                # Keep its true value while making sub-mL residuals and limits legible.
+                ax.set_yscale('symlog', linthresh=.5)
+                ax.set_ylim(-.065, 1.45*ymax)
+                ticks = [v for v in (0, .25, .5, 1, 5, 20, 40, 100) if v <= 1.4*ymax]
+                ax.set_yticks(ticks, labels=[f'{v:g}' for v in ticks])
+                ax.set_ylabel('Liquid left (nominal mL)\nlog scale above 0.5 mL')
+            else:
+                ax.set_ylim(-.04*ymax, 1.12*ymax)
         for (i, row), value in zip(group, vals): point(ax, i, value, row)
     for ax in axes.flat:
         ax.set_axisbelow(True); ax.grid(alpha=.18); ax.spines[['top','right']].set_visible(False)
