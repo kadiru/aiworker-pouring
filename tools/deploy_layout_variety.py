@@ -23,7 +23,9 @@ def out(*args): return subprocess.check_output(args,text=True,timeout=35).strip(
 def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--expected-container',required=True);p.add_argument('--source-commit',required=True);args=p.parse_args()
+    global STUDY
+    p=argparse.ArgumentParser();p.add_argument('--expected-container',required=True);p.add_argument('--source-commit',required=True);p.add_argument('--extra',action='store_true');args=p.parse_args()
+    if args.extra:STUDY=ROOT/'learning/A-layout-variety-extra-20261105-v1'
     assert not (STUDY/'selection.json').exists(), 'Do not redeploy a frozen evaluation'
     info=json.loads(out('docker','inspect',args.expected_container))[0]
     assert info['Id']==args.expected_container and info['Name']=='/aiworker_pouring_4070'
@@ -37,12 +39,17 @@ def main():
     own={int(x.strip()) for x in out('docker','top',args.expected_container,'-eo','pid').splitlines()[1:]}
     gpu=out('nvidia-smi','--query-compute-apps=gpu_uuid,pid','--format=csv,noheader')
     assert all(int(row.split(',')[1]) in own for row in gpu.splitlines() if row.startswith(GPU))
-    old=json.loads((ROOT/'learning/A-workspace-20261104-v1/final-selection.json').read_text())
+    previous=ROOT/'learning/A-layout-variety-20261105-v1'
+    if args.extra:
+        assert json.loads((previous/'watcher-completion.json').read_text())['all_cases_complete']
+        assert json.loads((previous/'final-benchmark.json').read_text())['counts']['complete']==12
+    old=json.loads((previous/'selection.json' if args.extra else ROOT/'learning/A-workspace-20261104-v1/final-selection.json').read_text())
     for name,digest in old['runtime_sources'].items(): assert sha(ROOT/'src'/name)==digest,name
     assert sha(ROOT/'learning/A-workspace-20261104-v1/best.pt')==old['selected_checkpoint_sha256']
-    for name,key in [('preflight.json','ready'),('initial-object-preflight.json','clear')]:
+    preflights=[('preflight.json','ready')] if args.extra else [('preflight.json','ready'),('initial-object-preflight.json','clear')]
+    for name,key in preflights:
         assert all(x[key] for x in json.loads((STUDY/name).read_text())['cases'])
-    staged=STUDY/'harness-staged';changed=('run_fountain.py','pour_recording.py','pour_layout_variety.py')
+    staged=STUDY/'harness-staged';changed=('run_fountain.py','pour_layout_extra.py') if args.extra else ('run_fountain.py','pour_recording.py','pour_layout_variety.py')
     for name in changed: ast.parse((staged/name).read_text())
     archive=STUDY/'harness-before';archive.mkdir(exist_ok=False)
     for name in old['runtime_sources']: shutil.copy2(ROOT/'src'/name,archive/name)
@@ -52,14 +59,14 @@ def main():
     for name in changed: shutil.copy2(staged/name,ROOT/'src'/name)
     frozen=STUDY/'frozen-plan.json';shutil.copy2(STUDY/'proposed-plan.json',frozen)
     sources={name:sha(ROOT/'src'/name) for name in dict.fromkeys((*old['runtime_sources'],*changed))}
-    assert {n for n,h in old['runtime_sources'].items() if sources[n]!=h}=={'run_fountain.py','pour_recording.py'}
+    assert {n for n,h in old['runtime_sources'].items() if sources[n]!=h}==({'run_fountain.py'} if args.extra else {'run_fountain.py','pour_recording.py'})
     selection=dict(created_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
         source_commit=args.source_commit,selected_checkpoint_sha256=old['selected_checkpoint_sha256'],
         scene_plan_sha256=sha(frozen),runtime_sources=sources,
-        unchanged_controller=True,changes='New queue command and optional recording-only overview camera; learned actor, weights, thresholds, physics and task/wrist calibration unchanged.',
-        container=args.expected_container,plan_count=12,attempts_per_layout=1,
+        unchanged_controller=True,changes='Only extra layout queue command; actor and all camera/physics code unchanged from original twelve.' if args.extra else 'New queue command and optional recording-only overview camera; learned actor, weights, thresholds, physics and task/wrist calibration unchanged.',
+        container=args.expected_container,plan_count=len(json.loads(frozen.read_text())['test']),attempts_per_layout=1,
         primary_definition='Verified physical and visual grasp, bilateral contacts >=80% of tipping samples, >=1 nominal mL transferred, correct near-full/empty stop, >=90% final rim height or <=max(.25 nominal mL,1% initial) source, ordered completed upright return/release, no gates, zero final outside liquid and zero sampled near-table loss.',
-        preflight_hashes={n:sha(STUDY/n) for n in ('preflight.json','initial-object-preflight.json')})
+        preflight_hashes={n:sha(STUDY/n) for n,_ in preflights})
     (STUDY/'selection.json').write_text(json.dumps(selection,indent=2)+'\n')
     print('FROZEN '+selection['scene_plan_sha256'],flush=True)
     out('docker','stop','--timeout','15',args.expected_container)

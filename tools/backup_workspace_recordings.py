@@ -20,9 +20,12 @@ def digest(path):
     return h.hexdigest()
 
 
-def main(manifest, verification):
+def main(manifest, verification, study='workspace'):
     report = json.loads(manifest.read_text())
-    destination = PROJECT / 'data/material-A-workspace'
+    prefix, directory = {'workspace': ('W30_A_', 'data/material-A-workspace'),
+                         'layout': ('V12_A_', 'data/material-A-layout-variety'),
+                         'layout-extra': ('VX2_A_', 'data/material-A-layout-variety')}[study]
+    destination = PROJECT / directory
     keys = ('files', 'sidecar_files', 'partial_files', 'partial_sidecar_files')
     items = [item for key in keys for item in report.get(key, [])]
     assert items, 'Empty integrity manifest'
@@ -33,7 +36,7 @@ def main(manifest, verification):
         relative = Path(item['relative_path'])
         assert not relative.is_absolute() and '..' not in relative.parts
         assert re.fullmatch(r'[A-Za-z0-9_./-]+', str(relative))
-        assert relative.parts[1].find('W30_A_') >= 0, relative
+        assert relative.parts[1].find(prefix) >= 0, relative
         target = destination / relative
         if not target.exists():
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -57,7 +60,8 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--manifest', type=Path, required=True)
     p.add_argument('--verification', type=Path, required=True)
+    p.add_argument('--study', choices=('workspace','layout','layout-extra'), default='workspace')
     args = p.parse_args()
     assert args.manifest.resolve().is_relative_to(PROJECT)
     assert args.verification.resolve().is_relative_to(PROJECT)
-    main(args.manifest, args.verification)
+    main(args.manifest, args.verification, args.study)

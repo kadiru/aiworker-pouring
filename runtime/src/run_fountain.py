@@ -38,6 +38,7 @@ allowed_commands.update(('settled_train','settled_development','settled_test'))
 allowed_commands.update(('reliable_train','reliable_development','reliable_test'))
 allowed_commands.update(('workspace_collect','workspace_train','workspace_development','workspace_test'))
 allowed_commands.add('layout_variety_test')
+allowed_commands.add('layout_variety_extra')
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -628,7 +629,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd=='layout_variety_test':
+                    if cmd=='layout_variety_extra':
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before queuing additional layouts';continue
+                        from pour_layout_extra import unstarted
+                        pending.extend(unstarted())
+                    elif cmd=='layout_variety_test':
                         if current is not None or pending:
                             state['control_message']='Wait for idle before queuing layout variety tests';continue
                         from pour_layout_variety import unstarted
