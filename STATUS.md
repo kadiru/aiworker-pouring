@@ -39,6 +39,8 @@ python3 tools/analyze_robust_outcomes.py --study workspace
 python3 tools/audit_workspace_particle_counts.py
 ```
 
+**Labeled video:** `evidence/workspace-A/labeled-highlights.mp4` is a 106.9-second, silent 1280×720 H.264 reel. It shows the two prespecified success examples and every one of the seven failed tests, with final PASS/FAIL badges, measured reasons, camera labels, simulated time and explicit playback speed/cuts. The opening explains that this selection is not the benchmark success frequency. Full decode passed; 27 encoded case frames were visually checked. Rendering used only the Mac CPU and closed, checksum-matched local recordings. [Source/frame manifest](evidence/workspace-A/labeled-highlights-manifest.json), [visual review](evidence/workspace-A/labeled-highlights-review.json). Reproduce with the isolated video dependencies and `python tools/render_labeled_benchmark.py`; a completed output is preserved rather than overwritten.
+
 ## Completed localization and spill repair
 
 The authorized study `A-reliable-20261103-v1` used reserved seed `20261217` and prefix `C30_A_`. It addresses the two initial localization aborts and one one-particle spill in the previous 27/30 benchmark. **All thirty new scenes ran once without tuning, retries, restarts or expert fallback.** Every case verified physical/visual grasp, transferred liquid, used the correct stop reason and completed upright return/release. Fifteen full targets ended at **91.334–92.869% rim height**; fifteen empty targets ended with **zero source particles**. All thirty had zero final outside particles and zero sampled near-table loss. [Verified results](evidence/reliable-A/final-benchmark.json), [CSV](evidence/reliable-A/final-benchmark.csv), [method](docs/RELIABILITY_STUDY.md).
