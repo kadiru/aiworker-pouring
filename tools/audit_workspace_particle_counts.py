@@ -24,6 +24,17 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def same_measurement(a, b):
+    if isinstance(a, dict):
+        return isinstance(b, dict) and a.keys() == b.keys() and all(
+            same_measurement(v, b[k]) for k, v in a.items())
+    # Local and native math.hypot can differ by one ulp. Particle counts,
+    # artifact identities, labels and other non-floating values remain exact.
+    if isinstance(a, float):
+        return isinstance(b, float) and math.isclose(a, b, rel_tol=0., abs_tol=1e-9)
+    return type(a) is type(b) and a == b
+
+
 def particles(nominal_ml, quantum):
     count = round(nominal_ml / quantum)
     assert count >= 0 and math.isclose(nominal_ml, count * quantum, rel_tol=0, abs_tol=1e-9)
@@ -80,12 +91,33 @@ def check_record(folder, row):
         terminal_empty = mouth_geometry(samples[drain_i], spec)
         terminal_empty["airborne_outside_particles"] = particles(samples[drain_i]["airborne_ml"], quantum)
         terminal_empty["nonairborne_outside_particles"] = particles(samples[drain_i]["spilled_ml"], quantum)
+    loss_timing = None
+    if ever or airborne + outside:
+        decisions = read(folder / "policy-decisions.json")
+        stop = next((d for d in decisions if d["stop_latched"]), None)
+        first = next((s for s in samples if s["ever_table_ml"] > 0), None)
+        def snapshot(s):
+            if s is None:
+                return None
+            return dict(**mouth_geometry(s, spec), phase=s["phase"],
+                        source_particles=particles(s["bottle_ml"], quantum),
+                        cup_particles=particles(s["cup_ml"], quantum),
+                        airborne_outside=particles(s["airborne_ml"], quantum),
+                        nonairborne_outside=particles(s["spilled_ml"], quantum),
+                        ever_near_table=particles(s["ever_table_ml"], quantum))
+        at = min(samples, key=lambda s: abs(s["t"]-stop["t"])) if stop else None
+        if at is not None:
+            assert abs(at["t"]-stop["t"]) < .051
+        loss_timing = dict(stop_s=stop["t"] if stop else None,
+                           stop_reason=stop["stop_latched"] if stop else None,
+                           at_stop=snapshot(at), first_near_table=snapshot(first),
+                           first_near_table_minus_stop_s=first["t"]-stop["t"] if first and stop else None)
     return dict(name=spec["name"], samples=len(samples), total_particles=total,
                 final_source=source, final_cup=cup, final_airborne=airborne,
                 final_nonairborne_outside=outside, ever_near_table=ever,
                 first_near_table_s=first_near, peak_nonairborne_outside=peak_outside,
                 nonairborne_outside_samples=outside_samples, nominal_ml_per_particle=quantum,
-                last_drain_geometry=terminal_empty)
+                last_drain_geometry=terminal_empty, loss_timing=loss_timing)
 
 
 def main():
@@ -113,9 +145,21 @@ def main():
         assert digest(EVIDENCE / v["video"]) == v["video_sha256"]
         assert digest(EVIDENCE / v["review"]["sheet"]) == v["review"]["sheet_sha256"]
     rows = [check_record(DATA / Path(r["path"]).relative_to(NATIVE), r) for r in report["cases"]]
+    by_name = {r["name"]: r for r in rows}
+    folders = {r["name"]: Path(r["path"]).relative_to(NATIVE) for r in report["cases"]}
+    earlier_losses = read(EVIDENCE / "first-two-losses-comparison.json")["rows"]
+    rejection = read(EVIDENCE / "test16-localization-diagnostic.json")
+    for diagnostic in [rejection, *earlier_losses]:
+        folder = folders[diagnostic["name"]]
+        for name, native_hash in diagnostic["sidecar_sha256"].items():
+            assert indexed[str(folder / name)]["sha256"] == native_hash
+    for earlier in earlier_losses:
+        assert same_measurement(by_name[earlier["name"]],
+                                {k: v for k, v in earlier.items() if k != "sidecar_sha256"})
     summary = dict(checkpoint_sha256=report["checkpoint_sha256"], cases=len(rows),
                    samples=sum(r["samples"] for r in rows), all_sampled_totals_conserved=True,
                    verified_earlier_manifests=archive_names, verified_video_sources_and_exports=2,
+                   verified_interim_failure_diagnostics=1 + len(earlier_losses),
                    zero_final_and_near_table=sum(r["ever_near_table"] == 0 and
                      r["final_airborne"] + r["final_nonairborne_outside"] == 0 for r in rows),
                    cases_with_nonairborne_outside=sum(r["nonairborne_outside_samples"] > 0 for r in rows),
