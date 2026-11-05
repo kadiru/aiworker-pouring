@@ -59,12 +59,16 @@ def main(evidence=EVIDENCE, data=DATA):
                     note='Inspect saved RGB and replay the unchanged template localizer on CPU; no grasp or pour was attempted.'))
             if not row['grasp_verified']:
                 causes.append('grasp_not_verified')
+            elif row['sustained_grasp_fraction'] < .8:
+                causes.append('grip_not_sustained')
             if row['delivered_to_cup_ml'] < 1:
                 causes.append('insufficient_transfer')
             if not row['zero_spill']:
                 causes.append('escaped_liquid')
             if not row['completed_return_release_sequence']:
                 causes.append('incomplete_return_release')
+            if stop is None and row['delivered_to_cup_ml'] >= 1:
+                causes.append('no_stop_command_after_transfer')
             poured_full = row['expected_stop'] == 'cup_near_full' and row['delivered_to_cup_ml'] >= 1
             if poured_full and row['cup_surface_height_fraction'] < .9:
                 causes.append('settled_cup_below_90_percent')

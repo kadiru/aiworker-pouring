@@ -149,7 +149,9 @@ def main():
     folders = {r["name"]: Path(r["path"]).relative_to(NATIVE) for r in report["cases"]}
     earlier_losses = read(EVIDENCE / "first-two-losses-comparison.json")["rows"]
     rejection = read(EVIDENCE / "test16-localization-diagnostic.json")
-    for diagnostic in [rejection, *earlier_losses]:
+    underfill = read(EVIDENCE / "test22-full-stop-diagnostic.json")
+    missed_stop = read(EVIDENCE / "test24-missed-empty-diagnostic.json")
+    for diagnostic in [rejection, underfill, missed_stop, *earlier_losses]:
         folder = folders[diagnostic["name"]]
         for name, native_hash in diagnostic["sidecar_sha256"].items():
             assert indexed[str(folder / name)]["sha256"] == native_hash
@@ -159,7 +161,7 @@ def main():
     summary = dict(checkpoint_sha256=report["checkpoint_sha256"], cases=len(rows),
                    samples=sum(r["samples"] for r in rows), all_sampled_totals_conserved=True,
                    verified_earlier_manifests=archive_names, verified_video_sources_and_exports=2,
-                   verified_interim_failure_diagnostics=1 + len(earlier_losses),
+                   verified_interim_failure_diagnostics=3 + len(earlier_losses),
                    zero_final_and_near_table=sum(r["ever_near_table"] == 0 and
                      r["final_airborne"] + r["final_nonairborne_outside"] == 0 for r in rows),
                    cases_with_nonairborne_outside=sum(r["nonairborne_outside_samples"] > 0 for r in rows),
