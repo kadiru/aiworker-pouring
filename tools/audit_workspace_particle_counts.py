@@ -1,0 +1,130 @@
+"""Reconcile the four particle inventories at every recorded test sample.
+
+Run on the Mac after the final native manifest and backups have been verified.
+This is an offline observation audit; it does not change the benchmark score.
+"""
+import hashlib
+import json
+import math
+from pathlib import Path
+
+
+PROJECT = Path(__file__).resolve().parents[1]
+EVIDENCE = PROJECT / "evidence/workspace-A"
+DATA = PROJECT / "data/material-A-workspace"
+NATIVE = Path("/workspace/outputs/fountain")
+COMPARTMENTS = ("bottle_ml", "cup_ml", "airborne_ml", "spilled_ml")
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def particles(nominal_ml, quantum):
+    count = round(nominal_ml / quantum)
+    assert count >= 0 and math.isclose(nominal_ml, count * quantum, rel_tol=0, abs_tol=1e-9)
+    return count
+
+
+def mouth_geometry(sample, spec):
+    # Rotate the local bottle-mouth center (0, 0, 135 mm) into world space.
+    # The receiver is fixed during these tests. Radii here are geometry, not
+    # a stream footprint: being over the opening does not guarantee a catch.
+    x, y, z, w = sample["bottle_quat_xyzw"]
+    assert math.isclose(x*x + y*y + z*z + w*w, 1, abs_tol=1e-5)
+    axis = (2*(x*z+w*y), 2*(y*z-w*x), 1-2*(x*x+y*y))
+    dx, dy, dz = [1000*(a-b) + 135*u for a, b, u in
+                  zip(sample["bottle_pose_xyz"], spec["cup_world"], axis)]
+    return dict(t=sample["t"], radial_offset_mm=math.hypot(dx, dy),
+                height_above_rim_mm=dz-38, tilt_deg=sample["bottle_tilt_deg"])
+
+
+def check_record(folder, row):
+    metrics = read(folder / "metrics.json")
+    spec = read(folder / "parameters.json")
+    samples = read(folder / "samples.json")
+    quantum = metrics["spill"]["particle_quantum_ml"]
+    assert spec["name"] == row["name"] and math.isclose(quantum, spec["spacing"] ** 3 * 1e6)
+    assert samples
+    total = samples[0]["count"]
+    previous_t, ever, first_near, peak_outside, outside_samples = -1, 0, None, 0, 0
+    for s in samples:
+        counts = [particles(s[k], quantum) for k in COMPARTMENTS]
+        assert s["finite"] and s["count"] == total == sum(counts), (spec["name"], s["t"], counts)
+        assert s["t"] > previous_t
+        previous_t = s["t"]
+        near = particles(s["ever_table_ml"], quantum)
+        assert ever <= near <= total
+        if near and first_near is None:
+            first_near = s["t"]
+        ever = near
+        peak_outside = max(peak_outside, counts[3])
+        outside_samples += counts[3] > 0
+    source, cup, airborne, outside = counts
+    assert source == particles(row["source_remaining_ml"], quantum)
+    assert cup == particles(row["cup_final_ml"], quantum)
+    assert airborne + outside == particles(row["final_outside_ml"], quantum)
+    assert ever == particles(row["ever_below_worktop_ml"], quantum)
+    assert row["zero_spill"] == (airborne + outside == 0 and ever == 0)
+    # For exact-empty runs, compare the same physical event across layouts:
+    # the first observation in the final stretch of zero remaining particles.
+    # Residual-but-allowed or incomplete drains have no such event.
+    terminal_empty = None
+    if spec["expected_stop"] == "bottle_empty" and source == 0:
+        drain_i = next((i + 1 for i in range(len(samples)-1, -1, -1)
+                        if samples[i]["bottle_ml"] > 0), 0)
+        terminal_empty = mouth_geometry(samples[drain_i], spec)
+        terminal_empty["airborne_outside_particles"] = particles(samples[drain_i]["airborne_ml"], quantum)
+        terminal_empty["nonairborne_outside_particles"] = particles(samples[drain_i]["spilled_ml"], quantum)
+    return dict(name=spec["name"], samples=len(samples), total_particles=total,
+                final_source=source, final_cup=cup, final_airborne=airborne,
+                final_nonairborne_outside=outside, ever_near_table=ever,
+                first_near_table_s=first_near, peak_nonairborne_outside=peak_outside,
+                nonairborne_outside_samples=outside_samples, nominal_ml_per_particle=quantum,
+                last_drain_geometry=terminal_empty)
+
+
+def main():
+    report = read(EVIDENCE / "final-benchmark.json")
+    assert report["independently_recomputed_primary_scores"] == len(report["cases"]) == 30
+    integrity = read(EVIDENCE / "recording-integrity.json")
+    verification = read(EVIDENCE / "final-backup-verification.json")
+    assert verification["all_native_hashes_and_sizes_match"]
+    assert verification["integrity_manifest_sha256"] == digest(EVIDENCE / "recording-integrity.json")
+    indexed = {f["relative_path"]: f for group in ("files", "sidecar_files") for f in integrity[group]}
+    # Preserve the attribution of early spill evidence, intermediate backups, and prespecified videos.
+    archive_names = ["first-spill-backup-manifest.json"] + [
+        f"backup-test-block-{span}.json" for span in ("00-04", "05-14", "15-24")]
+    for name in archive_names:
+        archive = read(EVIDENCE / name)
+        for group in ("files", "sidecar_files"):
+            for f in archive[group]:
+                final = indexed[f["relative_path"]]
+                assert (f["sha256"], f["bytes"]) == (final["sha256"], final["bytes"]), name
+    for label in ("full", "empty"):
+        v = read(EVIDENCE / f"fresh-{label}-video-review.json")
+        source = indexed[str(Path(v["source_hdf5"]).relative_to(NATIVE))]
+        assert v["source_sha256"] == source["sha256"] and v["name"] == source["name"]
+        assert v["checkpoint_sha256"] == report["checkpoint_sha256"]
+        assert digest(EVIDENCE / v["video"]) == v["video_sha256"]
+        assert digest(EVIDENCE / v["review"]["sheet"]) == v["review"]["sheet_sha256"]
+    rows = [check_record(DATA / Path(r["path"]).relative_to(NATIVE), r) for r in report["cases"]]
+    summary = dict(checkpoint_sha256=report["checkpoint_sha256"], cases=len(rows),
+                   samples=sum(r["samples"] for r in rows), all_sampled_totals_conserved=True,
+                   verified_earlier_manifests=archive_names, verified_video_sources_and_exports=2,
+                   zero_final_and_near_table=sum(r["ever_near_table"] == 0 and
+                     r["final_airborne"] + r["final_nonairborne_outside"] == 0 for r in rows),
+                   cases_with_nonairborne_outside=sum(r["nonairborne_outside_samples"] > 0 for r in rows),
+                   max_nonairborne_outside_particles=max(r["peak_nonairborne_outside"] for r in rows),
+                   note="Four compartments sum to the initial particle count at every saved sample. "
+                        "This checks accounting at 20 Hz, not trajectories between observations.")
+    (EVIDENCE / "particle-accounting.json").write_text(json.dumps(dict(**summary, rows=rows), indent=2) + "\n")
+    print(json.dumps(summary, indent=2))
+
+
+if __name__ == "__main__":
+    main()
