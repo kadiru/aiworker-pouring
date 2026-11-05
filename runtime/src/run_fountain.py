@@ -37,6 +37,7 @@ allowed_commands.add('robust_test')
 allowed_commands.update(('settled_train','settled_development','settled_test'))
 allowed_commands.update(('reliable_train','reliable_development','reliable_test'))
 allowed_commands.update(('workspace_collect','workspace_train','workspace_development','workspace_test'))
+allowed_commands.add('layout_variety_test')
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -325,7 +326,7 @@ def setup(spec):
         from pour_recording import PourRecording
         recording = PourRecording(stage, folder, spec, sim, bottle, preview)
         state['recording'] = dict(active=True, path=str(folder/'episode.partial.hdf5'),
-                                  cameras=['task','wrist'], resolution=[384,384], control_hz=20, frames=0)
+                                  cameras=list(recording.cameras), resolution=[384,384], control_hz=20, frames=0)
     actor = None
     if spec.get('policy_evaluation'):
         if spec.get('policy_family')=='visual_guard_hierarchy':
@@ -513,6 +514,7 @@ def finish(trial):
                 (metrics['expected_stop']!='cup_near_full' or metrics['bottle_result']['cup_inventory_fraction']>=.90))
             metrics['task_success_zero_spill']=False
     if trial.get('recording'):
+        recording_cameras = list(trial['recording'].cameras)
         recording_path = trial['recording'].finish(metrics)
         metrics['recording'] = str(recording_path)
         if trial['spec'].get('replay_episode'):
@@ -521,7 +523,7 @@ def finish(trial):
             json_write(ROOT/'latest-recording.json', dict(path=str(recording_path), spec=trial['spec']))
 
         state['recording'] = dict(active=False, path=str(recording_path),
-                                  cameras=['task','wrist'], resolution=[384,384], control_hz=20,
+                                  cameras=recording_cameras, resolution=[384,384], control_hz=20,
                                   frames=trial['recording'].count)
     metrics['wall_seconds']=round(time.monotonic()-trial['wall'],2)
     result=dict(spec=trial['spec'],metrics=metrics,path=str(trial['folder']))
@@ -626,7 +628,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd=='workspace_train':
+                    if cmd=='layout_variety_test':
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before queuing layout variety tests';continue
+                        from pour_layout_variety import unstarted
+                        pending.extend(unstarted())
+                    elif cmd=='workspace_train':
                         if current is not None or pending:
                             state['control_message']='Wait for active trials to finish';continue
                         try:

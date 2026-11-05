@@ -3,6 +3,12 @@
 Updated: November 5, 2026 (America/Los_Angeles).
 State: **Expanded-position benchmark complete: 23/30 strict passes, 28/30 with zero measured loss. All thirty recordings and outcomes are retained.**
 
+## Current: twelve larger layout videos
+
+The user chose once-only autonomous tests with honest labels. New study `A-layout-variety-20261105-v1` keeps the current v18 model/controller unchanged and adds twelve explicit layouts, including four exact bottle/cup swap pairs. Object centers cover X 0.40–0.58 m and Y −0.38 to −0.04 m. Six full / six empty targets use material A. CPU native USD preflights pass for all twelve: reference reach, actor-style lift/raised approach, worktop clearance and no initial robot/prop convex-envelope intersection. This is geometry evidence, not successful manipulation. [Plan and protocol](docs/LAYOUT_VARIETY_VIDEO.md), [preflight](evidence/layout-variety-A/preflight.json).
+
+An optional recording-only overview camera preserves both calibrated policy cameras. No model fitting, teacher fallback, threshold changes or retries. The owned 4070 simulator was idle; a separate 4090 job was active. Only our owned container will restart for the recording harness, retaining all GPU/CPU/memory limits and priority guard. Native tests/video are pending. Baseline checks: 14 trial-log tests and five GPU guard tests passed. Prior W30 evidence/video remain intact.
+
 ## Completed expanded-position study
 
 Study `A-workspace-20261104-v1` triples each of four position ranges: cup world X/Y ±24 mm, bottle cup-frame X/Y ±27/12 mm. Material A, vessel/particle physics, fill ranges, two RGB cameras and the strict whole-task goal remain fixed. Every development/test layout exceeds the old range by at least 25% along one coordinate. The frozen scene plan separates 20 scripted reference layouts, 8 development layouts and 30 reserved tests (15 full / 15 empty; seed `20261224`). [Study](docs/WORKSPACE_STUDY.md), [plan](evidence/workspace-A/frozen-plan.json).

@@ -36,6 +36,11 @@ class PourRecording:
             'task': ('/World/TrainingTaskCamera', [.85,-.55,1.35], [.49,-.22,1.12], [0,0,1], .040),
             'wrist': ('/World/TrainingWristCamera', [.16,-.07,-.025], [0,.04,-.22], [1,0,0], .007),
         }
+        if spec.get('record_overview'):
+            # Recording-only spectator: never supplied to either vision model.
+            # Preserve the calibrated task/wrist lenses and poses verbatim.
+            definitions['overview'] = ('/World/RecordingOverviewCamera',
+                [1.0,-.73,1.65], [.49,-.22,1.12], [0,0,1], .024)
         for name, (path, eye, target, up, focal) in definitions.items():
             camera = Camera(prim_path=path, name='pour_'+name, frequency=-1,
                             resolution=CAMERA_SIZE, annotator_device='cpu')
@@ -108,6 +113,10 @@ class PourRecording:
             self.file.attrs['evidence_kind']='policy_prefix_expert_recovery'
             self.file.attrs['supervision_semantics']='expert_supervision=1 only for actual expert-issued actions; unsupervised policy prefix supplies history only'
         self.file.attrs['camera_rig'] = 'A_task_wrist_v4'
+        if spec.get('record_overview'):
+            self.file.attrs['camera_rig'] = 'A_task_wrist_v4_with_spectator_v1'
+            self.file.attrs['policy_camera_names'] = json.dumps(['task','wrist'])
+            self.file.attrs['spectator_camera_names'] = json.dumps(['overview'])
         self.file.attrs['camera_visual_review'] = 'pending'
         self.file.attrs['joint_names'] = json.dumps(NAMES)
         self.file.attrs['control_dt'] = DT
