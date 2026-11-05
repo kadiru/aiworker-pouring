@@ -1,7 +1,9 @@
 """CPU-only convex collision-mesh/bench intersection for approach paths.
 
-This checks the configured convex hulls with the gripper open. It does not
-replace dynamic native grasp tests, nor test robot self-collision.
+Historical check: geometry() includes eight arm/palm collision meshes but
+omits the four articulated finger meshes. It does not certify full-hand
+clearance, replace dynamic native tests, or test robot self-collision.
+The newer preflight_layout_extra.py explicitly adds all four finger meshes.
 """
 import hashlib
 import json

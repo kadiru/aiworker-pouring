@@ -1,4 +1,8 @@
-"""Conservative convex-envelope check: initial robot must not intersect props."""
+"""Legacy eight-mesh arm check; omitted fingers, so NOT full-hand clearance.
+
+Preserved for the original preflight's provenance. New layouts must use the
+complete-hand checks in preflight_layout_extra.py instead.
+"""
 import json
 from check_workspace_clearance import geometry
 import numpy as np
@@ -9,6 +13,7 @@ from robot_pour import build_path
 from pour_layout_variety import ROOT
 
 stage, planner, meshes = geometry()
+assert not (ROOT/'selection.json').exists(), 'Do not overwrite frozen legacy preflight evidence'
 plan = json.loads((ROOT/'proposed-plan.json').read_text())
 home = np.radians(build_path(stage,plan['test'][0])[0][0])
 xyz=planner.shoulder.copy();rot=np.eye(3);trans=[]

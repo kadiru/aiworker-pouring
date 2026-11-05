@@ -1,4 +1,4 @@
-"""Show all twelve native autonomous runs, outcome labels and initial XY maps.
+"""Show all fourteen native autonomous runs, outcome labels and initial XY maps.
 
 Mac CPU composition only. No interpolation or synthesized simulation frames.
 Every trial is retained from start to finish, at explicitly labeled 1x/2x speed.
@@ -142,7 +142,7 @@ def main():
             start=frame_count;schedule=[]
             with h5py.File(path,'r') as f:
                 assert f.attrs['status']=='complete';ds=f['data/demo_0'];times=ds['next_time'][:]
-                duration=float(times[-1]-ds['time'][0]);speed=1 if duration<=6 else 2
+                duration=float(times[-1]-ds['time'][0]);speed=1 if duration<=6 or row.get('setup_flag') else 2
                 first=frame(row,ds,'obs',0,float(ds['time'][0]),speed,'Initial layout')
                 for _ in range(FPS):emit(first);schedule.append(['obs',0])
                 for i in range(0,len(times),speed):

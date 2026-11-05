@@ -1,4 +1,4 @@
-"""Audit all twelve unchanged-policy trials; preserve failures and native media."""
+"""Audit either frozen layout batch; preserve failures and native media."""
 import argparse
 import csv
 import hashlib

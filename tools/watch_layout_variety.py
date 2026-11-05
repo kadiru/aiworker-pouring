@@ -1,4 +1,4 @@
-"""Read-only Ubuntu watcher for the twelve once-only autonomous layouts."""
+"""Read-only Ubuntu watcher for either once-only autonomous layout batch."""
 import argparse
 import datetime
 import hashlib
