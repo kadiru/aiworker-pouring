@@ -12,6 +12,7 @@ def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
     p=argparse.ArgumentParser();p.add_argument('--collection-progress',required=True);p.add_argument('--manifest',required=True);p.add_argument('--output',required=True)
     p.add_argument('--reuse-deployment',action='store_true');p.add_argument('--reuse-recording-audit',action='store_true')
+    p.add_argument('--development-round',type=int,default=0)
     a=p.parse_args();manifest=read(pathlib.Path(a.manifest));output=pathlib.Path(a.output);assert not output.exists()
     progress=dict(stage='waiting_for_accepted_references',source_commit=manifest['source_commit']);started=time.monotonic()
     def save():output.write_text(json.dumps(progress,indent=2)+'\n')
@@ -77,9 +78,10 @@ def main():
         assert model['device']['visible_cuda_devices']==1 and '4070' in model['device']['name']
         for n,sha in model['sources'].items():assert digest(HOST_ROOT/'src'/n)==sha,n
         progress.update(stage='fit_complete',checkpoint_sha256=model['checkpoint_sha256'],training=model['training']);save()
-        assert not list((HOST_ROOT/'outputs/fountain').glob('*/*XW30_A_dev_*/parameters.json'))
+        rounds=[read(p).get('development_round',-1) for p in (HOST_ROOT/'outputs/fountain').glob('*/*XW30_A_dev_*/parameters.json')]
+        assert a.development_round==max(rounds,default=-1)+1,'Requested development round is not the next unused round'
         isolation();command('wide_development')
-        progress.update(stage='development_queued',cases=8,reserved_tests_started=False,elapsed_s=time.monotonic()-started);save()
+        progress.update(stage='development_queued',development_round=a.development_round,cases=8,reserved_tests_started=False,elapsed_s=time.monotonic()-started);save()
         print(json.dumps(progress),flush=True)
     except BaseException as e:
         progress.update(stage='needs_inspection',error=str(e),elapsed_s=time.monotonic()-started);save();raise

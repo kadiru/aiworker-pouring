@@ -39,3 +39,9 @@ def combine_evidence(raw_empty,raw_present,aligned_empty,aligned_present):
         if isfinite(e) and isfinite(p) and 0<=e<=1 and 0<=p<=1]
     return (max((e for e,p in views if p>=.7),default=0.),
         max((p for _,p in views),default=0.))
+
+
+def held_source_presence(raw_present,aligned_present,encoder_hold):
+    """Either camera framing may see the bottle; fingers must still hold it."""
+    if not encoder_hold:return 0.
+    return max((p for p in (raw_present,aligned_present) if isfinite(p) and 0<=p<=1),default=0.)

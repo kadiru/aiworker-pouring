@@ -1,6 +1,6 @@
 """Source confirmation must be supported by a visible bottle in that view."""
 import unittest
-from pour_source_alignment import combine_evidence
+from pour_source_alignment import combine_evidence,held_source_presence
 
 
 class SourceAlignmentTests(unittest.TestCase):
@@ -19,6 +19,16 @@ class SourceAlignmentTests(unittest.TestCase):
     def test_invalid_prediction_cannot_override_valid_view(self):
         self.assertEqual(combine_evidence(float('nan'),.99,.2,.9),(.2,.9))
         self.assertEqual(combine_evidence(1.1,.99,.2,.9),(.2,.9))
+
+    def test_raw_view_preserves_held_bottle_during_early_tilt(self):
+        self.assertEqual(held_source_presence(.916,.0066,True),.916)
+
+    def test_visual_presence_cannot_override_lost_encoder_hold(self):
+        self.assertEqual(held_source_presence(.999,.999,False),0.)
+
+    def test_presence_ignores_invalid_view(self):
+        self.assertEqual(held_source_presence(float('nan'),.9,True),.9)
+        self.assertEqual(held_source_presence(2.,-1.,True),0.)
 
 
 if __name__=='__main__':unittest.main()

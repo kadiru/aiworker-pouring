@@ -49,6 +49,12 @@ def slow_empty_evidence(threshold,phase,cap,tilt,cap_age,held,present,empty,flow
         empty>=threshold['slow_empty_probability'] and flow_ml_s<threshold['slow_empty_max_flow_ml_s'])
 
 
+def early_return_profile(profile,minimum_seconds):
+    """Slow a pre-pour abort along its measured reverse path without overshoot."""
+    return dict(profile,return_s=max(profile['return_s'],minimum_seconds),
+        warp=[float(ease(u)) for u in np.linspace(0,1,len(profile['warp']))])
+
+
 class Actor:
     def __init__(self,checkpoint):
         torch.set_num_threads(4);self.saved=torch.load(checkpoint,map_location='cuda',weights_only=False)
@@ -192,7 +198,10 @@ class Actor:
 
     def latch(self,reason,t,robot):
         self.stop_latched=reason;robot.reason=reason;robot.stop_time=t
-        self.terminal=TerminalPrimitive(self.history,t,self.profile)
+        profile=self.profile
+        if self.saved.get('early_return_seconds') and self.pour_phase<70.:
+            profile=early_return_profile(profile,self.saved['early_return_seconds'])
+        self.terminal=TerminalPrimitive(self.history,t,profile)
         self.terminal.return_path=monotone_return_path(self.outbound,self.pour_phase,self.history[-1][1],self.qlift)
         if self.saved.get('centered_return') and self.pour_phase>=70.:
             from pour_wide_motion import CenteredTerminal
@@ -239,6 +248,11 @@ class Actor:
                 empty_views=dict(raw_empty=empty,raw_present=present,aligned_empty=ae,aligned_present=apr)
                 empty,present=((ae,apr) if self.saved.get('source_frame_normalization')=='cup_aligned_v2'
                                else combine_evidence(empty,present,ae,apr))
+                if self.saved.get('source_presence_fusion')=='held_raw_or_aligned_v1':
+                    from pour_source_alignment import held_source_presence
+                    held=held_gripper(q,self.saved['pour_primitive']['grasp_closure']['min_deficit_rad'])
+                    present=held_source_presence(empty_views['raw_present'],apr,held)
+                    empty_views.update(fused_present=present,encoder_hold=held)
             rotation=self.fk.fk(q[:7])[1];up=rotation@self.lift_rotation.T@np.array([0.,0.,1.])
             if self.empty_detector is not None:
                 from pour_wide_empty import wrist_crop

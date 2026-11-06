@@ -62,7 +62,11 @@ def main():
     assert before['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
     final=snapshots['runtime-final']['health'];assert not final['queue'] and not final['recording']['active'] and not final['error'] and not final['learning_error']
     manifest=read(E/'data-manifest.json');assert sha(E/'data-manifest.json')==model['data_manifest_sha256']
-    assert all(not x['name'].startswith(('XW30_A_test','XW30_A_dev')) for x in manifest)
+    consumed={s['name']+'_r0' for s in plan['development']}
+    assert all(not x['name'].startswith('XW30_A_test') and (not x['name'].startswith('XW30_A_dev') or x['name'] in consumed) for x in manifest)
+    dev_level=[x for x in manifest if x['name'] in consumed]
+    assert {x['name'] for x in dev_level}==consumed and len(dev_level)==model['training']['consumed_development_level_episodes']
+    assert all(x['split']=='train' and x['recording_split']=='development' and x['consumed_development'] for x in dev_level)
     train={x['name'] for x in manifest if x['split']=='train'};valid={x['name'] for x in manifest if x['split']=='validation'}
     assert train.isdisjoint(valid) and len(train)==model['training']['train_episodes'] and len(valid)==model['training']['validation_episodes']
     accepted={x['name'] for x in report['demonstrations'] if x['reference_accepted']}
@@ -70,6 +74,11 @@ def main():
     assert all(not x['name'].startswith('T30_A_demo_') or x['name'] in accepted for x in manifest)
     for key in ('train_episodes','validation_episodes'):
         assert all(not n.startswith(('XW30_A_test','XW30_A_dev')) and (not n.startswith('T30_A_demo_') or n in accepted) for n in model['motion'][key])
+    calibration=read(E/'localization-development-manifest.json')
+    assert sha(E/'localization-development-manifest.json')==model['localization_development_manifest_sha256']
+    expected_dev={s['name']+'_r0' for s in plan['development']}
+    assert {r['name'] for r in calibration['records']}==expected_dev==set(model['training']['localization_development_names'])
+    for r in calibration['records']:assert r['sha256']==indexed[r['name']]['sha256']
     groups={}
     for reason in ('cup_near_full','bottle_empty'):
         rows=[r for r in report['cases'] if r['expected_stop']==reason];assert len(rows)==15

@@ -1,12 +1,29 @@
 """CPU checks for perceptual grasp gating and safe top-up return history."""
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 import numpy as np
 from pour_guard_actor import Actor,monotone_return_path,topup_goal,trim_expired,slow_empty_evidence
 from pour_guard_vision import project,plane_point,bottle_base_from_neck,locate
 
 
 class GuardTests(unittest.TestCase):
+    def test_early_source_loss_returns_slowly_with_grip_closed(self):
+        a=object.__new__(Actor);zero=np.zeros(7);middle=np.full(7,.2);current=np.full(7,.4)
+        a.profile=dict(grasp_mark_s=0.,lift_mark_s=1.,return_s=.8,place_s=.5,release_s=.3,retreat_s=.5,
+            warp=[0.,.2,.7,1.],grip=[1.,0.])
+        a.history=[(0.,zero),(1.,zero),(2.,middle),(3.,current)]
+        a.outbound=[(0.,zero),(20.,middle),(42.,current)];a.pour_phase=42.;a.qlift=zero
+        a.saved=dict(early_return_seconds=4.3);robot=SimpleNamespace()
+        a.latch('source_tracking_lost',3.,robot)
+        targets,mode=a.terminal.act(3.8)
+        self.assertEqual(mode,'Returning upright');self.assertTrue(np.all(targets[:7]>.3))
+        for elapsed in np.linspace(.8,4.29,20):
+            q,mode=a.terminal.act(3.+elapsed)
+            self.assertEqual(mode,'Returning upright');self.assertTrue(np.all((q[:7]>=0)&(q[:7]<=.4)))
+            np.testing.assert_allclose(q[7:],np.pi/4)
+        self.assertEqual(a.profile['return_s'],.8)
+
     def test_initial_family_calibration_does_not_change_lift_tracking_scores(self):
         old,new={'family':'retained'},{'family':'outline'}
         bank=dict(alternatives=[old,new],initial_score_maps=[
