@@ -11,6 +11,7 @@ def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--collection-progress',required=True);p.add_argument('--manifest',required=True);p.add_argument('--output',required=True)
+    p.add_argument('--reuse-deployment',action='store_true');p.add_argument('--reuse-recording-audit',action='store_true')
     a=p.parse_args();manifest=read(pathlib.Path(a.manifest));output=pathlib.Path(a.output);assert not output.exists()
     progress=dict(stage='waiting_for_accepted_references',source_commit=manifest['source_commit']);started=time.monotonic()
     def save():output.write_text(json.dumps(progress,indent=2)+'\n')
@@ -38,8 +39,13 @@ def main():
             save();time.sleep(30)
         else:raise TimeoutError('Finite reference-wait limit reached')
         assert not h['queue'] and not h.get('recording',{}).get('active');staged()
-        progress['stage']='deploying_candidate_source';save()
-        subprocess.run(['python3','/tmp/deploy_wide_study.py','--expected-container',CID,'--phase',manifest['deployment_phase'],*manifest['files']],check=True,timeout=180)
+        if a.reuse_deployment:
+            receipt=read(STUDY/('deployment-'+manifest['deployment_phase']+'.json'))
+            assert receipt['container']==CID
+            assert all(receipt['new_sources'][n]==manifest['files'][n] for n in receipt['files'])
+        else:
+            progress['stage']='deploying_candidate_source';save()
+            subprocess.run(['python3','/tmp/deploy_wide_study.py','--expected-container',CID,'--phase',manifest['deployment_phase'],*manifest['files']],check=True,timeout=180)
         for _ in range(60):
             try:
                 h=health()
@@ -50,12 +56,18 @@ def main():
         isolation()
         for n,sha in manifest['files'].items():assert digest(HOST_ROOT/'src'/n)==sha,n
         progress['stage']='checking_native_reference_recordings';save()
-        subprocess.run(['docker','exec',CID,'/isaac-sim/python.sh',
-            '/workspace/learning/A-wide-20261105-v1/staged/audit_wide_study.py',
-            '--output','prefit-recording-integrity.json'],check=True,timeout=900)
+        if not a.reuse_recording_audit:
+            subprocess.run(['docker','exec',CID,'/isaac-sim/python.sh',
+                '/workspace/learning/A-wide-20261105-v1/staged/audit_wide_study.py',
+                '--output','prefit-recording-integrity.json'],check=True,timeout=900)
         integrity=read(STUDY/'prefit-recording-integrity.json')
         assert integrity['native_checks_passed'] and not integrity['pending_attempts']
         assert all(r['valid'] for r in integrity['files'])
+        if a.reuse_recording_audit:
+            for r in integrity['files']+integrity['sidecar_files']:
+                path=HOST_ROOT/'outputs/fountain'/r['relative_path']
+                assert path.stat().st_size==r['bytes'] and digest(path)==r['sha256'],r['relative_path']
+            progress['reused_recording_audit_sha256']=digest(STUDY/'prefit-recording-integrity.json')
         command('wide_train');progress['stage']='fitting_on_4070';save();print('WIDE_FIT_REQUESTED',flush=True)
         for _ in range(180):
             time.sleep(5);h=health();assert not h.get('error') and not h.get('learning_error'),h.get('learning_error')

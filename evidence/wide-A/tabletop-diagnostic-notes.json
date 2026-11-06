@@ -1,0 +1,16 @@
+{
+  "updated_utc": "2026-11-06T12:10:02.316096+00:00",
+  "r0": "Full native fit stopped before checkpoint creation: initial-source localization failed across complete validation.",
+  "r1": "Training-derived tabletop region alone still failed localization; retained.",
+  "r2": "Localization and temporal-consensus gates passed. The compatibility harness incorrectly compared a newly clipped bank against the old unclipped implementation; that assertion failure is preserved, not a runtime regression.",
+  "r3": "Compatibility check corrected to use the unchanged parent bank; all eight checks passed. Held tracker accurately located the repaired train04 neck but rejected its 13.7px expected-lift deviation under the old 12px follows gate.",
+  "r4": "Initial localization, all temporal windows, eight original-bank compatibility checks, and all held-neck checks passed. Follow radius derives only from training neck labels (p99 plus 2px, capped at 18px). No candidate checkpoint or autonomous test was created by any component probe.",
+  "follow_calibration": {
+    "radius_px": 15.692052258949532,
+    "training_p99_drift_px": 13.692052258949532,
+    "training_max_drift_px": 13.69347961328349,
+    "margin_px": 2.0,
+    "maximum_allowed_px": 18.0,
+    "source": "Training-reference neck labels versus RGB-localized expected lift; no validation/test radius fitting."
+  }
+}

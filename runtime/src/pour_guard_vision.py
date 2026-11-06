@@ -41,10 +41,11 @@ def gradients(image):
         F.pad((gray[:,:,2:,:]-gray[:,:,:-2,:])*.5,(0,0,1,1))],1)
 
 
-def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gradients=False,anchor_radius_px=None,anchor_penalty=0.,source_mask_box=None):
+def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gradients=False,anchor_radius_px=None,anchor_penalty=0.,source_mask_box=None,gradient_clip=None):
     # Only the neck outline or glass rim is matched, not liquid volume.
     width,height,dx,dy=(48,64,-24,-12) if kind=='source' else (80,28,-40,-14)
     feat=gradients(torch.as_tensor(np.stack(images),device=device));n=len(images)
+    if gradient_clip is not None:feat=feat.clamp(-gradient_clip,gradient_clip)
     if absolute_gradients:feat=feat.abs()
     xx,yy=torch.meshgrid(torch.arange(width,device=device),torch.arange(height,device=device),indexing='xy')
     uv=torch.tensor(np.asarray(anchors),device=device,dtype=torch.float32)
@@ -67,7 +68,7 @@ def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gr
     lo=np.floor(np.min(anchors,axis=0)-9).astype(int);hi=np.ceil(np.max(anchors,axis=0)+9).astype(int)
     return dict(kernels=kernels.cpu(),mask=mask.cpu(),offset=[dx,dy],bounds=[*lo.tolist(),*hi.tolist()],kind=kind,
         aggregation=aggregation,absolute_gradients=absolute_gradients,anchors=np.asarray(anchors).tolist(),anchor_radius_px=anchor_radius_px,anchor_penalty=anchor_penalty,
-        source_mask_box=source_mask_box)
+        source_mask_box=source_mask_box,gradient_clip=gradient_clip)
 
 
 @torch.inference_mode()
@@ -80,6 +81,7 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
             matches=[(uv,m['offset']+m['scale']*(score-m['anchor'])) for (uv,score),m in zip(matches,maps)]
         return max(matches,key=lambda x:x[1])
     a=torch.as_tensor(image,device=device);feat=gradients(a)
+    if bank.get('gradient_clip') is not None:feat=feat.clamp(-bank['gradient_clip'],bank['gradient_clip'])
     if bank.get('absolute_gradients'):feat=feat.abs()
     kernels=bank['kernels'].to(device);mask=bank['mask'].to(device);h,w=kernels.shape[-2:];dx,dy=bank['offset']
     x0,y0,x1,y1=bank['bounds']
@@ -105,6 +107,17 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
     elif aggregation=='max':field=scores.max(1).values[0]
     elif aggregation=='top3':field=scores.topk(min(3,len(kernels)),dim=1).values.mean(1)[0]
     else:raise ValueError(aggregation)
+    if bank.get('initial_region_uv') is not None and not tracking and expected_uv is None:
+        # A calibrated tabletop support prior learned from training positions.
+        # Background edges above/outside that workspace are not object anchors.
+        hh,ww=field.shape
+        xx,yy=torch.meshgrid(torch.arange(ww,device=device),torch.arange(hh,device=device),indexing='xy')
+        uv=torch.stack((xx+startx-dx,yy+starty-dy),-1)
+        polygon=torch.as_tensor(bank['initial_region_uv'],device=device,dtype=field.dtype)
+        edge=polygon.roll(-1,0)-polygon;relative=uv[:,:,None]-polygon
+        cross=edge[:,0]*relative[:,:,:,1]-edge[:,1]*relative[:,:,:,0]
+        inside=(cross>=-1e-5).all(-1)|(cross<=1e-5).all(-1)
+        field=field.masked_fill(~inside,-1.)
     hh,ww=field.shape;flat=int(field.argmax());y,x=divmod(flat,ww);sub=[]
     for axis,index,limit in ((1,x,ww),(0,y,hh)):
         if 0<index<limit-1:

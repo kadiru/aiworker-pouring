@@ -152,13 +152,15 @@ class Actor:
                 expected=self.expected_lift_neck-self.initial_neck
                 actual=neck-self.initial_neck
                 moved=np.linalg.norm(expected)>=8. and np.dot(actual,expected)>.65*np.dot(expected,expected)
-            follows=np.linalg.norm(neck-self.expected_lift_neck)<12.
+            follow_radius=self.threshold.get('grasp_follow_radius_px',12.)
+            follows=np.linalg.norm(neck-self.expected_lift_neck)<follow_radius
             gap=self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']
             obstructed=held_gripper(q,gap)
             arm_lift=float(self.fk.fk(q[:7])[0][2]-self.grasp_tcp[2])
             confidence=.23
             self.grasp_check=dict(neck_uv=neck.tolist(),expected_uv=self.expected_lift_neck.tolist(),score=score,
-                moved=bool(moved),follows=bool(follows),finger_obstruction=bool(obstructed),arm_lift_m=arm_lift)
+                moved=bool(moved),follows=bool(follows),follow_radius_px=follow_radius,
+                finger_obstruction=bool(obstructed),arm_lift_m=arm_lift)
             if self.threshold.get('grasp_visual_window',0):
                 physical=bool(obstructed and arm_lift>.035)
                 self.physical_votes=self.physical_votes+1 if physical else 0

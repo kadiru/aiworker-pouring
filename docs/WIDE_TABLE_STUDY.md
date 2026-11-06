@@ -1,6 +1,6 @@
 # Wider and swapped table placements
 
-Status: in progress, November 6, 2026, America/Los_Angeles. No new trained-candidate or reserved-test result yet. Preserve earlier W30 (23/30) and broader-layout (1/14) evidence.
+Status: in progress, November 6, 2026, America/Los_Angeles. All 32 reference targets are accepted and all 37 retained recordings pass native integrity. The first fit failed localization; its repaired components now pass validation. No complete new checkpoint or reserved-test result yet. Preserve earlier W30 (23/30) and broader-layout (1/14) evidence.
 
 ## Task and evaluation
 
@@ -26,6 +26,8 @@ This is supervised imitation/regression with a programmed feedback controller, n
 
 The candidate's final frame/episode counts, selected coefficients, errors, checkpoint hashes and fit time must come from the completed model summary; they are not known yet. Frozen parent: v18 SHA256 `a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b`.
 
+The complete validation set falsified the initial narrow-mask approach: robot edges caused up to 318.67 mm source error. A repaired component search uses clipped gradients, top-three matching, and a calibrated tabletop rectangle learned from training positions with 25 mm padding. The selected matcher reaches 1.533 mm bottle / 1.266 mm cup maximum initial error and passes every temporal window. Held tracking retains the <=6 px neck-error gate; its follows radius is calibrated from training p99 grasp displacement plus 2 px, bounded at 18 px, because closure can shift a free bottle laterally. All 192 held reference predicates and eight unchanged-parent compatibility checks pass. These are consumed training/validation results, not fresh autonomous tests. Failed fit/component reports and exact sources remain preserved.
+
 ## Pilot failures and clearance correction
 
 Initial four reference pilots are all preserved. 00 reached 93.114% rim height with zero measured loss; swapped 01 emptied with zero measured loss. 02 contacted a finger at initialization and lost 27.999432 nominal mL. 03 grasped/poured but lost 0.268272 nominal mL. The original successful references are 00/01; later explicitly named repairs add accepted supervision without deleting originals.
@@ -36,7 +38,7 @@ Repair identities `T30_A_demo_train_02_ready_r1`, `03_ready_r1` and `03_return_r
 
 New scripted empty-source references hold the verified emptied bottle at its current tilt for 1.2 seconds before returning, producing stable empty-state images for supervision. The hold never applies to full-cup stops or autonomous evaluation; both object motion and liquid remain native physics.
 
-A further candidate retains the early lift boost until 45 degrees, adds 4 mm lip clearance and moves the final upright drip position to the cup center. Native swapped-pilot logs showed real cup-wall contact during early tilt. Candidate piecewise vessel envelopes pass all 70 sampled paths; dynamic validation is pending. This candidate was deployed only after the original 32-reference collection became idle; two wet repair references are now running. Late one-particle losses in references 04/12 originate from the bottle during upright transfer (cup inventory unchanged). The refined candidate lengthens the over-cup drain pause from 0.4 to 1.2 s and return translation from 1.0 to 2.0 s. Its geometry audit is separate; wet validation remains pending. Geometry constraints and return timing are explicitly engineered components.
+A further candidate retains the early lift boost until 45 degrees, adds 4 mm lip clearance and moves the final upright drip position to the cup center. Native swapped-pilot logs showed real cup-wall contact during early tilt. Candidate piecewise vessel envelopes pass all 70 sampled paths; dynamic validation is pending. This candidate was deployed only after the original collection became idle. Both wet repairs passed with zero measured loss at 93.852% and 94.160% rim height; autonomous evaluation remains pending. Late one-particle losses in references 04/12 originate from the bottle during upright transfer (cup inventory unchanged). The refined candidate lengthens the over-cup drain pause from 0.4 to 1.2 s and return translation from 1.0 to 2.0 s. Its geometry audit and two wet reference repairs are separate from autonomous performance. Geometry constraints and return timing are explicitly engineered components.
 
 ## Fresh identities and source freezing
 

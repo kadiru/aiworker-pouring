@@ -81,15 +81,25 @@ def fit_localization(saved,seq):
     train=[e for e in seq if e['split']=='train'];reports={}
     for kind,height in [('source',.135),('cup',.038)]:
         anchors=[project(e[kind+'_xyz']+[0,0,height],saved['calibration']) for e in train]
+        # Learn the supported tabletop rectangle from training labels only.
+        # Twenty-five millimetres of padding permits unseen placements while
+        # excluding robot/background edges that cannot be tabletop anchors.
+        xy=np.stack([e[kind+'_xyz'][:2] for e in train]);lo=xy.min(0)-.025;hi=xy.max(0)+.025
+        corners=[[lo[0],lo[1]],[hi[0],lo[1]],[hi[0],hi[1]],[lo[0],hi[1]]]
+        region=[project([*p,1.04+height],saved['calibration']).tolist() for p in corners]
         candidates=[]
         # Restrict source templates to the neck when nearby robot/background
         # edges dominate the wider image. Validation chooses the mask; runtime
         # matching still uses RGB only and the stored template support.
         masks=(None,(10,8,38,40),(12,8,36,36),(14,8,34,34)) if kind=='source' else (None,)
-        for absolute,radius,mask_box in product((True,False),(32.,48.),masks):
-            bank=make_bank([e['images'][0] for e in train],anchors,kind,aggregation='max',
-                           absolute_gradients=absolute,anchor_radius_px=radius,source_mask_box=mask_box)
+        clips=(None,.05,.1) if kind=='source' else (None,)
+        aggregations=('max','top3') if kind=='source' else ('max',)
+        for absolute,radius,mask_box,clip,aggregation in product((True,False),(32.,48.),masks,clips,aggregations):
+            bank=make_bank([e['images'][0] for e in train],anchors,kind,aggregation=aggregation,
+                           absolute_gradients=absolute,anchor_radius_px=radius,source_mask_box=mask_box,gradient_clip=clip)
             bank['bounds']=[24,24,360,350]
+            bank['initial_region_uv']=region
+            bank['initial_workspace_xy_m']=[lo.tolist(),hi.tolist()]
             rows=[]
             for e in seq:
                 image=e['images'][0];uv,score=locate(image,bank)
@@ -104,9 +114,11 @@ def fit_localization(saved,seq):
             minimum=min(r['score'] for r in rows);maximum=max(r['synthetic_negative_score'] for r in rows)
             threshold=(minimum+maximum)/2
             candidates.append(dict(absolute_gradients=absolute,anchor_radius_px=radius,source_mask_box=mask_box,
+                gradient_clip=clip,aggregation=aggregation,
+                initial_workspace_xy_m=bank['initial_workspace_xy_m'],
                 min_positive=minimum,max_negative=maximum,threshold=threshold,margin=minimum-maximum,
                 max_error_mm=max(r['error_mm'] for r in rows),rows=rows,bank=bank))
-            print('LOCALIZATION',kind,absolute,radius,mask_box,'error',candidates[-1]['max_error_mm'],'margin',minimum-maximum,flush=True)
+            print('LOCALIZATION',kind,absolute,radius,mask_box,clip,aggregation,'error',candidates[-1]['max_error_mm'],'margin',minimum-maximum,flush=True)
         eligible=[c for c in candidates if c['max_error_mm']<2. and c['margin']>.015]
         write(kind+'-localization-candidates.json',[{k:v for k,v in c.items() if k!='bank'} for c in candidates])
         assert eligible, 'No precise, occlusion-rejecting '+kind+' localization candidate'
@@ -133,7 +145,7 @@ def fit_localization(saved,seq):
         configs[kind]=config
     saved['localization_consensus']=dict(**configs,timeout_s=2.)
     report=dict(template_training_names=[e['name'] for e in train],families=reports,windows=windows,
-        method='Whole-image gradient template matching with view-local support, learned reference banks, calibrated confidence and temporal consensus.',
+        method='Gradient template matching with a training-derived tabletop region, view-local support, learned reference banks, calibrated confidence and temporal consensus.',
         scope='Consumed reference/validation calibration only; no reserved test images. Synthetic occlusions are a check, not independent missing-object performance.')
     write('localization-validation.json',report)
     return report
@@ -143,21 +155,34 @@ def fit_localization(saved,seq):
 def fit_tracking(saved,seq):
     """Separate lifted-neck templates avoid table-view background contamination."""
     train=[e for e in seq if e['split']=='train'];candidates=[]
+    projections={};training_drift=[]
+    for e in seq:
+        initial,_=locate(e['images'][0],saved['source_bank'])
+        expected=project(bottle_base_from_neck(initial,saved['calibration'])+[0,0,.135+.044],saved['calibration'])
+        projections[e['name']]=(initial,expected)
+        if e['split']=='train':training_drift.extend(np.linalg.norm(e['held_neck_uv']-expected,axis=1).tolist())
+    # Closing fingers can center the free bottle laterally. Calibrate that
+    # observed grasp displacement from training labels, without widening the
+    # image-search window or weakening the measured neck-error requirement.
+    radius=max(12.,float(np.quantile(training_drift,.99))+2.)
+    assert radius<=18.,'Observed grasp drift exceeds the bounded tracking calibration'
+    calibration=dict(radius_px=radius,training_p99_drift_px=float(np.quantile(training_drift,.99)),
+        training_max_drift_px=max(training_drift),margin_px=2.,maximum_allowed_px=18.,
+        source='Training-reference neck labels versus RGB-localized expected lift; no validation/test radius fitting.')
     for absolute,box in product((True,False),(None,(10,8,38,40),(12,8,36,36),(14,8,34,34))):
         bank=make_bank([e['held_images'][-1] for e in train],[e['held_neck_uv'][-1] for e in train],
             'source',aggregation='max',absolute_gradients=absolute,source_mask_box=box)
         bank['bounds']=[24,24,360,350];rows=[];episodes=[]
         for e in seq:
-            initial,_=locate(e['images'][0],saved['source_bank'])
-            expected=project(bottle_base_from_neck(initial,saved['calibration'])+[0,0,.135+.044],saved['calibration'])
+            initial,expected=projections[e['name']]
             delta=expected-initial;votes=0
             for i,image,truth in zip(e['held_indices'],e['held_images'],e['held_neck_uv']):
                 uv,score=locate(image,bank,tracking=True,expected_uv=expected)
-                follows=np.linalg.norm(uv-expected)<12.
+                distance=float(np.linalg.norm(uv-expected));follows=distance<radius
                 moved=np.linalg.norm(delta)>=8. and np.dot(uv-initial,delta)>.65*np.dot(delta,delta)
                 passed=bool(score>.23 and follows and moved);votes+=passed
                 rows.append(dict(name=e['name'],split=e['split'],index=i,uv=uv.tolist(),score=score,
-                    visual_predicate=passed,neck_error_px=float(np.linalg.norm(uv-truth))))
+                    follows_distance_px=distance,visual_predicate=passed,neck_error_px=float(np.linalg.norm(uv-truth))))
             episodes.append(dict(name=e['name'],split=e['split'],votes=votes,frames=len(e['held_indices'])))
         valid=[r['neck_error_px'] for r in rows if r['split']=='validation']
         candidates.append(dict(absolute_gradients=absolute,source_mask_box=box,bank=bank,rows=rows,episodes=episodes,
@@ -168,7 +193,9 @@ def fit_tracking(saved,seq):
     assert eligible,'Held-neck tracking needs five of six positive views per reference and <=6px error before native deployment'
     chosen=min(eligible,key=lambda c:c['validation_mean_error_px']+.25*c['validation_max_error_px'])
     saved['source_tracking_bank']=chosen['bank']
+    saved['thresholds']['grasp_follow_radius_px']=radius
     result=dict(**{k:v for k,v in chosen.items() if k!='bank'},template_training_names=[e['name'] for e in train],
+        follow_calibration=calibration,
         template_indices={e['name']:e['held_indices'][-1] for e in train},
         method='Distinct RGB gradient template bank learned from lifted bottles; disjoint validation chooses the mask.',
         scope='Simulator neck positions label training/error only. Runtime uses RGB and its expected lift projection; finger/own-motion gates remain. Positive tracking coverage is not a missing-bottle rejection test.')
