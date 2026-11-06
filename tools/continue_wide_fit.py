@@ -37,6 +37,13 @@ def main():
         else:raise TimeoutError('Owned simulator did not return ready after deployment')
         isolation()
         for n,sha in manifest['files'].items():assert digest(HOST_ROOT/'src'/n)==sha,n
+        progress['stage']='checking_native_reference_recordings';save()
+        subprocess.run(['docker','exec',CID,'/isaac-sim/python.sh',
+            '/workspace/learning/A-wide-20261105-v1/staged/audit_wide_study.py',
+            '--output','prefit-recording-integrity.json'],check=True,timeout=900)
+        integrity=read(STUDY/'prefit-recording-integrity.json')
+        assert integrity['native_checks_passed'] and not integrity['pending_attempts']
+        assert all(r['valid'] for r in integrity['files'])
         command('wide_train');progress['stage']='fitting_on_4070';save();print('WIDE_FIT_REQUESTED',flush=True)
         for _ in range(180):
             time.sleep(5);h=health();assert not h.get('error') and not h.get('learning_error'),h.get('learning_error')
