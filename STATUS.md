@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **V20 development r1 completed: 5/8 strict passes. All eight localized/grasped; all four empty cases passed. Three full underfills, including one retreat spill. V21 repairs are CPU-tested but not deployed; weighted level component r3 passes after r2 failed its accuracy gate. No reserved test has run.**
+State: **V21 combined fit r4 completed on the 4070; eight development r2 attempts are running. Prior r1 was 5/8, with three underfills and one retreat spill. No reserved test has run.**
 
 ## In progress: wider/swapped study
 
@@ -37,6 +37,8 @@ The old r2 checkpoint and 52 root fit/provenance files plus all runtime sources 
 
 **Weighted level component r3 passes:** 138/36 training/validation episodes, 4,272/1,128 images, 60 ridge coefficients (lambda 1). Explicit domain weights are parent 1, wide reference 4, consumed development 16, with episode balancing and 3× near-full weights. The preceding equal-domain candidate failed and remains preserved. Near-full validation MAE is 1.042 percentage points; wider near-full maximum error 3.915 points. Consumed-development maximum error is 1.996 points, not independent validation. Full target is 92.496%. Combined fit r4 and wet development r2 remain pending.
 
+**Combined fit r4 completed in 241.35 seconds on the 4070**, committed source `826f865`, checkpoint `e01f5ff12eb8c7c6964d2954c9c05bfa0aef3bb6ac55a94d1da598c659de51f5`. Level counts and metrics exactly reproduce the passing weighted component. All 48 localization calibration scenes / 96 temporal windows pass (maximum bottle/cup error 1.533 / 0.765 mm). The wrist CNN selects epoch 53; final presence-aware coverage detects 58/72 eligible positives across all four empty validation episodes, zero eligible false positives. Source-presence replay covers 11,819 pre-stop held frames with no false-loss episode. All are consumed fit/validation evidence. V21 is deployed in run `20261106T160125Z`; development r2 observer `/tmp/aiworker-wide-development-r2` and a finite audit/backup/review pipeline are active. R3 model/provenance/source is archived and SHA-verified, with its original r0 fit-input audit retained separately from the later r1 audit.
+
 A verified local preview of development 00 is `evidence/wide-A/XW30_A_dev_00_r0-preview.mp4`: 15.75 s, 1280×720, 20 fps, complete attempt at labeled 2×. Its SHA is `696e74efca8eb0089226b9777fd354b34c0a43682ddeb152cd28860700b91a93`. Full decoding, four inspected encoded frames, and 12 native/encoded camera comparisons pass (maximum mean pixel error 0.903/255). It is explicitly excluded from the 30-test benchmark. Renderer and provenance are pushed as `8b1b544`.
 
 
@@ -46,7 +48,7 @@ Method: supervised RGB template localization, settled-height ridge regression, C
 
 **Isolation:** immutable owned container `0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1`; 4070 UUID `GPU-cde23916-c5fa-f18e-a343-127f732cc2f6`; four CPU cores quota on 16–23, shares 256, nice 10, 16 GiB memory/no additional swap. Foreign jobs are read only. An idle diagnostic exit coincided with an unclassified PID triggering the guard at 12:17 UTC; exact exited-PID ownership was not recoverable. The guard now ignores dead/zombie entries and recognizes full-container cgroups, while live foreign processes still stop only this container. Eight mocked guard checks pass; source `48aef5a` is pushed. The owned idle container was manually resumed at 12:26 UTC after GPU/owner/caps checks, guard PID 658813. No recording was active at that stop. `gpu-guard-exit-race.json` and `gpu-guard-race-resume.json` preserve evidence. These limits do not imply zero shared-host overhead.
 
-Next: correct the remaining level-fit error, combine with slower terminal motion, and run development r2. Freeze source/checkpoint/plan before 30 once-only tests. Audit/back up native recordings, independently score all outcomes, render all 30 with honest labels, commit/push evidence and deliver videos. `tools/continue_wide_fit.py` stops after queueing development and cannot queue reserved tests; `tools/freeze_wide_candidate.py` requires explicit reviewed development evidence. See `docs/WIDE_TABLE_STUDY.md` for protocol and commands. No active reference collection or full-fit continuation remains from earlier attempts.
+Next: complete and inspect development r2, including post-release finger contact and final settled levels. Freeze source/checkpoint/plan before 30 once-only tests. Audit/back up native recordings, independently score all outcomes, render all 30 with honest labels, commit/push evidence and deliver videos. `tools/continue_wide_fit.py` stops after queueing development and cannot queue reserved tests; `tools/freeze_wide_candidate.py` requires explicit reviewed development evidence. See `docs/WIDE_TABLE_STUDY.md` for protocol and commands. No active reference collection or full-fit continuation remains from earlier attempts.
 
 ## Completed: twenty successful autonomous pours on video
 

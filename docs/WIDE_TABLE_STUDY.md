@@ -34,7 +34,7 @@ R0 produced five strict passes, one false source-loss spill, one localization re
 
 Candidate v20 adds raw/aligned presence fusion gated by measured finger obstruction, and slows early abort returns to at least 4.3 seconds on the existing reverse path. These are programmed safeguards, not learned motor behavior. The 4070 level component passes with 130/36 train/validation episodes, 4,068/1,128 frames, 21 coefficients, and 0.917 percentage-point overall validation MAE. Consumed development errors are separately reported. The combined r3 fit now passes with the same level metrics, 0.765 mm maximum cup calibration error, and no false-loss episode in 8,929 pre-stop held frames. Checkpoint: `238dec5548f5733aa8c3e3d5e1c70e2dcdac9bda6166ed76cf27bd2b9afd64de`. Complete closed-loop development remains required before freezing the 30-test candidate.
 
-## V21 candidate after r1 failures (combined deployment pending)
+## V21 deployed after r1 failures
 
 R1 cleared the original false source-loss and cup-localization failures, but case 03 stopped at 85.830% rim height and case 04 at 89.666%, both below the unchanged 90% goal. Case 03 also lost eight particles after placement: the open right finger recontacted the bottle during retreat, accelerating it to 0.840 m/s. The 0.5-second retreat requested up to 0.230 rad per frame against a 0.12-rad command limit; eight of ten retreat commands were clipped. This is recorded contact/trajectory evidence, not a conjectured fluid leak.
 
@@ -67,3 +67,5 @@ Use `tools/deploy_wide_study.py` on the Ubuntu host for an idle-only archived de
 Local protocol checks: `python3 -m unittest discover -s tests -p test_wide_protocol.py -v`. Initial preflight and corrected audits are `tools/preflight_wide_study.py` and `tools/audit_wide_clearance.py`. POST commands to `http://192.168.68.60:8212/control`: `wide_repair`, `wide_collect`, `wide_train`, `wide_development`, `wide_test`, only in the appropriate verified idle stage. Do not reload/stop an active recording to advance stages. Final report/video commands and measured outcomes will be added after the actual evaluation.
 
 The weighted v21 component passes with 60 ridge coefficients (lambda 1); parent/wide-reference/consumed-development episode weights 1/4/16. Training uses 138 episodes/4,272 images; validation 36/1,128. Near-full validation MAE 1.042 percentage points; maximum consumed-development error 1.996 points. The 92.496% stop target includes the observed overestimation margin. Full deployment and closed-loop development remain pending.
+
+Combined fit r4 completed in 241.35 seconds on the 4070, source `826f865`, checkpoint `e01f5ff12eb8c7c6964d2954c9c05bfa0aef3bb6ac55a94d1da598c659de51f5`. It reproduces the weighted component level metrics. Empty validation coverage is 58/72 eligible positives with zero eligible false positives, covering all four empty episodes. Development r2 is running; no reserved test has run.

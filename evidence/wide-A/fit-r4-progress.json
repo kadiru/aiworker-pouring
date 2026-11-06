@@ -1,0 +1,176 @@
+{
+  "stage": "development_queued",
+  "source_commit": "826f8653ba6244383e5d31836cbcb874bf924350",
+  "reused_recording_audit_sha256": "696c3b06f88ad05107ee22bc68a8ae444b71804ff688d654cb85064df213ff4e",
+  "checkpoint_sha256": "e01f5ff12eb8c7c6964d2954c9c05bfa0aef3bb6ac55a94d1da598c659de51f5",
+  "training": {
+    "train_episodes": 138,
+    "validation_episodes": 36,
+    "train_frames": 4272,
+    "validation_frames": 1128,
+    "learned_level_parameters": 60,
+    "consumed_development_level_episodes": 16,
+    "training_domain_weights": {
+      "parent": 1.0,
+      "wide_reference": 4.0,
+      "consumed_development": 16.0
+    },
+    "objective": "Episode-balanced weighted squared settled-height error plus ridge penalty",
+    "motion_training_episodes": 43,
+    "motion_validation_episodes": 12,
+    "localization_template_episodes": 24,
+    "localization_validation_episodes": 8,
+    "localization_development_calibration_episodes": 16,
+    "localization_development_names": [
+      "XW30_A_dev_00_r0",
+      "XW30_A_dev_01_r0",
+      "XW30_A_dev_02_r0",
+      "XW30_A_dev_03_r0",
+      "XW30_A_dev_04_r0",
+      "XW30_A_dev_05_r0",
+      "XW30_A_dev_06_r0",
+      "XW30_A_dev_07_r0",
+      "XW30_A_dev_00_r1",
+      "XW30_A_dev_01_r1",
+      "XW30_A_dev_02_r1",
+      "XW30_A_dev_03_r1",
+      "XW30_A_dev_04_r1",
+      "XW30_A_dev_05_r1",
+      "XW30_A_dev_06_r1",
+      "XW30_A_dev_07_r1"
+    ],
+    "lifted_tracking_template_episodes": 24,
+    "lifted_tracking_validation_max_error_px": 5.0809126255320995,
+    "frozen_existing_visual_encoders": true,
+    "empty_encoder_finetuned": true,
+    "learned_empty_parameters": 48001,
+    "empty_readout_fit": {
+      "method": "Supervised binary classification: separate wrist CNN initialized from the parent wrist encoder and fine-tuned on a high-resolution fixed bottle crop, with episode/class-balanced BCE, AdamW and augmentation.",
+      "validation_operating_gate": "Labeled tilt>=95 degrees and source outflow<3 nominal mL/s, an offline proxy for runtime proprioception/visual flow; all-angle errors reported. No test data.",
+      "learned_parameters": 48001,
+      "train_episodes": 24,
+      "validation_episodes": 8,
+      "train_frames": 2159,
+      "validation_frames": 738,
+      "epochs": 100,
+      "optimizer_steps": 1700,
+      "roi_calibration": {
+        "roi_xyxy": [
+          170,
+          140,
+          246,
+          248
+        ],
+        "training_names": [
+          "T30_A_demo_train_00",
+          "T30_A_demo_train_01",
+          "T30_A_demo_train_02_ready_r1",
+          "T30_A_demo_train_03_return_r2",
+          "T30_A_demo_train_05",
+          "T30_A_demo_train_06",
+          "T30_A_demo_train_07",
+          "T30_A_demo_train_08",
+          "T30_A_demo_train_09",
+          "T30_A_demo_train_10",
+          "T30_A_demo_train_11",
+          "T30_A_demo_train_13",
+          "T30_A_demo_train_14",
+          "T30_A_demo_train_15",
+          "T30_A_demo_train_16",
+          "T30_A_demo_train_17",
+          "T30_A_demo_train_18",
+          "T30_A_demo_train_19",
+          "T30_A_demo_train_20",
+          "T30_A_demo_train_21",
+          "T30_A_demo_train_22",
+          "T30_A_demo_train_23",
+          "T30_A_demo_train_04_gentle_return_r4",
+          "T30_A_demo_train_12_gentle_return_r4"
+        ],
+        "envelope_radius_m": 0.03,
+        "envelope_height_m": 0.135,
+        "padding_px": 8,
+        "method": "Fixed wrist ROI learned from training-only projected bottle envelopes; no live poses or validation/test ROI fitting."
+      },
+      "optimizer": {
+        "name": "AdamW",
+        "initial_lr": 0.0003,
+        "weight_decay": 0.0001,
+        "divide_lr_by_three_at_epochs": [
+          46,
+          76
+        ],
+        "batch_size": 128
+      },
+      "training_augmentation": {
+        "online": true,
+        "max_translation_px": 3,
+        "max_rotation_deg": 3,
+        "scale_range": [
+          0.95,
+          1.05
+        ],
+        "gain_range": [
+          0.9,
+          1.1
+        ],
+        "max_offset_fraction": 0.03,
+        "identity_probability": 0.2,
+        "seed": 20261105,
+        "scope": "Training crops only; validation and recordings remain native."
+      },
+      "existing_detector_weights_unchanged": true,
+      "selected": {
+        "epoch": 53,
+        "steps": 901,
+        "train_loss": 0.04930042923113651,
+        "metrics": {
+          "validation_bce": 0.027910416945815086,
+          "positive_frames": 77,
+          "negative_frames": 661,
+          "false_positive_normal": 0,
+          "false_positive_slow": 0,
+          "false_positive_slow_all_tilts": 0,
+          "positive_detected": 58,
+          "false_positive_samples": [],
+          "maximum_eligible_negative_probability": 0.8724130392074585
+        },
+        "positive_episodes": [
+          {
+            "name": "T30_A_demo_validation_01",
+            "positive_frames": 18,
+            "detected": 15,
+            "min_probability": 0.23893298208713531,
+            "max_probability": 0.9990463852882385
+          },
+          {
+            "name": "T30_A_demo_validation_03",
+            "positive_frames": 18,
+            "detected": 16,
+            "min_probability": 0.5315495729446411,
+            "max_probability": 0.999903678894043
+          },
+          {
+            "name": "T30_A_demo_validation_04",
+            "positive_frames": 18,
+            "detected": 11,
+            "min_probability": 0.09741877764463425,
+            "max_probability": 0.997916042804718
+          },
+          {
+            "name": "T30_A_demo_validation_07",
+            "positive_frames": 18,
+            "detected": 16,
+            "min_probability": 0.8544431328773499,
+            "max_probability": 0.9999926090240479
+          }
+        ]
+      }
+    },
+    "kinematic_projection": "Programmed geometry constraint; no live object or particle state"
+  },
+  "development_round": 2,
+  "cases": 8,
+  "reserved_tests_started": false,
+  "elapsed_s": 247.092902725999
+}

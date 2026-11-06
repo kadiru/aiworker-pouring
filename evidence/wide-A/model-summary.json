@@ -1,20 +1,25 @@
 {
-  "checkpoint_sha256": "238dec5548f5733aa8c3e3d5e1c70e2dcdac9bda6166ed76cf27bd2b9afd64de",
+  "checkpoint_sha256": "e01f5ff12eb8c7c6964d2954c9c05bfa0aef3bb6ac55a94d1da598c659de51f5",
   "parent_checkpoint_sha256": "a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b",
   "method": "Supervised RGB template localization calibrated with consumed development scenes, settled-height ridge regression and a fine-tuned wrist-crop empty CNN; contextual motion behavioral cloning with IK constraints, dual-view presence plus encoder hold, feedback stopping and programmed upright return.",
   "training": {
-    "train_episodes": 130,
+    "train_episodes": 138,
     "validation_episodes": 36,
-    "train_frames": 4068,
+    "train_frames": 4272,
     "validation_frames": 1128,
-    "learned_level_parameters": 21,
-    "consumed_development_level_episodes": 8,
+    "learned_level_parameters": 60,
+    "consumed_development_level_episodes": 16,
+    "training_domain_weights": {
+      "parent": 1.0,
+      "wide_reference": 4.0,
+      "consumed_development": 16.0
+    },
     "objective": "Episode-balanced weighted squared settled-height error plus ridge penalty",
     "motion_training_episodes": 43,
     "motion_validation_episodes": 12,
     "localization_template_episodes": 24,
     "localization_validation_episodes": 8,
-    "localization_development_calibration_episodes": 8,
+    "localization_development_calibration_episodes": 16,
     "localization_development_names": [
       "XW30_A_dev_00_r0",
       "XW30_A_dev_01_r0",
@@ -23,7 +28,15 @@
       "XW30_A_dev_04_r0",
       "XW30_A_dev_05_r0",
       "XW30_A_dev_06_r0",
-      "XW30_A_dev_07_r0"
+      "XW30_A_dev_07_r0",
+      "XW30_A_dev_00_r1",
+      "XW30_A_dev_01_r1",
+      "XW30_A_dev_02_r1",
+      "XW30_A_dev_03_r1",
+      "XW30_A_dev_04_r1",
+      "XW30_A_dev_05_r1",
+      "XW30_A_dev_06_r1",
+      "XW30_A_dev_07_r1"
     ],
     "lifted_tracking_template_episodes": 24,
     "lifted_tracking_validation_max_error_px": 5.0809126255320995,
@@ -109,46 +122,46 @@
       "selected": {
         "epoch": 53,
         "steps": 901,
-        "train_loss": 0.04927772520482713,
+        "train_loss": 0.04930042923113651,
         "metrics": {
-          "validation_bce": 0.028268618509173393,
+          "validation_bce": 0.027910416945815086,
           "positive_frames": 77,
           "negative_frames": 661,
           "false_positive_normal": 0,
           "false_positive_slow": 0,
           "false_positive_slow_all_tilts": 0,
-          "positive_detected": 55,
+          "positive_detected": 58,
           "false_positive_samples": [],
-          "maximum_eligible_negative_probability": 0.8721635937690735
+          "maximum_eligible_negative_probability": 0.8724130392074585
         },
         "positive_episodes": [
           {
             "name": "T30_A_demo_validation_01",
             "positive_frames": 18,
             "detected": 15,
-            "min_probability": 0.2457088679075241,
-            "max_probability": 0.9988742470741272
+            "min_probability": 0.23893298208713531,
+            "max_probability": 0.9990463852882385
           },
           {
             "name": "T30_A_demo_validation_03",
             "positive_frames": 18,
             "detected": 16,
-            "min_probability": 0.5350140929222107,
-            "max_probability": 0.9998654127120972
+            "min_probability": 0.5315495729446411,
+            "max_probability": 0.999903678894043
           },
           {
             "name": "T30_A_demo_validation_04",
             "positive_frames": 18,
-            "detected": 8,
-            "min_probability": 0.09862487018108368,
-            "max_probability": 0.99748694896698
+            "detected": 11,
+            "min_probability": 0.09741877764463425,
+            "max_probability": 0.997916042804718
           },
           {
             "name": "T30_A_demo_validation_07",
             "positive_frames": 18,
             "detected": 16,
-            "min_probability": 0.8543811440467834,
-            "max_probability": 0.9999901056289673
+            "min_probability": 0.8544431328773499,
+            "max_probability": 0.9999926090240479
           }
         ]
       }
@@ -161,20 +174,22 @@
   },
   "chosen": {
     "metrics": {
-      "mae": 0.009167886521172766,
-      "near_full_mae": 0.010483265503550011,
-      "near_full_p95_abs": 0.02053856057031431,
-      "near_full_p95_overestimate": 0.01743090696273702,
-      "wide_mae": 0.009539645163625893,
-      "wide_near_full_max_abs": 0.014333586651009034,
-      "wide_near_full_p95_overestimate": 0.013800392990253789,
-      "consumed_development_mae": 0.019469276457043227,
-      "consumed_development_max_abs": 0.051372896935969026
+      "mae": 0.011445199800228636,
+      "near_full_mae": 0.010419304074164573,
+      "near_full_p95_abs": 0.027777229451747064,
+      "near_full_p95_overestimate": 0.014310214916036566,
+      "wide_mae": 0.024070834528956964,
+      "wide_near_full_max_abs": 0.039148279323775625,
+      "wide_near_full_p95_overestimate": -0.000167960647905609,
+      "consumed_development_mae": 0.004974048233147531,
+      "consumed_development_max_abs": 0.019956300317071407,
+      "consumed_development_near_full_max_abs": 0.019956300317071407,
+      "consumed_development_near_full_max_overestimate": 0.019956300317071407
     },
-    "score": 0.03029219095233306
+    "score": 0.048378753328995064
   },
   "thresholds": {
-    "full_settled_target": 0.922430906962737,
+    "full_settled_target": 0.9249563003170714,
     "coarse_brake_target": 0.89,
     "runoff_seconds": 0.25,
     "empty_probability": 0.97,
@@ -519,6 +534,62 @@
         "error_mm": 0.4794911340999603
       },
       {
+        "kind": "source",
+        "name": "XW30_A_dev_00_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.16046420062736574
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_01_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.23460017973988812
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_02_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.9403778937728948
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_03_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 1.0585460431906886
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_04_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.18777444480658617
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_05_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 1.0441576138146142
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_06_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.3535640625909174
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_07_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.3403754478126856
+      },
+      {
         "kind": "cup",
         "name": "T30_A_demo_train_00",
         "split": "train",
@@ -797,6 +868,62 @@
         "split": "development",
         "latency_s": 0.3500000000000003,
         "error_mm": 0.20002274657433297
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_00_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.15761965678717724
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_01_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.1275828987241418
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_02_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.35734444426303763
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_03_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.5113863921165294
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_04_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.7315810182810019
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_05_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.3492027437320595
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_06_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.26557096451639256
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_07_r1",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.20849483158710522
       }
     ],
     "consumed_development_names": [
@@ -807,7 +934,15 @@
       "XW30_A_dev_04_r0",
       "XW30_A_dev_05_r0",
       "XW30_A_dev_06_r0",
-      "XW30_A_dev_07_r0"
+      "XW30_A_dev_07_r0",
+      "XW30_A_dev_00_r1",
+      "XW30_A_dev_01_r1",
+      "XW30_A_dev_02_r1",
+      "XW30_A_dev_03_r1",
+      "XW30_A_dev_04_r1",
+      "XW30_A_dev_05_r1",
+      "XW30_A_dev_06_r1",
+      "XW30_A_dev_07_r1"
     ],
     "method": "Gradient template matching with a training-derived tabletop region, view-local support, learned reference banks, calibrated confidence and temporal consensus.",
     "scope": "Reference validation and explicitly consumed development calibration; no reserved test images. Synthetic occlusions are a check, not independent missing-object performance."
@@ -1096,10 +1231,10 @@
       "method": "Preserve parent cap or expand to third-largest successful new training-demonstration phase, limited to150 degrees; no validation/test targets."
     }
   },
-  "elapsed_s": 201.5534953949973,
-  "data_manifest_sha256": "49f5d7817f1c1ca2d68a399733a926b97328bbe077266c51afdda250d023b37f",
+  "elapsed_s": 241.3526365650032,
+  "data_manifest_sha256": "570c8e9620eeff22560a7c2d7cdeefb1201e44b6357722f4199e022cff27ad2c",
   "sources": {
-    "pour_guard_actor.py": "22e23fd176e515750d93b022c4bf6fecda5e1690b2e1eccf76adf2d1a9ae950a",
+    "pour_guard_actor.py": "e6d5cbf9e1418b5386ac5359c2bb5f5637ed0b12073ce7fff90baf230c04cd98",
     "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
     "pour_guard_vision.py": "529945a3df3db41dabec65ef4a10f44bef8148d3a680e10491b8aafd54ab8691",
     "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
@@ -1113,7 +1248,7 @@
     "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
     "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
     "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
-    "pour_settled_model.py": "9ea083db882986d2da42e220564084d651ca8912cc1696d4e9348279bc0c651c",
+    "pour_settled_model.py": "08240e909b45f8db9374c1823c177071fbccc887839df64538183f9a6f08c33d",
     "pour_settled_data.py": "c18409bffa1d49a0783174aa0bad95cfe6e22115bc81331ce1c894a7fe7d1fa7",
     "pour_settled_train.py": "144494fe6c3b29dcdc4969cb2630902e9054e7ab8287256c9a033c724dbba5a5",
     "pour_settled_study.py": "60e33261bc28546b5907d2e5573e4b38fcb4b8b6bd8bb573221ab127be386e2c",
@@ -1130,7 +1265,7 @@
     "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
     "pour_learning.py": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a",
     "pour_wide_study.py": "1637a365d6b151f7a1c42313586697bc008fcd84f020df0cc1bd9c5e9d47a02e",
-    "pour_wide_train.py": "370ea43685e0d000a66efb2e62f54975798b8853373d239aeb6d3e6169e67962",
+    "pour_wide_train.py": "4288194ec630c5397dc445adb839c49d9389dd419071356e4f6f36c8f74ee596",
     "pour_wide_motion.py": "efb895b1cb948bcabdeb87e90ca90fd397b8abc09844ae2b7f0886d329ab3778",
     "pour_wide_geometry.py": "5a4aec3ed1154cbdfd7e7d1f5bb8636e71fade06ab1079ca03cf6235a93ff12c",
     "pour_wide_source.py": "2341a53d9b33828f55824669126e25975c21d37abb6d637998dbcfc21e451692",
@@ -1145,24 +1280,33 @@
     "source_presence_fusion": "held_raw_or_aligned_v1",
     "validation_positive_frames": 72,
     "validation_negative_frames": 88,
-    "detected_positive_frames": 55,
+    "detected_positive_frames": 58,
     "false_positive_frames": 0,
     "validation_empty_episodes_without_detection": [],
     "caveat": "Offline filtering uses labeled tilt/flow. Closed-loop dwell, visibility and task tests remain necessary; no test images consumed."
   },
   "source_presence_coverage": {
     "method": "Unchanged detector on raw and cup-aligned views, maximum finite presence, gated by measured gripper obstruction; eight consecutive low-presence frames latch source loss.",
-    "frames": 8929,
+    "frames": 11819,
     "false_lost_source_episodes": [],
     "scope": "Offline replay on consumed positive held-bottle frames before the original stop; no counterfactual future trajectory or real missing-bottle validation. No test data."
   },
   "source_presence_fusion": "held_raw_or_aligned_v1",
   "early_return_seconds": 4.3,
-  "localization_development_manifest_sha256": "84d23589e44437922a55e4f3d4df237e8d79d1c6ff494a701afcd5a893cdcbae",
+  "gentle_release_retreat": {
+    "place_s": 1.5,
+    "release_s": 0.6,
+    "retreat_s": 2.0
+  },
+  "consumed_development_rounds": [
+    0,
+    1
+  ],
+  "localization_development_manifest_sha256": "cbe59bbcb2c34113d7a5e8a892ac5882fae884f682cb5618e3f56fec04775fef",
   "camera_focal_m": 0.03,
   "source_frame_normalization": "cup_aligned_v2",
   "no_privileged_runtime_inputs": true,
   "task_goal": "Sustained verified grasp, actual pour, correct full/empty stop, upright return/release and zero measured loss; original scoring unchanged.",
-  "native_summary_sha256": "02d399ef518fc615dc7b0983e92883d2afb00624017c7d92eae3e92b3fa1ca80",
+  "native_summary_sha256": "91271f3ef9369aad52a1d0105c1b04459119d2c10054bb99cc6affcabf84bd12",
   "coefficient_arrays_omitted": true
 }
