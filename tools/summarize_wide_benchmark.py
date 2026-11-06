@@ -62,7 +62,8 @@ def main():
     assert before['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
     final=snapshots['runtime-final']['health'];assert not final['queue'] and not final['recording']['active'] and not final['error'] and not final['learning_error']
     manifest=read(E/'data-manifest.json');assert sha(E/'data-manifest.json')==model['data_manifest_sha256']
-    consumed={s['name']+'_r0' for s in plan['development']}
+    rounds=model.get('consumed_development_rounds',[0]);assert rounds in ([0],[0,1])
+    consumed={s['name']+f'_r{r}' for r in rounds for s in plan['development']}
     assert all(not x['name'].startswith('XW30_A_test') and (not x['name'].startswith('XW30_A_dev') or x['name'] in consumed) for x in manifest)
     dev_level=[x for x in manifest if x['name'] in consumed]
     assert {x['name'] for x in dev_level}==consumed and len(dev_level)==model['training']['consumed_development_level_episodes']
@@ -76,7 +77,7 @@ def main():
         assert all(not n.startswith(('XW30_A_test','XW30_A_dev')) and (not n.startswith('T30_A_demo_') or n in accepted) for n in model['motion'][key])
     calibration=read(E/'localization-development-manifest.json')
     assert sha(E/'localization-development-manifest.json')==model['localization_development_manifest_sha256']
-    expected_dev={s['name']+'_r0' for s in plan['development']}
+    expected_dev=consumed
     assert {r['name'] for r in calibration['records']}==expected_dev==set(model['training']['localization_development_names'])
     for r in calibration['records']:assert r['sha256']==indexed[r['name']]['sha256']
     groups={}

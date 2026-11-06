@@ -13,7 +13,15 @@ def features(image, cnn, cup_xy):
         (xy[:, 0] - .49) / .008, (xy[:, 1] + .15) / .008), 1)
     # Keep the vertical color distribution: a mean alone loses rim-level detail.
     bands = hist[:, 14:84].reshape(len(image), 14, 5).mean(2)
-    return torch.cat((base, bands), 1)
+    original = torch.cat((base, bands), 1)
+    # Perspective changes how each visual level feature maps to rim height.
+    # Preserve the original 21 columns for existing checkpoints, then expose
+    # spatial interactions for the wider-table supervised candidate.
+    view = base[:, 5:7] * .08
+    visual = torch.cat((base[:, 1:5], bands), 1)
+    return torch.cat((original, visual * view[:, :1], visual * view[:, 1:],
+                      view[:, :1].square(), view[:, :1] * view[:, 1:],
+                      view[:, 1:].square()), 1)
 
 
 def predict(x, fitted):

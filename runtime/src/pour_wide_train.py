@@ -77,17 +77,17 @@ def sequences(saved):
 
 
 def development_calibration(saved):
-    """Consume development r0 for localization and stable-level calibration."""
-    expected={s['name']+'_r0':s for s in plan()['development']};result=[];manifest=[]
+    """Consume audited development r0/r1 for localization and stable levels."""
+    expected={s['name']+f'_r{r}':s for r in (0,1) for s in plan()['development']};result=[];manifest=[]
     integrity=ROOT/'development-recording-integrity.json'
     audit=json.loads(integrity.read_text());assert audit['native_checks_passed'] and not audit['pending_attempts']
     indexed={r['name']:r for r in audit['files']}
     for path in sorted(Path('/workspace/outputs/fountain').glob(f'*/*{PREFIX}dev_*/episode.hdf5')):
         with h5py.File(path) as f:
             spec=json.loads(f.attrs['spec']);name=spec['name']
-            if not name.endswith('_r0'):continue
+            if not name.endswith(('_r0','_r1')):continue
             assert name in expected and spec['protocol']==17 and spec['study_split']=='development'
-            assert spec['development_round']==0 and spec['policy_evaluation'] and f.attrs['status']=='complete'
+            assert spec['development_round'] in (0,1) and spec['policy_evaluation'] and f.attrs['status']=='complete'
             assert all(spec[k]==v for k,v in expected[name].items() if k!='name')
             digest=sha(path);assert indexed[name]['valid'] and indexed[name]['sha256']==digest
             d=f['data/demo_0'];indices=np.flatnonzero(d['time'][:]-d['time'][0]<=.35+1e-7)
@@ -100,9 +100,9 @@ def development_calibration(saved):
                 source_xyz=d['ground_truth/bottle_pose'][0,:3],cup_xyz=np.asarray(spec['cup_world'])))
             manifest.append(dict(name=name,path=str(path),sha256=digest,indices=indices.tolist(),
                 use='Localization candidate/confidence calibration and stable-level regression supervision; no localization templates, empty-CNN or motion targets.'))
-    assert len(result)==8 and {e['name'] for e in result}==set(expected),'All eight closed initial development cases are required'
+    assert len(result)==16 and {e['name'] for e in result}==set(expected),'All sixteen closed r0/r1 development recordings are required'
     write('localization-development-manifest.json',dict(records=manifest,integrity_sha256=sha(integrity),
-        scope='Explicitly consumed development round zero; not held-out performance. Reserved tests remain untouched.'))
+        scope='Explicitly consumed development rounds zero and one; not held-out performance. Eight layouts repeated, sixteen recordings. Reserved tests remain untouched.'))
     return result
 
 
@@ -246,7 +246,11 @@ def level_data(saved,seq,development=()):
         decisions=json.loads((p.parent/'policy-decisions.json').read_text()) if consumed else None
         uv,_=locate(e['images'][0],saved['cup_bank'])
         xy=plane_point(uv,1.078,saved['calibration'])[:2].tolist()
-        changed=[r['t'] for r in rows if abs(r['cup_ml']-last['cup_ml'])>.5*.0018**3*1e6]
+        # A few returning droplets must not discard an otherwise unchanged
+        # settled pause. Only consumed development permits this bounded label
+        # tolerance; reference/validation sampling keeps its original rule.
+        inventory_tolerance=(8. if consumed else .5)*.0018**3*1e6
+        changed=[r['t'] for r in rows if abs(r['cup_ml']-last['cup_ml'])>inventory_tolerance]
         stable=max(changed,default=0.)+.35;used=[]
         with h5py.File(p,'r') as f:
             d=f['data/demo_0']
@@ -264,8 +268,9 @@ def level_data(saved,seq,development=()):
         assert used,e['name']
         manifest.append(dict(name=e['name'],split=split,recording_split=e['split'],consumed_development=consumed,path=e['path'],sha256=e['sha256'],frames=len(used),indices=used,
             target_final_height=last['cup_fill_fraction'],cup_crop_xy=xy,stable_inventory_after_s=stable,
+            inventory_tolerance_nominal_ml=inventory_tolerance,
             visibility_window='Stable-inventory pause, placement and final views from consumed development' if consumed else 'Setting down/releasing after the bottle has transferred away from the cup',
-            label='Simulator-measured final settled rim fraction after the same cup inventory; RGB-localized crop',scripted_reference=not consumed))
+            label='Simulator-measured final settled rim fraction within the recorded inventory tolerance; RGB-localized crop',scripted_reference=not consumed))
     data={}
     for split,a in arrays.items():
         data[split]={k:old['data'][split][k]+v if k=='episode' else torch.cat((old['data'][split][k],
@@ -291,7 +296,9 @@ def fit_level(saved,bundle):
     x,vx=matrices['train'],matrices['validation'];y,vy=tr['target'].cuda().double(),va['target'].cuda().double()
     counts=Counter(tr['episode']);weights=y.new_tensor([1./counts[n] for n in tr['episode']])*torch.where(y>.8,3.,1.)
     weights/=weights.mean();candidates=[]
-    for columns in ([0,1,2,3],[0,1,2,3,4],list(range(7)),[0,4]+list(range(7,21)),list(range(21))):
+    feature_sets=([0,1,2,3],[0,1,2,3,4],list(range(7)),[0,4]+list(range(7,21)),list(range(21)),
+        list(range(21))+list(range(21,25))+list(range(39,43))+list(range(57,60)),list(range(60)))
+    for columns in feature_sets:
         a=x[:,columns];mean=a.mean(0);scale=a.std(0).clamp(min=.001);mean[0]=0.;scale[0]=1.;a=(a-mean)/scale
         for ridge in (.001,.01,.1,1.):
             penalty=torch.eye(len(columns),device='cuda',dtype=torch.float64)*ridge;penalty[0,0]=1e-9
@@ -300,6 +307,7 @@ def fit_level(saved,bundle):
             error=predict(vx,fitted)-vy;near=vy>.8
             development_mask=torch.tensor([n.startswith(PREFIX+'dev') for n in tr['episode']],device='cuda')
             development_error=predict(x,fitted)-y
+            development_near=development_mask&(y>.8)
             wide=torch.tensor([n.startswith(REFERENCE_PREFIX+'demo_') for n in va['episode']],device='cuda')
             stats=dict(mae=float(error.abs().mean()),near_full_mae=float(error[near].abs().mean()),
                 near_full_p95_abs=float(torch.quantile(error[near].abs(),.95)),
@@ -307,14 +315,18 @@ def fit_level(saved,bundle):
                 wide_mae=float(error[wide].abs().mean()),wide_near_full_max_abs=float(error[wide&near].abs().max()),
                 wide_near_full_p95_overestimate=float(torch.quantile(error[wide&near],.95)),
                 consumed_development_mae=float(development_error[development_mask].abs().mean()) if development_mask.any() else None,
-                consumed_development_max_abs=float(development_error[development_mask].abs().max()) if development_mask.any() else None)
+                consumed_development_max_abs=float(development_error[development_mask].abs().max()) if development_mask.any() else None,
+                consumed_development_near_full_max_abs=float(development_error[development_near].abs().max()) if development_near.any() else None,
+                consumed_development_near_full_max_overestimate=float(development_error[development_near].max()) if development_near.any() else None)
             candidates.append(dict(fit=fitted,metrics=stats,score=stats['near_full_mae']+.5*stats['near_full_p95_abs']+stats['wide_mae']))
-    eligible=[c for c in candidates if c['metrics']['consumed_development_max_abs'] is None or c['metrics']['consumed_development_max_abs']<.06]
+    eligible=[c for c in candidates if (c['metrics']['consumed_development_max_abs'] is None or c['metrics']['consumed_development_max_abs']<.04)
+        and (c['metrics']['consumed_development_near_full_max_abs'] is None or c['metrics']['consumed_development_near_full_max_abs']<.02)]
     write('level-candidates.json',candidates)
-    assert eligible,'The level model still misses consumed stable development levels by over six percentage points'
+    assert eligible,'Improve consumed stable-level calibration: <4 points overall and <2 points near full are required'
     chosen=min(eligible,key=lambda c:c['score'])
     full_target=.90+max(.01,chosen['metrics']['near_full_p95_overestimate'],
-                       chosen['metrics']['wide_near_full_p95_overestimate'])+.005
+                       chosen['metrics']['wide_near_full_p95_overestimate'],
+                       chosen['metrics']['consumed_development_near_full_max_overestimate'] or 0.)+.005
     assert full_target<=.94 and chosen['metrics']['wide_near_full_max_abs']<.04,'Improve wider settled-level uncertainty before native use'
     saved['settled_regressor']=chosen['fit'];saved['settled_validation']=chosen['metrics']
     saved['thresholds']['full_settled_target']=full_target
@@ -373,10 +385,11 @@ def train(state):
     saved['project_pour_kinematics']=True;saved['pour_mouth_z']=.052
     saved['centered_return']=True
     saved['early_return_seconds']=4.3
+    saved['gentle_release_retreat']=dict(place_s=1.5,release_s=.6,retreat_s=2.)
     saved['thresholds'].update(approach_seconds=2.,approach_tracking_wait_s=1.,settled_geometry_tolerance=.10)
     saved['parent_training_step']=saved.get('step');saved['step']=0
     saved['parent_checkpoint_sha256']=PARENT_SHA
-    saved['model_version']='visual_wide_hierarchy_v20'
+    saved['model_version']='visual_wide_hierarchy_v21'
     saved['method']='Supervised RGB template localization calibrated with consumed development scenes, settled-height ridge regression and a fine-tuned wrist-crop empty CNN; contextual motion behavioral cloning with IK constraints, dual-view presence plus encoder hold, feedback stopping and programmed upright return.'
     saved['sources']={n:sha(Path('/workspace/src')/n) for n in RUNTIME_SOURCES}
     training.update(motion_training_episodes=len(motion['train_episodes']),motion_validation_episodes=len(motion['validation_episodes']),
@@ -397,6 +410,7 @@ def train(state):
         empty_detector_coverage={k:v for k,v in empty_coverage.items() if k!='episodes'},
         source_presence_coverage={k:v for k,v in presence.items() if k!='episodes'},
         source_presence_fusion=saved['source_presence_fusion'],early_return_seconds=saved['early_return_seconds'],
+        gentle_release_retreat=saved['gentle_release_retreat'],consumed_development_rounds=[0,1],
         localization_development_manifest_sha256=sha(ROOT/'localization-development-manifest.json'),
         camera_focal_m=.030,source_frame_normalization=saved['source_frame_normalization'],no_privileged_runtime_inputs=True,
         task_goal='Sustained verified grasp, actual pour, correct full/empty stop, upright return/release and zero measured loss; original scoring unchanged.')

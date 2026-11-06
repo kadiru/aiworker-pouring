@@ -15,7 +15,7 @@ def main():
     from pour_guard_vision import make_bank,project
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name(0);torch.set_num_threads(2)
     study.ROOT=a.candidate_dir;train.ROOT=a.candidate_dir;started=time.monotonic()
-    result=dict(device=torch.cuda.get_device_name(0),source_sha256={n:hashlib.sha256((a.candidate_dir/n).read_bytes()).hexdigest() for n in ('pour_wide_train.py','pour_guard_vision.py')},scope='Component fit on reference data plus explicitly consumed development r0 stable-level images. Original validation episodes retained; no reserved tests or deployed checkpoint changes.')
+    result=dict(device=torch.cuda.get_device_name(0),source_sha256={n:hashlib.sha256((a.candidate_dir/n).read_bytes()).hexdigest() for n in ('pour_wide_train.py','pour_guard_vision.py','pour_settled_model.py')},scope='Component fit on reference data plus explicitly consumed development r0/r1 stable-level images. Original validation episodes retained; no reserved tests or deployed checkpoint changes.')
     try:
         saved=torch.load(study.PARENT/'best.pt',map_location='cpu',weights_only=False)
         current=torch.load(root/'best.pt',map_location='cpu',weights_only=False)

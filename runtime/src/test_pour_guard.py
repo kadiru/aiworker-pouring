@@ -8,6 +8,36 @@ from pour_guard_vision import project,plane_point,bottle_base_from_neck,locate
 
 
 class GuardTests(unittest.TestCase):
+    def test_gentle_terminal_finishes_open_hand_retreat_before_done(self):
+        from pour_guard_actor import gentle_terminal_profile
+        from pour_stop_sequence import TerminalPrimitive
+        old=dict(grasp_mark_s=1.,lift_mark_s=2.,return_s=.8,place_s=.9,release_s=.3,retreat_s=.45,
+                 warp=[0.,.3,.7,1.],grip=[1.,0.])
+        profile=gentle_terminal_profile(old,dict(place_s=1.5,release_s=.6,retreat_s=2.))
+        history=[(float(i),np.full(7,.2*i)) for i in range(4)]
+        terminal=TerminalPrimitive(history,3.,profile)
+        retreat_start=3.+.8+1.5+.6
+        q,mode=terminal.act(retreat_start+.45)
+        self.assertEqual(mode,'Retreating');self.assertTrue(np.all(q[:7]>.1))
+        np.testing.assert_allclose(q[7:],0.)
+        q,mode=terminal.act(retreat_start+2.01)
+        self.assertEqual(mode,'Holding completed pose');np.testing.assert_allclose(q,0.)
+        self.assertEqual(old['retreat_s'],.45)
+        self.assertEqual(gentle_terminal_profile(old,{}),old)
+
+    def test_centered_return_receives_gentle_place_and_retreat_timing(self):
+        a=object.__new__(Actor);q=np.zeros(7)
+        a.profile=dict(return_s=.8,place_s=.9,release_s=.3,retreat_s=.45,
+                       grasp_mark_s=0.,lift_mark_s=1.,warp=[0.,1.],grip=[1.,0.])
+        a.history=[(0.,q),(1.,q),(2.,q)];a.outbound=[(0.,q),(80.,q)]
+        a.pour_phase=80.;a.qlift=q;a.fk=None;a.source_xy=[.5,-.1];a.cup_xy=[.5,-.3];a.cal={'table_z':1.04}
+        a.saved=dict(centered_return=True,pour_mouth_z=.052,
+                     gentle_release_retreat=dict(place_s=1.5,release_s=.6,retreat_s=2.))
+        with patch('pour_wide_motion.CenteredTerminal') as constructor:
+            a.latch('cup_near_full',2.,SimpleNamespace())
+        received=constructor.call_args.args[2]
+        self.assertEqual([received[k] for k in ('place_s','release_s','retreat_s')],[1.5,.6,2.])
+
     def test_early_source_loss_returns_slowly_with_grip_closed(self):
         a=object.__new__(Actor);zero=np.zeros(7);middle=np.full(7,.2);current=np.full(7,.4)
         a.profile=dict(grasp_mark_s=0.,lift_mark_s=1.,return_s=.8,place_s=.5,release_s=.3,retreat_s=.5,

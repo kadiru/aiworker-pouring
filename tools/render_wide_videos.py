@@ -72,7 +72,7 @@ def card(report,model,part,closing=False):
     else:
         lines(d,(610,210),'Supervised learning on the RTX 4070',28,570,WHITE,True)
         training=model['training'];source=training['empty_readout_fit']
-        lines(d,(610,279),f"RGB localization: {training['localization_template_episodes']} train / {training['localization_validation_episodes']} validation references + {training.get('localization_development_calibration_episodes',0)} development calibration scenes",21,570,MUTED)
+        lines(d,(610,279),f"RGB localization: {training['localization_template_episodes']} train / {training['localization_validation_episodes']} validation references + {training.get('localization_development_calibration_episodes',0)} development recordings across 8 layouts",21,570,MUTED)
         lines(d,(610,370),f"Motion: {training['motion_training_episodes']} demonstrations, behavioral cloning + IK. Level: {training['learned_level_parameters']}-parameter ridge model. Empty detection: {source['learned_parameters']:,}-parameter wrist CNN.",21,570,WHITE)
         lines(d,(610,470),'Programmed grasp, stop and return logic. No reinforcement learning; no physical robot test.',21,570,MUTED)
     lines(d,(70,585),'Native task, wrist and overview cameras. Complete runs at labeled playback speed; no generated camera footage.',19,1140,MUTED)

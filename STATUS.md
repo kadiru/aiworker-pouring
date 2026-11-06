@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **Combined v20 fit r3 completed on the 4070. Development r1 is running; r0 remains 5/8 with all failures retained. No reserved test has run.**
+State: **V20 development r1 is running: 3/5 closed attempts pass; two full cases underfill and one has retreat-contact spill. V21 repairs are local/CPU-tested, not deployed. No reserved test has run.**
 
 ## In progress: wider/swapped study
 
@@ -28,6 +28,12 @@ Native controller/fusion/early-return tests pass 26/26; protocol/scoring passes 
 **Combined fit r3 completed in 201.55 seconds on the 4070**, source `03ea720`, checkpoint `238dec5548f5733aa8c3e3d5e1c70e2dcdac9bda6166ed76cf27bd2b9afd64de`. All 40 localization calibration scenes and 80 temporal windows pass: maximum bottle/cup errors 1.533 / 0.765 mm. Level counts/metrics match the component above. The wrist CNN again selects epoch 53; the final presence-aware probe detects 55/72 eligible positive frames, zero eligible false positives, covering all four empty validation scenes. The new presence replay checks 8,929 pre-stop held frames across 40 consumed episodes with no eight-frame false-loss episode. None of these are independent task results.
 
 The old r2 checkpoint and 52 root fit/provenance files plus all runtime sources are archived natively at `fit-attempts/r2`, verified before root replacement. Local fit-r2 and fit-r3 model backups are ignored in Git. Source `03ea720` and the repair evidence are pushed. The complete r3 source-presence trace stays native/ignored locally; the committed report retains per-episode counts and its native SHA. Development r1 is running in simulator `20261106T142222Z`, observed by `/tmp/aiworker-wide-development-r1`. No errors or foreign-job changes were observed at launch.
+
+**Development r1 interim:** first six closed cases give 4 strict passes (00/01/02/05), with 06 running. Full 00 settles at 92.014% rim; 01/02/05 empty completely with zero measured loss. Source-tracking case 03 clears its old false-abort point but stops at 85.830% and loses eight particles (0.046656 nominal mL). Cup-localization case 04 grasps/pours/returns with zero loss but settles at 89.666%, below the unchanged 90% requirement. All failures remain retained; these are not reserved tests.
+
+**New diagnosis:** case 03 predicts about 93.7% at stop versus actual 85.8%, persisting after withdrawal. Loss begins at 33.055 s, when the opened right finger recontacts the released bottle during retreat; bottle speed reaches 0.840 m/s, followed by cup-wall contact. The 0.5-second retreat clips 8/10 commands. Across five closed trajectories, its planned maximum joint increment is 0.230 rad versus a 0.12-rad command limit. The candidate 2.0-second retreat reduces the peak to 0.06193 rad. Eight selected native failure views were inspected. These are recorded contact/timing observations, not an unverified dripping explanation.
+
+**V21 candidate, not deployed:** minimum placement/release/retreat times 1.5/0.6/2.0 seconds, same measured paths; 21 CPU controller tests pass. Level features retain the original 21 columns and offer up to 60 columns with visual-feature/position interactions; 15 native-view compatibility checks preserve current-model predictions exactly. Upcoming fitting explicitly consumes audited r0/r1 stable-level images (16 recordings across eight layouts), with original validation kept separate, stricter <2 percentage-point consumed near-full error, and a stop margin covering observed development overestimation. A bounded eight-particle inventory tolerance allows stable development pauses before a few returning droplets; reference/validation windows retain their original half-particle rule. Full fit and wet validation remain pending. No active runtime/source was changed.
 
 A verified local preview of development 00 is `evidence/wide-A/XW30_A_dev_00_r0-preview.mp4`: 15.75 s, 1280×720, 20 fps, complete attempt at labeled 2×. Its SHA is `696e74efca8eb0089226b9777fd354b34c0a43682ddeb152cd28860700b91a93`. Full decoding, four inspected encoded frames, and 12 native/encoded camera comparisons pass (maximum mean pixel error 0.903/255). It is explicitly excluded from the 30-test benchmark. Renderer and provenance are pushed as `8b1b544`.
 

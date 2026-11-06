@@ -55,6 +55,12 @@ def early_return_profile(profile,minimum_seconds):
         warp=[float(ease(u)) for u in np.linspace(0,1,len(profile['warp']))])
 
 
+def gentle_terminal_profile(profile,minimums):
+    """Preserve measured paths; give placement and open-hand retreat time to track."""
+    return dict(profile,**{key:max(profile[key],value) for key,value in minimums.items()
+                         if key in ('place_s','release_s','retreat_s')})
+
+
 class Actor:
     def __init__(self,checkpoint):
         torch.set_num_threads(4);self.saved=torch.load(checkpoint,map_location='cuda',weights_only=False)
@@ -198,7 +204,7 @@ class Actor:
 
     def latch(self,reason,t,robot):
         self.stop_latched=reason;robot.reason=reason;robot.stop_time=t
-        profile=self.profile
+        profile=gentle_terminal_profile(self.profile,self.saved.get('gentle_release_retreat',{}))
         if self.saved.get('early_return_seconds') and self.pour_phase<70.:
             profile=early_return_profile(profile,self.saved['early_return_seconds'])
         self.terminal=TerminalPrimitive(self.history,t,profile)
@@ -206,7 +212,7 @@ class Actor:
         if self.saved.get('centered_return') and self.pour_phase>=70.:
             from pour_wide_motion import CenteredTerminal
             try:
-                self.terminal=CenteredTerminal(self.history,t,self.profile,self.fk,self.pour_phase,
+                self.terminal=CenteredTerminal(self.history,t,profile,self.fk,self.pour_phase,
                     self.source_xy,self.cup_xy,self.cal['table_z'],self.qlift,self.saved['pour_mouth_z'])
             except ValueError as error:
                 self.return_planning_error=str(error)
