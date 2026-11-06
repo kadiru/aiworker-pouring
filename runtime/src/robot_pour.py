@@ -305,7 +305,10 @@ class RobotPour(Pour):
 
     def complete(self,t):
         if self.spec.get('corrective_prefix'): return t>=self.spec.get('prefix_seconds',3.3)
-        terminal_s=4.6 if self.spec.get('protocol')==17 and self.verified and self.stop_command_angle>=70. else 3.
+        terminal_s=3.
+        if self.spec.get('protocol')==17 and self.verified and self.stop_command_angle>=70.:
+            from pour_wide_motion import RETURN_SECONDS
+            terminal_s=RETURN_SECONDS+2.1
         return (self.stop_time is not None and t>=self.stop_time+terminal_s+self.reference_empty_dwell()) or t>=self.spec['max_seconds']+.65
 
     def summary(self,rows):

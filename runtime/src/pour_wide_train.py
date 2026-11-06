@@ -138,7 +138,9 @@ def level_data(saved,seq):
         with h5py.File(p,'r') as f:
             d=f['data/demo_0']
             for i in range(0,len(rows),2):
-                if rows[i]['t']<stable:continue
+                # Upright draining above the cup can hide its surface. Use
+                # the settled view after transfer back to the source position.
+                if rows[i]['t']<stable or rows[i]['phase'] not in ('Setting bottle down','Releasing bottle'):continue
                 image=cup_crop(decode(d['next_obs/task_image'][i],'jpeg95'),xy,saved['calibration'])
                 for k,v in dict(image=image,target=last['cup_fill_fraction'],cup_xy=xy,episode=e['name']).items():
                     arrays[e['split']][k].append(v)
@@ -146,6 +148,7 @@ def level_data(saved,seq):
         assert used,e['name']
         manifest.append(dict(name=e['name'],split=e['split'],path=e['path'],sha256=e['sha256'],frames=len(used),indices=used,
             target_final_height=last['cup_fill_fraction'],cup_crop_xy=xy,stable_inventory_after_s=stable,
+            visibility_window='Setting down/releasing after the bottle has transferred away from the cup',
             label='Simulator-measured settled rim fraction; RGB-localized normalized cup crop',scripted_reference=True))
     data={}
     for split,a in arrays.items():
@@ -182,10 +185,12 @@ def fit_level(saved,bundle):
             stats=dict(mae=float(error.abs().mean()),near_full_mae=float(error[near].abs().mean()),
                 near_full_p95_abs=float(torch.quantile(error[near].abs(),.95)),
                 near_full_p95_overestimate=float(torch.quantile(error[near],.95)),
-                wide_mae=float(error[wide].abs().mean()),wide_near_full_max_abs=float(error[wide&near].abs().max()))
+                wide_mae=float(error[wide].abs().mean()),wide_near_full_max_abs=float(error[wide&near].abs().max()),
+                wide_near_full_p95_overestimate=float(torch.quantile(error[wide&near],.95)))
             candidates.append(dict(fit=fitted,metrics=stats,score=stats['near_full_mae']+.5*stats['near_full_p95_abs']+stats['wide_mae']))
     chosen=min(candidates,key=lambda c:c['score'])
-    full_target=.90+max(.01,chosen['metrics']['near_full_p95_overestimate'])+.005
+    full_target=.90+max(.01,chosen['metrics']['near_full_p95_overestimate'],
+                       chosen['metrics']['wide_near_full_p95_overestimate'])+.005
     write('level-candidates.json',candidates)
     assert full_target<=.94 and chosen['metrics']['wide_near_full_max_abs']<.04,'Improve wider settled-level uncertainty before native use'
     saved['settled_regressor']=chosen['fit'];saved['settled_validation']=chosen['metrics']
