@@ -1,9 +1,11 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **V21 development r2 audited: 6/8 strict passes, 8/8 grasps, zero measured loss in all eight. V22 finer-image level component passes; combined fit and closed-loop validation are next. No reserved test has run.**
+State: **V22 combined fit r5 completed on the 4070; development r3 is running. V21 r2 audit retained 6/8 passes and zero measured loss in all eight. No reserved test has run.**
 
 **R2 audit and V22 component:** 61 native recordings / 207 sidecars / 28,066 transitions pass integrity and local byte/SHA checks. All 64 selected r2 frames are inspected; all eight release/retreat traces have zero recorded finger recontact. The 60-feature recalibration and all 144 domain-weight variants failed the unchanged accuracy gates. Finer row/color-edge features pass with 340 ridge coefficients, lambda 0.1, domain weights parent/reference/development 1/1/64. Fitting explicitly consumes 24 r0/r1/r2 recordings; 146/36 train/validation episodes, 4,519/1,128 images. Validation near-full MAE 1.040 points; wider near-full maximum error 2.881 points; consumed near-full maximum 1.988 points. Target 92.488%. This remains component evidence, not new task performance.
+
+**Combined r5:** 288.031 seconds on the 4070, source `07cd41c321c7a00229618bc0db912a38be388001`, checkpoint `4c8ab7bab4b5121004e47ac1458f6df8ead0bd481c381efa807c7be8195d3430`. Full localization recalibration changes the crops from the component diagnostic; full-fit near-full validation MAE is 1.033 points, wider near-full maximum 3.177 points, consumed near-full maximum 1.774 points, stop target 92.274%. The separate wrist CNN selects epoch 46/782 steps (100 epochs/1,700 total). Presence replay covers 14,748 consumed held frames with no false-loss episode. Raw model/provenance is SHA-verified and backed up locally; the previous r4 model/source and original r1 fit-input audit are archived natively. Eight r3 trials run in simulator `20261106T175050Z`, with observer and finite audit/backup pipeline active. Resource caps and GPU-priority guard remain verified.
 
 ## In progress: wider/swapped study
 

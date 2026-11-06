@@ -1,25 +1,25 @@
 {
-  "checkpoint_sha256": "e01f5ff12eb8c7c6964d2954c9c05bfa0aef3bb6ac55a94d1da598c659de51f5",
+  "checkpoint_sha256": "4c8ab7bab4b5121004e47ac1458f6df8ead0bd481c381efa807c7be8195d3430",
   "parent_checkpoint_sha256": "a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b",
   "method": "Supervised RGB template localization calibrated with consumed development scenes, settled-height ridge regression and a fine-tuned wrist-crop empty CNN; contextual motion behavioral cloning with IK constraints, dual-view presence plus encoder hold, feedback stopping and programmed upright return.",
   "training": {
-    "train_episodes": 138,
+    "train_episodes": 146,
     "validation_episodes": 36,
-    "train_frames": 4272,
+    "train_frames": 4519,
     "validation_frames": 1128,
-    "learned_level_parameters": 60,
-    "consumed_development_level_episodes": 16,
+    "learned_level_parameters": 340,
+    "consumed_development_level_episodes": 24,
     "training_domain_weights": {
       "parent": 1.0,
-      "wide_reference": 4.0,
-      "consumed_development": 16.0
+      "wide_reference": 1.0,
+      "consumed_development": 64.0
     },
     "objective": "Episode-balanced weighted squared settled-height error plus ridge penalty",
     "motion_training_episodes": 43,
     "motion_validation_episodes": 12,
     "localization_template_episodes": 24,
     "localization_validation_episodes": 8,
-    "localization_development_calibration_episodes": 16,
+    "localization_development_calibration_episodes": 24,
     "localization_development_names": [
       "XW30_A_dev_00_r0",
       "XW30_A_dev_01_r0",
@@ -36,7 +36,15 @@
       "XW30_A_dev_04_r1",
       "XW30_A_dev_05_r1",
       "XW30_A_dev_06_r1",
-      "XW30_A_dev_07_r1"
+      "XW30_A_dev_07_r1",
+      "XW30_A_dev_00_r2",
+      "XW30_A_dev_01_r2",
+      "XW30_A_dev_02_r2",
+      "XW30_A_dev_03_r2",
+      "XW30_A_dev_04_r2",
+      "XW30_A_dev_05_r2",
+      "XW30_A_dev_06_r2",
+      "XW30_A_dev_07_r2"
     ],
     "lifted_tracking_template_episodes": 24,
     "lifted_tracking_validation_max_error_px": 5.0809126255320995,
@@ -120,48 +128,48 @@
       },
       "existing_detector_weights_unchanged": true,
       "selected": {
-        "epoch": 53,
-        "steps": 901,
-        "train_loss": 0.04930042923113651,
+        "epoch": 46,
+        "steps": 782,
+        "train_loss": 0.056961387107273866,
         "metrics": {
-          "validation_bce": 0.027910416945815086,
+          "validation_bce": 0.02832203172147274,
           "positive_frames": 77,
           "negative_frames": 661,
           "false_positive_normal": 0,
           "false_positive_slow": 0,
           "false_positive_slow_all_tilts": 0,
-          "positive_detected": 58,
+          "positive_detected": 51,
           "false_positive_samples": [],
-          "maximum_eligible_negative_probability": 0.8724130392074585
+          "maximum_eligible_negative_probability": 0.8424097895622253
         },
         "positive_episodes": [
           {
             "name": "T30_A_demo_validation_01",
             "positive_frames": 18,
-            "detected": 15,
-            "min_probability": 0.23893298208713531,
-            "max_probability": 0.9990463852882385
+            "detected": 14,
+            "min_probability": 0.22836226224899292,
+            "max_probability": 0.9981579184532166
           },
           {
             "name": "T30_A_demo_validation_03",
             "positive_frames": 18,
-            "detected": 16,
-            "min_probability": 0.5315495729446411,
-            "max_probability": 0.999903678894043
+            "detected": 15,
+            "min_probability": 0.5066011548042297,
+            "max_probability": 0.9997197985649109
           },
           {
             "name": "T30_A_demo_validation_04",
             "positive_frames": 18,
-            "detected": 11,
-            "min_probability": 0.09741877764463425,
-            "max_probability": 0.997916042804718
+            "detected": 6,
+            "min_probability": 0.09830942749977112,
+            "max_probability": 0.9960349202156067
           },
           {
             "name": "T30_A_demo_validation_07",
             "positive_frames": 18,
             "detected": 16,
-            "min_probability": 0.8544431328773499,
-            "max_probability": 0.9999926090240479
+            "min_probability": 0.8245911598205566,
+            "max_probability": 0.9999756813049316
           }
         ]
       }
@@ -174,27 +182,27 @@
   },
   "chosen": {
     "metrics": {
-      "mae": 0.011445199800228636,
-      "near_full_mae": 0.010419304074164573,
-      "near_full_p95_abs": 0.027777229451747064,
-      "near_full_p95_overestimate": 0.014310214916036566,
-      "wide_mae": 0.024070834528956964,
-      "wide_near_full_max_abs": 0.039148279323775625,
-      "wide_near_full_p95_overestimate": -0.000167960647905609,
-      "consumed_development_mae": 0.004974048233147531,
-      "consumed_development_max_abs": 0.019956300317071407,
-      "consumed_development_near_full_max_abs": 0.019956300317071407,
-      "consumed_development_near_full_max_overestimate": 0.019956300317071407
+      "mae": 0.012766825956508902,
+      "near_full_mae": 0.010333072280553515,
+      "near_full_p95_abs": 0.02132413416394973,
+      "near_full_p95_overestimate": 0.013314199731962384,
+      "wide_mae": 0.03256421862143403,
+      "wide_near_full_max_abs": 0.03176768382005246,
+      "wide_near_full_p95_overestimate": 0.010735734130797113,
+      "consumed_development_mae": 0.002111289519332113,
+      "consumed_development_max_abs": 0.01773516299886413,
+      "consumed_development_near_full_max_abs": 0.01773516299886413,
+      "consumed_development_near_full_max_overestimate": 0.01773516299886413
     },
-    "score": 0.048378753328995064
+    "score": 0.053559357983962406
   },
   "thresholds": {
-    "full_settled_target": 0.9249563003170714,
+    "full_settled_target": 0.9227351629988642,
     "coarse_brake_target": 0.89,
     "runoff_seconds": 0.25,
     "empty_probability": 0.97,
     "source_localization_score": 0.6554526388645172,
-    "cup_localization_score": 0.7590272724628448,
+    "cup_localization_score": 0.4680345952510834,
     "source_present": 0.7,
     "empty_votes": 12,
     "settle_seconds": 1.2,
@@ -590,340 +598,452 @@
         "error_mm": 0.3403754478126856
       },
       {
+        "kind": "source",
+        "name": "XW30_A_dev_00_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.09922957448988401
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_01_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.19153486583395168
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_02_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.688737371839052
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_03_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.9529305041553952
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_04_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.17030494726657394
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_05_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.7436514359791581
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_06_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.23451189258259114
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_07_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.4894386740477422
+      },
+      {
         "kind": "cup",
         "name": "T30_A_demo_train_00",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.36877682977253945
+        "error_mm": 0.25965454774076885
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_01",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.14231890966919813
+        "error_mm": 0.07060532582414683
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_02_ready_r1",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.2305483028393594
+        "error_mm": 0.3306766975332736
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_03_return_r2",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.15795375209337545
+        "error_mm": 0.22027868270189083
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_05",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.12011675515186823
+        "error_mm": 0.08845027285367246
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_06",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.19259681700206144
+        "error_mm": 0.2958747827845557
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_07",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.33395346240433627
+        "error_mm": 0.11391250424239038
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_08",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.18621576243734714
+        "error_mm": 0.2575872369405521
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_09",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.13048584723106546
+        "error_mm": 0.11195024447710118
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_10",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.29964664974422506
+        "error_mm": 0.19912885312257927
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_11",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.17865334700794053
+        "error_mm": 0.14966221085364917
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_13",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.18627258758238552
+        "error_mm": 0.2768049693120632
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_14",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.23519860248023058
+        "error_mm": 0.23054024609826665
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_15",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.07166888125542682
+        "error_mm": 0.031308502496748665
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_16",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.25990731452978816
+        "error_mm": 0.3140866351822882
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_17",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.05660755310477274
+        "error_mm": 0.07457655711753615
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_18",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.40814903665175456
+        "error_mm": 0.1725223207869976
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_19",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.22755078234189344
+        "error_mm": 0.18257812286277447
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_20",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.19178505534641832
+        "error_mm": 0.19949978077682778
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_21",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.11797023498974595
+        "error_mm": 0.12360432208574618
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_22",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.36130557675933317
+        "error_mm": 0.14875058361299373
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_23",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.08933039199699047
+        "error_mm": 0.09574386968572184
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_00",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.2716949007619824
+        "error_mm": 0.145538252295038
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_01",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.03663407064062113
+        "error_mm": 0.2836553055442969
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_02",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.21822099100545672
+        "error_mm": 0.08825288519880797
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_03",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.08470885088922295
+        "error_mm": 0.09957433490182244
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_04",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.06510174546457602
+        "error_mm": 0.22729613044339292
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_05",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.11662004524649153
+        "error_mm": 0.10215298156912499
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_06",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.6214105485004616
+        "error_mm": 0.6901252023872766
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_07",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.8966566975863662
+        "error_mm": 0.9181990701119589
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_04_gentle_return_r4",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5072736573531365
+        "error_mm": 0.4924723277706109
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_12_gentle_return_r4",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.03997381652403805
+        "error_mm": 0.11239540880682466
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_00_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.21824324350753424
+        "error_mm": 0.25814243629033806
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_01_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.16210015928033697
+        "error_mm": 0.025209245142394164
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_02_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.374692840879257
+        "error_mm": 0.0572932561290818
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_03_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5025761011213533
+        "error_mm": 0.4824409088552151
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_04_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.6714916287026321
+        "error_mm": 0.6414580213116567
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_05_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.13822821755955975
+        "error_mm": 0.38230571831058263
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_06_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.25652629168228963
+        "error_mm": 0.26647060013457824
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_07_r0",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.20002274657433297
+        "error_mm": 0.18439920196547147
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_00_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.15761965678717724
+        "error_mm": 0.2119039415526358
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_01_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.1275828987241418
+        "error_mm": 0.03941642854738664
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_02_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.35734444426303763
+        "error_mm": 0.17103026974060526
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_03_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5113863921165294
+        "error_mm": 0.5357351787018727
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_04_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.7315810182810019
+        "error_mm": 0.8013003521355938
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_05_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.3492027437320595
+        "error_mm": 0.274798019228295
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_06_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.26557096451639256
+        "error_mm": 0.28863844411780826
       },
       {
         "kind": "cup",
         "name": "XW30_A_dev_07_r1",
         "split": "development",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.20849483158710522
+        "error_mm": 0.2126778192777194
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_00_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.21918697544641727
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_01_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.10887733432263604
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_02_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.12357014267137006
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_03_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.5203054364981226
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_04_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.6591527615015045
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_05_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.44165662454085164
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_06_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.2563559113906447
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_07_r2",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.23713283772294924
       }
     ],
     "consumed_development_names": [
@@ -942,7 +1062,15 @@
       "XW30_A_dev_04_r1",
       "XW30_A_dev_05_r1",
       "XW30_A_dev_06_r1",
-      "XW30_A_dev_07_r1"
+      "XW30_A_dev_07_r1",
+      "XW30_A_dev_00_r2",
+      "XW30_A_dev_01_r2",
+      "XW30_A_dev_02_r2",
+      "XW30_A_dev_03_r2",
+      "XW30_A_dev_04_r2",
+      "XW30_A_dev_05_r2",
+      "XW30_A_dev_06_r2",
+      "XW30_A_dev_07_r2"
     ],
     "method": "Gradient template matching with a training-derived tabletop region, view-local support, learned reference banks, calibrated confidence and temporal consensus.",
     "scope": "Reference validation and explicitly consumed development calibration; no reserved test images. Synthetic occlusions are a check, not independent missing-object performance."
@@ -1231,8 +1359,8 @@
       "method": "Preserve parent cap or expand to third-largest successful new training-demonstration phase, limited to150 degrees; no validation/test targets."
     }
   },
-  "elapsed_s": 241.3526365650032,
-  "data_manifest_sha256": "570c8e9620eeff22560a7c2d7cdeefb1201e44b6357722f4199e022cff27ad2c",
+  "elapsed_s": 288.0311310140023,
+  "data_manifest_sha256": "d880d6929f9dbc90c1156de06f9b6f0f9f2891c7c0b0776bb3e411d754eeab01",
   "sources": {
     "pour_guard_actor.py": "e6d5cbf9e1418b5386ac5359c2bb5f5637ed0b12073ce7fff90baf230c04cd98",
     "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
@@ -1248,7 +1376,7 @@
     "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
     "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
     "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
-    "pour_settled_model.py": "08240e909b45f8db9374c1823c177071fbccc887839df64538183f9a6f08c33d",
+    "pour_settled_model.py": "b07a39081d0e065a9dca35e40c42c310300ca41351dcf025122f42e32a3935a8",
     "pour_settled_data.py": "c18409bffa1d49a0783174aa0bad95cfe6e22115bc81331ce1c894a7fe7d1fa7",
     "pour_settled_train.py": "144494fe6c3b29dcdc4969cb2630902e9054e7ab8287256c9a033c724dbba5a5",
     "pour_settled_study.py": "60e33261bc28546b5907d2e5573e4b38fcb4b8b6bd8bb573221ab127be386e2c",
@@ -1265,7 +1393,7 @@
     "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
     "pour_learning.py": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a",
     "pour_wide_study.py": "1637a365d6b151f7a1c42313586697bc008fcd84f020df0cc1bd9c5e9d47a02e",
-    "pour_wide_train.py": "4288194ec630c5397dc445adb839c49d9389dd419071356e4f6f36c8f74ee596",
+    "pour_wide_train.py": "848f4b031e8563f9a0bcdaa0bbb2ec1a57f3a2840212185c2be862f14d2c3dd7",
     "pour_wide_motion.py": "efb895b1cb948bcabdeb87e90ca90fd397b8abc09844ae2b7f0886d329ab3778",
     "pour_wide_geometry.py": "5a4aec3ed1154cbdfd7e7d1f5bb8636e71fade06ab1079ca03cf6235a93ff12c",
     "pour_wide_source.py": "2341a53d9b33828f55824669126e25975c21d37abb6d637998dbcfc21e451692",
@@ -1280,14 +1408,14 @@
     "source_presence_fusion": "held_raw_or_aligned_v1",
     "validation_positive_frames": 72,
     "validation_negative_frames": 88,
-    "detected_positive_frames": 58,
+    "detected_positive_frames": 51,
     "false_positive_frames": 0,
     "validation_empty_episodes_without_detection": [],
     "caveat": "Offline filtering uses labeled tilt/flow. Closed-loop dwell, visibility and task tests remain necessary; no test images consumed."
   },
   "source_presence_coverage": {
     "method": "Unchanged detector on raw and cup-aligned views, maximum finite presence, gated by measured gripper obstruction; eight consecutive low-presence frames latch source loss.",
-    "frames": 11819,
+    "frames": 14748,
     "false_lost_source_episodes": [],
     "scope": "Offline replay on consumed positive held-bottle frames before the original stop; no counterfactual future trajectory or real missing-bottle validation. No test data."
   },
@@ -1300,13 +1428,14 @@
   },
   "consumed_development_rounds": [
     0,
-    1
+    1,
+    2
   ],
-  "localization_development_manifest_sha256": "cbe59bbcb2c34113d7a5e8a892ac5882fae884f682cb5618e3f56fec04775fef",
+  "localization_development_manifest_sha256": "35610d23b1de8aa6a73cc564b3efdbdf3c1f89b248e9b6bb0e563d72c96403f2",
   "camera_focal_m": 0.03,
   "source_frame_normalization": "cup_aligned_v2",
   "no_privileged_runtime_inputs": true,
   "task_goal": "Sustained verified grasp, actual pour, correct full/empty stop, upright return/release and zero measured loss; original scoring unchanged.",
-  "native_summary_sha256": "91271f3ef9369aad52a1d0105c1b04459119d2c10054bb99cc6affcabf84bd12",
+  "native_summary_sha256": "d93eb9cdb6874efe2d6872ccb8fdf1ee891d93dfab20b4bc7d49cfaf34d7f85d",
   "coefficient_arrays_omitted": true
 }
