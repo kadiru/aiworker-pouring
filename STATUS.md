@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **V21 development r2 is 3/4 completed strict passes; case 03 remains underfilled but its spill/recontact is fixed. Four cases continue unchanged. V22 data-scope update is local only, not fitted/deployed. No reserved test has run.**
+State: **V21 development r2 is 4/5 completed strict passes; case 03 remains underfilled but its spill/recontact is fixed. Three cases continue unchanged. V22 data-scope update is committed/staged for a component fit, not fitted/deployed. No reserved test has run.**
 
 ## In progress: wider/swapped study
 
@@ -47,6 +47,10 @@ A second verified local preview retains the r1 case-03 failure: `evidence/wide-A
 **First r2 development attempt passed:** case 00 final settled rim 92.5649%, source 43.728336 nominal mL, zero measured final/near-table loss, complete return/release. Its closed logs show zero post-release gripper contacts and zero clipped retreat/hold commands. The other seven cases are pending. Verified preview `evidence/wide-A/XW30_A_dev_00_r2-preview.mp4`: 17.8 s, 1280×720/20 fps, complete labeled 2× playback, SHA `8d9e779026541fdca181fca0df8cd5ddfbcec4777f7e757c2f69d7caa3c03015`. Full decode, four manually inspected encoded frames and twelve native-camera comparisons pass (maximum mean pixel error 0.841/255). Development only; excluded from reserved results.
 
 **R2 case 03 fails only underfill:** final 87.8926% rim, zero measured loss, zero post-release gripper contacts and zero clipped retreat commands. Stop prediction 93.2813%, observed stop height 90.1624%; the sampled height drops from about 90.14% to 87.99% late in the final hold while cup inventory remains exactly 61.282656 nominal mL. No physical mechanism is inferred from this trace alone. Six native task-camera frames were inspected. All first four closed recordings are backed up and SHA-verified. The local v22 candidate will consume all 24 audited r0/r1/r2 recordings for localization calibration and stable-level labels; original validation/empty-CNN/motion splits and task scoring remain unchanged. Full fit waits for completion and audit of r2.
+
+**R2 case 04 now passes:** final settled rim 93.6234%, source 30.658824 nominal mL, zero measured loss, complete return/release. All five completed cases have zero measured loss; case 03 remains the sole strict failure.
+
+**Local backup space:** 37 scripted-reference HDF5 copies are stored losslessly as `.hdf5.zst`; every decompressed byte count and SHA matches the native index. This frees 1,132,940,378 bytes; local free space is about 4.8 GiB. Native originals are unchanged. All 57 closed recordings / 191 sidecars verify, including the 37 lossless archives. Development/test recordings stay uncompressed for video work. `tools/backup_workspace_recordings.py` and the final verifier support these archives.
 
 Method: supervised RGB template localization, settled-height ridge regression, CNN empty/nonempty classification, and contextual joint-target behavioral cloning. IK geometry, visual grasp checks, full/empty temporal stopping and return are programmed. No reinforcement learning. The target remains ≥90% settled rim height OR source ≤max(0.25 nominal mL, 1% initial), correct complete return/release, and zero measured loss. One particle represents 0.005832 nominal mL; 20 Hz scoring permits transient droplets that return, not a claim of continuously splash-free fluid or physical-robot performance.
 

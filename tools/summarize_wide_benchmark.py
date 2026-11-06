@@ -32,8 +32,14 @@ def main():
     assert not integrity['pending_attempts'] and integrity['native_checks_passed']
     assert {r['name'] for r in integrity['files']}=={r['name'] for r in report['all_attempts']}
     indexed={r['name']:r for r in integrity['files']}
+    archived_references=0
     for r in integrity['files']+integrity['sidecar_files']:
-        p=DATA/r['relative_path'];assert p.stat().st_size==r['bytes'] and sha(p)==r['sha256'],str(p)
+        p=DATA/r['relative_path']
+        if not p.exists() and p.suffix=='.hdf5' and r['name'].startswith('T30_A_demo_'):
+            from archive_wide_references import archive_identity
+            assert archive_identity(p.with_suffix('.hdf5.zst'))==(r['bytes'],r['sha256'])
+            archived_references+=1
+        else:assert p.stat().st_size==r['bytes'] and sha(p)==r['sha256'],str(p)
     for r in report['cases']:
         folder=(DATA/indexed[r['name']]['relative_path']).parent;spec=read(folder/'parameters.json')
         assert all(spec[k]==v for k,v in expected[r['name']].items())
@@ -85,7 +91,8 @@ def main():
         rows=[r for r in report['cases'] if r['expected_stop']==reason];assert len(rows)==15
         groups[reason]=dict(attempts=15,strict_passes=sum(r['strict_pass'] for r in rows))
     final_report=dict(**report,groups=groups,verified_native_backups=len(integrity['files']),
-        verified_sidecars=len(integrity['sidecar_files']),independently_recomputed_primary_scores=30)
+        verified_sidecars=len(integrity['sidecar_files']),lossless_reference_archives_verified=archived_references,
+        independently_recomputed_primary_scores=30)
     (E/'final-benchmark.json').write_text(json.dumps(final_report,indent=2)+'\n')
     (E/'runtime-comparison.json').write_text(json.dumps(dict(same_container_caps_sources_checkpoint_asset=True,
         source_count=len(selection['runtime_sources']),snapshots=snapshots,
