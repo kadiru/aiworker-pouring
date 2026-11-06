@@ -1,0 +1,150 @@
+{
+  "stage": "development_queued",
+  "source_commit": "d461222c736638563fe27869290e5f25745c48eb",
+  "reused_recording_audit_sha256": "696c3b06f88ad05107ee22bc68a8ae444b71804ff688d654cb85064df213ff4e",
+  "checkpoint_sha256": "a88578b0bf3d770bf986c1e900b739a17cb154f5b86d3c473b43966bf6467757",
+  "training": {
+    "train_episodes": 122,
+    "validation_episodes": 36,
+    "train_frames": 3914,
+    "validation_frames": 1128,
+    "learned_level_parameters": 21,
+    "objective": "Episode-balanced weighted squared settled-height error plus ridge penalty",
+    "motion_training_episodes": 43,
+    "motion_validation_episodes": 12,
+    "localization_template_episodes": 24,
+    "localization_validation_episodes": 8,
+    "lifted_tracking_template_episodes": 24,
+    "lifted_tracking_validation_max_error_px": 5.0809126255320995,
+    "frozen_existing_visual_encoders": true,
+    "empty_encoder_finetuned": true,
+    "learned_empty_parameters": 48001,
+    "empty_readout_fit": {
+      "method": "Supervised binary classification: separate wrist CNN initialized from the parent wrist encoder and fine-tuned on a high-resolution fixed bottle crop, with episode/class-balanced BCE, AdamW and augmentation.",
+      "validation_operating_gate": "Labeled tilt>=95 degrees and source outflow<3 nominal mL/s, an offline proxy for runtime proprioception/visual flow; all-angle errors reported. No test data.",
+      "learned_parameters": 48001,
+      "train_episodes": 24,
+      "validation_episodes": 8,
+      "train_frames": 2159,
+      "validation_frames": 738,
+      "epochs": 100,
+      "optimizer_steps": 1700,
+      "roi_calibration": {
+        "roi_xyxy": [
+          170,
+          140,
+          246,
+          248
+        ],
+        "training_names": [
+          "T30_A_demo_train_00",
+          "T30_A_demo_train_01",
+          "T30_A_demo_train_02_ready_r1",
+          "T30_A_demo_train_03_return_r2",
+          "T30_A_demo_train_05",
+          "T30_A_demo_train_06",
+          "T30_A_demo_train_07",
+          "T30_A_demo_train_08",
+          "T30_A_demo_train_09",
+          "T30_A_demo_train_10",
+          "T30_A_demo_train_11",
+          "T30_A_demo_train_13",
+          "T30_A_demo_train_14",
+          "T30_A_demo_train_15",
+          "T30_A_demo_train_16",
+          "T30_A_demo_train_17",
+          "T30_A_demo_train_18",
+          "T30_A_demo_train_19",
+          "T30_A_demo_train_20",
+          "T30_A_demo_train_21",
+          "T30_A_demo_train_22",
+          "T30_A_demo_train_23",
+          "T30_A_demo_train_04_gentle_return_r4",
+          "T30_A_demo_train_12_gentle_return_r4"
+        ],
+        "envelope_radius_m": 0.03,
+        "envelope_height_m": 0.135,
+        "padding_px": 8,
+        "method": "Fixed wrist ROI learned from training-only projected bottle envelopes; no live poses or validation/test ROI fitting."
+      },
+      "optimizer": {
+        "name": "AdamW",
+        "initial_lr": 0.0003,
+        "weight_decay": 0.0001,
+        "divide_lr_by_three_at_epochs": [
+          46,
+          76
+        ],
+        "batch_size": 128
+      },
+      "training_augmentation": {
+        "online": true,
+        "max_translation_px": 3,
+        "max_rotation_deg": 3,
+        "scale_range": [
+          0.95,
+          1.05
+        ],
+        "gain_range": [
+          0.9,
+          1.1
+        ],
+        "max_offset_fraction": 0.03,
+        "identity_probability": 0.2,
+        "seed": 20261105,
+        "scope": "Training crops only; validation and recordings remain native."
+      },
+      "existing_detector_weights_unchanged": true,
+      "selected": {
+        "epoch": 53,
+        "steps": 901,
+        "train_loss": 0.048631437153017536,
+        "metrics": {
+          "validation_bce": 0.028038112446665764,
+          "positive_frames": 77,
+          "negative_frames": 661,
+          "false_positive_normal": 0,
+          "false_positive_slow": 0,
+          "false_positive_slow_all_tilts": 0,
+          "positive_detected": 57,
+          "false_positive_samples": [],
+          "maximum_eligible_negative_probability": 0.8758059740066528
+        },
+        "positive_episodes": [
+          {
+            "name": "T30_A_demo_validation_01",
+            "positive_frames": 18,
+            "detected": 15,
+            "min_probability": 0.23596236109733582,
+            "max_probability": 0.9989640712738037
+          },
+          {
+            "name": "T30_A_demo_validation_03",
+            "positive_frames": 18,
+            "detected": 16,
+            "min_probability": 0.5374523401260376,
+            "max_probability": 0.9998815059661865
+          },
+          {
+            "name": "T30_A_demo_validation_04",
+            "positive_frames": 18,
+            "detected": 10,
+            "min_probability": 0.09317197650671005,
+            "max_probability": 0.9978153705596924
+          },
+          {
+            "name": "T30_A_demo_validation_07",
+            "positive_frames": 18,
+            "detected": 16,
+            "min_probability": 0.8534194827079773,
+            "max_probability": 0.9999914169311523
+          }
+        ]
+      }
+    },
+    "kinematic_projection": "Programmed geometry constraint; no live object or particle state"
+  },
+  "cases": 8,
+  "reserved_tests_started": false,
+  "elapsed_s": 91.83326207500068
+}
