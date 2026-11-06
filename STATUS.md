@@ -1,7 +1,19 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 5, 2026 (America/Los_Angeles).
-State: **Fourteen-layout autonomous video complete: 1/14 whole-task pass; all 13 localization failures and three flagged starting overlaps retained. The earlier 30-case benchmark remains unchanged.**
+State: **Twenty-success reel complete and reviewed, selected from the earlier 23/30 W30 benchmark, with task/method annotations. The later wider-layout result remains 1/14; all failures and prior videos are preserved.**
+
+## Completed: twenty successful autonomous pours on video
+
+The requested local reel is `evidence/workspace-A/twenty-successful-pours.mp4`, **308.1 seconds (5:08), 1280×720, 20 fps, 6,162 frames**. It presents twenty distinct complete autonomous episodes at labeled 2×, with synchronized native task/wrist views, controller phases, final outcomes, task and training-method cards. This is an explicitly disclosed success-only selection from the earlier **23/30** W30 benchmark, not a new 20/20 result or twenty successful wide/swapped layouts. Same v18 model; no retraining. The later wide-layout **1/14** result appears in the closing context.
+
+All nine successful empty stops and eleven successful full stops appear; full cases are selected deterministically for placement coverage. Selected full cups finish at **90.521–93.908% rim height** and all nine empty bottles have **zero remaining particles**. All twenty meet sustained verified grasp, liquid transfer, correct stop, completed upright return/release, no scoring gates, and zero measured loss. The latter is a 20 Hz measurement and allows transient particles that return; it is not a claim of continuously splash-free fluid. Native 04/13/14 are the three omitted successes; the seven failures remain intact.
+
+The video explains contextual joint-target behavioral cloning (35 train / eight validation demonstrations), the 16-coefficient settled-level ridge model (98 / 28 episodes; 3,412 / 960 frames), frozen visual networks and programmed visual grasp/feedback/return. The whole-task target is ≥90% rim height or empty source, with zero measured loss. Fitting was previously done on the 4070; this task only reads and renders local backups on the Mac CPU. No Ubuntu connection or job changes.
+
+Twenty HDF5 recordings, eighty sidecars and **9,151 transitions** were checked against native hashes and timing/continuity requirements; all twenty strict scores were recomputed. Complete decoding and visual review of 83 encoded frames passed; 160 camera-crop comparisons have mean absolute error below 1/255. Final MP4: 23,266,506 bytes, SHA256 `2db1bb5a1f19add1194ea26e992d07073fb9a28eae6b97e82c81630cdd17c5c3`. [Video manifest](evidence/workspace-A/twenty-successes-manifest.json), [review](evidence/workspace-A/twenty-successes-review.json), [selection and hashes](evidence/workspace-A/twenty-successes-selection.json), [method and reproduction](docs/TWENTY_SUCCESSFUL_POURS_VIDEO.md).
+
+Local commands: `.venv/bin/python tools/render_twenty_successes.py --preview`; `.venv/bin/python tools/render_twenty_successes.py`; `.venv/bin/python tools/review_twenty_successes.py`. Preserve an existing completed export before rerendering; the renderer refuses overwrite. Next engineering action remains wider-table perception/localization and full-hand fixture clearance before collecting wider motion references.
 
 ## Completed: fourteen larger layout videos
 
