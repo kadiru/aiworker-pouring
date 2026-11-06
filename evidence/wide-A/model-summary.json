@@ -1,18 +1,30 @@
 {
-  "checkpoint_sha256": "a88578b0bf3d770bf986c1e900b739a17cb154f5b86d3c473b43966bf6467757",
+  "checkpoint_sha256": "238dec5548f5733aa8c3e3d5e1c70e2dcdac9bda6166ed76cf27bd2b9afd64de",
   "parent_checkpoint_sha256": "a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b",
-  "method": "Supervised wide-view RGB template localization, settled-height ridge regression and a separately fine-tuned wrist-crop empty CNN; contextual motion behavioral cloning with IK constraints, programmed visual grasp, feedback stopping and over-cup upright return.",
+  "method": "Supervised RGB template localization calibrated with consumed development scenes, settled-height ridge regression and a fine-tuned wrist-crop empty CNN; contextual motion behavioral cloning with IK constraints, dual-view presence plus encoder hold, feedback stopping and programmed upright return.",
   "training": {
-    "train_episodes": 122,
+    "train_episodes": 130,
     "validation_episodes": 36,
-    "train_frames": 3914,
+    "train_frames": 4068,
     "validation_frames": 1128,
     "learned_level_parameters": 21,
+    "consumed_development_level_episodes": 8,
     "objective": "Episode-balanced weighted squared settled-height error plus ridge penalty",
     "motion_training_episodes": 43,
     "motion_validation_episodes": 12,
     "localization_template_episodes": 24,
     "localization_validation_episodes": 8,
+    "localization_development_calibration_episodes": 8,
+    "localization_development_names": [
+      "XW30_A_dev_00_r0",
+      "XW30_A_dev_01_r0",
+      "XW30_A_dev_02_r0",
+      "XW30_A_dev_03_r0",
+      "XW30_A_dev_04_r0",
+      "XW30_A_dev_05_r0",
+      "XW30_A_dev_06_r0",
+      "XW30_A_dev_07_r0"
+    ],
     "lifted_tracking_template_episodes": 24,
     "lifted_tracking_validation_max_error_px": 5.0809126255320995,
     "frozen_existing_visual_encoders": true,
@@ -97,46 +109,46 @@
       "selected": {
         "epoch": 53,
         "steps": 901,
-        "train_loss": 0.048631437153017536,
+        "train_loss": 0.04927772520482713,
         "metrics": {
-          "validation_bce": 0.028038112446665764,
+          "validation_bce": 0.028268618509173393,
           "positive_frames": 77,
           "negative_frames": 661,
           "false_positive_normal": 0,
           "false_positive_slow": 0,
           "false_positive_slow_all_tilts": 0,
-          "positive_detected": 57,
+          "positive_detected": 55,
           "false_positive_samples": [],
-          "maximum_eligible_negative_probability": 0.8758059740066528
+          "maximum_eligible_negative_probability": 0.8721635937690735
         },
         "positive_episodes": [
           {
             "name": "T30_A_demo_validation_01",
             "positive_frames": 18,
             "detected": 15,
-            "min_probability": 0.23596236109733582,
-            "max_probability": 0.9989640712738037
+            "min_probability": 0.2457088679075241,
+            "max_probability": 0.9988742470741272
           },
           {
             "name": "T30_A_demo_validation_03",
             "positive_frames": 18,
             "detected": 16,
-            "min_probability": 0.5374523401260376,
-            "max_probability": 0.9998815059661865
+            "min_probability": 0.5350140929222107,
+            "max_probability": 0.9998654127120972
           },
           {
             "name": "T30_A_demo_validation_04",
             "positive_frames": 18,
-            "detected": 10,
-            "min_probability": 0.09317197650671005,
-            "max_probability": 0.9978153705596924
+            "detected": 8,
+            "min_probability": 0.09862487018108368,
+            "max_probability": 0.99748694896698
           },
           {
             "name": "T30_A_demo_validation_07",
             "positive_frames": 18,
             "detected": 16,
-            "min_probability": 0.8534194827079773,
-            "max_probability": 0.9999914169311523
+            "min_probability": 0.8543811440467834,
+            "max_probability": 0.9999901056289673
           }
         ]
       }
@@ -149,23 +161,25 @@
   },
   "chosen": {
     "metrics": {
-      "mae": 0.008449859196456345,
-      "near_full_mae": 0.009774814715272381,
-      "near_full_p95_abs": 0.0194774755290656,
-      "near_full_p95_overestimate": 0.01757540163354515,
-      "wide_mae": 0.00561858613563698,
-      "wide_near_full_max_abs": 0.011134440087034791,
-      "wide_near_full_p95_overestimate": 0.010336809362406066
+      "mae": 0.009167886521172766,
+      "near_full_mae": 0.010483265503550011,
+      "near_full_p95_abs": 0.02053856057031431,
+      "near_full_p95_overestimate": 0.01743090696273702,
+      "wide_mae": 0.009539645163625893,
+      "wide_near_full_max_abs": 0.014333586651009034,
+      "wide_near_full_p95_overestimate": 0.013800392990253789,
+      "consumed_development_mae": 0.019469276457043227,
+      "consumed_development_max_abs": 0.051372896935969026
     },
-    "score": 0.02513213861544216
+    "score": 0.03029219095233306
   },
   "thresholds": {
-    "full_settled_target": 0.9225754016335451,
+    "full_settled_target": 0.922430906962737,
     "coarse_brake_target": 0.89,
     "runoff_seconds": 0.25,
     "empty_probability": 0.97,
-    "source_localization_score": 0.6508447527885437,
-    "cup_localization_score": 0.8088279664516449,
+    "source_localization_score": 0.6554526388645172,
+    "cup_localization_score": 0.7590272724628448,
     "source_present": 0.7,
     "empty_votes": 12,
     "settle_seconds": 1.2,
@@ -449,232 +463,354 @@
         "error_mm": 0.08422529288853352
       },
       {
+        "kind": "source",
+        "name": "XW30_A_dev_00_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.3101304228584217
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_01_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.4244997506551728
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_02_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.9175273945126877
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_03_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.6932381264259508
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_04_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.20069319103932398
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_05_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 1.1297047436804692
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_06_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.27401907854522745
+      },
+      {
+        "kind": "source",
+        "name": "XW30_A_dev_07_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.4794911340999603
+      },
+      {
         "kind": "cup",
         "name": "T30_A_demo_train_00",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.13801348480639286
+        "error_mm": 0.36877682977253945
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_01",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.09375455205143847
+        "error_mm": 0.14231890966919813
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_02_ready_r1",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5385196354489877
+        "error_mm": 0.2305483028393594
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_03_return_r2",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.02534719055419439
+        "error_mm": 0.15795375209337545
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_05",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.2319602629135788
+        "error_mm": 0.12011675515186823
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_06",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.2008302459136505
+        "error_mm": 0.19259681700206144
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_07",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5378516991666787
+        "error_mm": 0.33395346240433627
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_08",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.35894200643569035
+        "error_mm": 0.18621576243734714
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_09",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.19774389963171307
+        "error_mm": 0.13048584723106546
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_10",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.3427753344581835
+        "error_mm": 0.29964664974422506
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_11",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.21310688548896892
+        "error_mm": 0.17865334700794053
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_13",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.24215096067203062
+        "error_mm": 0.18627258758238552
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_14",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.2376574136179818
+        "error_mm": 0.23519860248023058
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_15",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.18308409976620654
+        "error_mm": 0.07166888125542682
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_16",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.4255216858322101
+        "error_mm": 0.25990731452978816
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_17",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.04008997194013469
+        "error_mm": 0.05660755310477274
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_18",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.4356985869838279
+        "error_mm": 0.40814903665175456
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_19",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.3825971361539283
+        "error_mm": 0.22755078234189344
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_20",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 1.2087869861386273
+        "error_mm": 0.19178505534641832
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_21",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.6644659897622364
+        "error_mm": 0.11797023498974595
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_22",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.2948648353414922
+        "error_mm": 0.36130557675933317
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_23",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.12319637130536393
+        "error_mm": 0.08933039199699047
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_00",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.24771258428088352
+        "error_mm": 0.2716949007619824
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_01",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5564880086205031
+        "error_mm": 0.03663407064062113
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_02",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.3495813586763893
+        "error_mm": 0.21822099100545672
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_03",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.07398312126086336
+        "error_mm": 0.08470885088922295
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_04",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5768586462353132
+        "error_mm": 0.06510174546457602
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_05",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.23018115297507513
+        "error_mm": 0.11662004524649153
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_06",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.6941440829370673
+        "error_mm": 0.6214105485004616
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_validation_07",
         "split": "validation",
         "latency_s": 0.3500000000000003,
-        "error_mm": 1.0185866101065737
+        "error_mm": 0.8966566975863662
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_04_gentle_return_r4",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 1.0672862240627765
+        "error_mm": 0.5072736573531365
       },
       {
         "kind": "cup",
         "name": "T30_A_demo_train_12_gentle_return_r4",
         "split": "train",
         "latency_s": 0.3500000000000003,
-        "error_mm": 0.5329407850307442
+        "error_mm": 0.03997381652403805
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_00_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.21824324350753424
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_01_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.16210015928033697
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_02_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.374692840879257
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_03_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.5025761011213533
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_04_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.6714916287026321
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_05_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.13822821755955975
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_06_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.25652629168228963
+      },
+      {
+        "kind": "cup",
+        "name": "XW30_A_dev_07_r0",
+        "split": "development",
+        "latency_s": 0.3500000000000003,
+        "error_mm": 0.20002274657433297
       }
     ],
+    "consumed_development_names": [
+      "XW30_A_dev_00_r0",
+      "XW30_A_dev_01_r0",
+      "XW30_A_dev_02_r0",
+      "XW30_A_dev_03_r0",
+      "XW30_A_dev_04_r0",
+      "XW30_A_dev_05_r0",
+      "XW30_A_dev_06_r0",
+      "XW30_A_dev_07_r0"
+    ],
     "method": "Gradient template matching with a training-derived tabletop region, view-local support, learned reference banks, calibrated confidence and temporal consensus.",
-    "scope": "Consumed reference/validation calibration only; no reserved test images. Synthetic occlusions are a check, not independent missing-object performance."
+    "scope": "Reference validation and explicitly consumed development calibration; no reserved test images. Synthetic occlusions are a check, not independent missing-object performance."
   },
   "motion": {
     "method": "CUDA ridge behavioral cloning of joint targets conditioned on own lift joints and visual cup XY; expanded-position reference demonstrations plus original successful demonstrations",
@@ -960,12 +1096,12 @@
       "method": "Preserve parent cap or expand to third-largest successful new training-demonstration phase, limited to150 degrees; no validation/test targets."
     }
   },
-  "elapsed_s": 78.87708409599873,
-  "data_manifest_sha256": "a362676ac99fdc83cf866953dcd7d1e10ea0fc73f0465ff5a55fcc5417acc5c1",
+  "elapsed_s": 201.5534953949973,
+  "data_manifest_sha256": "49f5d7817f1c1ca2d68a399733a926b97328bbe077266c51afdda250d023b37f",
   "sources": {
-    "pour_guard_actor.py": "aca6fd65442ac4a9296bad67e315b11c7c695224055fec34371dcceb876c6605",
+    "pour_guard_actor.py": "22e23fd176e515750d93b022c4bf6fecda5e1690b2e1eccf76adf2d1a9ae950a",
     "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
-    "pour_guard_vision.py": "dfa4cae5848c65d09b646a02eeea24cfd9eef05738a1465fef803b8047ed8d9f",
+    "pour_guard_vision.py": "529945a3df3db41dabec65ef4a10f44bef8148d3a680e10491b8aafd54ab8691",
     "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
     "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
     "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
@@ -990,14 +1126,14 @@
     "pour_workspace_train.py": "79f457202ad069f22044a34c38e0927dfb3b1217fcc347d6e3e958b2ca6fa561",
     "pour_workspace_motion.py": "22bf921ed4c90596c53cd09bc4095bee35b6a1fed811a0878de6dcb7b706ebed",
     "pour_workspace_path.py": "d19dddde3b17469ef6592bbfb887ec36b02f82cebb024dbc7f9dcb9387499998",
-    "pour_source_alignment.py": "3d81193f45b6503f786ff3f6624b03aa535c942607dd10dbc99a0f46ce89872b",
+    "pour_source_alignment.py": "9e037df0188b96c465d58fb3e7da01162dee275f8c1cdca853ba3a7fcc29127e",
     "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
     "pour_learning.py": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a",
     "pour_wide_study.py": "1637a365d6b151f7a1c42313586697bc008fcd84f020df0cc1bd9c5e9d47a02e",
-    "pour_wide_train.py": "f4e2593ec7ba516a0db8f29bd20c6b58a68e6bc96b4523e7b583e56b6db318dc",
+    "pour_wide_train.py": "370ea43685e0d000a66efb2e62f54975798b8853373d239aeb6d3e6169e67962",
     "pour_wide_motion.py": "efb895b1cb948bcabdeb87e90ca90fd397b8abc09844ae2b7f0886d329ab3778",
     "pour_wide_geometry.py": "5a4aec3ed1154cbdfd7e7d1f5bb8636e71fade06ab1079ca03cf6235a93ff12c",
-    "pour_wide_source.py": "4241a5bff484f36c18c0f127df5bf6c93bf99921ecc8bf2bdbf4fa3037a7f4df",
+    "pour_wide_source.py": "2341a53d9b33828f55824669126e25975c21d37abb6d637998dbcfc21e451692",
     "pour_wide_empty.py": "fdcba3bb6e4490267468728d026bc327424359f968b3cbe56ec62a459fd40ad1"
   },
   "scene_plan_sha256": "1d2ff7b863c0dc0724b8cb5cc34dadfa18b6dccf8e38c1e29b2015dc67e84076",
@@ -1006,23 +1142,27 @@
     "method": "Fine-tuned wrist-crop empty CNN and unchanged presence detector using normalized task views and the saved wrist crop; this probe itself performs no fit.",
     "source_frame_normalization": "cup_aligned_v2",
     "empty_probability_threshold": 0.97,
+    "source_presence_fusion": "held_raw_or_aligned_v1",
     "validation_positive_frames": 72,
     "validation_negative_frames": 88,
-    "detected_positive_frames": 57,
+    "detected_positive_frames": 55,
     "false_positive_frames": 0,
     "validation_empty_episodes_without_detection": [],
     "caveat": "Offline filtering uses labeled tilt/flow. Closed-loop dwell, visibility and task tests remain necessary; no test images consumed."
   },
+  "source_presence_coverage": {
+    "method": "Unchanged detector on raw and cup-aligned views, maximum finite presence, gated by measured gripper obstruction; eight consecutive low-presence frames latch source loss.",
+    "frames": 8929,
+    "false_lost_source_episodes": [],
+    "scope": "Offline replay on consumed positive held-bottle frames before the original stop; no counterfactual future trajectory or real missing-bottle validation. No test data."
+  },
+  "source_presence_fusion": "held_raw_or_aligned_v1",
+  "early_return_seconds": 4.3,
+  "localization_development_manifest_sha256": "84d23589e44437922a55e4f3d4df237e8d79d1c6ff494a701afcd5a893cdcbae",
   "camera_focal_m": 0.03,
   "source_frame_normalization": "cup_aligned_v2",
   "no_privileged_runtime_inputs": true,
   "task_goal": "Sustained verified grasp, actual pour, correct full/empty stop, upright return/release and zero measured loss; original scoring unchanged.",
-  "native_summary_sha256": "9abd67a777f2ecfd5410ad75cc0bb85607b764c162c918b5ea1a01c03304cb36",
-  "coefficient_arrays_omitted": [
-    "columns",
-    "mean",
-    "scale",
-    "coef",
-    "ridge"
-  ]
+  "native_summary_sha256": "02d399ef518fc615dc7b0983e92883d2afb00624017c7d92eae3e92b3fa1ca80",
+  "coefficient_arrays_omitted": true
 }

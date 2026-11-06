@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **Development r0 completed 5/8 strict passes; targeted localization, source-presence and level repairs passed component checks. Combined retraining/development remain next. No reserved test has run.**
+State: **Combined v20 fit r3 completed on the 4070. Development r1 is running; r0 remains 5/8 with all failures retained. No reserved test has run.**
 
 ## In progress: wider/swapped study
 
@@ -23,7 +23,11 @@ Candidate repair (not deployed): fuse finite raw/aligned source-presence probabi
 
 Level component fit on the idle 4070 passes: 130 train / 36 validation episodes, 4,068 / 1,128 images, 21 parameters. Validation MAE 0.917 percentage points overall / 0.954 wider views; wider near-full maximum absolute error 1.433 points. Consumed-development stable-image maximum error 5.137 points (not independent validation); learned full target 92.243%. The combined fit still must pass every gate and actual closed-loop development. Original checkpoints, failed candidates and diagnostics are retained.
 
-Native controller/fusion/early-return tests pass 26/26; protocol/scoring passes 8/8. `tools/continue_wide_fit.py` supports the next unused development round and cannot freeze or queue reserved tests. All component work stays inside existing resource caps; runtime/checkpoint remain r2 pending the idle-only deployment.
+Native controller/fusion/early-return tests pass 26/26; protocol/scoring passes 8/8. `tools/continue_wide_fit.py` supports the next unused development round and cannot freeze or queue reserved tests. All component work stays inside existing resource caps; runtime/checkpoint were r2 during those checks; the later combined deployment is recorded below.
+
+**Combined fit r3 completed in 201.55 seconds on the 4070**, source `03ea720`, checkpoint `238dec5548f5733aa8c3e3d5e1c70e2dcdac9bda6166ed76cf27bd2b9afd64de`. All 40 localization calibration scenes and 80 temporal windows pass: maximum bottle/cup errors 1.533 / 0.765 mm. Level counts/metrics match the component above. The wrist CNN again selects epoch 53; the final presence-aware probe detects 55/72 eligible positive frames, zero eligible false positives, covering all four empty validation scenes. The new presence replay checks 8,929 pre-stop held frames across 40 consumed episodes with no eight-frame false-loss episode. None of these are independent task results.
+
+The old r2 checkpoint and 52 root fit/provenance files plus all runtime sources are archived natively at `fit-attempts/r2`, verified before root replacement. Local fit-r2 and fit-r3 model backups are ignored in Git. Source `03ea720` and the repair evidence are pushed. The complete r3 source-presence trace stays native/ignored locally; the committed report retains per-episode counts and its native SHA. Development r1 is running in simulator `20261106T142222Z`, observed by `/tmp/aiworker-wide-development-r1`. No errors or foreign-job changes were observed at launch.
 
 A verified local preview of development 00 is `evidence/wide-A/XW30_A_dev_00_r0-preview.mp4`: 15.75 s, 1280×720, 20 fps, complete attempt at labeled 2×. Its SHA is `696e74efca8eb0089226b9777fd354b34c0a43682ddeb152cd28860700b91a93`. Full decoding, four inspected encoded frames, and 12 native/encoded camera comparisons pass (maximum mean pixel error 0.903/255). It is explicitly excluded from the 30-test benchmark. Renderer and provenance are pushed as `8b1b544`.
 
@@ -32,7 +36,7 @@ Method: supervised RGB template localization, settled-height ridge regression, C
 
 **Isolation:** immutable owned container `0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1`; 4070 UUID `GPU-cde23916-c5fa-f18e-a343-127f732cc2f6`; four CPU cores quota on 16–23, shares 256, nice 10, 16 GiB memory/no additional swap. Foreign jobs are read only. An idle diagnostic exit coincided with an unclassified PID triggering the guard at 12:17 UTC; exact exited-PID ownership was not recoverable. The guard now ignores dead/zombie entries and recognizes full-container cgroups, while live foreign processes still stop only this container. Eight mocked guard checks pass; source `48aef5a` is pushed. The owned idle container was manually resumed at 12:26 UTC after GPU/owner/caps checks, guard PID 658813. No recording was active at that stop. `gpu-guard-exit-race.json` and `gpu-guard-race-resume.json` preserve evidence. These limits do not imply zero shared-host overhead.
 
-Next: preserve r2 checkpoint/reports, commit and deploy the targeted repairs while idle, retrain on the 4070 and run development r1. Freeze source/checkpoint/plan before 30 once-only tests. Audit/back up native recordings, independently score all outcomes, render all 30 with honest labels, commit/push evidence and deliver videos. `tools/continue_wide_fit.py` stops after queueing development and cannot queue reserved tests; `tools/freeze_wide_candidate.py` requires explicit reviewed development evidence. See `docs/WIDE_TABLE_STUDY.md` for protocol and commands. No active reference collection or full-fit continuation remains from earlier attempts.
+Next: finish, audit and visually review all eight development r1 attempts. Freeze source/checkpoint/plan before 30 once-only tests. Audit/back up native recordings, independently score all outcomes, render all 30 with honest labels, commit/push evidence and deliver videos. `tools/continue_wide_fit.py` stops after queueing development and cannot queue reserved tests; `tools/freeze_wide_candidate.py` requires explicit reviewed development evidence. See `docs/WIDE_TABLE_STUDY.md` for protocol and commands. No active reference collection or full-fit continuation remains from earlier attempts.
 
 ## Completed: twenty successful autonomous pours on video
 
