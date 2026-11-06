@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **V22 is frozen and all 30 fresh once-only tests are queued/running on the 4070. Development: 6/8 strict passes, all eight grasps/returns and zero measured loss. Both full-stop limitations are retained. Final benchmark/videos are pending.**
+State: **Frozen V22 benchmark: first 5/30 tests closed, 4 strict passes, 5 verified grasps, 4 zero-loss runs. Test 03 lost two particles (0.011664 nominal mL). The remaining 25 tests are running unchanged; final audit/videos pending.**
 
 **R2 audit and V22 component:** 61 native recordings / 207 sidecars / 28,066 transitions pass integrity and local byte/SHA checks. All 64 selected r2 frames are inspected; all eight release/retreat traces have zero recorded finger recontact. The 60-feature recalibration and all 144 domain-weight variants failed the unchanged accuracy gates. Finer row/color-edge features pass with 340 ridge coefficients, lambda 0.1, domain weights parent/reference/development 1/1/64. Fitting explicitly consumes 24 r0/r1/r2 recordings; 146/36 train/validation episodes, 4,519/1,128 images. Validation near-full MAE 1.040 points; wider near-full maximum error 2.881 points; consumed near-full maximum 1.988 points. Target 92.488%. This remains component evidence, not new task performance.
 
