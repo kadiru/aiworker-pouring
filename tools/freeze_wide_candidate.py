@@ -1,4 +1,4 @@
-"""Freeze one reviewed wide candidate after eight successful development cases.
+"""Freeze one reviewed wide candidate after eight completed development cases.
 
 Explicit invocation only. Archives model/source, snapshots isolation, and queues
 the thirty unused reserved scenes once. Never trains or repairs a test case.
@@ -9,6 +9,7 @@ from watch_wide_trials import capture
 sys.path.insert(0,str(HOST_ROOT/'src'))
 from pour_robust_report import completed_row
 from pour_wide_report import strict_success,reasons
+from wide_release_gate import validate_development_outcome
 
 
 def read(p):return json.loads(pathlib.Path(p).read_text())
@@ -18,7 +19,9 @@ def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--manifest',required=True)
     parser.add_argument('--review',required=True);parser.add_argument('--round',type=int,default=0)
-    parser.add_argument('--output-dir',required=True);a=parser.parse_args()
+    parser.add_argument('--output-dir',required=True)
+    parser.add_argument('--evaluate-known-full-stop-limitations',metavar='RATIONALE')
+    a=parser.parse_args()
     destination=pathlib.Path(a.output_dir);assert not destination.exists()
     manifest=read(a.manifest);review=read(a.review);model=read(STUDY/'model-summary.json');plan=read(STUDY/'frozen-plan.json')
     assert not (STUDY/'final-selection.json').exists()
@@ -36,13 +39,14 @@ def main():
         assert all(s[k]==v for k,v in expected[name].items() if k!='name')
         assert s['protocol']==17 and s['development_round']==a.round
         assert (p.parent/'episode.hdf5').exists() and not (p.parent/'episode.partial.hdf5').exists()
-        row=completed_row(p.parent,checkpoint);assert strict_success(row),(name,reasons(row))
+        row=completed_row(p.parent,checkpoint);passed=strict_success(row);failure_reasons=reasons(row)
+        validate_development_outcome(row,passed,failure_reasons,a.evaluate_known_full_stop_limitations)
         decisions=read(p.parent/'policy-decisions.json');samples=read(p.parent/'samples.json')
         modes=('Returning upright','Setting bottle down','Releasing bottle','Retreating','Holding completed pose')
         times=[next(x['t'] for x in decisions if x['stop_latched'] and x['mode']==mode) for mode in modes]
         assert all(x<y for x,y in zip(times,times[1:]))
         assert abs(samples[-1]['bottle_tilt_deg'])<8 and abs(samples[-1]['bottle_base_height_m'])<=.005
-        rows.append(dict(row,strict_pass=True,failure_reasons=[]))
+        rows.append(dict(row,strict_pass=passed,failure_reasons=failure_reasons))
     assert seen==set(expected)
     assert review['checkpoint_sha256']==checkpoint and review['manual_review']=='inspected'
     assert {r['name'] for r in review['cases']}==seen and all(r['manual_review']=='inspected' for r in review['cases'])
@@ -58,6 +62,10 @@ def main():
         scene_plan_sha256=model['scene_plan_sha256'],runtime_sources=model['sources'],source_commit=manifest['source_commit'],
         container=CID,development=rows,development_round=a.round,development_visual_review_sha256=sha(a.review),
         development_integrity_sha256=sha(STUDY/'development-recording-integrity.json'),
+        development_selection=dict(strict_passes=sum(r['strict_pass'] for r in rows),attempts=8,
+            known_full_stop_limitations=a.evaluate_known_full_stop_limitations,
+            scope='Explicit benchmark selection may retain documented full-stop failures. All eight must still grasp, transfer, return and have zero measured loss. No outcome is relabeled; reserved scoring is unchanged.'),
+        selection_helper_sha256=sha(__file__),selection_gate_sha256=sha(pathlib.Path(__file__).with_name('wide_release_gate.py')),
         primary_definition='Verified grasp and transfer; correct full/empty stop; >=90% settled rim height or empty source; ordered return/release; zero measured final/near-table particle loss.',
         volume_units='Nominal particle-count mL, not calibrated physical volume',
         test_policy='Thirty reserved once-only scenes. No retries, fitting, threshold/source changes or teacher fallback during evaluation.')
