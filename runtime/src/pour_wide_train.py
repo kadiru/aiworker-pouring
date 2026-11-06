@@ -56,10 +56,20 @@ def sequences(saved):
                 saved['calibration']=cal
             else:
                 assert np.allclose(cal['K'],saved['calibration']['K']) and np.allclose(cal['T'],saved['calibration']['T'])
+            phases=np.array([v.decode() for v in d['ground_truth/phase'][:]])
+            held=np.flatnonzero((phases=='Lifting and checking grip')&d['ground_truth/grasp_verified'][:])[-6:]
+            assert len(held)==6,(s['name'],'Need six held-neck calibration frames')
+            neck_uv=[]
+            for i in held:
+                pose=d['ground_truth/bottle_pose'][i];x,y,z,w=pose[3:]/np.linalg.norm(pose[3:])
+                up=np.array([2*(x*z+y*w),2*(y*z-x*w),1-2*(x*x+y*y)])
+                neck_uv.append(project(pose[:3]+.135*up,saved['calibration']))
             result.append(dict(name=s['name'],reference_case=reference,split=s['study_split'],path=str(path),sha256=sha(path),
                 images=np.stack([decode(d['obs/task_image'][i],'jpeg95') for i in indices]),
                 times=d['time'][:][indices]-float(d['time'][0]),
-                source_xyz=d['ground_truth/bottle_pose'][0,:3],cup_xyz=np.asarray(s['cup_world']),accepted_reference=True))
+                source_xyz=d['ground_truth/bottle_pose'][0,:3],cup_xyz=np.asarray(s['cup_world']),accepted_reference=True,
+                held_indices=held.tolist(),held_images=np.stack([decode(d['next_obs/task_image'][i],'jpeg95') for i in held]),
+                held_neck_uv=np.asarray(neck_uv)))
     write('reference-acceptance.json',dict(accepted=[e['name'] for e in result],rejected=rejected))
     assert {e['reference_case'] for e in result}==set(expected), 'Complete a successful retained reference for every planned layout before fitting'
     assert len({e['reference_case'] for e in result})==len(result), 'Duplicate successful reference targets'
@@ -127,6 +137,43 @@ def fit_localization(saved,seq):
         scope='Consumed reference/validation calibration only; no reserved test images. Synthetic occlusions are a check, not independent missing-object performance.')
     write('localization-validation.json',report)
     return report
+
+
+@torch.inference_mode()
+def fit_tracking(saved,seq):
+    """Separate lifted-neck templates avoid table-view background contamination."""
+    train=[e for e in seq if e['split']=='train'];candidates=[]
+    for absolute,box in product((True,False),(None,(10,8,38,40),(12,8,36,36),(14,8,34,34))):
+        bank=make_bank([e['held_images'][-1] for e in train],[e['held_neck_uv'][-1] for e in train],
+            'source',aggregation='max',absolute_gradients=absolute,source_mask_box=box)
+        bank['bounds']=[24,24,360,350];rows=[];episodes=[]
+        for e in seq:
+            initial,_=locate(e['images'][0],saved['source_bank'])
+            expected=project(bottle_base_from_neck(initial,saved['calibration'])+[0,0,.135+.044],saved['calibration'])
+            delta=expected-initial;votes=0
+            for i,image,truth in zip(e['held_indices'],e['held_images'],e['held_neck_uv']):
+                uv,score=locate(image,bank,tracking=True,expected_uv=expected)
+                follows=np.linalg.norm(uv-expected)<12.
+                moved=np.linalg.norm(delta)>=8. and np.dot(uv-initial,delta)>.65*np.dot(delta,delta)
+                passed=bool(score>.23 and follows and moved);votes+=passed
+                rows.append(dict(name=e['name'],split=e['split'],index=i,uv=uv.tolist(),score=score,
+                    visual_predicate=passed,neck_error_px=float(np.linalg.norm(uv-truth))))
+            episodes.append(dict(name=e['name'],split=e['split'],votes=votes,frames=len(e['held_indices'])))
+        valid=[r['neck_error_px'] for r in rows if r['split']=='validation']
+        candidates.append(dict(absolute_gradients=absolute,source_mask_box=box,bank=bank,rows=rows,episodes=episodes,
+            min_votes=min(e['votes'] for e in episodes),max_error_px=max(r['neck_error_px'] for r in rows),
+            validation_mean_error_px=float(np.mean(valid)),validation_max_error_px=max(valid)))
+    write('source-tracking-candidates.json',[{k:v for k,v in c.items() if k!='bank'} for c in candidates])
+    eligible=[c for c in candidates if c['min_votes']>=5 and c['max_error_px']<=6.]
+    assert eligible,'Held-neck tracking needs five of six positive views per reference and <=6px error before native deployment'
+    chosen=min(eligible,key=lambda c:c['validation_mean_error_px']+.25*c['validation_max_error_px'])
+    saved['source_tracking_bank']=chosen['bank']
+    result=dict(**{k:v for k,v in chosen.items() if k!='bank'},template_training_names=[e['name'] for e in train],
+        template_indices={e['name']:e['held_indices'][-1] for e in train},
+        method='Distinct RGB gradient template bank learned from lifted bottles; disjoint validation chooses the mask.',
+        scope='Simulator neck positions label training/error only. Runtime uses RGB and its expected lift projection; finger/own-motion gates remain. Positive tracking coverage is not a missing-bottle rejection test.')
+    write('source-tracking-validation.json',result)
+    return result
 
 
 def level_data(saved,seq):
@@ -214,6 +261,7 @@ def train(state):
     saved=torch.load(PARENT/'best.pt',map_location='cpu',weights_only=False)
     state.update(phase='Fitting wider-table RGB localization',learning=dict(stage='localization'))
     seq=sequences(saved);localization=fit_localization(saved,seq)
+    tracking=fit_tracking(saved,seq)
     state.update(phase='Fitting wider-table settled level and motion imitation',learning=dict(stage='supervised_fit'))
     bundle=level_data(saved,seq);chosen,training=fit_level(saved,bundle)
     from pour_wide_source import probe,fit_readout
@@ -254,6 +302,8 @@ def train(state):
     saved['sources']={n:sha(Path('/workspace/src')/n) for n in RUNTIME_SOURCES}
     training.update(motion_training_episodes=len(motion['train_episodes']),motion_validation_episodes=len(motion['validation_episodes']),
         localization_template_episodes=sum(e['split']=='train' for e in seq),localization_validation_episodes=sum(e['split']=='validation' for e in seq),
+        lifted_tracking_template_episodes=len(tracking['template_training_names']),
+        lifted_tracking_validation_max_error_px=tracking['validation_max_error_px'],
         frozen_visual_encoders=True,learned_empty_parameters=65,empty_readout_fit=source_fit,
         kinematic_projection='Programmed geometry constraint; no live object or particle state')
     saved['training_device']=dict(name=torch.cuda.get_device_name(0),visible_cuda_devices=1)

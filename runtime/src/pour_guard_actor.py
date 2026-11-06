@@ -145,7 +145,8 @@ class Actor:
             arm=path_at(self.lift_path,ease(elapsed/1.0))
             if elapsed>=1.:self.change_grasp_stage('verify',t)
         elif stage=='verify':
-            arm=self.lift_path[-1].copy();neck,score=locate(task,self.saved['source_bank'],tracking=True,expected_uv=self.expected_lift_neck)
+            arm=self.lift_path[-1].copy()
+            neck,score=locate(task,self.saved.get('source_tracking_bank',self.saved['source_bank']),tracking=True,expected_uv=self.expected_lift_neck)
             moved=self.initial_neck[1]-neck[1]>25.
             if self.saved.get('grasp_projection_consistency'):
                 expected=self.expected_lift_neck-self.initial_neck
