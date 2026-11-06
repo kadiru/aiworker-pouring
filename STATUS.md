@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **V20 development r1 is running: 3/5 closed attempts pass; two full cases underfill and one has retreat-contact spill. V21 repairs are local/CPU-tested, not deployed. No reserved test has run.**
+State: **V20 development r1 is running: 5/7 closed attempts pass, all four empty cases clean; full case 07 remains. V21 repairs are committed/CPU-tested but not deployed. No reserved test has run.**
 
 ## In progress: wider/swapped study
 
@@ -29,7 +29,7 @@ Native controller/fusion/early-return tests pass 26/26; protocol/scoring passes 
 
 The old r2 checkpoint and 52 root fit/provenance files plus all runtime sources are archived natively at `fit-attempts/r2`, verified before root replacement. Local fit-r2 and fit-r3 model backups are ignored in Git. Source `03ea720` and the repair evidence are pushed. The complete r3 source-presence trace stays native/ignored locally; the committed report retains per-episode counts and its native SHA. Development r1 is running in simulator `20261106T142222Z`, observed by `/tmp/aiworker-wide-development-r1`. No errors or foreign-job changes were observed at launch.
 
-**Development r1 interim:** first six closed cases give 4 strict passes (00/01/02/05), with 06 running. Full 00 settles at 92.014% rim; 01/02/05 empty completely with zero measured loss. Source-tracking case 03 clears its old false-abort point but stops at 85.830% and loses eight particles (0.046656 nominal mL). Cup-localization case 04 grasps/pours/returns with zero loss but settles at 89.666%, below the unchanged 90% requirement. All failures remain retained; these are not reserved tests.
+**Development r1 interim:** first seven closed cases give 5 strict passes (00/01/02/05/06), with 07 running. Full 00 settles at 92.014% rim; 01/02/05/06 empty completely with zero measured loss. Source-tracking case 03 clears its old false-abort point but stops at 85.830% and loses eight particles (0.046656 nominal mL). Cup-localization case 04 grasps/pours/returns with zero loss but settles at 89.666%, below the unchanged 90% requirement. All failures remain retained; these are not reserved tests.
 
 **New diagnosis:** case 03 predicts about 93.7% at stop versus actual 85.8%, persisting after withdrawal. Loss begins at 33.055 s, when the opened right finger recontacts the released bottle during retreat; bottle speed reaches 0.840 m/s, followed by cup-wall contact. The 0.5-second retreat clips 8/10 commands. Across five closed trajectories, its planned maximum joint increment is 0.230 rad versus a 0.12-rad command limit. The candidate 2.0-second retreat reduces the peak to 0.06193 rad. Eight selected native failure views were inspected. These are recorded contact/timing observations, not an unverified dripping explanation.
 
@@ -37,6 +37,8 @@ The old r2 checkpoint and 52 root fit/provenance files plus all runtime sources 
 
 A verified local preview of development 00 is `evidence/wide-A/XW30_A_dev_00_r0-preview.mp4`: 15.75 s, 1280×720, 20 fps, complete attempt at labeled 2×. Its SHA is `696e74efca8eb0089226b9777fd354b34c0a43682ddeb152cd28860700b91a93`. Full decoding, four inspected encoded frames, and 12 native/encoded camera comparisons pass (maximum mean pixel error 0.903/255). It is explicitly excluded from the 30-test benchmark. Renderer and provenance are pushed as `8b1b544`.
 
+
+A second verified local preview retains the r1 case-03 failure: `evidence/wide-A/XW30_A_dev_03_r1-preview.mp4`, 36.9 seconds, 1280×720/20 fps, complete attempt at 1× with FAIL/development labels. SHA256 `fab70d4833ad438c42747a1220095f8d3c1ad484dcab0ceecda7ec23548dd818`. Full decode, four inspected encoded frames and twelve native-camera comparisons pass (maximum mean pixel error 1.038/255). The bottle strike is visible near the end; this video is excluded from reserved-test results. V21 candidate source and diagnostics are pushed as `24b3961`; full fit remains pending complete audited r1 data.
 
 Method: supervised RGB template localization, settled-height ridge regression, CNN empty/nonempty classification, and contextual joint-target behavioral cloning. IK geometry, visual grasp checks, full/empty temporal stopping and return are programmed. No reinforcement learning. The target remains ≥90% settled rim height OR source ≤max(0.25 nominal mL, 1% initial), correct complete return/release, and zero measured loss. One particle represents 0.005832 nominal mL; 20 Hz scoring permits transient droplets that return, not a claim of continuously splash-free fluid or physical-robot performance.
 
