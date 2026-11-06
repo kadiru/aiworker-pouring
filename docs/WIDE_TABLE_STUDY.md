@@ -1,6 +1,6 @@
 # Wider and swapped table placements
 
-Status: in progress, November 6, 2026, America/Los_Angeles. References: 32 accepted targets across 37 retained recordings. Full fit r2 completed; development r0 finished 5/8 strict passes. V20 repairs for cup localization, source presence and level calibration are committed as `03ea720` and combined fit r3 completed in 201.55 seconds on the 4070; development r1 is running. No reserved test has run. Preserve earlier W30 (23/30) and broader-layout (1/14) evidence.
+Status: in progress, November 6, 2026, America/Los_Angeles. References: 32 accepted targets across 37 retained recordings. Full fit r2 completed; development r0 finished 5/8 strict passes. V20 repairs for cup localization, source presence and level calibration are committed as `03ea720` and combined fit r3 completed in 201.55 seconds on the 4070; development r1 completed 5/8 strict passes. No reserved test has run. Preserve earlier W30 (23/30) and broader-layout (1/14) evidence.
 
 ## Task and evaluation
 
@@ -34,7 +34,7 @@ R0 produced five strict passes, one false source-loss spill, one localization re
 
 Candidate v20 adds raw/aligned presence fusion gated by measured finger obstruction, and slows early abort returns to at least 4.3 seconds on the existing reverse path. These are programmed safeguards, not learned motor behavior. The 4070 level component passes with 130/36 train/validation episodes, 4,068/1,128 frames, 21 coefficients, and 0.917 percentage-point overall validation MAE. Consumed development errors are separately reported. The combined r3 fit now passes with the same level metrics, 0.765 mm maximum cup calibration error, and no false-loss episode in 8,929 pre-stop held frames. Checkpoint: `238dec5548f5733aa8c3e3d5e1c70e2dcdac9bda6166ed76cf27bd2b9afd64de`. Complete closed-loop development remains required before freezing the 30-test candidate.
 
-## V21 candidate after r1 failures (not deployed)
+## V21 candidate after r1 failures (combined deployment pending)
 
 R1 cleared the original false source-loss and cup-localization failures, but case 03 stopped at 85.830% rim height and case 04 at 89.666%, both below the unchanged 90% goal. Case 03 also lost eight particles after placement: the open right finger recontacted the bottle during retreat, accelerating it to 0.840 m/s. The 0.5-second retreat requested up to 0.230 rad per frame against a 0.12-rad command limit; eight of ten retreat commands were clipped. This is recorded contact/trajectory evidence, not a conjectured fluid leak.
 
@@ -65,3 +65,5 @@ Owned immutable container: `0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc88970
 Use `tools/deploy_wide_study.py` on the Ubuntu host for an idle-only archived deployment. It verifies ownership, immutable ID, GPU exclusivity and caps; refuses changes after test selection; and restarts only the owned container. Native Python is `/isaac-sim/python.sh`.
 
 Local protocol checks: `python3 -m unittest discover -s tests -p test_wide_protocol.py -v`. Initial preflight and corrected audits are `tools/preflight_wide_study.py` and `tools/audit_wide_clearance.py`. POST commands to `http://192.168.68.60:8212/control`: `wide_repair`, `wide_collect`, `wide_train`, `wide_development`, `wide_test`, only in the appropriate verified idle stage. Do not reload/stop an active recording to advance stages. Final report/video commands and measured outcomes will be added after the actual evaluation.
+
+The weighted v21 component passes with 60 ridge coefficients (lambda 1); parent/wide-reference/consumed-development episode weights 1/4/16. Training uses 138 episodes/4,272 images; validation 36/1,128. Near-full validation MAE 1.042 percentage points; maximum consumed-development error 1.996 points. The 92.496% stop target includes the observed overestimation margin. Full deployment and closed-loop development remain pending.

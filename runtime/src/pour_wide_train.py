@@ -295,6 +295,13 @@ def fit_level(saved,bundle):
     tr,va=bundle['data']['train'],bundle['data']['validation']
     x,vx=matrices['train'],matrices['validation'];y,vy=tr['target'].cuda().double(),va['target'].cuda().double()
     counts=Counter(tr['episode']);weights=y.new_tensor([1./counts[n] for n in tr['episode']])*torch.where(y>.8,3.,1.)
+    # The inherited narrow-workspace set otherwise dominates the newly
+    # collected camera perspectives. Ratios were selected in an explicit
+    # reference/development-only diagnostic; reserved scenes are never read.
+    domain_weights={'parent':1.,'wide_reference':4.,'consumed_development':16.}
+    weights*=y.new_tensor([domain_weights['consumed_development'] if n.startswith(PREFIX+'dev')
+        else domain_weights['wide_reference'] if n.startswith(REFERENCE_PREFIX+'demo_')
+        else domain_weights['parent'] for n in tr['episode']])
     weights/=weights.mean();candidates=[]
     feature_sets=([0,1,2,3],[0,1,2,3,4],list(range(7)),[0,4]+list(range(7,21)),list(range(21)),
         list(range(21))+list(range(21,25))+list(range(39,43))+list(range(57,60)),list(range(60)))
@@ -303,7 +310,8 @@ def fit_level(saved,bundle):
         for ridge in (.001,.01,.1,1.):
             penalty=torch.eye(len(columns),device='cuda',dtype=torch.float64)*ridge;penalty[0,0]=1e-9
             coef=torch.linalg.solve(a.T@(a*weights[:,None])+penalty,a.T@(y*weights))
-            fitted=dict(columns=columns,mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),coef=coef.cpu().tolist(),ridge=ridge)
+            fitted=dict(columns=columns,mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),coef=coef.cpu().tolist(),ridge=ridge,
+                training_domain_weights=domain_weights)
             error=predict(vx,fitted)-vy;near=vy>.8
             development_mask=torch.tensor([n.startswith(PREFIX+'dev') for n in tr['episode']],device='cuda')
             development_error=predict(x,fitted)-y
@@ -333,6 +341,7 @@ def fit_level(saved,bundle):
     return chosen,dict(train_episodes=len(set(tr['episode'])),validation_episodes=len(set(va['episode'])),
         train_frames=len(y),validation_frames=len(vy),learned_level_parameters=len(chosen['fit']['coef']),
         consumed_development_level_episodes=len({n for n in tr['episode'] if n.startswith(PREFIX+'dev')}),
+        training_domain_weights=domain_weights,
         objective='Episode-balanced weighted squared settled-height error plus ridge penalty')
 
 
