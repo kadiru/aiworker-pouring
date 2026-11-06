@@ -33,12 +33,14 @@ def main():
     assert {r['name'] for r in integrity['files']}=={r['name'] for r in report['all_attempts']}
     indexed={r['name']:r for r in integrity['files']}
     archived_references=0
+    archived_development=0
     for r in integrity['files']+integrity['sidecar_files']:
         p=DATA/r['relative_path']
-        if not p.exists() and p.suffix=='.hdf5' and r['name'].startswith('T30_A_demo_'):
+        if not p.exists() and p.suffix=='.hdf5' and r['name'].startswith(('T30_A_demo_', 'XW30_A_dev_')):
             from archive_wide_references import archive_identity
             assert archive_identity(p.with_suffix('.hdf5.zst'))==(r['bytes'],r['sha256'])
-            archived_references+=1
+            if r['name'].startswith('T30_A_demo_'):archived_references+=1
+            else:archived_development+=1
         else:assert p.stat().st_size==r['bytes'] and sha(p)==r['sha256'],str(p)
     for r in report['cases']:
         folder=(DATA/indexed[r['name']]['relative_path']).parent;spec=read(folder/'parameters.json')
@@ -92,6 +94,7 @@ def main():
         groups[reason]=dict(attempts=15,strict_passes=sum(r['strict_pass'] for r in rows))
     final_report=dict(**report,groups=groups,verified_native_backups=len(integrity['files']),
         verified_sidecars=len(integrity['sidecar_files']),lossless_reference_archives_verified=archived_references,
+        lossless_development_archives_verified=archived_development,
         independently_recomputed_primary_scores=30)
     (E/'final-benchmark.json').write_text(json.dumps(final_report,indent=2)+'\n')
     (E/'runtime-comparison.json').write_text(json.dumps(dict(same_container_caps_sources_checkpoint_asset=True,

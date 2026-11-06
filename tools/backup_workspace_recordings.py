@@ -34,6 +34,7 @@ def main(manifest, verification, study='workspace'):
     assert len(names) == len(set(names)), 'Duplicate artifact'
     copied = 0
     archives = 0
+    development_archives = 0
     for item in items:
         relative = Path(item['relative_path'])
         assert not relative.is_absolute() and '..' not in relative.parts
@@ -42,10 +43,11 @@ def main(manifest, verification, study='workspace'):
         target = destination / relative
         archive = target.with_suffix(target.suffix + '.zst')
         if study == 'wide' and not target.exists() and target.suffix == '.hdf5' and archive.exists():
-            assert item['name'].startswith('T30_A_demo_'), 'Only reference copies may be archived'
+            assert item['name'].startswith(('T30_A_demo_', 'XW30_A_dev_')), 'Only reference/development copies may be archived'
             from archive_wide_references import archive_identity
             assert archive_identity(archive) == (item['bytes'], item['sha256']), str(relative)
-            archives += 1
+            if item['name'].startswith('T30_A_demo_'): archives += 1
+            else: development_archives += 1
             continue
         if not target.exists():
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -61,6 +63,7 @@ def main(manifest, verification, study='workspace'):
         integrity_manifest_sha256=digest(manifest), recordings=len(report['files']),
         sidecars=len(report['sidecar_files']), copied_this_pass=copied,
         lossless_reference_archives_verified=archives,
+        lossless_development_archives_verified=development_archives,
         all_native_hashes_and_sizes_match=True, partials=len(report.get('partial_files', [])))
     verification.write_text(json.dumps(summary, indent=2) + '\n')
     print(json.dumps(summary, indent=2))

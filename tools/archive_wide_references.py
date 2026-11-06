@@ -1,4 +1,4 @@
-"""Losslessly compress verified local reference copies; keep native originals."""
+"""Losslessly compress verified local reference/reviewed development copies."""
 import argparse
 import datetime
 import hashlib
@@ -34,9 +34,23 @@ def archive_identity(path):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True);p.add_argument('--limit',type=int)
+    p.add_argument('--development-rounds',type=int,nargs='+')
     a=p.parse_args();assert a.output.resolve().is_relative_to(PROJECT) and not a.output.exists()
     manifest=json.loads(a.manifest.read_text());records=[r for r in manifest['files'] if r['name'].startswith('T30_A_demo_')]
-    assert len(records)==37
+    if a.development_rounds is None:
+        assert len(records)==37
+    else:
+        assert len(set(a.development_rounds))==len(a.development_rounds)
+        reviewed={}
+        for number in a.development_rounds:
+            review=json.loads((PROJECT/f'evidence/wide-A/development-r{number}-visual/manifest.json').read_text())
+            assert review['manual_review']=='inspected' and len(review['cases'])==8
+            for c in review['cases']:
+                assert c['manual_review']=='inspected' and c['name'].startswith('XW30_A_dev_') and c['name'].endswith(f'_r{number}')
+                reviewed[c['name']]=c['source_sha256']
+        records=[r for r in manifest['files'] if r['name'] in reviewed]
+        assert len(records)==8*len(a.development_rounds)
+        assert all(r['sha256']==reviewed[r['name']] for r in records)
     if a.limit is not None:assert a.limit>0;records=records[:a.limit]
     rows=[]
     for r in records:
@@ -60,7 +74,8 @@ def main():
         print(json.dumps({k:rows[-1][k] for k in ('name','original_bytes','archive_bytes','created_this_pass')}),flush=True)
     report=dict(checked_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),native_index_sha256=digest(a.manifest),
         records=rows,bytes_saved=sum(r['original_bytes']-r['archive_bytes'] for r in rows),
-        scope='Lossless local copies of closed protocol-17 scripted references only. Every decompressed byte count and SHA matches the native index. Native files, development/test recordings and model/runtime state are unchanged.')
+        development_rounds=a.development_rounds,
+        scope='Lossless local copies of closed protocol-17 references or explicitly reviewed development recordings. Every decompressed byte count and SHA matches the native index. Native originals, test recordings and model/runtime state are unchanged.')
     a.output.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(records=len(rows),bytes_saved=report['bytes_saved'])),flush=True)
 
