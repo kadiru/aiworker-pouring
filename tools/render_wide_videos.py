@@ -73,7 +73,7 @@ def card(report,model,part,closing=False):
         lines(d,(610,210),'Supervised learning on the RTX 4070',28,570,WHITE,True)
         training=model['training'];source=training['empty_readout_fit']
         lines(d,(610,279),f"RGB localization · {training['localization_template_episodes']} training / {training['localization_validation_episodes']} validation references",22,570,MUTED)
-        lines(d,(610,361),f"Motion behavioral cloning + IK constraints. Settled-height ridge regression; {source['learned_parameters']}-parameter empty classifier.",22,570,WHITE)
+        lines(d,(610,361),f"Motion behavioral cloning + IK constraints. Settled-height ridge regression; {source['learned_parameters']:,}-parameter wrist CNN for empty detection.",22,570,WHITE)
         lines(d,(610,470),'Programmed grasp, stop and return logic. No reinforcement learning; no physical robot test.',21,570,MUTED)
     lines(d,(70,585),'Native task, wrist and overview cameras. Complete runs at labeled playback speed; no generated camera footage.',19,1140,MUTED)
     lines(d,(70,643),'Spill is measured at 20 Hz in simulation. Transient returning droplets are allowed by this metric.',18,1140,MUTED)

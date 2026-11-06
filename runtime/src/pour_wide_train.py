@@ -20,7 +20,7 @@ from pour_wide_study import ROOT, PARENT, PARENT_SHA, PREFIX, REFERENCE_PREFIX, 
 
 RUNTIME_SOURCES=tuple(dict.fromkeys(PARENT_SOURCES+(
     'pour_wide_study.py','pour_wide_train.py','pour_wide_motion.py','pour_wide_geometry.py','pour_recording.py',
-    'run_fountain.py','robot_pour.py','pour_guard_actor.py','pour_guard_vision.py','pour_source_alignment.py','pour_wide_source.py')))
+    'run_fountain.py','robot_pour.py','pour_guard_actor.py','pour_guard_vision.py','pour_source_alignment.py','pour_wide_source.py','pour_wide_empty.py')))
 
 
 def sha(path):
@@ -291,7 +291,8 @@ def train(state):
     tracking=fit_tracking(saved,seq)
     state.update(phase='Fitting wider-table settled level and motion imitation',learning=dict(stage='supervised_fit'))
     bundle=level_data(saved,seq);chosen,training=fit_level(saved,bundle)
-    from pour_wide_source import probe,fit_readout
+    from pour_wide_source import probe
+    from pour_wide_empty import fit_readout
     localized={e['name']:e['cup_crop_xy'] for e in bundle['manifest'] if e['name'].startswith(REFERENCE_PREFIX+'demo_')}
     source_fit=fit_readout(saved,seq,localized)
     saved['wide_empty_readout']=source_fit
@@ -325,13 +326,13 @@ def train(state):
     saved['parent_training_step']=saved.get('step');saved['step']=0
     saved['parent_checkpoint_sha256']=PARENT_SHA
     saved['model_version']='visual_wide_hierarchy_v19'
-    saved['method']='Supervised wide-view RGB template localization, settled-height ridge regression and a logistic empty readout on frozen encoders; contextual motion behavioral cloning with IK constraints, programmed visual grasp, feedback stopping and over-cup upright return.'
+    saved['method']='Supervised wide-view RGB template localization, settled-height ridge regression and a separately fine-tuned wrist-crop empty CNN; contextual motion behavioral cloning with IK constraints, programmed visual grasp, feedback stopping and over-cup upright return.'
     saved['sources']={n:sha(Path('/workspace/src')/n) for n in RUNTIME_SOURCES}
     training.update(motion_training_episodes=len(motion['train_episodes']),motion_validation_episodes=len(motion['validation_episodes']),
         localization_template_episodes=sum(e['split']=='train' for e in seq),localization_validation_episodes=sum(e['split']=='validation' for e in seq),
         lifted_tracking_template_episodes=len(tracking['template_training_names']),
         lifted_tracking_validation_max_error_px=tracking['validation_max_error_px'],
-        frozen_visual_encoders=True,learned_empty_parameters=65,empty_readout_fit=source_fit,
+        frozen_existing_visual_encoders=True,empty_encoder_finetuned=True,learned_empty_parameters=source_fit['learned_parameters'],empty_readout_fit=source_fit,
         kinematic_projection='Programmed geometry constraint; no live object or particle state')
     saved['training_device']=dict(name=torch.cuda.get_device_name(0),visible_cuda_devices=1)
     saved['wide_training']=training

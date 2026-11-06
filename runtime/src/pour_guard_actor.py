@@ -54,6 +54,10 @@ class Actor:
         torch.set_num_threads(4);self.saved=torch.load(checkpoint,map_location='cuda',weights_only=False)
         self.checkpoint_sha256=hashlib.sha256(Path(checkpoint).read_bytes()).hexdigest()
         self.detector=LiquidDetector().cuda().eval();self.detector.load_state_dict(self.saved['source_detector'])
+        self.empty_detector=None
+        if 'wide_empty_model' in self.saved:
+            from pour_wide_empty import load_empty
+            self.empty_detector=load_empty(self.saved)
         self.cup_model=CupEstimator().cuda().eval();self.cup_model.load_state_dict(self.saved['cup_model'])
         self.cal=self.saved['calibration'];self.profile=dict(self.saved['primitive']);self.threshold=self.saved['thresholds']
         self.steps=0;self.clamps=0;self.diagnostics=[];self.history=[];self.start=None;self.fk=None;self.arm_limits=None
@@ -236,6 +240,11 @@ class Actor:
                 empty,present=((ae,apr) if self.saved.get('source_frame_normalization')=='cup_aligned_v2'
                                else combine_evidence(empty,present,ae,apr))
             rotation=self.fk.fk(q[:7])[1];up=rotation@self.lift_rotation.T@np.array([0.,0.,1.])
+            if self.empty_detector is not None:
+                from pour_wide_empty import wrist_crop
+                image=wrist_crop(wrist,self.saved['wide_empty_roi'])
+                empty=float(self.empty_detector(torch.as_tensor(image,device='cuda')[None]).sigmoid()[0])
+                empty_views=dict(empty_views or {},wrist_crop_empty=empty)
             tilt=float(np.degrees(np.arccos(np.clip(up[2],-1,1))))
             is_empty=empty>=self.threshold['empty_probability'] and present>=.7 and tilt>=95 and flow*72.8<3.
             self.empty_votes=self.empty_votes+1 if is_empty else 0;self.lost_votes=self.lost_votes+1 if present<.05 else 0

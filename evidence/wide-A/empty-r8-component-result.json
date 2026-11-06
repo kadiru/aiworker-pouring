@@ -1,0 +1,146 @@
+{
+  "device": "NVIDIA GeForce RTX 4070",
+  "visible_cuda_devices": 1,
+  "source_sha256": {
+    "pour_wide_source.py": "6719d4388e44dc3a0fa26378b3c4999469905b6e2c48e77663f8b8c0ca64726e",
+    "pour_wide_empty.py": "fdcba3bb6e4490267468728d026bc327424359f968b3cbe56ec62a459fd40ad1"
+  },
+  "localized_crop_manifest_sha256": "a362676ac99fdc83cf866953dcd7d1e10ea0fc73f0465ff5a55fcc5417acc5c1",
+  "scope": "Empty-readout component fit on 24 training/eight validation references with fixed RGB-localized crops. No test data, candidate checkpoint, deployment or autonomous trial.",
+  "status": "passed",
+  "fit": {
+    "method": "Supervised binary classification: separate wrist CNN initialized from the parent wrist encoder and fine-tuned on a high-resolution fixed bottle crop, with episode/class-balanced BCE, AdamW and augmentation.",
+    "validation_operating_gate": "Labeled tilt>=95 degrees and source outflow<3 nominal mL/s, an offline proxy for runtime proprioception/visual flow; all-angle errors reported. No test data.",
+    "learned_parameters": 48001,
+    "train_episodes": 24,
+    "validation_episodes": 8,
+    "train_frames": 2159,
+    "validation_frames": 738,
+    "epochs": 100,
+    "optimizer_steps": 1700,
+    "roi_calibration": {
+      "roi_xyxy": [
+        170,
+        140,
+        246,
+        248
+      ],
+      "training_names": [
+        "T30_A_demo_train_00",
+        "T30_A_demo_train_01",
+        "T30_A_demo_train_02_ready_r1",
+        "T30_A_demo_train_03_return_r2",
+        "T30_A_demo_train_05",
+        "T30_A_demo_train_06",
+        "T30_A_demo_train_07",
+        "T30_A_demo_train_08",
+        "T30_A_demo_train_09",
+        "T30_A_demo_train_10",
+        "T30_A_demo_train_11",
+        "T30_A_demo_train_13",
+        "T30_A_demo_train_14",
+        "T30_A_demo_train_15",
+        "T30_A_demo_train_16",
+        "T30_A_demo_train_17",
+        "T30_A_demo_train_18",
+        "T30_A_demo_train_19",
+        "T30_A_demo_train_20",
+        "T30_A_demo_train_21",
+        "T30_A_demo_train_22",
+        "T30_A_demo_train_23",
+        "T30_A_demo_train_04_gentle_return_r4",
+        "T30_A_demo_train_12_gentle_return_r4"
+      ],
+      "envelope_radius_m": 0.03,
+      "envelope_height_m": 0.135,
+      "padding_px": 8,
+      "method": "Fixed wrist ROI learned from training-only projected bottle envelopes; no live poses or validation/test ROI fitting."
+    },
+    "optimizer": {
+      "name": "AdamW",
+      "initial_lr": 0.0003,
+      "weight_decay": 0.0001,
+      "divide_lr_by_three_at_epochs": [
+        46,
+        76
+      ],
+      "batch_size": 128
+    },
+    "training_augmentation": {
+      "online": true,
+      "max_translation_px": 3,
+      "max_rotation_deg": 3,
+      "scale_range": [
+        0.95,
+        1.05
+      ],
+      "gain_range": [
+        0.9,
+        1.1
+      ],
+      "max_offset_fraction": 0.03,
+      "identity_probability": 0.2,
+      "seed": 20261105,
+      "scope": "Training crops only; validation and recordings remain native."
+    },
+    "existing_detector_weights_unchanged": true,
+    "selected": {
+      "epoch": 44,
+      "steps": 748,
+      "train_loss": 0.05069977355643852,
+      "metrics": {
+        "validation_bce": 0.02941228821873665,
+        "positive_frames": 77,
+        "negative_frames": 661,
+        "false_positive_normal": 0,
+        "false_positive_slow": 0,
+        "false_positive_slow_all_tilts": 0,
+        "positive_detected": 51,
+        "false_positive_samples": [],
+        "maximum_eligible_negative_probability": 0.8629976511001587
+      },
+      "positive_episodes": [
+        {
+          "name": "T30_A_demo_validation_01",
+          "positive_frames": 18,
+          "detected": 14,
+          "min_probability": 0.23568947613239288,
+          "max_probability": 0.9977654218673706
+        },
+        {
+          "name": "T30_A_demo_validation_03",
+          "positive_frames": 18,
+          "detected": 15,
+          "min_probability": 0.5174902677536011,
+          "max_probability": 0.9995929598808289
+        },
+        {
+          "name": "T30_A_demo_validation_04",
+          "positive_frames": 18,
+          "detected": 6,
+          "min_probability": 0.09964627027511597,
+          "max_probability": 0.995399534702301
+        },
+        {
+          "name": "T30_A_demo_validation_07",
+          "positive_frames": 18,
+          "detected": 16,
+          "min_probability": 0.8480382561683655,
+          "max_probability": 0.9999712705612183
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "method": "Fine-tuned wrist-crop empty CNN and unchanged presence detector on affine-normalized wide-camera RGB and unchanged wrist RGB; this probe itself performs no fit.",
+    "source_frame_normalization": "cup_aligned_v2",
+    "empty_probability_threshold": 0.97,
+    "validation_positive_frames": 72,
+    "validation_negative_frames": 88,
+    "detected_positive_frames": 51,
+    "false_positive_frames": 0,
+    "validation_empty_episodes_without_detection": [],
+    "caveat": "Offline filtering uses labeled tilt/flow. Closed-loop dwell, visibility and task tests remain necessary; no test images consumed."
+  },
+  "elapsed_s": 27.610368205998384
+}
