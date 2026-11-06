@@ -5,16 +5,16 @@ controller's own phase. No simulator object transform or particle state enters.
 The learned target initializes IK; this geometry correction is programmed.
 """
 import numpy as np
-from bottle_pour import pose, GRASP_Z, ease
+from bottle_pour import GRASP_Z, ease
+from pour_wide_geometry import calibrated_pose
 from robot_pour import FRAME, WRIST
 
 
-def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth_z):
+def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth_z, centered=False):
     cup=np.r_[cup_xy,table_z]
     delta=np.asarray(source_xy)-np.asarray(cup_xy)
     initial=[delta[1],-delta[0]]
-    base,rotation=pose(phase,1.,initial,mouth_z)
-    base[2]+=.018*(1-ease(phase/60.))
+    base,rotation=calibrated_pose(phase,1.,initial,mouth_z,centered=centered)
     tcp=cup+FRAME@(base+rotation@np.array([0.,0.,GRASP_Z]))
     orientation=FRAME@rotation@FRAME.T@WRIST
     planner.q=np.clip(np.asarray(prediction),planner.limits[0]+1e-7,planner.limits[1]-1e-7)
@@ -22,3 +22,41 @@ def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth
     if np.linalg.norm(planner.fk(q)[0]-tcp)>.001:
         raise ValueError('Projected pouring TCP misses calibrated target by over 1mm')
     return q
+
+
+def centered_return_path(planner,current,phase,source_xy,cup_xy,table_z,lift,mouth_z):
+    """Timed upright-over-cup, drain pause, then raised translation to lift.
+
+    Geometry and timing are engineered. Joint history and RGB-localized XY
+    are the only episode-dependent inputs; no object/particle state is read.
+    """
+    from pour_workspace_path import clearance_approach
+    from robot_pour import interpolate
+    times=[0.];path=[np.asarray(current).copy()]
+    for t in np.arange(.05,1.1001,.05):
+        angle=phase*(1-ease(t/1.1))
+        path.append(project_target(planner,path[-1],source_xy,cup_xy,table_z,angle,mouth_z,centered=True));times.append(float(t))
+    for t in np.arange(1.15,1.5001,.05):
+        path.append(path[-1].copy());times.append(float(t))
+    transit=clearance_approach(planner,path[-1],lift,clearance_m=.04,level_transit=True)
+    for t in np.arange(1.55,2.5001,.05):
+        path.append(interpolate(transit,ease((t-1.5)/1.)));times.append(float(t))
+    return np.asarray(times),np.asarray(path)
+
+
+def timed_target(times,path,t):
+    return np.array([np.interp(t,times,path[:,j]) for j in range(7)])
+
+
+class CenteredTerminal:
+    """Programmed over-cup return followed by the learned terminal profiles."""
+    def __init__(self,history,start,profile,planner,phase,source_xy,cup_xy,table_z,lift,mouth_z):
+        from pour_stop_sequence import TerminalPrimitive
+        self.times,self.path=centered_return_path(planner,history[-1][1],phase,source_xy,cup_xy,table_z,lift,mouth_z)
+        self.start=start;self.profile=dict(profile,return_s=float(self.times[-1]))
+        self.inner=TerminalPrimitive(history,start,self.profile);self.stage=0
+
+    def act(self,t):
+        elapsed=max(0.,t-self.start)
+        if elapsed<self.times[-1]:return np.r_[timed_target(self.times,self.path,elapsed),np.full(4,np.pi/4)],'Returning upright'
+        result=self.inner.act(t);self.stage=self.inner.stage;return result

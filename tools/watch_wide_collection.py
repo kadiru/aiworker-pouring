@@ -3,7 +3,7 @@
 Ordinary finite host process, not a scheduled automation. Never signals other
 processes, restarts containers, trains models, or queues reserved tests.
 """
-import argparse,datetime,json,pathlib,subprocess,time,urllib.request
+import argparse,datetime,json,pathlib,subprocess,time,urllib.request,hashlib
 
 HOST_ROOT=pathlib.Path('/home/kadir/aiworker-pouring-4070')
 STUDY=HOST_ROOT/'learning/A-wide-20261105-v1'
@@ -45,10 +45,12 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--run',required=True);p.add_argument('--output',required=True)
     a=p.parse_args();output=pathlib.Path(a.output);assert not output.exists()
     expected={s['name'] for s in read(STUDY/'frozen-plan.json')['demonstrations']}
-    repairs={s['name'] for s in read(STUDY/'reference-repair-plan.json')['demonstrations']}
+    repair_plan=read(STUDY/'reference-repair-plan.json')['demonstrations']
+    repairs={s['name'] for s in repair_plan};repair_targets={s['reference_case'] for s in repair_plan}
     report=dict(stage='waiting_for_repaired_pilots',snapshots=[isolation()],rows=[],expected_references=32)
     previous=-1;queued=False;last_snapshot=time.monotonic();start=time.monotonic()
-    def save():output.write_text(json.dumps(report,indent=2)+'\n')
+    def save():
+        temporary=output.with_suffix('.partial.json');temporary.write_text(json.dumps(report,indent=2)+'\n');temporary.replace(output)
     try:
         while time.monotonic()-start<8*3600:
             h=health();assert h['run']==a.run,'Unexpected restart; retain work and inspect before continuing'
@@ -60,11 +62,19 @@ def main():
                 report['announced']=[r['name'] for r in rows];previous=len(rows)
             if time.monotonic()-last_snapshot>=120:
                 report['snapshots'].append(isolation());last_snapshot=time.monotonic()
-            idle=not h['queue'] and not h.get('recording',{}).get('active')
+            idle=not h['queue'] and not h.get('recording',{}).get('active') and not h['phase'].startswith('Building')
             if idle and not queued:
                 repaired={r['name']:r for r in rows if r['name'] in repairs}
-                assert set(repaired)==repairs,'Repair queue ended before both named pilots completed'
-                assert all(r['accepted'] for r in repaired.values()),'A repaired pilot failed; inspect it before collecting more'
+                assert set(repaired)==repairs,'Repair queue ended before every named repair attempt completed'
+                assert {r['reference_case'] for r in repaired.values() if r['accepted']}==repair_targets,'A repaired target still lacks an accepted demonstration; inspect before collecting more'
+                audit_path=STUDY/'centered-return-clearance.json'
+                try:audit=read(audit_path) if audit_path.exists() else {'cases':[]}
+                except json.JSONDecodeError:audit={'cases':[]}
+                if len(audit['cases'])<70:
+                    report['stage']='waiting_for_complete_return_geometry_audit';save();time.sleep(20);continue
+                assert len(audit['cases'])==70 and all(r['ready'] for r in audit['cases']),'Corrected return geometry is not clear for every planned case'
+                for n in ('robot_pour.py','pour_wide_motion.py','pour_workspace_path.py'):
+                    assert hashlib.sha256((HOST_ROOT/'src'/n).read_bytes()).hexdigest()==audit['source_hashes'][n],n
                 command('wide_collect');queued=True;report['stage']='collecting_remaining_references'
                 print('QUEUED remaining frozen reference layouts',flush=True)
             elif idle and queued:

@@ -17,10 +17,11 @@ FINGERS = ('gripper_r_rh_p12_rn_r2', 'gripper_r_rh_p12_rn_l2')
 
 class ArmPath:
     """Solve wrist poses within the seven USD joint limits, in path order."""
-    def __init__(self, offsets, axes, limits, shoulder, cup_world=CUP_WORLD, start_xy=None, mouth_z=.054):
+    def __init__(self, offsets, axes, limits, shoulder, cup_world=CUP_WORLD, start_xy=None, mouth_z=.054, wide_geometry=False):
         self.cup_world = np.asarray(cup_world)
         self.start_xy = start_xy
         self.mouth_z = mouth_z
+        self.wide_geometry = wide_geometry
         self.offsets = np.asarray(offsets)
         self.axes = np.eye(3)[['XYZ'.index(a) for a in axes]]
         self.limits = np.radians(limits).T
@@ -35,8 +36,12 @@ class ArmPath:
         return xyz + rot @ TCP, rot
 
     def solve(self, angle, lift=1., retreat=0.):
-        base, rot = pose(angle, lift, self.start_xy, self.mouth_z)
-        base[2] += .018*lift*(1-ease(angle/60))
+        if self.wide_geometry:
+            from pour_wide_geometry import calibrated_pose
+            base, rot = calibrated_pose(angle, lift, self.start_xy, self.mouth_z)
+        else:
+            base, rot = pose(angle, lift, self.start_xy, self.mouth_z)
+            base[2] += .018*lift*(1-ease(angle/60))
         target = self.cup_world + FRAME @ (base + rot @ [0.,0.,GRASP_Z]) - [retreat,0.,0.]
         orientation = FRAME @ rot @ FRAME.T @ WRIST
         return self.solve_pose(target, orientation)
@@ -55,7 +60,7 @@ class ArmPath:
         return np.degrees(self.q)
 
 
-def build_path(stage, spec):
+def build_path(stage, spec, include_planner=False):
     from pxr import UsdPhysics
     joints=[UsdPhysics.RevoluteJoint.Get(stage, ROOT+'/joints/arm_r_joint'+str(i)) for i in range(1,8)]
     lift=UsdPhysics.PrismaticJoint.Get(stage,ROOT+'/joints/lift_joint')
@@ -63,7 +68,7 @@ def build_path(stage, spec):
                     [j.GetAxisAttr().Get() for j in joints],
                     [(j.GetLowerLimitAttr().Get(),j.GetUpperLimitAttr().Get()) for j in joints],
                     lift.GetLocalPos0Attr().Get(), spec.get('cup_world',CUP_WORLD),
-                    spec.get('source_xy'),spec.get('mouth_z',.054))
+                    spec.get('source_xy'),spec.get('mouth_z',.054),wide_geometry=spec.get('protocol')==17)
     nominal=ArmPath(planner.offsets,[j.GetAxisAttr().Get() for j in joints],
                     [(j.GetLowerLimitAttr().Get(),j.GetUpperLimitAttr().Get()) for j in joints],
                     lift.GetLocalPos0Attr().Get())
@@ -84,7 +89,7 @@ def build_path(stage, spec):
         from pour_workspace_path import clearance_approach
         approach=np.degrees(clearance_approach(planner,np.radians(home),np.radians(grasp),
             clearance_m=spec['approach_clearance_m'],level_transit=spec.get('protocol')==17))
-    return approach,lift_path,tilt
+    return (approach,lift_path,tilt,planner) if include_planner else (approach,lift_path,tilt)
 
 
 def interpolate(path, fraction):
@@ -141,7 +146,8 @@ class RobotPour(Pour):
                 phys=PhysxSchema.PhysxCollisionAPI.Apply(prim)
                 phys.CreateContactOffsetAttr(.001)
                 phys.CreateRestOffsetAttr(0.)
-        self.approach,self.lift_path,self.tilt=build_path(stage,spec)
+        self.approach,self.lift_path,self.tilt,self.path_planner=build_path(stage,spec,include_planner=True)
+        self.centered_return=None
         self.scene_evidence = dict(
             bottle_mass_kg=.18, bottle_gravity_enabled=True, bottle_kinematic=False,
             bottle_attachment_joints=[], robot_arm_gravity_compensation=True,
@@ -235,6 +241,23 @@ class RobotPour(Pour):
                 closure=1-ease((elapsed-1.8)/.35)
                 arm=interpolate(self.approach,1-ease((elapsed-2.2)/.5))
                 self.phase='Releasing bottle'
+            if self.spec.get('protocol')==17 and self.verified and self.stop_command_angle>=70.:
+                from pour_wide_motion import centered_return_path,timed_target
+                if self.centered_return is None:
+                    source=self.cup_world+FRAME@np.r_[self.start_xy,0.]
+                    current=np.radians([float(s.Get()) for s in self.states[:7]])
+                    self.centered_return=centered_return_path(self.path_planner,current,self.stop_command_angle,
+                        source[:2],self.cup_world[:2],self.cup_world[2],np.radians(self.lift_path[-1]),self.spec.get('mouth_z',.054))
+                times,path=self.centered_return;end=float(times[-1])
+                self.command_angle=self.stop_command_angle*(1-ease(elapsed/1.1))
+                arm=np.degrees(timed_target(times,path,elapsed));closure=1.
+                self.phase=('Holding empty source for supervision' if t<self.stop_time+self.reference_empty_dwell() else 'Returning upright')
+                if elapsed>end:
+                    arm=interpolate(self.lift_path,1-ease((elapsed-end)/.7));self.phase='Setting bottle down'
+                if elapsed>end+.8:
+                    closure=1-ease((elapsed-end-.8)/.35);self.phase='Releasing bottle'
+                if elapsed>end+1.25:
+                    arm=interpolate(self.approach,1-ease((elapsed-end-1.25)/.7))
         self.command=np.r_[arm,np.full(4,45.*closure)]
         self.teacher_command=self.command.copy()
         if self.spec.get('noisy_expert'):
@@ -282,7 +305,8 @@ class RobotPour(Pour):
 
     def complete(self,t):
         if self.spec.get('corrective_prefix'): return t>=self.spec.get('prefix_seconds',3.3)
-        return (self.stop_time is not None and t>=self.stop_time+3.+self.reference_empty_dwell()) or t>=self.spec['max_seconds']+.65
+        terminal_s=4.6 if self.spec.get('protocol')==17 and self.verified and self.stop_command_angle>=70. else 3.
+        return (self.stop_time is not None and t>=self.stop_time+terminal_s+self.reference_empty_dwell()) or t>=self.spec['max_seconds']+.65
 
     def summary(self,rows):
         result=super().summary(rows)

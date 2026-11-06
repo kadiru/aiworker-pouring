@@ -24,7 +24,8 @@ def main(manifest, verification, study='workspace'):
     report = json.loads(manifest.read_text())
     prefix, directory = {'workspace': ('W30_A_', 'data/material-A-workspace'),
                          'layout': ('V12_A_', 'data/material-A-layout-variety'),
-                         'layout-extra': ('VX2_A_', 'data/material-A-layout-variety')}[study]
+                         'layout-extra': ('VX2_A_', 'data/material-A-layout-variety'),
+                         'wide': (('XW30_A_', 'T30_A_demo_'), 'data/material-A-wide')}[study]
     destination = PROJECT / directory
     keys = ('files', 'sidecar_files', 'partial_files', 'partial_sidecar_files')
     items = [item for key in keys for item in report.get(key, [])]
@@ -36,7 +37,7 @@ def main(manifest, verification, study='workspace'):
         relative = Path(item['relative_path'])
         assert not relative.is_absolute() and '..' not in relative.parts
         assert re.fullmatch(r'[A-Za-z0-9_./-]+', str(relative))
-        assert relative.parts[1].find(prefix) >= 0, relative
+        assert any(p in relative.parts[1] for p in (prefix if isinstance(prefix,tuple) else (prefix,))), relative
         target = destination / relative
         if not target.exists():
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--manifest', type=Path, required=True)
     p.add_argument('--verification', type=Path, required=True)
-    p.add_argument('--study', choices=('workspace','layout','layout-extra'), default='workspace')
+    p.add_argument('--study', choices=('workspace','layout','layout-extra','wide'), default='workspace')
     args = p.parse_args()
     assert args.manifest.resolve().is_relative_to(PROJECT)
     assert args.verification.resolve().is_relative_to(PROJECT)

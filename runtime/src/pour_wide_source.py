@@ -16,7 +16,7 @@ def fit_readout(saved,seq,localized):
     outputs remain byte-identical. Disjoint validation chooses regularization.
     """
     model=LiquidDetector().cuda().eval();model.load_state_dict(saved['source_detector'])
-    arrays={s:dict(x=[],y=[],name=[],index=[]) for s in ('train','validation')}
+    arrays={s:dict(x=[],y=[],name=[],index=[],eligible=[]) for s in ('train','validation')}
     manifest=[]
     with torch.inference_mode():
         for e in seq:
@@ -36,12 +36,14 @@ def fit_readout(saved,seq,localized):
                     embedding=model.source_head[:2](torch.cat([model.source(source),model.wrist(wrist)],1))
                     a=arrays[e['split']];a['x'].append(torch.cat([embedding,torch.ones((len(indices),1),device='cuda')],1).cpu())
                     a['y'].extend(float(rows[i]['bottle_ml']<=allowance) for i in indices)
+                    a['eligible'].extend(rows[i]['bottle_tilt_deg']>=95 and rows[i]['source_outflow_ml_s']<3. for i in indices)
                     a['name'].extend([e['name']]*len(indices));a['index'].extend(indices);used.extend(indices)
             manifest.append(dict(name=e['name'],split=e['split'],path=e['path'],sha256=e['sha256'],indices=used,
                                  empty_allowance_ml=allowance,labels='Offline particle inventory; encoder inputs are RGB only'))
     with torch.inference_mode(False),torch.enable_grad():
         data={s:dict(x=torch.cat(a['x']).to(device='cuda',dtype=torch.float64).clone(),
-                    y=torch.tensor(a['y'],device='cuda',dtype=torch.float64),name=a['name'],index=a['index']) for s,a in arrays.items()}
+                    y=torch.tensor(a['y'],device='cuda',dtype=torch.float64),eligible=torch.tensor(a['eligible'],device='cuda'),
+                    name=a['name'],index=a['index']) for s,a in arrays.items()}
         tr,va=data['train'],data['validation'];assert set(tr['name']).isdisjoint(va['name'])
         assert all(len(set(a['y']))==2 for a in arrays.values())
         counts=Counter(zip(tr['name'],arrays['train']['y']))
@@ -60,12 +62,13 @@ def fit_readout(saved,seq,localized):
                 probability=(va['x']@coef).sigmoid();positive=va['y']>.5;negative=~positive
                 stats=dict(validation_bce=float(torch.nn.functional.binary_cross_entropy(probability,va['y'])),
                     positive_frames=int(positive.sum()),negative_frames=int(negative.sum()),
-                    false_positive_normal=int(((probability>=normal)&negative).sum()),
-                    false_positive_slow=int(((probability>=slow)&negative).sum()),
-                    positive_detected=int(((probability>=normal)&positive).sum()))
+                    false_positive_normal=int(((probability>=normal)&negative&va['eligible']).sum()),
+                    false_positive_slow=int(((probability>=slow)&negative&va['eligible']).sum()),
+                    false_positive_slow_all_tilts=int(((probability>=slow)&negative).sum()),
+                    positive_detected=int(((probability>=normal)&positive&va['eligible']).sum()))
                 episodes=[]
                 for name in sorted(set(va['name'])):
-                    ix=[i for i,n in enumerate(va['name']) if n==name and arrays['validation']['y'][i]>.5]
+                    ix=[i for i,n in enumerate(va['name']) if n==name and arrays['validation']['y'][i]>.5 and arrays['validation']['eligible'][i]]
                     if ix:episodes.append(dict(name=name,positive_frames=len(ix),
                         detected=int((probability[ix]>=normal).sum()),min_probability=float(probability[ix].min()),max_probability=float(probability[ix].max())))
                 candidates.append(dict(ridge=ridge,metrics=stats,positive_episodes=episodes,coef=coef.detach().cpu().tolist()))
@@ -73,6 +76,7 @@ def fit_readout(saved,seq,localized):
                and all(e['detected']>=6 for e in c['positive_episodes'])]
         from pour_wide_study import ROOT
         report=dict(method='Episode/class-balanced binary cross entropy with L2 penalty around the parent empty readout; 64 frozen hidden features plus bias.',
+            validation_operating_gate='Labeled tilt>=95 degrees and source outflow<3 nominal mL/s, an offline proxy for the existing runtime proprioception/visual-flow gate. All-angle errors also reported. No test data.',
             learned_parameters=65,train_episodes=len(set(tr['name'])),validation_episodes=len(set(va['name'])),
             train_frames=len(tr['y']),validation_frames=len(va['y']),
             candidates=[{k:v for k,v in c.items() if k!='coef'} for c in candidates],data_manifest=manifest)

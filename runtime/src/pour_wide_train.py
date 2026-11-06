@@ -18,7 +18,7 @@ from pour_workspace_study import RUNTIME_SOURCES as PARENT_SOURCES
 from pour_wide_study import ROOT, PARENT, PARENT_SHA, PREFIX, REFERENCE_PREFIX, plan
 
 RUNTIME_SOURCES=tuple(dict.fromkeys(PARENT_SOURCES+(
-    'pour_wide_study.py','pour_wide_train.py','pour_wide_motion.py','pour_recording.py',
+    'pour_wide_study.py','pour_wide_train.py','pour_wide_motion.py','pour_wide_geometry.py','pour_recording.py',
     'run_fountain.py','robot_pour.py','pour_guard_actor.py','pour_guard_vision.py','pour_source_alignment.py','pour_wide_source.py')))
 
 
@@ -39,6 +39,8 @@ def sequences(saved):
             reference=s.get('reference_case',s['name'])
             if s.get('protocol')!=17:continue
             assert reference in expected and not s['policy_evaluation'] and not s['expert_recovery']
+            for key in ('cup_world','source_xy','initial_ml','cup_initial_ml','expected_stop','study_split','mouth_z','vessel_appearance'):
+                assert s[key]==expected[reference][key],(s['name'],key,'Reference fixture changed')
             assert f.attrs['status']=='complete' and s['task_camera_focal_m']==.030
             assert s['spacing']==.0018 and s['dt']==.0025 and s['study_split'] in ('train','validation')
             assert s['name'] not in seen;seen.add(s['name'])
@@ -212,19 +214,34 @@ def train(state):
     write('empty-readout-summary.json',source_fit)
     empty_coverage=probe(saved,seq,localized)
     write('empty-detector-coverage.json',empty_coverage)
+    assert empty_coverage['validation_negative_frames']>0,'Empty detection needs observed eligible nonempty negatives'
     assert not empty_coverage['validation_empty_episodes_without_detection'], 'Validate empty recognition on every wider validation pour before native use'
     assert not empty_coverage['false_positive_frames'], 'Wide validation frames falsely identify remaining liquid as empty'
-    saved['pour_primitive'],motion=fit_motion(saved['pour_primitive'],seq,root=ROOT,prefix=REFERENCE_PREFIX)
+    # Expand the old angle cap only where at least three successful training
+    # demonstrations reached that phase. Validation/test caps do not set it.
+    training_caps=[]
+    for e in seq:
+        if e['split']!='train':continue
+        with h5py.File(e['path']) as f:
+            d=f['data/demo_0'];mask=~d['ground_truth/stop_command'][:].astype(bool)
+            training_caps.append(float(d['ground_truth/command_angle_deg'][:][mask].max()))
+    parent_motion=dict(saved['pour_primitive']);old_cap=parent_motion['phase_cap_deg']
+    parent_motion['phase_cap_deg']=min(150.,max(old_cap,sorted(training_caps)[-3]))
+    saved['pour_primitive'],motion=fit_motion(parent_motion,seq,root=ROOT,prefix=REFERENCE_PREFIX)
+    motion['cap_selection']=dict(parent_deg=old_cap,selected_deg=parent_motion['phase_cap_deg'],training_caps_deg=training_caps,
+        method='Preserve parent cap or expand to third-largest successful new training-demonstration phase, limited to150 degrees; no validation/test targets.')
+    write('motion-summary.json',motion)
     saved['pour_primitive']['slow_rate_deg_s']=4.
     saved['source_frame_normalization']='cup_aligned_v2'
     saved['approach_clearance_m']=.07;saved['grasp_projection_consistency']=True
     saved['level_transit_approach']=True
     saved['project_pour_kinematics']=True;saved['pour_mouth_z']=.052
+    saved['centered_return']=True
     saved['thresholds'].update(approach_seconds=2.,approach_tracking_wait_s=1.,settled_geometry_tolerance=.10)
     saved['parent_training_step']=saved.get('step');saved['step']=0
     saved['parent_checkpoint_sha256']=PARENT_SHA
     saved['model_version']='visual_wide_hierarchy_v19'
-    saved['method']='Supervised wide-view RGB template localization, settled-height ridge regression and a logistic empty readout on frozen encoders; contextual motion behavioral cloning projected onto calibrated pouring kinematics, with programmed visual grasp and feedback stopping.'
+    saved['method']='Supervised wide-view RGB template localization, settled-height ridge regression and a logistic empty readout on frozen encoders; contextual motion behavioral cloning with IK constraints, programmed visual grasp, feedback stopping and over-cup upright return.'
     saved['sources']={n:sha(Path('/workspace/src')/n) for n in RUNTIME_SOURCES}
     training.update(motion_training_episodes=len(motion['train_episodes']),motion_validation_episodes=len(motion['validation_episodes']),
         localization_template_episodes=sum(e['split']=='train' for e in seq),localization_validation_episodes=sum(e['split']=='validation' for e in seq),
@@ -237,6 +254,7 @@ def train(state):
         device=saved['training_device'],chosen=chosen,thresholds=saved['thresholds'],
         localization={k:v for k,v in localization.items() if k!='families'},motion={k:v for k,v in motion.items() if k!='regularizer_validation'},
         elapsed_s=time.monotonic()-started,data_manifest_sha256=sha(ROOT/'data-manifest.json'),sources=saved['sources'],
+        scene_plan_sha256=sha(ROOT/'frozen-plan.json'),reference_repair_plan_sha256=sha(ROOT/'reference-repair-plan.json'),
         empty_detector_coverage={k:v for k,v in empty_coverage.items() if k!='episodes'},
         camera_focal_m=.030,source_frame_normalization=saved['source_frame_normalization'],no_privileged_runtime_inputs=True,
         task_goal='Sustained verified grasp, actual pour, correct full/empty stop, upright return/release and zero measured loss; original scoring unchanged.')

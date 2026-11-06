@@ -187,6 +187,14 @@ class Actor:
         self.stop_latched=reason;robot.reason=reason;robot.stop_time=t
         self.terminal=TerminalPrimitive(self.history,t,self.profile)
         self.terminal.return_path=monotone_return_path(self.outbound,self.pour_phase,self.history[-1][1],self.qlift)
+        if self.saved.get('centered_return') and self.pour_phase>=70.:
+            from pour_wide_motion import CenteredTerminal
+            try:
+                self.terminal=CenteredTerminal(self.history,t,self.profile,self.fk,self.pour_phase,
+                    self.source_xy,self.cup_xy,self.cal['table_z'],self.qlift,self.saved['pour_mouth_z'])
+            except ValueError as error:
+                self.return_planning_error=str(error)
+                self.stop_latched=robot.reason='return_planning_failed'
 
     @torch.inference_mode()
     def act(self,observation,robot,t):
@@ -327,6 +335,7 @@ class Actor:
             visual_grasp_confirmed=self.grasp_confirmed,confirmation_votes=self.confirm_votes,source_xy=None if self.source_xy is None else self.source_xy.tolist(),
             grasp_check=self.grasp_check,localization_consensus=self.localization_check,
             approach_tracking=self.approach_check,
+            return_planning_error=getattr(self,'return_planning_error',None),
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
             settled_prediction=settled_prediction,empty_views=empty_views,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,

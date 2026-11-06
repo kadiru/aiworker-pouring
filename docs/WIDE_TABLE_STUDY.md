@@ -1,6 +1,6 @@
 # Wider and swapped table placements
 
-Status: in progress, November 5, 2026, America/Los_Angeles. No new trained-candidate or reserved-test result yet. Preserve earlier W30 (23/30) and broader-layout (1/14) evidence.
+Status: in progress, November 6, 2026, America/Los_Angeles. No new trained-candidate or reserved-test result yet. Preserve earlier W30 (23/30) and broader-layout (1/14) evidence.
 
 ## Task and evaluation
 
@@ -28,13 +28,15 @@ The candidate's final frame/episode counts, selected coefficients, errors, check
 
 ## Pilot failures and clearance correction
 
-Initial four reference pilots are all preserved. 00 reached 93.114% rim height with zero measured loss; swapped 01 emptied with zero measured loss. 02 contacted a finger at initialization and lost 27.999432 nominal mL. 03 grasped/poured but lost 0.268272 nominal mL. Only 00/01 qualify as accepted reference supervision so far.
+Initial four reference pilots are all preserved. 00 reached 93.114% rim height with zero measured loss; swapped 01 emptied with zero measured loss. 02 contacted a finger at initialization and lost 27.999432 nominal mL. 03 grasped/poured but lost 0.268272 nominal mL. The original successful references are 00/01; later explicitly named repairs add accepted supervision without deleting originals.
 
-The first preflight included all twelve arm/palm/finger meshes but incorrectly screened against the inner fluid profile. The corrected envelope adds actual 2.4 mm walls and a combined 2 mm contact margin. It identifies the two affected starts. The candidate uses a fixed ready TCP 10 cm higher and level overhead translation before descent. Geometry audits cover initial vessel contact and 41 approach samples; they exclude native tracking dynamics and general robot self-collision. Native repaired pilots must pass before general collection.
+The first preflight included all twelve arm/palm/finger meshes but incorrectly screened against the inner fluid profile. The corrected envelope adds actual 2.4 mm walls and a combined 2 mm contact margin. It identifies the two affected starts. The candidate uses a fixed ready TCP 10 cm higher and level overhead translation before descent. Geometry audits cover initial vessel contact and 41 approach samples; they exclude native tracking dynamics and general robot self-collision. The raised-ready approach passed all 70 geometry checks. Repaired 02 passed; repaired 03 still lost 28 particles during withdrawal. An over-cup upright return and drain pause then produced a zero-loss 03 repair at 93.403% rim height, permitting general collection. Reference 04 subsequently lost one particle; it is retained as a failure.
 
-Repair identities `T30_A_demo_train_02_ready_r1` and `03_ready_r1` map to the original planned layouts. Repaired records do not erase failed originals. Training acceptance checks require closed recordings, verified grasp, zero measured loss and no scoring gates.
+Repair identities `T30_A_demo_train_02_ready_r1`, `03_ready_r1` and `03_return_r2` map to the original planned layouts. Repaired records do not erase failed originals. Training acceptance checks require closed recordings, verified grasp, zero measured loss and no scoring gates.
 
 New scripted empty-source references hold the verified emptied bottle at its current tilt for 1.2 seconds before returning, producing stable empty-state images for supervision. The hold never applies to full-cup stops or autonomous evaluation; both object motion and liquid remain native physics.
+
+A further candidate retains the early lift boost until 45 degrees, adds 4 mm lip clearance and moves the final upright drip position to the cup center. Native swapped-pilot logs showed real cup-wall contact during early tilt. Candidate piecewise vessel envelopes pass all 70 sampled paths; dynamic validation is pending. This candidate is staged, not deployed into the active collection. Geometry constraints and return timing are explicitly engineered components.
 
 ## Fresh identities and source freezing
 
