@@ -18,6 +18,28 @@ def log(event, **fields):
     print(json.dumps({"time": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                       "event": event, **fields}), flush=True)
 
+def foreign_gpu_pids(rows, own_pids, container_id):
+    foreign = []
+    for row in rows.splitlines():
+        if not row.startswith(GPU): continue
+        pid = int(row.split(",")[1].strip())
+        if pid in own_pids: continue
+        process = Path(f"/proc/{pid}")
+        try:
+            # NVML can still list a process while Docker removes its exiting
+            # child from `top`. A zombie cannot execute competing GPU work.
+            state = (process / "stat").read_text().rpartition(")")[2].split()[0]
+            if state in ("Z", "X"): continue
+            groups = (process / "cgroup").read_text()
+        except FileNotFoundError:
+            continue
+        components = {part for line in groups.splitlines()
+                      for part in line.split(":", 2)[2].split("/")}
+        if container_id in components or f"docker-{container_id}.scope" in components:
+            continue
+        foreign.append(pid)
+    return foreign
+
 def main(container_id):
     info = json.loads(output("docker", "inspect", container_id))[0]
     if (info["Id"] != container_id or info["Name"] != "/aiworker_pouring_4070"
@@ -33,15 +55,13 @@ def main(container_id):
             # Query GPU first so a newly created container child cannot look foreign.
             rows = output("nvidia-smi", "--query-compute-apps=gpu_uuid,pid", "--format=csv,noheader")
             own_pids = {int(s.strip()) for s in output("docker", "top", container_id, "-eo", "pid").splitlines()[1:]}
-            foreign = [int(row.split(",")[1].strip()) for row in rows.splitlines()
-                       if row.startswith(GPU) and int(row.split(",")[1].strip()) not in own_pids
-                       and Path(f"/proc/{int(row.split(',')[1].strip())}").exists()]
+            foreign = foreign_gpu_pids(rows, own_pids, container_id)
             if foreign:
                 log("yielding_gpu", foreign_pids=foreign)
                 subprocess.run(["docker", "stop", "--timeout", "5", container_id], check=True, timeout=20)
                 return
             failures = 0
-        except (subprocess.SubprocessError, ValueError, IndexError) as error:
+        except (subprocess.SubprocessError, OSError, ValueError, IndexError) as error:
             if isinstance(error, subprocess.CalledProcessError):
                 try:
                     if container_id not in output("docker", "ps", "-aq", "--no-trunc").splitlines():
