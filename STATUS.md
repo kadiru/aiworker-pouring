@@ -1,7 +1,9 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **V21 development r2 is 4/5 completed strict passes; case 03 remains underfilled but its spill/recontact is fixed. Three cases continue unchanged. V22 data-scope update is committed/staged for a component fit, not fitted/deployed. No reserved test has run.**
+State: **V21 development r2 audited: 6/8 strict passes, 8/8 grasps, zero measured loss in all eight. V22 finer-image level component passes; combined fit and closed-loop validation are next. No reserved test has run.**
+
+**R2 audit and V22 component:** 61 native recordings / 207 sidecars / 28,066 transitions pass integrity and local byte/SHA checks. All 64 selected r2 frames are inspected; all eight release/retreat traces have zero recorded finger recontact. The 60-feature recalibration and all 144 domain-weight variants failed the unchanged accuracy gates. Finer row/color-edge features pass with 340 ridge coefficients, lambda 0.1, domain weights parent/reference/development 1/1/64. Fitting explicitly consumes 24 r0/r1/r2 recordings; 146/36 train/validation episodes, 4,519/1,128 images. Validation near-full MAE 1.040 points; wider near-full maximum error 2.881 points; consumed near-full maximum 1.988 points. Target 92.488%. This remains component evidence, not new task performance.
 
 ## In progress: wider/swapped study
 
@@ -51,6 +53,8 @@ A second verified local preview retains the r1 case-03 failure: `evidence/wide-A
 **R2 case 04 now passes:** final settled rim 93.6234%, source 30.658824 nominal mL, zero measured loss, complete return/release. All five completed cases have zero measured loss; case 03 remains the sole strict failure.
 
 **Local backup space:** 37 scripted-reference HDF5 copies are stored losslessly as `.hdf5.zst`; every decompressed byte count and SHA matches the native index. This frees 1,132,940,378 bytes; local free space is about 4.8 GiB. Native originals are unchanged. All 57 closed recordings / 191 sidecars verify, including the 37 lossless archives. Development/test recordings stay uncompressed for video work. `tools/backup_workspace_recordings.py` and the final verifier support these archives.
+
+**R2 complete:** 6/8 strict passes. All four empty cases end with zero source particles and zero measured loss. Full cases 00/04 pass at 92.5649% / 93.6234%; 03 fails at 87.8926%; 07 reaches 92.8057% but fails the required stop condition (`fill_unconfirmed`, top-up limit). All eight verified grasp and completed return/release with zero final outside and near-table loss. Observer exited successfully; final source/checkpoint/resource snapshot is backed up. Native integrity audit and remaining local backups are in progress.
 
 Method: supervised RGB template localization, settled-height ridge regression, CNN empty/nonempty classification, and contextual joint-target behavioral cloning. IK geometry, visual grasp checks, full/empty temporal stopping and return are programmed. No reinforcement learning. The target remains ≥90% settled rim height OR source ≤max(0.25 nominal mL, 1% initial), correct complete return/release, and zero measured loss. One particle represents 0.005832 nominal mL; 20 Hz scoring permits transient droplets that return, not a claim of continuously splash-free fluid or physical-robot performance.
 

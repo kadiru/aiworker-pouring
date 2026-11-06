@@ -298,16 +298,17 @@ def fit_level(saved,bundle):
     # The inherited narrow-workspace set otherwise dominates the newly
     # collected camera perspectives. Ratios were selected in an explicit
     # reference/development-only diagnostic; reserved scenes are never read.
-    domain_weights={'parent':1.,'wide_reference':4.,'consumed_development':16.}
+    domain_weights={'parent':1.,'wide_reference':1.,'consumed_development':64.}
     weights*=y.new_tensor([domain_weights['consumed_development'] if n.startswith(PREFIX+'dev')
         else domain_weights['wide_reference'] if n.startswith(REFERENCE_PREFIX+'demo_')
         else domain_weights['parent'] for n in tr['episode']])
     weights/=weights.mean();candidates=[]
     feature_sets=([0,1,2,3],[0,1,2,3,4],list(range(7)),[0,4]+list(range(7,21)),list(range(21)),
-        list(range(21))+list(range(21,25))+list(range(39,43))+list(range(57,60)),list(range(60)))
+        list(range(21))+list(range(21,25))+list(range(39,43))+list(range(57,60)),list(range(60)),
+        list(range(130)),list(range(200)),list(range(340)))
     for columns in feature_sets:
         a=x[:,columns];mean=a.mean(0);scale=a.std(0).clamp(min=.001);mean[0]=0.;scale[0]=1.;a=(a-mean)/scale
-        for ridge in (.001,.01,.1,1.):
+        for ridge in (.001,.01,.1,1.,10.,100.):
             penalty=torch.eye(len(columns),device='cuda',dtype=torch.float64)*ridge;penalty[0,0]=1e-9
             coef=torch.linalg.solve(a.T@(a*weights[:,None])+penalty,a.T@(y*weights))
             fitted=dict(columns=columns,mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),coef=coef.cpu().tolist(),ridge=ridge,
@@ -328,7 +329,8 @@ def fit_level(saved,bundle):
                 consumed_development_near_full_max_overestimate=float(development_error[development_near].max()) if development_near.any() else None)
             candidates.append(dict(fit=fitted,metrics=stats,score=stats['near_full_mae']+.5*stats['near_full_p95_abs']+stats['wide_mae']))
     eligible=[c for c in candidates if (c['metrics']['consumed_development_max_abs'] is None or c['metrics']['consumed_development_max_abs']<.04)
-        and (c['metrics']['consumed_development_near_full_max_abs'] is None or c['metrics']['consumed_development_near_full_max_abs']<.02)]
+        and (c['metrics']['consumed_development_near_full_max_abs'] is None or c['metrics']['consumed_development_near_full_max_abs']<.02)
+        and c['metrics']['wide_near_full_max_abs']<.04]
     write('level-candidates.json',candidates)
     assert eligible,'Improve consumed stable-level calibration: <4 points overall and <2 points near full are required'
     chosen=min(eligible,key=lambda c:c['score'])

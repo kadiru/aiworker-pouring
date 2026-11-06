@@ -19,9 +19,17 @@ def features(image, cnn, cup_xy):
     # spatial interactions for the wider-table supervised candidate.
     view = base[:, 5:7] * .08
     visual = torch.cat((base[:, 1:5], bands), 1)
-    return torch.cat((original, visual * view[:, :1], visual * view[:, 1:],
-                      view[:, :1].square(), view[:, :1] * view[:, 1:],
-                      view[:, 1:].square()), 1)
+    legacy = torch.cat((original, visual * view[:, :1], visual * view[:, 1:],
+                        view[:, :1].square(), view[:, :1] * view[:, 1:],
+                        view[:, 1:].square()), 1)
+    # Five-row pooling loses the small surface displacement that matters near
+    # the rim. Preserve row detail and continuous red evidence at color edges.
+    rgb = image.float() / 255.
+    r, g, b = rgb.unbind(-1)
+    red = torch.sigmoid((r - 1.4*g - .025) / .04) * torch.sigmoid((r - 1.2*b - .02) / .04)
+    fine = hist[:, 14:84]
+    soft = red[:, 14:84, 35:73].mean(2)
+    return torch.cat((legacy, fine, soft, fine * view[:, :1], fine * view[:, 1:]), 1)
 
 
 def predict(x, fitted):

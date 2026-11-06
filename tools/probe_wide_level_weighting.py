@@ -11,6 +11,7 @@ import time
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--candidate-dir', type=Path, required=True)
+    p.add_argument('--fine-features', action='store_true')
     args = p.parse_args()
     root = args.candidate_dir
     output = root / 'weighting-result.json'
@@ -43,7 +44,11 @@ def main():
         wide = torch.tensor([n.startswith('T30_A_demo') for n in tr['episode']], device='cuda')
         vwide = torch.tensor([n.startswith('T30_A_demo') for n in va['episode']], device='cuda')
         rows = []
-        for columns in (list(range(21)), list(range(21))+list(range(21,25))+list(range(39,43))+list(range(57,60)), list(range(60))):
+        feature_sets = (list(range(21)), list(range(21))+list(range(21,25))+list(range(39,43))+list(range(57,60)), list(range(60)))
+        if args.fine_features:
+            assert x.shape[1] == 340
+            feature_sets = tuple(list(range(n)) for n in (60, 130, 200, 340))
+        for columns in feature_sets:
             a = x[:, columns]
             mean, scale = a.mean(0), a.std(0).clamp(min=.001)
             mean[0], scale[0] = 0., 1.
@@ -53,7 +58,7 @@ def main():
                     weights = y.new_tensor([1./counts[n] for n in tr['episode']])*torch.where(y>.8,3.,1.)
                     weights *= torch.where(wide, wwide, 1.)*torch.where(dev, wdev, 1.)
                     weights /= weights.mean()
-                    for ridge in (.001, .01, .1, 1.):
+                    for ridge in ((.001, .01, .1, 1., 10., 100.) if args.fine_features else (.001, .01, .1, 1.)):
                         penalty = torch.eye(len(columns),device='cuda',dtype=torch.float64)*ridge
                         penalty[0,0] = 1e-9
                         coef = torch.linalg.solve(a.T@(a*weights[:,None])+penalty,a.T@(y*weights))
