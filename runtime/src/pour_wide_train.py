@@ -77,17 +77,17 @@ def sequences(saved):
 
 
 def development_calibration(saved):
-    """Consume audited development r0/r1 for localization and stable levels."""
-    expected={s['name']+f'_r{r}':s for r in (0,1) for s in plan()['development']};result=[];manifest=[]
+    """Consume audited development r0/r1/r2 for localization and stable levels."""
+    expected={s['name']+f'_r{r}':s for r in (0,1,2) for s in plan()['development']};result=[];manifest=[]
     integrity=ROOT/'development-recording-integrity.json'
     audit=json.loads(integrity.read_text());assert audit['native_checks_passed'] and not audit['pending_attempts']
     indexed={r['name']:r for r in audit['files']}
     for path in sorted(Path('/workspace/outputs/fountain').glob(f'*/*{PREFIX}dev_*/episode.hdf5')):
         with h5py.File(path) as f:
             spec=json.loads(f.attrs['spec']);name=spec['name']
-            if not name.endswith(('_r0','_r1')):continue
+            if not name.endswith(('_r0','_r1','_r2')):continue
             assert name in expected and spec['protocol']==17 and spec['study_split']=='development'
-            assert spec['development_round'] in (0,1) and spec['policy_evaluation'] and f.attrs['status']=='complete'
+            assert spec['development_round'] in (0,1,2) and spec['policy_evaluation'] and f.attrs['status']=='complete'
             assert all(spec[k]==v for k,v in expected[name].items() if k!='name')
             digest=sha(path);assert indexed[name]['valid'] and indexed[name]['sha256']==digest
             d=f['data/demo_0'];indices=np.flatnonzero(d['time'][:]-d['time'][0]<=.35+1e-7)
@@ -100,9 +100,9 @@ def development_calibration(saved):
                 source_xyz=d['ground_truth/bottle_pose'][0,:3],cup_xyz=np.asarray(spec['cup_world'])))
             manifest.append(dict(name=name,path=str(path),sha256=digest,indices=indices.tolist(),
                 use='Localization candidate/confidence calibration and stable-level regression supervision; no localization templates, empty-CNN or motion targets.'))
-    assert len(result)==16 and {e['name'] for e in result}==set(expected),'All sixteen closed r0/r1 development recordings are required'
+    assert len(result)==24 and {e['name'] for e in result}==set(expected),'All twenty-four closed r0/r1/r2 development recordings are required'
     write('localization-development-manifest.json',dict(records=manifest,integrity_sha256=sha(integrity),
-        scope='Explicitly consumed development rounds zero and one; not held-out performance. Eight layouts repeated, sixteen recordings. Reserved tests remain untouched.'))
+        scope='Explicitly consumed development rounds zero, one and two; not held-out performance. Eight layouts repeated, twenty-four recordings. Reserved tests remain untouched.'))
     return result
 
 
@@ -398,7 +398,7 @@ def train(state):
     saved['thresholds'].update(approach_seconds=2.,approach_tracking_wait_s=1.,settled_geometry_tolerance=.10)
     saved['parent_training_step']=saved.get('step');saved['step']=0
     saved['parent_checkpoint_sha256']=PARENT_SHA
-    saved['model_version']='visual_wide_hierarchy_v21'
+    saved['model_version']='visual_wide_hierarchy_v22'
     saved['method']='Supervised RGB template localization calibrated with consumed development scenes, settled-height ridge regression and a fine-tuned wrist-crop empty CNN; contextual motion behavioral cloning with IK constraints, dual-view presence plus encoder hold, feedback stopping and programmed upright return.'
     saved['sources']={n:sha(Path('/workspace/src')/n) for n in RUNTIME_SOURCES}
     training.update(motion_training_episodes=len(motion['train_episodes']),motion_validation_episodes=len(motion['validation_episodes']),
@@ -419,7 +419,7 @@ def train(state):
         empty_detector_coverage={k:v for k,v in empty_coverage.items() if k!='episodes'},
         source_presence_coverage={k:v for k,v in presence.items() if k!='episodes'},
         source_presence_fusion=saved['source_presence_fusion'],early_return_seconds=saved['early_return_seconds'],
-        gentle_release_retreat=saved['gentle_release_retreat'],consumed_development_rounds=[0,1],
+        gentle_release_retreat=saved['gentle_release_retreat'],consumed_development_rounds=[0,1,2],
         localization_development_manifest_sha256=sha(ROOT/'localization-development-manifest.json'),
         camera_focal_m=.030,source_frame_normalization=saved['source_frame_normalization'],no_privileged_runtime_inputs=True,
         task_goal='Sustained verified grasp, actual pour, correct full/empty stop, upright return/release and zero measured loss; original scoring unchanged.')

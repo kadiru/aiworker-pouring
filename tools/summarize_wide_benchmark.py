@@ -62,7 +62,7 @@ def main():
     assert before['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
     final=snapshots['runtime-final']['health'];assert not final['queue'] and not final['recording']['active'] and not final['error'] and not final['learning_error']
     manifest=read(E/'data-manifest.json');assert sha(E/'data-manifest.json')==model['data_manifest_sha256']
-    rounds=model.get('consumed_development_rounds',[0]);assert rounds in ([0],[0,1])
+    rounds=model.get('consumed_development_rounds',[0]);assert rounds in ([0],[0,1],[0,1,2])
     consumed={s['name']+f'_r{r}' for r in rounds for s in plan['development']}
     assert all(not x['name'].startswith('XW30_A_test') and (not x['name'].startswith('XW30_A_dev') or x['name'] in consumed) for x in manifest)
     dev_level=[x for x in manifest if x['name'] in consumed]
