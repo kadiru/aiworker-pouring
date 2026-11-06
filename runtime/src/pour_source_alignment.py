@@ -14,6 +14,18 @@ from pour_stop_data import crops
 def aligned_crops(task,wrist,cup_xy,cal):
     z=cal['table_z']+.038
     current=project([*cup_xy,z],cal)
+    reference=cal.get('source_reference_calibration')
+    if reference is not None:
+        nominal=project([.49,-.15,z],reference)
+        right=np.asarray(cal['T'])[:3,0]
+        ref_right=np.asarray(reference['T'])[:3,0]
+        radius=np.linalg.norm(project(np.r_[cup_xy,z]+right*.01,cal)-current)
+        ref_radius=np.linalg.norm(project(np.array([.49,-.15,z])+ref_right*.01,reference)-nominal)
+        scale=float(radius/ref_radius)
+        image=Image.fromarray(task).transform((384,384),Image.Transform.AFFINE,
+            (scale,0.,float(current[0]-scale*nominal[0]),0.,scale,float(current[1]-scale*nominal[1])),
+            Image.Resampling.BILINEAR,fillcolor=(180,180,180))
+        return crops(np.asarray(image).copy(),wrist)
     nominal=project([.49,-.15,z],cal)
     du,dv=current-nominal
     image=Image.fromarray(task).transform((384,384),Image.Transform.AFFINE,

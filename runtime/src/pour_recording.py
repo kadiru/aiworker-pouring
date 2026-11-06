@@ -33,7 +33,7 @@ class PourRecording:
         self.capture_retries = 0
         self.max_skew = 0.
         definitions = {
-            'task': ('/World/TrainingTaskCamera', [.85,-.55,1.35], [.49,-.22,1.12], [0,0,1], .040),
+            'task': ('/World/TrainingTaskCamera', [.85,-.55,1.35], [.49,-.22,1.12], [0,0,1], spec.get('task_camera_focal_m', .040)),
             'wrist': ('/World/TrainingWristCamera', [.16,-.07,-.025], [0,.04,-.22], [1,0,0], .007),
         }
         if spec.get('record_overview'):
@@ -117,6 +117,9 @@ class PourRecording:
             self.file.attrs['camera_rig'] = 'A_task_wrist_v4_with_spectator_v1'
             self.file.attrs['policy_camera_names'] = json.dumps(['task','wrist'])
             self.file.attrs['spectator_camera_names'] = json.dumps(['overview'])
+        if spec.get('task_camera_focal_m', .040) != .040:
+            self.file.attrs['camera_rig'] = 'A_task_wide_wrist_v5' + ('_with_spectator_v1' if spec.get('record_overview') else '')
+            self.file.attrs['task_camera_focal_m'] = spec['task_camera_focal_m']
         self.file.attrs['camera_visual_review'] = 'pending'
         self.file.attrs['joint_names'] = json.dumps(NAMES)
         self.file.attrs['control_dt'] = DT

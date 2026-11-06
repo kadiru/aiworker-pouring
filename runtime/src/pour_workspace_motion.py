@@ -8,17 +8,18 @@ from pour_workspace_study import ROOT,PREFIX
 
 
 @torch.inference_mode()
-def fit(parent,sequences):
+def fit(parent,sequences,root=ROOT,prefix=PREFIX):
     prior=json.loads(Path('/workspace/learning/A-recovery-20261102-v1/dataset-manifest.json').read_text())
     entries=[dict(name=e['name'],path=e['path'],split=e['split']) for e in prior if e.get('accepted') and not e.get('corrective_prefix') and not e.get('expert_recovery')]
-    entries.extend(dict(name=e['name'],path=e['path'],split=e['split']) for e in sequences if e['name'].startswith(PREFIX) and e['accepted_reference'])
+    entries.extend(dict(name=e['name'],path=e['path'],split=e['split']) for e in sequences if e['name'].startswith(prefix) and e['accepted_reference'])
     episodes={'train':[],'validation':[]}
     for e in entries:
         with h5py.File(e['path'],'r') as f:
             d=f['data/demo_0'];spec=json.loads(f.attrs['spec']);phase=np.array([x.decode() for x in d['ground_truth/phase'][:]])
             ix=np.flatnonzero((phase=='Pouring from gripper')&~d['ground_truth/stop_command'][:].astype(bool))
             assert len(ix)>5,e['name']
-            lift=d['obs/joint_pos'][np.argmin(abs(d['time'][:]-3.25)),:7]
+            lift_index=(max(0,int(ix[0])-1) if e['name'].startswith('T30_A_') else np.argmin(abs(d['time'][:]-3.25)))
+            lift=d['obs/joint_pos'][lift_index,:7]
             angle=d['ground_truth/command_angle_deg'][:][ix];q=d['actions'][:][ix,:7]
             unique=np.r_[True,np.diff(angle)>1e-4];angle=angle[unique];q=q[unique]
             delta=np.stack([np.interp(np.arange(166),angle,q[:,j])-lift[j] for j in range(7)],-1)
@@ -51,7 +52,7 @@ def fit(parent,sequences):
         validation_target_rmse_deg=best['rmse_deg'],regularizer_validation=[{k:v for k,v in c.items() if k not in ('weights','support')} for c in candidates],
         fast_rate_deg_s=30.,slow_rate_deg_s=5.,training_device=torch.cuda.get_device_name(0),
         context_dimensions=10,phase_grid_points=166,serialized_weight_entries=166*10*7)
-    (ROOT/'pour-primitive-fit.json').write_text(json.dumps(result,indent=2)+'\n')
+    (root/'pour-primitive-fit.json').write_text(json.dumps(result,indent=2)+'\n')
     metadata={k:v for k,v in result.items() if k not in ('weights','mean','std')}
-    (ROOT/'motion-summary.json').write_text(json.dumps(metadata,indent=2)+'\n')
+    (root/'motion-summary.json').write_text(json.dumps(metadata,indent=2)+'\n')
     return result,metadata

@@ -39,6 +39,7 @@ allowed_commands.update(('reliable_train','reliable_development','reliable_test'
 allowed_commands.update(('workspace_collect','workspace_train','workspace_development','workspace_test'))
 allowed_commands.add('layout_variety_test')
 allowed_commands.add('layout_variety_extra')
+allowed_commands.update(('wide_pilot', 'wide_repair', 'wide_collect', 'wide_train', 'wide_development', 'wide_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -629,7 +630,23 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd=='layout_variety_extra':
+                    if cmd in ('wide_pilot','wide_repair','wide_collect','wide_development','wide_test'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before queuing wider-table cases';continue
+                        from pour_wide_study import references,repairs,development,tests
+                        pending.extend(references(4) if cmd=='wide_pilot' else
+                            repairs() if cmd=='wide_repair' else
+                            references() if cmd=='wide_collect' else development() if cmd=='wide_development' else tests())
+                    elif cmd=='wide_train':
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before fitting wider-table models';continue
+                        try:
+                            from pour_wide_train import train
+                            state['trained_checkpoint']=train(state)
+                            state.pop('learning_error',None)
+                        except Exception:
+                            state['learning_error']=traceback.format_exc();state['phase']='Wider-table fitting failed'
+                    elif cmd=='layout_variety_extra':
                         if current is not None or pending:
                             state['control_message']='Wait for idle before queuing additional layouts';continue
                         from pour_layout_extra import unstarted

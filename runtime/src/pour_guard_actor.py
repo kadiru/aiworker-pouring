@@ -107,7 +107,7 @@ class Actor:
         if self.saved.get('approach_clearance_m'):
             from pour_workspace_path import clearance_approach
             self.approach_path=clearance_approach(self.fk,self.home,self.grasp,
-                clearance_m=self.saved['approach_clearance_m'])
+                clearance_m=self.saved['approach_clearance_m'],level_transit=self.saved.get('level_transit_approach',False))
         self.stage_start=t;self.grasp_stage='approach';self.history=[(age,q[:7].copy())]
 
     def change_grasp_stage(self,stage,t):
@@ -123,14 +123,15 @@ class Actor:
         if self.grasp_stage=='initialize':return np.r_[self.home,np.zeros(4)],'Waiting for consistent localization'
         elapsed=t-self.stage_start;grip=np.pi/4;stage=self.grasp_stage
         if stage=='approach':
-            arm=path_at(self.approach_path,ease(elapsed/1.35));grip=0.
-            if elapsed>=1.35:
+            approach_seconds=self.threshold.get('approach_seconds',1.35)
+            arm=path_at(self.approach_path,ease(elapsed/approach_seconds));grip=0.
+            if elapsed>=approach_seconds:
                 tolerance=self.threshold.get('approach_tracking_tolerance_rad')
                 error=float(np.max(abs(q[:7]-self.grasp)))
                 arrived=tolerance is None or (np.isfinite(error) and error<=tolerance)
                 self.approach_check=dict(max_joint_error_rad=error,arrived=bool(arrived),elapsed=elapsed)
                 if arrived:self.change_grasp_stage('close',t)
-                elif elapsed>=1.35+self.threshold.get('approach_tracking_wait_s',.75):
+                elif elapsed>=approach_seconds+self.threshold.get('approach_tracking_wait_s',.75):
                     # Reverse this attempt's measured motion with open fingers.
                     # A blocked approach must not close and then lurch into a bottle.
                     self.abort_time=t;self.stop_latched='approach_unconfirmed'
@@ -146,6 +147,10 @@ class Actor:
         elif stage=='verify':
             arm=self.lift_path[-1].copy();neck,score=locate(task,self.saved['source_bank'],tracking=True,expected_uv=self.expected_lift_neck)
             moved=self.initial_neck[1]-neck[1]>25.
+            if self.saved.get('grasp_projection_consistency'):
+                expected=self.expected_lift_neck-self.initial_neck
+                actual=neck-self.initial_neck
+                moved=np.linalg.norm(expected)>=8. and np.dot(actual,expected)>.65*np.dot(expected,expected)
             follows=np.linalg.norm(neck-self.expected_lift_neck)<12.
             gap=self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']
             obstructed=held_gripper(q,gap)
@@ -211,13 +216,14 @@ class Actor:
                 flow=float(np.clip((newer-older)/.3,0,.45))
             c,s,w=crops(task,wrist);p=self.detector(*[torch.as_tensor(x,device='cuda')[None] for x in (c,s,w)])
             empty=float(p['empty_logit'][0].sigmoid());present=float(p['present_logit'][0].sigmoid())
-            if self.saved.get('source_frame_normalization')=='raw_and_cup_aligned_v1':
+            if self.saved.get('source_frame_normalization') in ('raw_and_cup_aligned_v1','cup_aligned_v2'):
                 from pour_source_alignment import aligned_crops,combine_evidence
                 ac,asc,aw=aligned_crops(task,wrist,self.cup_xy,self.cal)
                 ap=self.detector(*[torch.as_tensor(x,device='cuda')[None] for x in (ac,asc,aw)])
                 ae=float(ap['empty_logit'][0].sigmoid());apr=float(ap['present_logit'][0].sigmoid())
                 empty_views=dict(raw_empty=empty,raw_present=present,aligned_empty=ae,aligned_present=apr)
-                empty,present=combine_evidence(empty,present,ae,apr)
+                empty,present=((ae,apr) if self.saved.get('source_frame_normalization')=='cup_aligned_v2'
+                               else combine_evidence(empty,present,ae,apr))
             rotation=self.fk.fk(q[:7])[1];up=rotation@self.lift_rotation.T@np.array([0.,0.,1.])
             tilt=float(np.degrees(np.arccos(np.clip(up[2],-1,1))))
             is_empty=empty>=self.threshold['empty_probability'] and present>=.7 and tilt>=95 and flow*72.8<3.
@@ -300,7 +306,16 @@ class Actor:
                 if self.terminal is not None:targets,phase=self.terminal.act(t)
                 else:
                     arm=target(self.saved['pour_primitive'],self.qlift,self.cup_xy,self.pour_phase)
-                    targets=np.r_[arm,np.full(4,np.pi/4)];phase='Pour control: '+self.fill_mode
+                    if self.saved.get('project_pour_kinematics'):
+                        from pour_wide_motion import project_target
+                        try:
+                            arm=project_target(self.fk,arm,self.source_xy,self.cup_xy,
+                                self.cal['table_z'],self.pour_phase,self.saved['pour_mouth_z'])
+                        except ValueError:
+                            self.latch('trajectory_unreachable',t,robot)
+                            targets,phase=self.terminal.act(t)
+                    if self.terminal is None:
+                        targets=np.r_[arm,np.full(4,np.pi/4)];phase='Pour control: '+self.fill_mode
         bounded=np.clip(targets-q,-np.r_[[.12]*7,[.85]*4],np.r_[[.12]*7,[.85]*4]);command=q+bounded
         limited=np.clip(command[:7],self.arm_limits[0],self.arm_limits[1]);clamped=not np.allclose(command[:7],limited) or not np.allclose(targets-q,bounded)
         command[:7]=limited;command[7:]=np.clip(command[7:],0,np.pi/4)

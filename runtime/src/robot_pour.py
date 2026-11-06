@@ -68,6 +68,13 @@ def build_path(stage, spec):
                     [(j.GetLowerLimitAttr().Get(),j.GetUpperLimitAttr().Get()) for j in joints],
                     lift.GetLocalPos0Attr().Get())
     home=nominal.solve(0.,0.,.07)
+    # Wider fixtures can occupy the old low ready-hand position. Raise the
+    # shared ready pose before simulation begins; the bottle stays dynamic.
+    # This is fixed robot setup, never derived from live object poses.
+    home_clearance=spec.get('home_clearance_m', .10 if spec.get('protocol')==17 else 0.)
+    if home_clearance:
+        tcp,rotation=nominal.fk(np.radians(home))
+        home=nominal.solve_pose(tcp+[0.,0.,home_clearance],rotation)
     grasp=planner.solve(0.,0.)
     approach=np.linspace(home,grasp,13)
     lift_path=np.array([planner.solve(0.,x) for x in np.linspace(0.,1.,9)])
@@ -76,7 +83,7 @@ def build_path(stage, spec):
     if spec.get('approach_clearance_m'):
         from pour_workspace_path import clearance_approach
         approach=np.degrees(clearance_approach(planner,np.radians(home),np.radians(grasp),
-            clearance_m=spec['approach_clearance_m']))
+            clearance_m=spec['approach_clearance_m'],level_transit=spec.get('protocol')==17))
     return approach,lift_path,tilt
 
 
@@ -141,6 +148,7 @@ class RobotPour(Pour):
             finger_static_friction=1.15, finger_dynamic_friction=1.,
             arm_control='Joint position drives with native actuator torque limits',
             observation_source='Simulator particle inventory and fill height',
+            home_clearance_m=spec.get('home_clearance_m', .10 if spec.get('protocol')==17 else 0.),
             dof_names=['arm_r_joint'+str(i) for i in range(1,8)]+
                       ['gripper_r_joint'+str(i) for i in range(1,5)],
             cup_frame_world=self.cup_world.tolist(), cup_frame_rotation=FRAME.tolist())
@@ -181,6 +189,18 @@ class RobotPour(Pour):
     def drive(self,t):
         if t+1e-8<self.next_control: return
         self.next_control=t+self.spec.get('control_period',.01)
+        if self.stop_time is None:
+            hold = self.spec.get('reference_hold_seconds', 0.)
+            extension = self.spec.get('reference_approach_extension_s', 0.)
+            # Keep an initial stationary calibration window and extend only the
+            # approach. Stop/return clocks always remain actual simulation time.
+            u = max(0., t - hold)
+            if .25 <= u <= 1. + extension:
+                t = .25 + .75 * (u - .25) / (.75 + extension)
+            elif u > 1. + extension:
+                t = u - extension
+            else:
+                t = u
         closure=ease((t-1.)/.65)
         if t<1.:
             arm=interpolate(self.approach,ease((t-.25)/.75))
@@ -204,10 +224,10 @@ class RobotPour(Pour):
             arm=interpolate(self.tilt,self.command_angle/165.)
             self.phase='Pouring from gripper' if self.verified else 'Grasp check failed'
         else:
-            elapsed=t-self.stop_time
+            elapsed=max(0.,t-self.stop_time-self.reference_empty_dwell())
             self.command_angle=self.stop_command_angle*(1-ease(elapsed/.85))
             arm=interpolate(self.tilt,self.command_angle/165.)
-            self.phase='Returning upright'
+            self.phase=('Holding empty source for supervision' if t<self.stop_time+self.reference_empty_dwell() else 'Returning upright')
             if elapsed>.95:
                 arm=interpolate(self.lift_path,1-ease((elapsed-.95)/.65))
                 self.phase='Setting bottle down'
@@ -233,10 +253,11 @@ class RobotPour(Pour):
         contacts=sorted(self.contacts)
         self.contacts.clear()
         both=all(name in contacts for name in FINGERS)
-        if (self.spec.get('policy_evaluation') or 2.55<=t<=TILT_START) and both and self.base[2]>.030 and abs(self.angle)<8:
+        reference_delay = self.spec.get('reference_hold_seconds', 0.) + self.spec.get('reference_approach_extension_s', 0.)
+        if (self.spec.get('policy_evaluation') or 2.55+reference_delay<=t<=TILT_START+reference_delay) and both and self.base[2]>.030 and abs(self.angle)<8:
             self.held_frames+=1
         self.verified |= self.held_frames>=6
-        if not self.spec.get('policy_evaluation') and t>=TILT_START and not self.verified and self.stop_time is None:
+        if not self.spec.get('policy_evaluation') and t>=TILT_START+reference_delay and not self.verified and self.stop_time is None:
             self.reason='grasp_failed'
             self.stop_time=t
         stopped=self.stop_time is not None
@@ -255,9 +276,13 @@ class RobotPour(Pour):
                    joint_positions_deg=[float(s.Get()) for s in self.states],command_angle_deg=self.command_angle)
         return row
 
+    def reference_empty_dwell(self):
+        if self.spec.get('policy_evaluation') or not self.verified or self.reason!='bottle_empty':return 0.
+        return self.spec.get('reference_empty_dwell_s',1.2 if self.spec.get('protocol')==17 else 0.)
+
     def complete(self,t):
         if self.spec.get('corrective_prefix'): return t>=self.spec.get('prefix_seconds',3.3)
-        return (self.stop_time is not None and t>=self.stop_time+3.) or t>=self.spec['max_seconds']+.65
+        return (self.stop_time is not None and t>=self.stop_time+3.+self.reference_empty_dwell()) or t>=self.spec['max_seconds']+.65
 
     def summary(self,rows):
         result=super().summary(rows)
