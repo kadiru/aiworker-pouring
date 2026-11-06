@@ -1,6 +1,6 @@
 # Wider and swapped table placements
 
-Status: in progress, November 6, 2026, America/Los_Angeles. References: 32 accepted targets across 37 retained recordings. V21 development r2 completed 6/8 strict passes, all eight verified grasps/returns and zero measured loss. V22 source `07cd41c` is deployed; combined fit r5 completed in 288.031 seconds on the 4070; development r3 completed 6/8 strict passes, with eight verified grasps/returns and zero measured loss in all eight. Eight development checks precede freezing the 30 unused reserved tests. Earlier W30 (23/30), broader-layout (1/14) and failed development evidence remain preserved.
+Status: thirty once-only reserved tests are queued/running with frozen V22 weights and source. November 6, 2026, America/Los_Angeles. Development r3: 6/8 strict passes, all eight grasps/returns and zero measured loss; two full-stop-confirmation failures retained. No final benchmark claim yet.
 
 ## Task and evaluation
 
