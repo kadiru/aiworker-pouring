@@ -1,7 +1,7 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **V22 r3 development completed: 6/8 strict passes, 8/8 verified grasps/returns, zero measured loss in all eight. Both failures reached >=90% final fill but reported fill_unconfirmed. Native audit is running; no reserved test has started.**
+State: **V22 r3 development completed: 6/8 strict passes, 8/8 verified grasps/returns, zero measured loss in all eight. Both failures reached >=90% final fill but reported fill_unconfirmed. Native audit and manual review passed; ready to freeze the thirty unused tests.**
 
 **R2 audit and V22 component:** 61 native recordings / 207 sidecars / 28,066 transitions pass integrity and local byte/SHA checks. All 64 selected r2 frames are inspected; all eight release/retreat traces have zero recorded finger recontact. The 60-feature recalibration and all 144 domain-weight variants failed the unchanged accuracy gates. Finer row/color-edge features pass with 340 ridge coefficients, lambda 0.1, domain weights parent/reference/development 1/1/64. Fitting explicitly consumes 24 r0/r1/r2 recordings; 146/36 train/validation episodes, 4,519/1,128 images. Validation near-full MAE 1.040 points; wider near-full maximum error 2.881 points; consumed near-full maximum 1.988 points. Target 92.488%. This remains component evidence, not new task performance.
 
@@ -10,6 +10,8 @@ State: **V22 r3 development completed: 6/8 strict passes, 8/8 verified grasps/re
 **First r3 development case passes:** final 94.168% rim height, source 42.177024 nominal mL, zero measured final/near-table loss, completed return/release. Complete 18.85-second preview at labeled 2× is `evidence/wide-A/XW30_A_dev_00_r3-preview.mp4` (SHA `0697e089591b1c2eae9d02a211cb2cbc3ff35d12367888b2696d82a8b85f9351`). Four encoded frames inspected; full decode and twelve native-camera comparisons pass, maximum mean pixel error 0.892/255. This is development only. Seven r3 checks remain pending.
 
 **R3 completed and bounded selection:** full cases finish at 94.168%, 91.038%, 92.805% and 96.333% rim height; all four empty cases finish with zero source particles. Cases 03/07 retain `fill_unconfirmed`/`wrong_stop_condition` failures after ten top-ups. Their six-frame prediction quartiles are 90.263%/92.094%, below the unchanged 92.274% target. All eight complete return/release with zero measured loss. Candidate selection among all four development rounds prioritizes eight complete grasps/returns and zero loss, then strict pass count, with latest fit breaking ties: r3 is selected over r2 (both 6/8). The committed explicit full-stop-limitations option permits benchmark selection without relabeling failures or changing any reserved-test criterion. Thirteen protocol/scoring/selection checks pass. Freeze waits for native audit and selected-frame review; no further fitting is planned before the thirty once-only tests.
+
+**R3 release checks passed:** native integrity verifies 69 recordings / 239 sidecars / 33,429 transitions with no partials. Local copies and 37 reference + 24 prior-development lossless archives all match native bytes/SHA. All 64 selected r3 frames were manually inspected, preserving two FAIL labels. All eight post-release traces have zero recorded gripper recontact. Native audit SHA `0df13de8f49393b1127fa4816e83cbe671f6e2e1be380f2f38545b2010c8e17d`. Candidate r3 is ready for explicit limited-performance selection and thirty once-only reserved tests.
 
 ## In progress: wider/swapped study
 
