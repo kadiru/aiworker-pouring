@@ -1,6 +1,7 @@
 """Supervised wide-view localization, level fitting and constrained imitation."""
 import copy
 import hashlib
+from itertools import product
 import json
 from pathlib import Path
 import time
@@ -71,28 +72,31 @@ def fit_localization(saved,seq):
     for kind,height in [('source',.135),('cup',.038)]:
         anchors=[project(e[kind+'_xyz']+[0,0,height],saved['calibration']) for e in train]
         candidates=[]
-        for absolute in (True,False):
-            for radius in (32.,48.):
-                bank=make_bank([e['images'][0] for e in train],anchors,kind,aggregation='max',
-                               absolute_gradients=absolute,anchor_radius_px=radius)
-                bank['bounds']=[24,24,360,350]
-                rows=[]
-                for e in seq:
-                    image=e['images'][0];uv,score=locate(image,bank)
-                    xy=(bottle_base_from_neck(uv,saved['calibration']) if kind=='source' else
-                        plane_point(uv,1.04+height,saved['calibration']))[:2]
-                    error=float(np.linalg.norm(xy-e[kind+'_xyz'][:2])*1000)
-                    negative=image.copy();x,y=np.rint(project(e[kind+'_xyz']+[0,0,height],saved['calibration'])).astype(int)
-                    dx,dy=(28,44) if kind=='source' else (44,22)
-                    negative[max(0,y-18):min(384,y+dy),max(0,x-dx):min(384,x+dx)]=180
-                    _,ns=locate(negative,bank)
-                    rows.append(dict(name=e['name'],split=e['split'],uv=uv.tolist(),score=score,error_mm=error,synthetic_negative_score=ns))
-                minimum=min(r['score'] for r in rows);maximum=max(r['synthetic_negative_score'] for r in rows)
-                threshold=(minimum+maximum)/2
-                candidates.append(dict(absolute_gradients=absolute,anchor_radius_px=radius,
-                    min_positive=minimum,max_negative=maximum,threshold=threshold,margin=minimum-maximum,
-                    max_error_mm=max(r['error_mm'] for r in rows),rows=rows,bank=bank))
-                print('LOCALIZATION',kind,absolute,radius,'error',candidates[-1]['max_error_mm'],'margin',minimum-maximum,flush=True)
+        # Restrict source templates to the neck when nearby robot/background
+        # edges dominate the wider image. Validation chooses the mask; runtime
+        # matching still uses RGB only and the stored template support.
+        masks=(None,(10,8,38,40),(12,8,36,36),(14,8,34,34)) if kind=='source' else (None,)
+        for absolute,radius,mask_box in product((True,False),(32.,48.),masks):
+            bank=make_bank([e['images'][0] for e in train],anchors,kind,aggregation='max',
+                           absolute_gradients=absolute,anchor_radius_px=radius,source_mask_box=mask_box)
+            bank['bounds']=[24,24,360,350]
+            rows=[]
+            for e in seq:
+                image=e['images'][0];uv,score=locate(image,bank)
+                xy=(bottle_base_from_neck(uv,saved['calibration']) if kind=='source' else
+                    plane_point(uv,1.04+height,saved['calibration']))[:2]
+                error=float(np.linalg.norm(xy-e[kind+'_xyz'][:2])*1000)
+                negative=image.copy();x,y=np.rint(project(e[kind+'_xyz']+[0,0,height],saved['calibration'])).astype(int)
+                dx,dy=(28,44) if kind=='source' else (44,22)
+                negative[max(0,y-18):min(384,y+dy),max(0,x-dx):min(384,x+dx)]=180
+                _,ns=locate(negative,bank)
+                rows.append(dict(name=e['name'],split=e['split'],uv=uv.tolist(),score=score,error_mm=error,synthetic_negative_score=ns))
+            minimum=min(r['score'] for r in rows);maximum=max(r['synthetic_negative_score'] for r in rows)
+            threshold=(minimum+maximum)/2
+            candidates.append(dict(absolute_gradients=absolute,anchor_radius_px=radius,source_mask_box=mask_box,
+                min_positive=minimum,max_negative=maximum,threshold=threshold,margin=minimum-maximum,
+                max_error_mm=max(r['error_mm'] for r in rows),rows=rows,bank=bank))
+            print('LOCALIZATION',kind,absolute,radius,mask_box,'error',candidates[-1]['max_error_mm'],'margin',minimum-maximum,flush=True)
         eligible=[c for c in candidates if c['max_error_mm']<2. and c['margin']>.015]
         write(kind+'-localization-candidates.json',[{k:v for k,v in c.items() if k!='bank'} for c in candidates])
         assert eligible, 'No precise, occlusion-rejecting '+kind+' localization candidate'

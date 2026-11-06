@@ -41,7 +41,7 @@ def gradients(image):
         F.pad((gray[:,:,2:,:]-gray[:,:,:-2,:])*.5,(0,0,1,1))],1)
 
 
-def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gradients=False,anchor_radius_px=None,anchor_penalty=0.):
+def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gradients=False,anchor_radius_px=None,anchor_penalty=0.,source_mask_box=None):
     # Only the neck outline or glass rim is matched, not liquid volume.
     width,height,dx,dy=(48,64,-24,-12) if kind=='source' else (80,28,-40,-14)
     feat=gradients(torch.as_tensor(np.stack(images),device=device));n=len(images)
@@ -56,11 +56,18 @@ def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gr
     if kind=='source':
         mask[:,:,:,0:5]=0;mask[:,:,:,-5:]=0;mask[:,:,:8]=0;mask[:,:,45:]=0
         mask[:,:,8:19]*=2.
+    if source_mask_box is not None:
+        assert kind=='source' and len(source_mask_box)==4
+        x0,y0,x1,y1=source_mask_box
+        assert 0<=x0<x1<=width and 0<=y0<y1<=height
+        keep=torch.zeros_like(mask);keep[:,:,y0:y1,x0:x1]=1
+        mask*=keep
     kernels*=mask;kernels/=kernels.square().sum((1,2,3),keepdim=True).sqrt().clamp(min=1e-6)
     kernels*=mask  # numerator weights both observations; denominator uses mask²
     lo=np.floor(np.min(anchors,axis=0)-9).astype(int);hi=np.ceil(np.max(anchors,axis=0)+9).astype(int)
     return dict(kernels=kernels.cpu(),mask=mask.cpu(),offset=[dx,dy],bounds=[*lo.tolist(),*hi.tolist()],kind=kind,
-        aggregation=aggregation,absolute_gradients=absolute_gradients,anchors=np.asarray(anchors).tolist(),anchor_radius_px=anchor_radius_px,anchor_penalty=anchor_penalty)
+        aggregation=aggregation,absolute_gradients=absolute_gradients,anchors=np.asarray(anchors).tolist(),anchor_radius_px=anchor_radius_px,anchor_penalty=anchor_penalty,
+        source_mask_box=source_mask_box)
 
 
 @torch.inference_mode()
