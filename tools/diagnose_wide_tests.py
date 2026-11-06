@@ -94,6 +94,8 @@ def main():
             final_source_nominal_ml=row['source_remaining_ml'],
             final_outside_nominal_ml=row['final_outside_ml'],
             ever_near_worktop_nominal_ml=row['ever_below_worktop_ml'],
+            final_height_trace=[{k:s[k] for k in ('t', 'cup_fill_fraction', 'cup_ml', 'phase')}
+                                for s in samples[-20:]],
             recorded_table_loss_events=table_events,
             post_release_recontacts=recontacts))
     located = [r['localization'] for r in cases if r['localization'] is not None]
