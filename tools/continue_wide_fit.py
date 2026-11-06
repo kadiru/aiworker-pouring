@@ -18,10 +18,22 @@ def main():
         for n,sha in manifest['files'].items():assert digest(STUDY/'staged'/n)==sha,n
     try:
         staged();assert not (STUDY/'best.pt').exists() and not (STUDY/'final-selection.json').exists()
+        repair_restart_started=None
         while time.monotonic()-started<8*3600:
-            isolation();h=health();assert not h.get('error') and not h.get('learning_error')
             collection=read(pathlib.Path(a.collection_progress))
             assert collection['stage']!='needs_inspection',collection.get('error')
+            # The reviewed repair owns its one idle-only simulator restart.
+            # Its atomic progress record distinguishes that bounded handoff
+            # from an unexpected guard stop, which still fails closed.
+            if collection['stage']=='deploying_reviewed_clearance_repair':
+                if repair_restart_started is None:repair_restart_started=time.monotonic()
+                assert time.monotonic()-repair_restart_started<600,'Repair deployment did not return ready'
+                save();time.sleep(15);continue
+            try:
+                isolation();h=health();assert not h.get('error') and not h.get('learning_error')
+            except (AssertionError,OSError,ValueError):
+                if read(pathlib.Path(a.collection_progress))['stage']=='deploying_reviewed_clearance_repair':continue
+                raise
             if collection['stage']=='complete':break
             save();time.sleep(30)
         else:raise TimeoutError('Finite reference-wait limit reached')
