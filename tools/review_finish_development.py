@@ -6,10 +6,8 @@ from PIL import Image,ImageDraw
 from render_labeled_benchmark import font
 
 PROJECT=Path(__file__).resolve().parents[1]
-DATA=Path('/workspace/outputs/fountain')
-import render_labeled_benchmark as typography
-typography.FONT=Path('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
-typography.BOLD=Path('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf')
+DATA=PROJECT/'data/material-A-finish'
+from finish_media_source import verified_recording
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -25,10 +23,10 @@ def main():
     indexed={r['name']:r for r in integrity['files']};a.output.mkdir(exist_ok=False)
     cases=[];checkpoints=set()
     for row in sorted(progress['rows'],key=lambda r:r['name']):
-        identity=indexed[row['name']];path=DATA/identity['relative_path']
-        assert identity['valid'] and path.stat().st_size==identity['bytes'] and sha(path)==identity['sha256']
-        decisions=read(path.parent/'policy-decisions.json');sheet=Image.new('RGB',(1536,960),'#101820');draw=ImageDraw.Draw(sheet)
-        with h5py.File(path) as f:
+        identity=indexed[row['name']];folder=(DATA/identity['relative_path']).parent
+        assert identity['valid']
+        decisions=read(folder/'policy-decisions.json');sheet=Image.new('RGB',(1536,960),'#101820');draw=ImageDraw.Draw(sheet)
+        with verified_recording(identity) as path,h5py.File(path) as f:
             spec=json.loads(f.attrs['spec']);metrics=json.loads(f.attrs['metrics'])
             assert f.attrs['status']=='complete' and spec['name']==row['name'] and spec['protocol']==18
             checkpoint=metrics['policy']['checkpoint_sha256'];checkpoints.add(checkpoint)

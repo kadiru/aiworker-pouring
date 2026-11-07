@@ -57,7 +57,9 @@ def build(saved):
     calibration=json.loads((ROOT/'calibration-plan.json').read_text())['cases']
     expected={s['name']:s for s in calibration};found=set()
     for path in sorted(OUTPUTS.glob('*/*FCAL_A_*/episode.hdf5')):
-        spec=json.loads((path.parent/'parameters.json').read_text());name=spec['name'];assert spec==expected[name] and name not in found;found.add(name)
+        spec=json.loads((path.parent/'parameters.json').read_text());name=spec['name']
+        if name not in expected:continue
+        assert spec==expected[name] and name not in found;found.add(name)
         rows=json.loads((path.parent/'samples.json').read_text());split=spec['study_split'];selected=[]
         with h5py.File(path) as f:
             assert f.attrs['status']=='complete';d=f['data/demo_0']

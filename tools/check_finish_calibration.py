@@ -21,7 +21,7 @@ for path in sorted(OUTPUTS.glob('*/*FCAL_A_*/episode.hdf5')):
     motion=float(np.ptp(np.array([r['joint_positions_deg'][:7] for r in tail]),axis=0).max())
     height_std=float(np.std([r['cup_fill_fraction'] for r in tail]));inventory_range=float(np.ptp([r['cup_ml'] for r in tail]))
     row=dict(name=name,source_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),initial_height=spec['calibration_initial_height'],initial_nominal_ml=spec['cup_initial_ml'],final_height=samples[-1]['cup_fill_fraction'],command_range_rad=command_range,tail_arm_motion_deg=motion,tail_height_std=height_std,tail_inventory_range_ml=inventory_range,final_outside_ml=samples[-1]['spilled_ml']+samples[-1]['airborne_ml'],image=str(out/(name+'.jpg')))
-    row['stable']=motion<.3 and height_std<.01 and inventory_range<.05;rows.append(row)
+    row['stable']=motion<.3 and height_std<.01 and inventory_range<.05 and row['final_outside_ml']==0.;rows.append(row)
 result=dict(scope='Stationary supervised camera calibration, not autonomous task success',expected=len(expected),closed=len(rows),all_stable=all(r['stable'] for r in rows),rows=rows)
 (out/'summary.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
 assert len(rows)==len(expected) and result['all_stable']

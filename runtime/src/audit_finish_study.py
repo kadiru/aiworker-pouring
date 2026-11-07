@@ -23,11 +23,15 @@ def item(path):
 
 
 def audit(output,scope="evaluation"):
-    files=[];sidecars=[];partials=[];partial_sidecars=[];checks=[];names=set()
+    files=[];sidecars=[];partials=[];partial_sidecars=[];checks=[];names=set();excluded=[]
+    expected={s['name'] for s in json.loads((ROOT/'calibration-plan.json').read_text())['cases']} if scope=='calibration' else None
     for prefix in (("FCAL_A_",) if scope=="calibration" else (PREFIX,)):
         for parameters in sorted(OUTPUTS.glob(f'*/*{prefix}*/parameters.json')):
             spec=json.loads(parameters.read_text())
             if spec.get('protocol')!=18:continue
+            if expected is not None and spec['name'] not in expected:
+                excluded.append(dict(name=spec['name'],parameters=item(parameters),reason='Superseded unstable calibration initialization; retained, excluded from fit'))
+                continue
             if scope=='evaluation' and spec['study_split'] not in ('development','test'):continue
             name=spec['name'];assert name not in names;names.add(name);folder=parameters.parent
             ep=folder/'episode.hdf5';partial=folder/'episode.partial.hdf5'
@@ -81,7 +85,7 @@ def audit(output,scope="evaluation"):
     report=dict(files=files,sidecar_files=sidecars,partial_files=[],partial_sidecar_files=partial_sidecars,
                 pending_attempts=partials,checks=checks,valid_recordings=len(files),
                 native_checks_passed=not partials,transitions=sum(r['transitions'] for r in files),
-                scope=scope,note='Integrity is distinct from task success. No missing outcome is imputed. Manual image review is separate.')
+                scope=scope,excluded_calibrations=excluded,note='Integrity is distinct from task success. No missing outcome is imputed. Manual image review is separate.')
     output.write_text(json.dumps(report,indent=2)+'\n')
     return report
 

@@ -6,7 +6,7 @@ STUDY=HOST_ROOT/'learning/A-finish-20261106-v1'
 
 def read(p):return json.loads(p.read_text())
 def main():
-    output=Path('/tmp/aiworker-finish-calibration-v1');output.mkdir(exist_ok=False)
+    output=Path('/tmp/aiworker-finish-calibration-v2');output.mkdir(exist_ok=False)
     expected={s['name']:s for s in read(STUDY/'calibration-plan.json')['cases']};assert len(expected)==51
     record=dict(stage='collecting',expected=len(expected),started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),snapshots=[isolation()])
     def save():
@@ -17,7 +17,9 @@ def main():
             h=health();assert not h.get('error') and not h.get('learning_error')
             closed=[]
             for p in (HOST_ROOT/'outputs/fountain').glob('*/*FCAL_A_*/metrics.json'):
-                s=read(p.parent/'parameters.json');assert s==expected[s['name']]
+                s=read(p.parent/'parameters.json')
+                if s['name'] not in expected:continue
+                assert s==expected[s['name']]
                 m=read(p);closed.append(dict(name=s['name'],path=str(p.parent),height=m['bottle_result']['cup_fill_fraction'],zero_loss=m['zero_spill']))
             assert len({r['name'] for r in closed})==len(closed)
             record.update(completed=len(closed),rows=closed,health={k:h.get(k) for k in ('run','phase','sim_time','recording','error')});save()
