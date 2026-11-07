@@ -53,15 +53,26 @@ def main():
                 time=float(d['time' if group=='obs' else 'next_time'][i])
                 draw.text((x+8,y),f'{label} / {time:.2f}s',font=font(16),fill='#B3C0CC');sheet.paste(image,(x,y+30))
                 samples.append(dict(group=group,index=i,camera=camera,t=time,label=label))
+            strip=Image.new('RGB',(1920,920),'#101820');sd=ImageDraw.Draw(strip)
+            sd.text((12,12),row['name']+' | Return sequence | native overview frames',font=font(23,True),fill=color)
+            return_samples=[]
+            for j,offset in enumerate((0.,.55,1.1,1.4,2.2,3.1,4.0,4.6,5.2,7.2)):
+                i=int(np.argmin(abs(times-min(times[-1],times[stop]+offset))))
+                x=(j%5)*384;y=60+(j//5)*424
+                image=Image.open(io.BytesIO(d['next_obs/overview_image'][i].tobytes())).convert('RGB')
+                sd.text((x+8,y),f"+{times[i]-times[stop]:.2f}s / {decisions[i]['mode']}",font=font(14),fill='#B3C0CC')
+                strip.paste(image,(x,y+30));return_samples.append(dict(index=i,t=float(times[i]),mode=decisions[i]['mode']))
+            return_output=a.output/(row['name']+'-return.jpg');strip.save(return_output,quality=95)
         output=a.output/(row['name']+'.jpg');sheet.save(output,quality=95)
         cases.append(dict(name=row['name'],source_sha256=identity['sha256'],sheet=str(output),sheet_sha256=sha(output),
-            strict_pass=row['strict_pass'],failure_reasons=row['failure_reasons'],samples=samples,manual_review='pending'))
+            strict_pass=row['strict_pass'],failure_reasons=row['failure_reasons'],samples=samples,
+            return_sheet=str(return_output),return_sheet_sha256=sha(return_output),return_samples=return_samples,manual_review='pending'))
     assert len(checkpoints)==1
     report=dict(checkpoint_sha256=next(iter(checkpoints)),cases=cases,manual_review='pending',
         source_manifest_sha256=sha(a.manifest),progress_sha256=sha(a.progress),
-        scope='Eight selected native frames per development attempt; not full-video playback. No HDF5 attributes changed.')
+        scope='Eight selected task/wrist/overview frames and ten return overview frames per development attempt; not full-video playback. No HDF5 attributes changed.')
     (a.output/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
-    print(json.dumps(dict(cases=len(cases),selected_frames=sum(len(r['samples']) for r in cases),manual_review='pending')))
+    print(json.dumps(dict(cases=len(cases),selected_frames=sum(len(r['samples'])+len(r['return_samples']) for r in cases),manual_review='pending')))
 
 
 if __name__=='__main__':main()

@@ -1,4 +1,4 @@
-"""Freeze one reviewed wide candidate after eight completed development cases.
+"""Freeze one reviewed finish candidate after eight completed development cases.
 
 Explicit invocation only. Archives model/source, snapshots isolation, and queues
 the thirty unused reserved scenes once. Never trains or repairs a test case.
@@ -20,6 +20,7 @@ def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--manifest',required=True)
     parser.add_argument('--review',required=True);parser.add_argument('--round',type=int,default=0)
+    parser.add_argument('--withdrawal',required=True)
     parser.add_argument('--output-dir',required=True)
     parser.add_argument('--evaluate-known-full-stop-limitations',metavar='RATIONALE')
     a=parser.parse_args()
@@ -30,6 +31,7 @@ def main():
     checkpoint=sha(STUDY/'best.pt');assert checkpoint==model['checkpoint_sha256']
     assert sha(STUDY/'frozen-plan.json')==model['scene_plan_sha256']
     assert '4070' in model['device']
+    assert model['terminal_drain_hold_s']==0.
     for n,digest in model['sources'].items():assert manifest['files'][n]==sha(HOST_ROOT/'src'/n)==digest,n
     expected={s['name']+f'_r{a.round}':s for s in plan['development']};assert len(expected)==8
     rows=[];seen=set()
@@ -55,6 +57,14 @@ def main():
     assert integrity['native_checks_passed'] and not integrity['pending_attempts']
     indexed={r['name']:r for r in integrity['files']}
     for r in review['cases']:assert r['source_sha256']==indexed[r['name']]['sha256']
+    withdrawal=read(a.withdrawal);motion={r['name']:r for r in withdrawal['cases']}
+    assert set(motion)==seen
+    for name,r in motion.items():
+        assert r['source_sha256']==indexed[name]['sha256']
+        assert r['post_release_gripper_contact_frames']==0,(name,'Post-release contact')
+        assert r['longest_sampled_upright_near_stationary_over_cup_s']<=.35,(name,'Lingering above cup')
+        starts=r['stage_starts_s'];duration=starts['Setting bottle down']-starts['Returning upright']
+        assert abs(duration-3.1)<=.051,(name,'Unexpected return duration',duration)
     witness=isolation();h=health()
     assert not h['queue'] and not h['recording']['active'] and not h.get('error') and not h.get('learning_error')
     own={int(x.strip()) for x in subprocess.check_output(['docker','top',CID,'-eo','pid'],text=True).splitlines()[1:]}
@@ -63,6 +73,7 @@ def main():
         scene_plan_sha256=model['scene_plan_sha256'],runtime_sources=model['sources'],source_commit=manifest['source_commit'],
         container=CID,development=rows,development_round=a.round,development_visual_review_sha256=sha(a.review),
         development_integrity_sha256=sha(STUDY/'development-recording-integrity.json'),
+        development_withdrawal_sha256=sha(a.withdrawal),
         development_selection=dict(strict_passes=sum(r['strict_pass'] for r in rows),attempts=8,
             known_full_stop_limitations=a.evaluate_known_full_stop_limitations,
             scope='Explicit benchmark selection may retain documented full-stop failures. All eight must still grasp, transfer, return and have zero measured loss. No outcome is relabeled; reserved scoring is unchanged.'),
@@ -78,7 +89,7 @@ assert hashlib.sha256((r/'best.pt').read_bytes()).hexdigest()==s['selected_check
 archive=r/'frozen-candidate';archive.mkdir(exist_ok=False);(archive/'src').mkdir()
 for n,h in s['runtime_sources'].items():
  assert hashlib.sha256((src/n).read_bytes()).hexdigest()==h;shutil.copy2(src/n,archive/'src'/n)
-for n in ('best.pt','model-summary.json','frozen-plan.json','data-manifest.json'):shutil.copy2(r/n,archive/n)
+for n in ('best.pt','model-summary.json','frozen-plan.json','data-manifest.json','calibration-plan.json','calibration-seed-provenance.json','calibration-particle-seed.npz'):shutil.copy2(r/n,archive/n)
 payload=json.dumps(s,indent=2)+'\\n';(archive/'final-selection.json').write_text(payload)
 p=r/'final-selection.partial.json';p.write_text(payload);p.replace(r/'final-selection.json')
 """
