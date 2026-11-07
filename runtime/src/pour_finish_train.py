@@ -14,7 +14,7 @@ from pour_guard_vision import cup_crop,locate,plane_point
 from pour_settled_model import features,predict
 from pour_finish_study import ROOT,PARENT,PARENT_SHA,PREFIX,OUTPUTS,sha,plan
 from pour_wide_train import RUNTIME_SOURCES as PREVIOUS_SOURCES
-RUNTIME_SOURCES=tuple(dict.fromkeys(PREVIOUS_SOURCES+('pour_finish_study.py','pour_finish_train.py')))
+RUNTIME_SOURCES=tuple(dict.fromkeys(PREVIOUS_SOURCES+('pour_finish_study.py','pour_finish_train.py','pour_finish_calibration.py')))
 def write(n,d):(ROOT/n).write_text(json.dumps(d,indent=2)+'\n')
 
 def build(saved):
@@ -56,7 +56,7 @@ def build(saved):
     assert len(records)==38
     calibration=json.loads((ROOT/'calibration-plan.json').read_text())['cases']
     expected={s['name']:s for s in calibration};found=set()
-    for path in sorted(OUTPUTS.glob('*/*FN30_A_calib_*/episode.hdf5')):
+    for path in sorted(OUTPUTS.glob('*/*FCAL_A_*/episode.hdf5')):
         spec=json.loads((path.parent/'parameters.json').read_text());name=spec['name'];assert spec==expected[name] and name not in found;found.add(name)
         rows=json.loads((path.parent/'samples.json').read_text());split=spec['study_split'];selected=[]
         with h5py.File(path) as f:
@@ -100,8 +100,8 @@ def train(state):
         matrices[split]=torch.cat(xs)
     x,vx=matrices['train'],matrices['validation'];y=data['train']['target'].cuda().double();vy=data['validation']['target'].cuda().double()
     count=Counter(data['train']['episode']);w=y.new_tensor([1/count[n] for n in data['train']['episode']])*torch.where(y>.8,3.,1.)
-    recent=torch.tensor([n.startswith(('XW30_A_','FN30_A_calib_')) for n in data['train']['episode']],device='cuda')
-    wideval=torch.tensor([n.startswith(('XW30_A_','FN30_A_calib_')) for n in data['validation']['episode']],device='cuda');near=vy>.8
+    recent=torch.tensor([n.startswith(('XW30_A_','FCAL_A_')) for n in data['train']['episode']],device='cuda')
+    wideval=torch.tensor([n.startswith(('XW30_A_','FCAL_A_')) for n in data['validation']['episode']],device='cuda');near=vy>.8
     candidates=[]
     feature_sets=[list(range(21)),list(range(60)),list(range(340)),list(range(21))+list(range(340,x.shape[1])),list(range(x.shape[1]))]
     for weight in (2.,8.,32.):

@@ -23,5 +23,5 @@ def tests():
 
 def calibrations():
     assert not (ROOT/'final-selection.json').exists()
-    started={s['name'] for s in seen()}
+    started={json.loads(p.read_text())['name'] for p in OUTPUTS.glob('*/*FCAL_A_*/parameters.json')}
     return [s for s in json.loads((ROOT/'calibration-plan.json').read_text())['cases'] if s['name'] not in started]

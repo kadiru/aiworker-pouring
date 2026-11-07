@@ -68,7 +68,7 @@ def build_path(stage, spec, include_planner=False):
                     [j.GetAxisAttr().Get() for j in joints],
                     [(j.GetLowerLimitAttr().Get(),j.GetUpperLimitAttr().Get()) for j in joints],
                     lift.GetLocalPos0Attr().Get(), spec.get('cup_world',CUP_WORLD),
-                    spec.get('source_xy'),spec.get('mouth_z',.054),wide_geometry=spec.get('protocol')==17)
+                    spec.get('source_xy'),spec.get('mouth_z',.054),wide_geometry=spec.get('protocol') in (17,18))
     nominal=ArmPath(planner.offsets,[j.GetAxisAttr().Get() for j in joints],
                     [(j.GetLowerLimitAttr().Get(),j.GetUpperLimitAttr().Get()) for j in joints],
                     lift.GetLocalPos0Attr().Get())
@@ -76,7 +76,7 @@ def build_path(stage, spec, include_planner=False):
     # Wider fixtures can occupy the old low ready-hand position. Raise the
     # shared ready pose before simulation begins; the bottle stays dynamic.
     # This is fixed robot setup, never derived from live object poses.
-    home_clearance=spec.get('home_clearance_m', .10 if spec.get('protocol')==17 else 0.)
+    home_clearance=spec.get('home_clearance_m', .10 if spec.get('protocol') in (17,18) else 0.)
     if home_clearance:
         tcp,rotation=nominal.fk(np.radians(home))
         home=nominal.solve_pose(tcp+[0.,0.,home_clearance],rotation)
@@ -88,7 +88,7 @@ def build_path(stage, spec, include_planner=False):
     if spec.get('approach_clearance_m'):
         from pour_workspace_path import clearance_approach
         approach=np.degrees(clearance_approach(planner,np.radians(home),np.radians(grasp),
-            clearance_m=spec['approach_clearance_m'],level_transit=spec.get('protocol')==17))
+            clearance_m=spec['approach_clearance_m'],level_transit=spec.get('protocol') in (17,18)))
     return (approach,lift_path,tilt,planner) if include_planner else (approach,lift_path,tilt)
 
 
@@ -123,6 +123,10 @@ class RobotPour(Pour):
             count=round(spec['cup_initial_ml']/(spacing**3*1e6))
             cup_points=np.array([[*cross[i%len(cross)],.004+2*spacing+(i//len(cross))*spacing]
                                  for i in range(count)],dtype=np.float32)
+            if spec.get('calibration_version')==1:
+                from pour_finish_calibration import cup_points as calibration_points
+                cup_points=calibration_points(spec)
+                assert abs(len(cup_points)*spacing**3*1e6-spec['cup_initial_ml'])<1e-6
             self.points=np.concatenate([self.points,(cup_points @ FRAME.T+self.cup_world).astype(np.float32)])
 
         cup=UsdGeom.Xformable(stage.GetPrimAtPath('/World/Cup'))
@@ -154,7 +158,7 @@ class RobotPour(Pour):
             finger_static_friction=1.15, finger_dynamic_friction=1.,
             arm_control='Joint position drives with native actuator torque limits',
             observation_source='Simulator particle inventory and fill height',
-            home_clearance_m=spec.get('home_clearance_m', .10 if spec.get('protocol')==17 else 0.),
+            home_clearance_m=spec.get('home_clearance_m', .10 if spec.get('protocol') in (17,18) else 0.),
             dof_names=['arm_r_joint'+str(i) for i in range(1,8)]+
                       ['gripper_r_joint'+str(i) for i in range(1,5)],
             cup_frame_world=self.cup_world.tolist(), cup_frame_rotation=FRAME.tolist())
@@ -193,6 +197,11 @@ class RobotPour(Pour):
                 self.contacts.update(path.rsplit('/',1)[-1] for path in actors if path!='/World/Bottle')
 
     def drive(self,t):
+        if self.spec.get('calibration_only'):
+            self.command=np.r_[self.approach[0],np.zeros(4)]
+            self.phase='Stationary liquid-level calibration'
+            for drive,target in zip(self.drives,self.command):drive.Set(float(target))
+            return
         if t+1e-8<self.next_control: return
         self.next_control=t+self.spec.get('control_period',.01)
         if self.stop_time is None:
@@ -241,7 +250,7 @@ class RobotPour(Pour):
                 closure=1-ease((elapsed-1.8)/.35)
                 arm=interpolate(self.approach,1-ease((elapsed-2.2)/.5))
                 self.phase='Releasing bottle'
-            if self.spec.get('protocol')==17 and self.verified and self.stop_command_angle>=70.:
+            if self.spec.get('protocol') in (17,18) and self.verified and self.stop_command_angle>=70.:
                 from pour_wide_motion import centered_return_path,timed_target
                 if self.centered_return is None:
                     source=self.cup_world+FRAME@np.r_[self.start_xy,0.]
@@ -301,12 +310,13 @@ class RobotPour(Pour):
 
     def reference_empty_dwell(self):
         if self.spec.get('policy_evaluation') or not self.verified or self.reason!='bottle_empty':return 0.
-        return self.spec.get('reference_empty_dwell_s',1.2 if self.spec.get('protocol')==17 else 0.)
+        return self.spec.get('reference_empty_dwell_s',1.2 if self.spec.get('protocol') in (17,18) else 0.)
 
     def complete(self,t):
+        if self.spec.get('calibration_only'):return t>=self.spec['max_seconds']
         if self.spec.get('corrective_prefix'): return t>=self.spec.get('prefix_seconds',3.3)
         terminal_s=3.
-        if self.spec.get('protocol')==17 and self.verified and self.stop_command_angle>=70.:
+        if self.spec.get('protocol') in (17,18) and self.verified and self.stop_command_angle>=70.:
             from pour_wide_motion import RETURN_SECONDS
             terminal_s=RETURN_SECONDS+2.1
         return (self.stop_time is not None and t>=self.stop_time+terminal_s+self.reference_empty_dwell()) or t>=self.spec['max_seconds']+.65

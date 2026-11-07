@@ -22,12 +22,13 @@ def item(path):
     return dict(relative_path=str(path.relative_to(OUTPUTS)),bytes=path.stat().st_size,sha256=digest(path))
 
 
-def audit(output):
+def audit(output,scope="evaluation"):
     files=[];sidecars=[];partials=[];partial_sidecars=[];checks=[];names=set()
-    for prefix in (PREFIX,):
+    for prefix in (("FCAL_A_",) if scope=="calibration" else (PREFIX,)):
         for parameters in sorted(OUTPUTS.glob(f'*/*{prefix}*/parameters.json')):
             spec=json.loads(parameters.read_text())
             if spec.get('protocol')!=18:continue
+            if scope=='evaluation' and spec['study_split'] not in ('development','test'):continue
             name=spec['name'];assert name not in names;names.add(name);folder=parameters.parent
             ep=folder/'episode.hdf5';partial=folder/'episode.partial.hdf5'
             if not ep.exists():
@@ -80,13 +81,13 @@ def audit(output):
     report=dict(files=files,sidecar_files=sidecars,partial_files=[],partial_sidecar_files=partial_sidecars,
                 pending_attempts=partials,checks=checks,valid_recordings=len(files),
                 native_checks_passed=not partials,transitions=sum(r['transitions'] for r in files),
-                note='Integrity is distinct from task success. No missing outcome is imputed. Manual image review is separate.')
+                scope=scope,note='Integrity is distinct from task success. No missing outcome is imputed. Manual image review is separate.')
     output.write_text(json.dumps(report,indent=2)+'\n')
     return report
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--output',default='recording-integrity.json');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--output',default='recording-integrity.json');p.add_argument('--scope',choices=('evaluation','calibration','all'),default='evaluation');a=p.parse_args()
     assert Path(a.output).name==a.output
-    r=audit(ROOT/a.output)
+    r=audit(ROOT/a.output,a.scope)
     print(json.dumps(dict(recordings=r['valid_recordings'],pending=len(r['pending_attempts']),transitions=r['transitions'])))

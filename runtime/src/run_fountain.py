@@ -40,7 +40,7 @@ allowed_commands.update(('workspace_collect','workspace_train','workspace_develo
 allowed_commands.add('layout_variety_test')
 allowed_commands.add('layout_variety_extra')
 allowed_commands.update(('wide_pilot', 'wide_repair', 'wide_collect', 'wide_train', 'wide_development', 'wide_test'))
-allowed_commands.update(('finish_train','finish_calibrate','finish_development','finish_test'))
+allowed_commands.update(('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -631,7 +631,7 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('finish_train','finish_calibrate','finish_development','finish_test'):
+                    if cmd in ('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before finish-study work';continue
                         if cmd=='finish_train':
@@ -643,7 +643,7 @@ try:
                                 state['learning_error']=traceback.format_exc();state['phase']='Finish-study fitting failed'
                         else:
                             from pour_finish_study import calibrations,development,tests
-                            pending.extend(calibrations() if cmd=='finish_calibrate' else development() if cmd=='finish_development' else tests())
+                            pending.extend(calibrations()[:3] if cmd=='finish_calibration_pilot' else calibrations() if cmd=='finish_calibrate' else development() if cmd=='finish_development' else tests())
                     elif cmd in ('wide_pilot','wide_repair','wide_collect','wide_development','wide_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before queuing wider-table cases';continue

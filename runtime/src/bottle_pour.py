@@ -226,7 +226,7 @@ class Pour:
             reason=None
         self.confirmed = self.confirmed+1 if reason and reason==self.last_signal else int(reason is not None)
         self.last_signal = reason
-        expert_enabled=not self.spec.get('policy_evaluation') or getattr(self,'expert_active',False)
+        expert_enabled=(not self.spec.get('policy_evaluation') or getattr(self,'expert_active',False)) and not self.spec.get('calibration_only')
         return_allowance=3.4 if self.spec.get('expert_recovery') else 2.4
         if expert_enabled and self.stop_time is None and (self.confirmed>=2 or t>=self.spec['max_seconds']-return_allowance):
             self.reason = reason if self.confirmed>=2 else 'timeout'
