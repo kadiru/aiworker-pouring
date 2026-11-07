@@ -1,7 +1,17 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **Frozen V22 benchmark: 25/30 tests closed, 16 strict passes, 25 verified grasps, 21 zero-loss runs. Four attempts lost seven particles in total (0.040824 nominal mL); five additional attempts failed the full-cup criterion. The remaining five tests are running unchanged; final audit/videos pending.**
+State: **The wider/swapped localization repair, 4070 retraining, thirty fresh tests and video delivery are complete: 18 strict passes, 30 verified grasps/transfers/returns, 26 zero-loss runs. All recording audits, local backups, independent scores and video review checks pass. Zero spill across all attempts was not achieved.**
+
+Near-full tasks pass 5/15; empty-bottle tasks pass 13/15. Six full cups finish below 90%, three stop `fill_unconfirmed`, and four attempts spill seven particles total (0.040824 nominal mL); one underfill also spills. All fifteen empty-target bottles finish with zero particles. Localization/pickup succeeds across the thirty tested layouts, but full-stop generalization and zero spill across all attempts remain unresolved. No retries or test-based model changes were made.
+
+Current next action: improve settled-level prediction and full-stop confirmation over the wider views, especially swapped full-cup tasks (0/7 strict passes), and investigate the four pour/settle loss events before a separately frozen evaluation. This follow-up is not queued; no further fit or simulation is running from the completed queue. The final runtime snapshot matches the frozen checkpoint/sources, owned container, 4070 binding and CPU/RAM caps; the guard remains present. The 4090 is idle at that snapshot. No foreign job was signaled or reconfigured.
+
+Final evidence: 99 recordings, 359 sidecars and 52,339 transitions pass native integrity and local checksum verification, with no partials. Independent scoring retains every once-only test and all twelve failures. The three videos contain all thirty complete attempts with task/method cards and PASS/FAIL reasons: [01–10, 4:07](evidence/wide-A/thirty-wide-tests-part-1.mp4), [11–20, 3:32](evidence/wide-A/thirty-wide-tests-part-2.mp4), [21–30, 3:27](evidence/wide-A/thirty-wide-tests-part-3.mp4). Full MP4 decoding, 270 native-camera comparisons and manual inspection of 96 selected encoded frames pass. This was selected-frame review, not continuous manual playback. [Review summary](evidence/wide-A/review-summary.json), [results](evidence/wide-A/final-benchmark.json), [diagnostics](evidence/wide-A/test-diagnostics.json), [method and runnable verification](docs/WIDE_TABLE_STUDY.md). Source, small reports and documentation are versioned; raw recordings, models and videos remain external to Git.
+
+## Historical progress and provenance
+
+The dated entries below retain earlier checkpoints and plans. Pending-work statements describe their state when recorded; the current state and next action are above.
 
 **Twenty-five-test evidence, November 6 at 16:35 PST:** `evidence/wide-A/test-progress-after25.json` retains all outcomes; `runtime-after-test25.json` again matches the initial sources/checkpoint, immutable container, asset and CPU/RAM/GPU limits, with the priority guard present. Since the halfway cutoff, cases 17/18/21 fail respectively for unconfirmed full stop (92.908% final height), underfill (85.238%) and underfill (86.932%). Cases 15/16/19/20/22/23/24 pass. No additional spill is recorded. The 4070 uses 4,904 MiB for our process; the 4090 has no compute process in this snapshot (its earlier process is no longer present; no cause is inferred). Available host RAM is 53,374 MiB. No foreign process was signaled or reconfigured by this task.
 

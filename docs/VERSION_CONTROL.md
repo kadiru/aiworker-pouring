@@ -19,6 +19,10 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 
 | Artifact | Existing location / identity |
 |---|---|
+| Frozen wider/swapped V22 candidate | Ubuntu `learning/A-wide-20261105-v1/best.pt` and `frozen-candidate/`; local `evidence/wide-A/best.pt`, SHA256 `4c8ab7bab4b5121004e47ac1458f6df8ead0bd481c381efa807c7be8195d3430`; core source commit `07cd41c321c7a00229618bc0db912a38be388001` |
+| Wider/swapped model provenance | Local `data/material-A-wide-models/fit-r5/`; earlier native `fit-attempts/r0`–`r4` retain failed/superseded models and sources. Fitted coefficient JSON and weights are external. |
+| Wider/swapped study recordings | Native `outputs/fountain/`; local `data/material-A-wide/`: 99 recordings and 359 sidecars, comprising 37 references, 32 development attempts and 30 fresh tests. Reviewed reference and r0/r1/r2 development HDF5 backups may be lossless `.hdf5.zst` archives; native originals stay unchanged. |
+| Wider/swapped study reports and videos | Versioned `evidence/wide-A/` JSON/CSV, selection/model/source hashes, resource and review evidence. Local `thirty-wide-tests-part-1.mp4`, `-2.mp4`, `-3.mp4` include all thirty attempts; media remain external to Git. See [the study](WIDE_TABLE_STUDY.md). |
 | Frozen expanded-position candidate | Ubuntu `learning/A-workspace-20261104-v1/best.pt`, SHA256 `a909abb318ecc980ad8450484ca98ba07990f9501cd641744b5ab6544732f51b` |
 | Expanded candidate archive | Ubuntu `learning/A-workspace-20261104-v1/candidates/v18-r0/`; model, fit reports and exact 29-file runtime snapshot; repaired `candidates/v18-r1/` has the new model and 30 sources |
 | Expanded study recordings | `data/material-A-workspace/`; 64 HDF5 and 234 sidecars checksum-verified: 22 references, four r0 development attempts, eight r1 development attempts and thirty fresh tests |

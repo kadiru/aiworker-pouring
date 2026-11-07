@@ -1,6 +1,81 @@
 # Wider and swapped table placements
 
-Status: thirty once-only reserved tests are queued/running with frozen V22 weights and source. November 6, 2026, America/Los_Angeles. Development r3: 6/8 strict passes, all eight grasps/returns and zero measured loss; two full-stop-confirmation failures retained. No final benchmark claim yet.
+Status: all thirty once-only reserved tests are closed and independently scored: **18/30 strict passes**, **30/30 verified grasps/transfers/returns**, and **26/30 zero-loss attempts**. November 6, 2026, America/Los_Angeles. Native integrity and local byte/SHA verification pass all 99 recordings / 359 sidecars / 52,339 transitions, with no partials. All three videos are rendered, fully decoded and reviewed at selected encoded frames; delivery is complete.
+
+## Frozen evaluation results
+
+| Criterion | Result |
+| --- | ---: |
+| Verified physical and visual grasp | 30/30 |
+| Liquid transfer and ordered return/release/retreat | 30/30 |
+| Complete strict task | 18/30 |
+| Near-full tasks passing all criteria | 5/15 |
+| Empty-bottle tasks passing all criteria | 13/15 |
+| Near-full cups actually at or above 90% final rim height | 9/15 |
+| Empty-target bottles with zero remaining particles | 15/15 |
+| Zero measured loss | 26/30 |
+
+Four attempts lost seven particles total (0.040824 nominal mL); zero spill across all thirty was **not** achieved. Six full-target attempts ended below 90%; three reached at least 90% but stopped `fill_unconfirmed`. One underfilled attempt also spilled, so the failure categories overlap. Localization/pickup worked across these tests; the settled-level predictor and full-stop confirmation remain the main task limitations. The larger placement range differs from previous benchmarks, so this is not a like-for-like comparison of success rates.
+
+Descriptive position/goal breakdown: normal/full **5/8**, normal/empty **6/7**, swapped/full **0/7**, swapped/empty **7/8**. The zero strict passes for swapped full-cup tasks are a material remaining limitation despite successful pickup in every layout. All thirty accepted localizations were measured offline: maximum bottle XY error **3.569 mm** against the nearest native pose, maximum cup XY error **1.337 mm** against the authored fixture center. These are test-set diagnostics, not a guarantee outside this placement plan.
+
+The retained stop traces expose prediction error: video test 19 had a six-frame lower-quartile level prediction of **97.58%** at its full stop versus **85.24%** final measured height. The three unconfirmed full stops reached the ten-top-up cap; their lower-quartile predictions remained below the fixed 92.274% confirmation target. This report does not change that target after seeing test results. All four table-loss events were recorded during pour/settle phases before return, and none of the thirty sampled retreat/hold traces contains gripper recontact. Some final surface-height traces drop while cup particle inventory stays constant; the physical cause is not established here. See `evidence/wide-A/test-diagnostics.json` for timestamps, localization estimates and the final one-second traces.
+
+| Video test number | Native ID suffix | Failure | Final rim height | Lost particles |
+| --- | --- | --- | ---: | ---: |
+| 04 | `test_03` | Spill; bottle emptied correctly | 48.12% | 2 |
+| 06 | `test_05` | Full stop unconfirmed | 90.34% | 0 |
+| 07 | `test_06` | Underfill and spill | 85.88% | 1 |
+| 10 | `test_09` | Spill; full stop confirmed | 92.06% | 2 |
+| 13 | `test_12` | Spill; bottle emptied correctly | 59.05% | 2 |
+| 14 | `test_13` | Underfill | 88.82% | 0 |
+| 18 | `test_17` | Full stop unconfirmed | 92.91% | 0 |
+| 19 | `test_18` | Underfill | 85.24% | 0 |
+| 22 | `test_21` | Underfill | 86.93% | 0 |
+| 26 | `test_25` | Full stop unconfirmed | 92.17% | 0 |
+| 27 | `test_26` | Underfill | 89.29% | 0 |
+| 30 | `test_29` | Underfill | 88.48% | 0 |
+
+Every native ID begins `XW30_A_`. [Independently verified results](../evidence/wide-A/final-benchmark.json), [all thirty CSV rows](../evidence/wide-A/final-benchmark.csv), [recording audit](../evidence/wide-A/recording-integrity.json), [backup verification](../evidence/wide-A/final-backup-verification.json) and [resource comparison](../evidence/wide-A/runtime-comparison.json) retain the evidence. No attempt was retried, excluded, or used to change the frozen model or score. The final snapshot preserves the initial 4070-only allocation, four-core CPU quota, CPUs 16–23, low shares, 16 GiB memory/swap cap and identity-bound GPU guard. No other job was signaled or reconfigured; snapshots do not establish uninterrupted foreign-job performance.
+
+## Selected model and training
+
+Final combined fit r5 took **288.03 seconds on the RTX 4070**. Runtime source commit: `07cd41c321c7a00229618bc0db912a38be388001`. Checkpoint SHA256: `4c8ab7bab4b5121004e47ac1458f6df8ead0bd481c381efa807c7be8195d3430`. The frozen scene-plan SHA256 is `1d2ff7b863c0dc0724b8cb5cc34dadfa18b6dccf8e38c1e29b2015dc67e84076`.
+
+- Localization uses clipped RGB gradients, top-three bottle-template aggregation, a training-derived tabletop region, calibrated cup templates and temporal consensus. Twenty-four training references supply templates; eight validation references plus 24 explicitly consumed development recordings calibrate confidence/position handling. Held-neck tracking checks the lifted bottle.
+- Settled level uses **340 ridge coefficients**, selected lambda **0.001**, fitted on **146 training / 36 validation episodes**, **4,519 / 1,128 images**. The input features include per-row red/color-edge profiles and spatial interactions. Episode/domain weights are parent/reference/consumed development **1/1/64**, with extra near-full weighting. Objective: `sum_i w_i (phi(x_i)^T beta - h_i)^2 + lambda ||beta||²`.
+- Empty detection uses a **48,001-parameter wrist-crop CNN**, balanced binary cross entropy and AdamW: **2,159 / 738 train/validation crops**, 100 epochs and 1,700 optimizer steps; epoch 46 selected. The final eligible validation probe detects 51/72 empty frames across all four empty episodes, with zero eligible false positives. These are consumed validation results, not fresh-test accuracy.
+- Motion is contextual joint-target behavioral cloning from **43 training / 12 validation scripted demonstrations**, with a programmed IK projection. The objective fits demonstrated joint targets by squared error. Grasp verification, staged top-ups, irreversible stop and upright placement/release/retreat remain programmed feedback logic. There is **no reinforcement learning** and no physical-robot validation.
+
+The 24 consumed development recordings are r0/r1/r2 repeats across eight layouts, not 24 independent layouts. Development r3 is used for candidate selection: **6/8 strict passes**, all eight complete grasps/returns with zero measured loss. Two full-stop failures remain explicit. A documented selection option permitted evaluating this candidate with those known limitations; it did not relax the reserved test criteria. No reserved test entered training, threshold selection or candidate selection.
+
+The final fit's near-full validation MAE is 1.033 percentage points, wider-view near-full maximum error 3.177 points, and consumed-development near-full maximum error 1.774 points. These favorable consumed-data estimates did not establish reliable full-stop generalization: the fresh benchmark above is the relevant task result. The learned full-stop target is 92.274%, while the independently measured task requirement stays 90%.
+
+## Audit and video production
+
+The finite delivery pipeline waits until all thirty recordings are closed, creates the native report, audits every study recording and sidecar, verifies local backup bytes/SHA256, and independently recomputes all thirty primary scores. It checks the frozen scene plan, committed runtime files, model identity and before/after resource snapshots. It cannot queue or retry a test, fit a model, or restart the simulator.
+
+The three local reels cover tests 01–10, 11–20 and 21–30 respectively, including every failure. They show native overview, task and wrist cameras, the planned bottle/cup layout, final PASS/FAIL reasons and task/method cards. Complete attempts run at labeled 2× speed; the four spill cases run at 1×. There is no generated camera footage or hidden failed attempt. Recordings, weights and MP4s remain outside Git; small manifests and review reports retain their hashes and exact frame mappings.
+
+| Local video | Duration | Final review |
+| --- | ---: | --- |
+| [Tests 01–10](../evidence/wide-A/thirty-wide-tests-part-1.mp4) | 247.05 s | [Part 1](../evidence/wide-A/video-part-1-review.json) |
+| [Tests 11–20](../evidence/wide-A/thirty-wide-tests-part-2.mp4) | 212.45 s | [Part 2](../evidence/wide-A/video-part-2-review.json) |
+| [Tests 21–30](../evidence/wide-A/thirty-wide-tests-part-3.mp4) | 206.60 s | [Part 3](../evidence/wide-A/video-part-3-review.json) |
+
+The complete set is 666.10 seconds, 13,322 frames, H.264 1280×720 at 20 fps. Full decoding passes all three files. All thirty unique IDs and displayed outcome labels match the independently scored report. The 270 native/encoded camera comparisons have maximum mean absolute pixel error 0.979 on a 0–255 scale. Manual review covers 96 selected encoded frames: each opening/closing card and every attempt's initial, middle and final frame. Labels are readable, camera panels are populated and the inspected frames have no text overlap. This is not full continuous manual playback. [Final review summary and media hashes](../evidence/wide-A/review-summary.json).
+
+Executed from the project environment:
+
+```sh
+.venv/bin/python -u tools/prepare_wide_test_delivery.py \
+  --checkpoint 4c8ab7bab4b5121004e47ac1458f6df8ead0bd481c381efa807c7be8195d3430 \
+  --snapshot-dir /tmp/aiworker-wide-selected-v22-r5
+```
+
+The pipeline's post-copy steps are `tools/summarize_wide_benchmark.py`, then `tools/render_wide_videos.py --part N` and `tools/review_wide_videos.py --part N` for N=1,2,3. `tools/diagnose_wide_tests.py` separately measures accepted localization error, first stop, sampled spill timing and post-release gripper contact without changing any score. Export/review tools preserve existing output and require fresh destinations for another export. Automatic review fully decodes each MP4, checks dimensions/FPS/counts, and compares 90 selected displayed camera views per reel against their native HDF5 frames. Separate manual inspection of the selected encoded frames is also complete.
+
+Delivery resumed at local scoring after a reader raised `KeyError: 'error'` on the healthy final snapshot, which omits optional error keys. The reader now accepts absent optional errors while still rejecting populated errors, an active recording or a nonempty queue. Independent scoring subsequently passed. Only local scoring/rendering resumed; no recording, test, model or runtime was changed. The recovery receipt is `evidence/wide-A/delivery-recovery.json`.
 
 ## Task and evaluation
 
@@ -14,7 +89,11 @@ The new task lens is 30 mm (previously 40 mm), fixed 384×384 task/wrist/overvie
 
 Primary pass requires verified physical and visual grasp, two-finger contact on at least 80% of sampled tipping frames, at least 1 nominal mL transferred, correct stop reason, completed upright return/release/retreat, no existing scoring gates, and the actual height/empty goal. Empty allowance is max(0.25 nominal mL, 1% initial source). Zero measured loss requires both final outside inventory (including airborne particles) and ever-near-worktop inventory to be zero. One particle is 0.005832 nominal mL. This sampled simulation criterion permits transient returning droplets and does not establish continuously splash-free or physical-robot performance.
 
-## Learning and engineered components
+## Development record (historical)
+
+The following sections retain the diagnostic sequence and earlier candidates. Statements about pending work describe their state at that point; the selected model and current results are recorded above.
+
+### Initial learning and engineered components
 
 This is supervised imitation/regression with a programmed feedback controller, not reinforcement learning or end-to-end task learning.
 

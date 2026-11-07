@@ -1,0 +1,5170 @@
+{
+  "source_report_sha256": "38e4d69e0e2213e8201006148eae9d34ed02808f16614f99ef5bd7ed0361c14c",
+  "source_integrity_sha256": "fb1cb8c8f141dd85b10de50df36ac9787055582604219958191c28c29be864b2",
+  "localized_cases": 30,
+  "maximum_source_xy_error_mm": 3.5689766132652783,
+  "maximum_cup_xy_error_vs_authored_mm": 1.3367295648624644,
+  "failure_groups": {
+    "measured_spill": [
+      "XW30_A_test_03",
+      "XW30_A_test_06",
+      "XW30_A_test_09",
+      "XW30_A_test_12"
+    ],
+    "fill_unconfirmed": [
+      "XW30_A_test_05",
+      "XW30_A_test_17",
+      "XW30_A_test_25"
+    ],
+    "wrong_stop_condition": [
+      "XW30_A_test_05",
+      "XW30_A_test_17",
+      "XW30_A_test_25"
+    ],
+    "underfilled": [
+      "XW30_A_test_06",
+      "XW30_A_test_13",
+      "XW30_A_test_18",
+      "XW30_A_test_21",
+      "XW30_A_test_26",
+      "XW30_A_test_29"
+    ]
+  },
+  "orientation_and_goal_groups": {
+    "normal/cup_near_full": {
+      "attempts": 8,
+      "strict_passes": 5
+    },
+    "normal/bottle_empty": {
+      "attempts": 7,
+      "strict_passes": 6
+    },
+    "swapped/cup_near_full": {
+      "attempts": 7,
+      "strict_passes": 0
+    },
+    "swapped/bottle_empty": {
+      "attempts": 8,
+      "strict_passes": 7
+    }
+  },
+  "cases": [
+    {
+      "name": "XW30_A_test_00",
+      "strict_pass": true,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "048eeaa94f6421a6e88a67f6eb61c7d0229e14add3ca2d8704aa49994a9fcad9",
+      "localization": {
+        "decision_time_s": 0.5049999987706545,
+        "nearest_sample_time_s": 0.505,
+        "source_estimated_xy": [
+          0.4856874779846769,
+          -0.2669842746380116
+        ],
+        "source_observed_xy": [
+          0.4854576289653778,
+          -0.26656827330589294
+        ],
+        "source_xy_error_mm": 0.475276424827959,
+        "cup_estimated_xy": [
+          0.48378440318871124,
+          -0.14850496633615157
+        ],
+        "cup_authored_xy": [
+          0.4838482790691258,
+          -0.14863776065080314
+        ],
+        "cup_xy_error_vs_authored_mm": 0.14735826445271805
+      },
+      "first_stop": {
+        "time_s": 18.9049999987711,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 3,
+        "predicted_settled_fraction": 0.9299921989440918,
+        "prediction_q25_last_six": 0.9276195615530014,
+        "sampled_current_rim_fraction": 0.9468327382031598,
+        "sampled_source_nominal_ml": 42.91185599999999
+      },
+      "final_rim_fraction": 0.9229459138477537,
+      "final_source_nominal_ml": 42.91185599999999,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 26.905,
+          "cup_fill_fraction": 0.9478817624204287,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 26.955,
+          "cup_fill_fraction": 0.9469521228004891,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.005,
+          "cup_fill_fraction": 0.9469324357369354,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.055,
+          "cup_fill_fraction": 0.9473329614190481,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.105,
+          "cup_fill_fraction": 0.9474236481329961,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.155,
+          "cup_fill_fraction": 0.9470990307190827,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.205,
+          "cup_fill_fraction": 0.9479724491343766,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.255,
+          "cup_fill_fraction": 0.9476794046514163,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.305,
+          "cup_fill_fraction": 0.9480298273703619,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.355,
+          "cup_fill_fraction": 0.94765272280749,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.405,
+          "cup_fill_fraction": 0.9472645563237794,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.455,
+          "cup_fill_fraction": 0.9477835374719944,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.505,
+          "cup_fill_fraction": 0.9473419722388762,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.555,
+          "cup_fill_fraction": 0.9474831475931041,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.605,
+          "cup_fill_fraction": 0.9472009371308705,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.655,
+          "cup_fill_fraction": 0.9476815083447613,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.705,
+          "cup_fill_fraction": 0.9472686409950244,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.755,
+          "cup_fill_fraction": 0.9225610606810613,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.805,
+          "cup_fill_fraction": 0.9226353385869184,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.855,
+          "cup_fill_fraction": 0.9229459138477537,
+          "cup_ml": 65.090952,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_01",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [],
+      "source_sha256": "6f068f706c03fb0bc27dc05a38d468cb648f05115928e129603765decde20a71",
+      "localization": {
+        "decision_time_s": 0.45499999877065456,
+        "nearest_sample_time_s": 0.455,
+        "source_estimated_xy": [
+          0.4841537056796346,
+          -0.14892066451438224
+        ],
+        "source_observed_xy": [
+          0.48389625549316406,
+          -0.1486564427614212
+        ],
+        "source_xy_error_mm": 0.36890884138432556,
+        "cup_estimated_xy": [
+          0.486044542489706,
+          -0.2667085188875144
+        ],
+        "cup_authored_xy": [
+          0.48550638941978635,
+          -0.2665809359116567
+        ],
+        "cup_xy_error_vs_authored_mm": 0.5530697446006833
+      },
+      "first_stop": {
+        "time_s": 21.254999998772302,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.6358830332756042,
+        "prediction_q25_last_six": 0.6367644369602203,
+        "sampled_current_rim_fraction": 0.6459200213937188,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.6330889645744762,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 29.255,
+          "cup_fill_fraction": 0.6459482985384314,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.305,
+          "cup_fill_fraction": 0.6453076537917631,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.355,
+          "cup_fill_fraction": 0.6457274808603164,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.405,
+          "cup_fill_fraction": 0.6459354660090267,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.455,
+          "cup_fill_fraction": 0.6455926867092346,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.505,
+          "cup_fill_fraction": 0.6452527298646804,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.555,
+          "cup_fill_fraction": 0.645361578464507,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.605,
+          "cup_fill_fraction": 0.6460341993500194,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.6457428027601791,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.6460144071017984,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.755,
+          "cup_fill_fraction": 0.6459616043988385,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.805,
+          "cup_fill_fraction": 0.6460605831707215,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.855,
+          "cup_fill_fraction": 0.6462634493322923,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.905,
+          "cup_fill_fraction": 0.6457725524902334,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.955,
+          "cup_fill_fraction": 0.6464489424929889,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.005,
+          "cup_fill_fraction": 0.6461410143796125,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.055,
+          "cup_fill_fraction": 0.6461811949225023,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.105,
+          "cup_fill_fraction": 0.6359306861372545,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.155,
+          "cup_fill_fraction": 0.6340014766244317,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.205,
+          "cup_fill_fraction": 0.6330889645744762,
+          "cup_ml": 41.004791999999995,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_02",
+      "strict_pass": true,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "16cd5cb052a865f830964820e67a582578d62f02c2ec46412fbb97dade5e756d",
+      "localization": {
+        "decision_time_s": 0.45499999877065456,
+        "nearest_sample_time_s": 0.455,
+        "source_estimated_xy": [
+          0.546362690026057,
+          -0.32201236509178005
+        ],
+        "source_observed_xy": [
+          0.5460797548294067,
+          -0.32184529304504395
+        ],
+        "source_xy_error_mm": 0.3285808793951635,
+        "cup_estimated_xy": [
+          0.42088744832035596,
+          -0.10963420656948547
+        ],
+        "cup_authored_xy": [
+          0.4202495099888568,
+          -0.10899205102015325
+        ],
+        "cup_xy_error_vs_authored_mm": 0.9051679757559423
+      },
+      "first_stop": {
+        "time_s": 22.704999998773044,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 5,
+        "predicted_settled_fraction": 0.927238941192627,
+        "prediction_q25_last_six": 0.9270969182252884,
+        "sampled_current_rim_fraction": 0.9514974327648374,
+        "sampled_source_nominal_ml": 39.564288
+      },
+      "final_rim_fraction": 0.9275491455022015,
+      "final_source_nominal_ml": 39.564288,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 30.705,
+          "cup_fill_fraction": 0.9514782190322864,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.755,
+          "cup_fill_fraction": 0.9506315525840299,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.805,
+          "cup_fill_fraction": 0.9510520458221422,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.855,
+          "cup_fill_fraction": 0.9510281864334544,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.905,
+          "cup_fill_fraction": 0.9509674598188947,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.955,
+          "cup_fill_fraction": 0.9511167343925017,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.005,
+          "cup_fill_fraction": 0.9511091610964595,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.055,
+          "cup_fill_fraction": 0.9507762516246112,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.105,
+          "cup_fill_fraction": 0.9510427895714241,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.155,
+          "cup_fill_fraction": 0.9510366537991678,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.205,
+          "cup_fill_fraction": 0.9514755718848272,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.255,
+          "cup_fill_fraction": 0.9508166074752797,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.305,
+          "cup_fill_fraction": 0.951399242877959,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.355,
+          "cup_fill_fraction": 0.9508046690155467,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.405,
+          "cup_fill_fraction": 0.9514088672750124,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.455,
+          "cup_fill_fraction": 0.9510993087992935,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.505,
+          "cup_fill_fraction": 0.9509283661842332,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.555,
+          "cup_fill_fraction": 0.9267964790849111,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.605,
+          "cup_fill_fraction": 0.9265139705994538,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.655,
+          "cup_fill_fraction": 0.9275491455022015,
+          "cup_ml": 65.43504,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_03",
+      "strict_pass": false,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [
+        "measured_spill"
+      ],
+      "source_sha256": "6abfc17e82a5caec57c73052cef138a80d63c340b8f5c9d3dd0ed9f677766a7c",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.42136468881856237,
+          -0.11239302147930647
+        ],
+        "source_observed_xy": [
+          0.4202307462692261,
+          -0.10900897532701492
+        ],
+        "source_xy_error_mm": 3.5689766132652783,
+        "cup_estimated_xy": [
+          0.5459761821606197,
+          -0.32077363037311846
+        ],
+        "cup_authored_xy": [
+          0.5461979566158683,
+          -0.3218340258342258
+        ],
+        "cup_xy_error_vs_authored_mm": 1.0833385633946242
+      },
+      "first_stop": {
+        "time_s": 18.9049999987711,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.8828877210617065,
+        "prediction_q25_last_six": 0.8452287018299103,
+        "sampled_current_rim_fraction": 0.48889670372009164,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.4811620543984796,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.011663999999999999,
+      "ever_near_worktop_nominal_ml": 0.011663999999999999,
+      "final_height_trace": [
+        {
+          "t": 26.905,
+          "cup_fill_fraction": 0.4888677428750419,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 26.955,
+          "cup_fill_fraction": 0.48816545991336485,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.005,
+          "cup_fill_fraction": 0.4882333215545196,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.055,
+          "cup_fill_fraction": 0.48800252886379364,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.105,
+          "cup_fill_fraction": 0.48857571517719833,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.155,
+          "cup_fill_fraction": 0.4885995219735528,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.205,
+          "cup_fill_fraction": 0.4889622688293446,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.255,
+          "cup_fill_fraction": 0.48878897709004915,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.305,
+          "cup_fill_fraction": 0.4884890605421617,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.355,
+          "cup_fill_fraction": 0.48869429335874565,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.405,
+          "cup_fill_fraction": 0.48878135120167354,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.455,
+          "cup_fill_fraction": 0.4883246218456931,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.505,
+          "cup_fill_fraction": 0.48889693162020403,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.555,
+          "cup_fill_fraction": 0.4888245470383578,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.605,
+          "cup_fill_fraction": 0.48829357483807634,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.655,
+          "cup_fill_fraction": 0.4885271549224844,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.705,
+          "cup_fill_fraction": 0.48804462026147183,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.755,
+          "cup_fill_fraction": 0.4808474295279549,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.805,
+          "cup_fill_fraction": 0.48025753638323504,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.855,
+          "cup_fill_fraction": 0.4811620543984796,
+          "cup_ml": 29.988144,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [
+        {
+          "time_s": 18.405,
+          "phase": "Visual guard: Pour control: coarse",
+          "increase_nominal_ml": 0.011663999999999999,
+          "cumulative_nominal_ml": 0.011663999999999999,
+          "bottle_tilt_deg": 127.39624845796394,
+          "contacts": [
+            "gripper_r_rh_p12_rn_l2",
+            "gripper_r_rh_p12_rn_r2"
+          ]
+        }
+      ],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_04",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "589ccec699404b19dd7a46412d2ce29dc0a82f0588296181f950f602cdaa7859",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5813820134135326,
+          -0.29333806147809416
+        ],
+        "source_observed_xy": [
+          0.5812453627586365,
+          -0.293098121881485
+        ],
+        "source_xy_error_mm": 0.27612390607208426,
+        "cup_estimated_xy": [
+          0.5822452193688645,
+          -0.16224291324470508
+        ],
+        "cup_authored_xy": [
+          0.5823476366518403,
+          -0.16228037314176422
+        ],
+        "cup_xy_error_vs_authored_mm": 0.10905294007875854
+      },
+      "first_stop": {
+        "time_s": 20.754999998772046,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.4730747640132904,
+        "prediction_q25_last_six": 0.4695514887571335,
+        "sampled_current_rim_fraction": 0.5021205551484041,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.4941617047085471,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 28.755,
+          "cup_fill_fraction": 0.5013400323250703,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.805,
+          "cup_fill_fraction": 0.5018465490902161,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.855,
+          "cup_fill_fraction": 0.5007201440194063,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.905,
+          "cup_fill_fraction": 0.5008534129928129,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.955,
+          "cup_fill_fraction": 0.5010174134198347,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.005,
+          "cup_fill_fraction": 0.5015256306704342,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.055,
+          "cup_fill_fraction": 0.5014892718371213,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.105,
+          "cup_fill_fraction": 0.5009893992367902,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.155,
+          "cup_fill_fraction": 0.501057085570166,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.205,
+          "cup_fill_fraction": 0.5011523653479173,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.255,
+          "cup_fill_fraction": 0.5014622744391936,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.305,
+          "cup_fill_fraction": 0.501684424456427,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.355,
+          "cup_fill_fraction": 0.5012082184062274,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.405,
+          "cup_fill_fraction": 0.5009470098158882,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.455,
+          "cup_fill_fraction": 0.5010414481163015,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.505,
+          "cup_fill_fraction": 0.5019021742484138,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.555,
+          "cup_fill_fraction": 0.5017040939892029,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.605,
+          "cup_fill_fraction": 0.49397245996138534,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.49335935606675885,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.4941617047085471,
+          "cup_ml": 31.002912,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_05",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": true,
+      "failure_reasons": [
+        "fill_unconfirmed",
+        "wrong_stop_condition"
+      ],
+      "source_sha256": "624785fec4108e0215e839b693f00f9893be7fafd48fbcef2b47da80dc611395",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5819289073151321,
+          -0.16229351259395736
+        ],
+        "source_observed_xy": [
+          0.5823299288749695,
+          -0.16225092113018036
+        ],
+        "source_xy_error_mm": 0.403276982037215,
+        "cup_estimated_xy": [
+          0.5813199846911506,
+          -0.2935105319786863
+        ],
+        "cup_authored_xy": [
+          0.5812112824829303,
+          -0.2932057579825661
+        ],
+        "cup_xy_error_vs_authored_mm": 0.323578983840219
+      },
+      "first_stop": {
+        "time_s": 33.854999998776115,
+        "reason": "fill_unconfirmed",
+        "mode": "Returning upright",
+        "pause_count": 10,
+        "predicted_settled_fraction": 0.9080102443695068,
+        "prediction_q25_last_six": 0.906186431646347,
+        "sampled_current_rim_fraction": 0.9274957642835718,
+        "sampled_source_nominal_ml": 32.577552
+      },
+      "final_rim_fraction": 0.9034311953712899,
+      "final_source_nominal_ml": 32.577552,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 41.855,
+          "cup_fill_fraction": 0.9272366067942439,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.905,
+          "cup_fill_fraction": 0.9265329389011148,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.955,
+          "cup_fill_fraction": 0.9272871129653022,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.005,
+          "cup_fill_fraction": 0.9265920176225538,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.055,
+          "cup_fill_fraction": 0.927331781387328,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.105,
+          "cup_fill_fraction": 0.926472229817333,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.155,
+          "cup_fill_fraction": 0.926924260924843,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.205,
+          "cup_fill_fraction": 0.9271574553321379,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.255,
+          "cup_fill_fraction": 0.9269591822343701,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.305,
+          "cup_fill_fraction": 0.9267525118940002,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 42.355,
+          "cup_fill_fraction": 0.9264191115603714,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.405,
+          "cup_fill_fraction": 0.9269611281507145,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.455,
+          "cup_fill_fraction": 0.9267129449283363,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.505,
+          "cup_fill_fraction": 0.9272666896090774,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.555,
+          "cup_fill_fraction": 0.9268293142318712,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.605,
+          "cup_fill_fraction": 0.9274459593436284,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.655,
+          "cup_fill_fraction": 0.9269447018118453,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.705,
+          "cup_fill_fraction": 0.9038081772187164,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.755,
+          "cup_fill_fraction": 0.9026392249500039,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.805,
+          "cup_fill_fraction": 0.9034311953712899,
+          "cup_ml": 63.422999999999995,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_06",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [
+        "underfilled",
+        "measured_spill"
+      ],
+      "source_sha256": "867cc3bb5d75734f201594cc969dc1a4ea2f7195a464139bee7ebfdf01f43625",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5098598143387212,
+          -0.35185589822429475
+        ],
+        "source_observed_xy": [
+          0.509702742099762,
+          -0.3520764410495758
+        ],
+        "source_xy_error_mm": 0.2707597201110483,
+        "cup_estimated_xy": [
+          0.6013288088700078,
+          -0.2012674989566462
+        ],
+        "cup_authored_xy": [
+          0.6008895946011611,
+          -0.20068983864449358
+        ],
+        "cup_xy_error_vs_authored_mm": 0.7256725226952158
+      },
+      "first_stop": {
+        "time_s": 15.604999998769692,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 1,
+        "predicted_settled_fraction": 0.9284067749977112,
+        "prediction_q25_last_six": 0.927579715847969,
+        "sampled_current_rim_fraction": 0.8800178247339573,
+        "sampled_source_nominal_ml": 41.43635999999999
+      },
+      "final_rim_fraction": 0.8588422754231608,
+      "final_source_nominal_ml": 41.43635999999999,
+      "final_outside_nominal_ml": 0.0058319999999999995,
+      "ever_near_worktop_nominal_ml": 0.0058319999999999995,
+      "final_height_trace": [
+        {
+          "t": 23.605,
+          "cup_fill_fraction": 0.8800764476551716,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.655,
+          "cup_fill_fraction": 0.8801086867556842,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.705,
+          "cup_fill_fraction": 0.8811353767619401,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.755,
+          "cup_fill_fraction": 0.8814835029489843,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.805,
+          "cup_fill_fraction": 0.8801505677840277,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.855,
+          "cup_fill_fraction": 0.8797607709379746,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.905,
+          "cup_fill_fraction": 0.880787811559788,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.955,
+          "cup_fill_fraction": 0.881659301589516,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.005,
+          "cup_fill_fraction": 0.880652771977816,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.055,
+          "cup_fill_fraction": 0.8802511243259195,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.105,
+          "cup_fill_fraction": 0.8809519347022551,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.155,
+          "cup_fill_fraction": 0.8811350962694943,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.205,
+          "cup_fill_fraction": 0.880818998813628,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.255,
+          "cup_fill_fraction": 0.8799444058362166,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.305,
+          "cup_fill_fraction": 0.8803750493947186,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.355,
+          "cup_fill_fraction": 0.8805447297937719,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.405,
+          "cup_fill_fraction": 0.881004562097436,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.455,
+          "cup_fill_fraction": 0.8608529504607694,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.505,
+          "cup_fill_fraction": 0.8591375463149117,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.555,
+          "cup_fill_fraction": 0.8588422754231608,
+          "cup_ml": 59.556383999999994,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [
+        {
+          "time_s": 14.355,
+          "phase": "Visual guard: Pour control: settle",
+          "increase_nominal_ml": 0.0058319999999999995,
+          "cumulative_nominal_ml": 0.0058319999999999995,
+          "bottle_tilt_deg": 80.37343552911685,
+          "contacts": [
+            "gripper_r_rh_p12_rn_l2",
+            "gripper_r_rh_p12_rn_r2"
+          ]
+        }
+      ],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_07",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [],
+      "source_sha256": "b1601faa6dd856c0b6647cbced092b23e04c389cc1cd165acfa0809d21caf4ec",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.6009032808687578,
+          -0.20073306426512555
+        ],
+        "source_observed_xy": [
+          0.6008912920951843,
+          -0.20063495635986328
+        ],
+        "source_xy_error_mm": 0.0988377041758129,
+        "cup_estimated_xy": [
+          0.5099275109830269,
+          -0.3516892665877097
+        ],
+        "cup_authored_xy": [
+          0.5097767164055133,
+          -0.3521138057039338
+        ],
+        "cup_xy_error_vs_authored_mm": 0.4505246561641791
+      },
+      "first_stop": {
+        "time_s": 19.80499999877156,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.5948758125305176,
+        "prediction_q25_last_six": 0.586107924580574,
+        "sampled_current_rim_fraction": 0.5739999525687264,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.5630882704959186,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 27.805,
+          "cup_fill_fraction": 0.5732651500140908,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.855,
+          "cup_fill_fraction": 0.5725322232526882,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.905,
+          "cup_fill_fraction": 0.5728568932589352,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.955,
+          "cup_fill_fraction": 0.5736321568489064,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.005,
+          "cup_fill_fraction": 0.5730658776619845,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.055,
+          "cup_fill_fraction": 0.5726416503681846,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.105,
+          "cup_fill_fraction": 0.572764278159421,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.155,
+          "cup_fill_fraction": 0.5718903688823466,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.205,
+          "cup_fill_fraction": 0.5727006589665121,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.255,
+          "cup_fill_fraction": 0.5720289146198935,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.305,
+          "cup_fill_fraction": 0.5731620690401852,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.355,
+          "cup_fill_fraction": 0.5717115900095762,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.405,
+          "cup_fill_fraction": 0.5717974382288306,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.455,
+          "cup_fill_fraction": 0.5719885237076693,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.505,
+          "cup_fill_fraction": 0.5728961271398197,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.555,
+          "cup_fill_fraction": 0.5721148154314816,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.605,
+          "cup_fill_fraction": 0.5724490221808928,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.655,
+          "cup_fill_fraction": 0.5632968867526325,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.705,
+          "cup_fill_fraction": 0.5623342016163984,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.755,
+          "cup_fill_fraction": 0.5630882704959186,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_08",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "7507bbf60ed8d13aebe755b3b67f134197078af3cd7933850f5b627a63a87787",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.4998189523467916,
+          -0.2657636859265692
+        ],
+        "source_observed_xy": [
+          0.49924132227897644,
+          -0.2654085159301758
+        ],
+        "source_xy_error_mm": 0.6780871784528958,
+        "cup_estimated_xy": [
+          0.4875535721392909,
+          -0.1413939172287899
+        ],
+        "cup_authored_xy": [
+          0.48761823237349394,
+          -0.14145137941043248
+        ],
+        "cup_xy_error_vs_authored_mm": 0.08650345777086439
+      },
+      "first_stop": {
+        "time_s": 20.304999998771816,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.6698521375656128,
+        "prediction_q25_last_six": 0.6704882234334946,
+        "sampled_current_rim_fraction": 0.6599710450452906,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.6437614216524001,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 28.305,
+          "cup_fill_fraction": 0.6558395666234623,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.355,
+          "cup_fill_fraction": 0.6564428532824786,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.405,
+          "cup_fill_fraction": 0.6563592139412364,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.455,
+          "cup_fill_fraction": 0.6566401271259072,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.505,
+          "cup_fill_fraction": 0.6572547561982088,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.555,
+          "cup_fill_fraction": 0.6564426429131441,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.605,
+          "cup_fill_fraction": 0.6569342234555402,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.655,
+          "cup_fill_fraction": 0.656439575027016,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.705,
+          "cup_fill_fraction": 0.6570439836558163,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.755,
+          "cup_fill_fraction": 0.656647595237282,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.805,
+          "cup_fill_fraction": 0.6563535514999828,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.855,
+          "cup_fill_fraction": 0.6569543838500966,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.905,
+          "cup_fill_fraction": 0.6566142166362079,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.955,
+          "cup_fill_fraction": 0.6567661208264958,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.005,
+          "cup_fill_fraction": 0.656314352680654,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.055,
+          "cup_fill_fraction": 0.6565118193626394,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.105,
+          "cup_fill_fraction": 0.6565355209743265,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.155,
+          "cup_fill_fraction": 0.6464578481281494,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.205,
+          "cup_fill_fraction": 0.6440375664654889,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.255,
+          "cup_fill_fraction": 0.6437614216524001,
+          "cup_ml": 42.002064,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_09",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": true,
+      "failure_reasons": [
+        "measured_spill"
+      ],
+      "source_sha256": "bf3f1129077fed5a2774db6525aafcb87e439b92993ff571b636045ea11dbc9b",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.4881322087406154,
+          -0.14172756073943216
+        ],
+        "source_observed_xy": [
+          0.48752084374427795,
+          -0.14134764671325684
+        ],
+        "source_xy_error_mm": 0.7197929049604789,
+        "cup_estimated_xy": [
+          0.4990880718083559,
+          -0.2654520906650885
+        ],
+        "cup_authored_xy": [
+          0.49917609946199276,
+          -0.2654549821181259
+        ],
+        "cup_xy_error_vs_authored_mm": 0.08807512875652221
+      },
+      "first_stop": {
+        "time_s": 31.854999998777725,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 9,
+        "predicted_settled_fraction": 0.9269399642944336,
+        "prediction_q25_last_six": 0.9255877435207367,
+        "sampled_current_rim_fraction": 0.94501512962229,
+        "sampled_source_nominal_ml": 35.07948
+      },
+      "final_rim_fraction": 0.9205791887115017,
+      "final_source_nominal_ml": 35.07948,
+      "final_outside_nominal_ml": 0.011663999999999999,
+      "ever_near_worktop_nominal_ml": 0.011663999999999999,
+      "final_height_trace": [
+        {
+          "t": 39.855,
+          "cup_fill_fraction": 0.9448864887742422,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 39.905,
+          "cup_fill_fraction": 0.9451035723966699,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 39.955,
+          "cup_fill_fraction": 0.9447859848246845,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.005,
+          "cup_fill_fraction": 0.9450135693830589,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.055,
+          "cup_fill_fraction": 0.9447610209969903,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.105,
+          "cup_fill_fraction": 0.9451057111515706,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.155,
+          "cup_fill_fraction": 0.9453336287947249,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.205,
+          "cup_fill_fraction": 0.9453215851503249,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.255,
+          "cup_fill_fraction": 0.944694894902845,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.305,
+          "cup_fill_fraction": 0.9449539822690614,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 40.355,
+          "cup_fill_fraction": 0.9446496830267054,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.405,
+          "cup_fill_fraction": 0.9454017008052141,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.455,
+          "cup_fill_fraction": 0.9448909591226005,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.505,
+          "cup_fill_fraction": 0.9448898897451499,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.555,
+          "cup_fill_fraction": 0.9457139940822813,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.605,
+          "cup_fill_fraction": 0.9454353423679565,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.655,
+          "cup_fill_fraction": 0.9446512082043803,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.705,
+          "cup_fill_fraction": 0.920550210335674,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.755,
+          "cup_fill_fraction": 0.9203837205381941,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 40.805,
+          "cup_fill_fraction": 0.9205791887115017,
+          "cup_ml": 64.91015999999999,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [
+        {
+          "time_s": 20.305,
+          "phase": "Visual guard: Pour control: settle",
+          "increase_nominal_ml": 0.011663999999999999,
+          "cumulative_nominal_ml": 0.011663999999999999,
+          "bottle_tilt_deg": 79.99266188155144,
+          "contacts": [
+            "gripper_r_rh_p12_rn_l2",
+            "gripper_r_rh_p12_rn_r2"
+          ]
+        }
+      ],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_10",
+      "strict_pass": true,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "1e9dee26fd5bcdd7a08ef13c3a2a0582aba0401e4b854ae1651f431b51194b3e",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.4453864078865532,
+          -0.3113414528449665
+        ],
+        "source_observed_xy": [
+          0.445544958114624,
+          -0.3115374743938446
+        ],
+        "source_xy_error_mm": 0.2521162875458037,
+        "cup_estimated_xy": [
+          0.5290183390727273,
+          -0.13052734669816235
+        ],
+        "cup_authored_xy": [
+          0.5281632866221427,
+          -0.13018961884050223
+        ],
+        "cup_xy_error_vs_authored_mm": 0.9193338887968892
+      },
+      "first_stop": {
+        "time_s": 23.254999998773325,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 5,
+        "predicted_settled_fraction": 0.9292750358581543,
+        "prediction_q25_last_six": 0.9295955151319504,
+        "sampled_current_rim_fraction": 0.9497008786481956,
+        "sampled_source_nominal_ml": 35.767655999999995
+      },
+      "final_rim_fraction": 0.9248382210731493,
+      "final_source_nominal_ml": 35.767655999999995,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 31.205,
+          "cup_fill_fraction": 0.9493671627605651,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.255,
+          "cup_fill_fraction": 0.9493754548185,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.305,
+          "cup_fill_fraction": 0.9490976796430689,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.355,
+          "cup_fill_fraction": 0.9487081106971281,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.405,
+          "cup_fill_fraction": 0.9495226432295395,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.455,
+          "cup_fill_fraction": 0.9494235417422113,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.505,
+          "cup_fill_fraction": 0.9490275214700127,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.555,
+          "cup_fill_fraction": 0.9493452492882213,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.605,
+          "cup_fill_fraction": 0.9492693760815777,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.655,
+          "cup_fill_fraction": 0.9494385480880726,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 31.705,
+          "cup_fill_fraction": 0.9494780449306253,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.755,
+          "cup_fill_fraction": 0.9490339552654927,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.805,
+          "cup_fill_fraction": 0.9493875159936779,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.855,
+          "cup_fill_fraction": 0.9494722422431485,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.905,
+          "cup_fill_fraction": 0.9492263380218943,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.955,
+          "cup_fill_fraction": 0.9497411643757526,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 32.005,
+          "cup_fill_fraction": 0.9497045250499938,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 32.055,
+          "cup_fill_fraction": 0.9493233007543216,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 32.105,
+          "cup_fill_fraction": 0.9251856986214122,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 32.155,
+          "cup_fill_fraction": 0.9248382210731493,
+          "cup_ml": 65.236752,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_11",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [],
+      "source_sha256": "3271bcbaaba29d1a15dc6902bb8fb898df87c0dcbefb16c83a8820e2b6a41b99",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5284133750403849,
+          -0.12995937950104064
+        ],
+        "source_observed_xy": [
+          0.528140127658844,
+          -0.13017144799232483
+        ],
+        "source_xy_error_mm": 0.34588607447323344,
+        "cup_estimated_xy": [
+          0.4452200479614156,
+          -0.31130983273763946
+        ],
+        "cup_authored_xy": [
+          0.445540894791564,
+          -0.31159423851155943
+        ],
+        "cup_xy_error_vs_authored_mm": 0.4287532304896155
+      },
+      "first_stop": {
+        "time_s": 21.15499999877225,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.5982866287231445,
+        "prediction_q25_last_six": 0.5989098995923996,
+        "sampled_current_rim_fraction": 0.6834944037830116,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.6666158760295183,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 29.155,
+          "cup_fill_fraction": 0.6796677855884317,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.205,
+          "cup_fill_fraction": 0.6801031098646265,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.255,
+          "cup_fill_fraction": 0.6795525207239028,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.305,
+          "cup_fill_fraction": 0.6795852857477515,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.355,
+          "cup_fill_fraction": 0.6797255845630858,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.405,
+          "cup_fill_fraction": 0.6795468582826492,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.455,
+          "cup_fill_fraction": 0.6795942790368014,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.505,
+          "cup_fill_fraction": 0.6793196944629435,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.555,
+          "cup_fill_fraction": 0.6789027073804059,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.605,
+          "cup_fill_fraction": 0.6793381719028238,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.6790179897757127,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.6797593839028292,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.755,
+          "cup_fill_fraction": 0.6796041138031894,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.805,
+          "cup_fill_fraction": 0.6790926007663493,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.855,
+          "cup_fill_fraction": 0.6797395565930523,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.905,
+          "cup_fill_fraction": 0.6794090137762171,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.955,
+          "cup_fill_fraction": 0.6794122394393461,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.005,
+          "cup_fill_fraction": 0.6686902228523692,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.055,
+          "cup_fill_fraction": 0.6662655234336843,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.105,
+          "cup_fill_fraction": 0.6666158760295183,
+          "cup_ml": 44.00243999999999,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_12",
+      "strict_pass": false,
+      "expected_stop": "bottle_empty",
+      "swapped": false,
+      "failure_reasons": [
+        "measured_spill"
+      ],
+      "source_sha256": "4815e1b6d5a634b525c7cb4453c0f4347e4e21ce4c1215464ce87a68eeb68859",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5460823552258862,
+          -0.3070867621811625
+        ],
+        "source_observed_xy": [
+          0.5459273457527161,
+          -0.30685916543006897
+        ],
+        "source_xy_error_mm": 0.27536923916954303,
+        "cup_estimated_xy": [
+          0.44147866244606887,
+          -0.1256653978301548
+        ],
+        "cup_authored_xy": [
+          0.44176378136314925,
+          -0.1257482821879065
+        ],
+        "cup_xy_error_vs_authored_mm": 0.2969218982106352
+      },
+      "first_stop": {
+        "time_s": 20.204999998771765,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.585790753364563,
+        "prediction_q25_last_six": 0.5849767923355103,
+        "sampled_current_rim_fraction": 0.6039687296923459,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.5904905242078434,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.011663999999999999,
+      "ever_near_worktop_nominal_ml": 0.011663999999999999,
+      "final_height_trace": [
+        {
+          "t": 28.205,
+          "cup_fill_fraction": 0.6009007208487557,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.255,
+          "cup_fill_fraction": 0.601187734744127,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.305,
+          "cup_fill_fraction": 0.6010872658561247,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.355,
+          "cup_fill_fraction": 0.6010217358084277,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.405,
+          "cup_fill_fraction": 0.6016354708110575,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.455,
+          "cup_fill_fraction": 0.6011873490670138,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.505,
+          "cup_fill_fraction": 0.6016639057327708,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.555,
+          "cup_fill_fraction": 0.60129595223595,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.605,
+          "cup_fill_fraction": 0.6018533257877116,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.655,
+          "cup_fill_fraction": 0.6012276698561265,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.705,
+          "cup_fill_fraction": 0.6012217269224268,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.755,
+          "cup_fill_fraction": 0.6011502013486965,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.805,
+          "cup_fill_fraction": 0.6014368646285102,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.855,
+          "cup_fill_fraction": 0.6014530455364889,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.905,
+          "cup_fill_fraction": 0.6011725180289313,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.955,
+          "cup_fill_fraction": 0.6014911399168116,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.005,
+          "cup_fill_fraction": 0.6014549914528331,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.055,
+          "cup_fill_fraction": 0.5918980878942144,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.105,
+          "cup_fill_fraction": 0.5908005560145648,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.155,
+          "cup_fill_fraction": 0.5904905242078434,
+          "cup_ml": 37.989647999999995,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [
+        {
+          "time_s": 11.955,
+          "phase": "Visual guard: Pour control: coarse",
+          "increase_nominal_ml": 0.011663999999999999,
+          "cumulative_nominal_ml": 0.011663999999999999,
+          "bottle_tilt_deg": 102.0438629043256,
+          "contacts": [
+            "gripper_r_rh_p12_rn_l2",
+            "gripper_r_rh_p12_rn_r2"
+          ]
+        }
+      ],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_13",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": true,
+      "failure_reasons": [
+        "underfilled"
+      ],
+      "source_sha256": "b1428adb6eee33c22acd51e278e4e6446684191babe073bbdec9a16e2b095074",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.44229372760999375,
+          -0.12601075129452094
+        ],
+        "source_observed_xy": [
+          0.44181862473487854,
+          -0.12581902742385864
+        ],
+        "source_xy_error_mm": 0.5123287855708185,
+        "cup_estimated_xy": [
+          0.5459552102351055,
+          -0.3067640772290986
+        ],
+        "cup_authored_xy": [
+          0.5459376956760554,
+          -0.3068602484566659
+        ],
+        "cup_xy_error_vs_authored_mm": 0.0977530807213545
+      },
+      "first_stop": {
+        "time_s": 27.454999998775474,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 7,
+        "predicted_settled_fraction": 0.9248021841049194,
+        "prediction_q25_last_six": 0.9231554120779037,
+        "sampled_current_rim_fraction": 0.9105158034492931,
+        "sampled_source_nominal_ml": 40.853159999999995
+      },
+      "final_rim_fraction": 0.8881996491376082,
+      "final_source_nominal_ml": 40.853159999999995,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 35.455,
+          "cup_fill_fraction": 0.9098893060403699,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.505,
+          "cup_fill_fraction": 0.9096629311056685,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.555,
+          "cup_fill_fraction": 0.9099669498555788,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.605,
+          "cup_fill_fraction": 0.9099539420183956,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.655,
+          "cup_fill_fraction": 0.9108152641969557,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.705,
+          "cup_fill_fraction": 0.9097323529860539,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.755,
+          "cup_fill_fraction": 0.9100443307091196,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.805,
+          "cup_fill_fraction": 0.9094045449705672,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.855,
+          "cup_fill_fraction": 0.9104783401769739,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.905,
+          "cup_fill_fraction": 0.9102074896588033,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 35.955,
+          "cup_fill_fraction": 0.9101968309458552,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.005,
+          "cup_fill_fraction": 0.9098809263285456,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.055,
+          "cup_fill_fraction": 0.9104073229958018,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.105,
+          "cup_fill_fraction": 0.9103525393149421,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.155,
+          "cup_fill_fraction": 0.9098193757674262,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.205,
+          "cup_fill_fraction": 0.9097824910107769,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.255,
+          "cup_fill_fraction": 0.9094196915626515,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.305,
+          "cup_fill_fraction": 0.8869530355229086,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.355,
+          "cup_fill_fraction": 0.8863250655286441,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 36.405,
+          "cup_fill_fraction": 0.8881996491376082,
+          "cup_ml": 62.151624,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_14",
+      "strict_pass": true,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "53ef9b1f217fa182a475aa41b10d36938351ab753b7e9403fc43af6b8d88bd15",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5729165332452042,
+          -0.309081700352837
+        ],
+        "source_observed_xy": [
+          0.5726483464241028,
+          -0.3087698817253113
+        ],
+        "source_xy_error_mm": 0.41128460642783987,
+        "cup_estimated_xy": [
+          0.569789584338714,
+          -0.14863291498538583
+        ],
+        "cup_authored_xy": [
+          0.570155394824551,
+          -0.14889386418888279
+        ],
+        "cup_xy_error_vs_authored_mm": 0.44934596732811444
+      },
+      "first_stop": {
+        "time_s": 15.504999998769712,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 1,
+        "predicted_settled_fraction": 0.942044198513031,
+        "prediction_q25_last_six": 0.9373254030942917,
+        "sampled_current_rim_fraction": 0.9256543839679032,
+        "sampled_source_nominal_ml": 31.615271999999997
+      },
+      "final_rim_fraction": 0.9036173897631017,
+      "final_source_nominal_ml": 31.615271999999997,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 23.505,
+          "cup_fill_fraction": 0.9262115471503302,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.555,
+          "cup_fill_fraction": 0.9259817712447209,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.605,
+          "cup_fill_fraction": 0.92615792050081,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.655,
+          "cup_fill_fraction": 0.9258599323384888,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.705,
+          "cup_fill_fraction": 0.9261568160618041,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.755,
+          "cup_fill_fraction": 0.9256189192042619,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.805,
+          "cup_fill_fraction": 0.9251870660220866,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.855,
+          "cup_fill_fraction": 0.9250622644143933,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.905,
+          "cup_fill_fraction": 0.925544939321629,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 23.955,
+          "cup_fill_fraction": 0.9260061916183009,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.005,
+          "cup_fill_fraction": 0.9255061261794132,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.055,
+          "cup_fill_fraction": 0.9249965590589174,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.105,
+          "cup_fill_fraction": 0.9260002136230456,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.155,
+          "cup_fill_fraction": 0.925434179867014,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.205,
+          "cup_fill_fraction": 0.9249601826948265,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.255,
+          "cup_fill_fraction": 0.9253320455551136,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.305,
+          "cup_fill_fraction": 0.9249802203739377,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.355,
+          "cup_fill_fraction": 0.9027143268024207,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.405,
+          "cup_fill_fraction": 0.9022353158277611,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.455,
+          "cup_fill_fraction": 0.9036173897631017,
+          "cup_ml": 63.38800799999999,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_15",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [],
+      "source_sha256": "93e611f6c5873a066842a8f1e1c9c81e366acdc71f17b670418ce9fac6346edd",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5699541379015507,
+          -0.14897449016462855
+        ],
+        "source_observed_xy": [
+          0.5701318979263306,
+          -0.1488734483718872
+        ],
+        "source_xy_error_mm": 0.2044702185897122,
+        "cup_estimated_xy": [
+          0.572597785657191,
+          -0.3088098756683223
+        ],
+        "cup_authored_xy": [
+          0.5725760346092229,
+          -0.3087956392789011
+        ],
+        "cup_xy_error_vs_authored_mm": 0.025995824115858532
+      },
+      "first_stop": {
+        "time_s": 21.454999998772404,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.5518466234207153,
+        "prediction_q25_last_six": 0.5453006476163864,
+        "sampled_current_rim_fraction": 0.6038025379180898,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.5900445412187004,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 29.455,
+          "cup_fill_fraction": 0.6014029075117662,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.505,
+          "cup_fill_fraction": 0.6015505341922525,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.555,
+          "cup_fill_fraction": 0.6010183698990755,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.605,
+          "cup_fill_fraction": 0.6009229323443234,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.6013156568302818,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.6015233264249904,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.755,
+          "cup_fill_fraction": 0.6008229718488795,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.805,
+          "cup_fill_fraction": 0.6014258027076711,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.855,
+          "cup_fill_fraction": 0.6010042050305525,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.905,
+          "cup_fill_fraction": 0.6012437981717716,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.955,
+          "cup_fill_fraction": 0.600956942053401,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.005,
+          "cup_fill_fraction": 0.6016044413342185,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.055,
+          "cup_fill_fraction": 0.6009914075627036,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.105,
+          "cup_fill_fraction": 0.6010059230467842,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.155,
+          "cup_fill_fraction": 0.6006111649905923,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.205,
+          "cup_fill_fraction": 0.6009484922184654,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.255,
+          "cup_fill_fraction": 0.6012079827925728,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.305,
+          "cup_fill_fraction": 0.5916112142450659,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.355,
+          "cup_fill_fraction": 0.5898687601089466,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.405,
+          "cup_fill_fraction": 0.5900445412187004,
+          "cup_ml": 38.001312,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_16",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "b3c8a0ebda48ef1eb9b6c5b300d4bdffe3a10d1f378a17986399015cd3d1dade",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5129309743124866,
+          -0.3543400540953213
+        ],
+        "source_observed_xy": [
+          0.5130271315574646,
+          -0.35478729009628296
+        ],
+        "source_xy_error_mm": 0.4574562889696907,
+        "cup_estimated_xy": [
+          0.5929023492470895,
+          -0.20064055645923506
+        ],
+        "cup_authored_xy": [
+          0.5920132881734322,
+          -0.19964234989900578
+        ],
+        "cup_xy_error_vs_authored_mm": 1.3367295648624644
+      },
+      "first_stop": {
+        "time_s": 21.50499999877243,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.6654910445213318,
+        "prediction_q25_last_six": 0.6540298610925674,
+        "sampled_current_rim_fraction": 0.6719860090928909,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.6545907616615284,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 29.505,
+          "cup_fill_fraction": 0.6676372892716341,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.555,
+          "cup_fill_fraction": 0.6675894302480351,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.605,
+          "cup_fill_fraction": 0.6680213360225442,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.667896288983961,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.6673171422060787,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.755,
+          "cup_fill_fraction": 0.6674500780947057,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.805,
+          "cup_fill_fraction": 0.6674449065152326,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.855,
+          "cup_fill_fraction": 0.667670141949372,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.905,
+          "cup_fill_fraction": 0.6669114449444927,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.955,
+          "cup_fill_fraction": 0.6676306976991531,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.005,
+          "cup_fill_fraction": 0.6676234224263349,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.055,
+          "cup_fill_fraction": 0.6674392966663125,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.105,
+          "cup_fill_fraction": 0.6674634891397802,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.155,
+          "cup_fill_fraction": 0.6673947509597319,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.205,
+          "cup_fill_fraction": 0.6676887946970312,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.255,
+          "cup_fill_fraction": 0.6674558281898487,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.305,
+          "cup_fill_fraction": 0.667404445479897,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.355,
+          "cup_fill_fraction": 0.6568089835784005,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.405,
+          "cup_fill_fraction": 0.6546233513775983,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.455,
+          "cup_fill_fraction": 0.6545907616615284,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_17",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": true,
+      "failure_reasons": [
+        "fill_unconfirmed",
+        "wrong_stop_condition"
+      ],
+      "source_sha256": "dd416d096dc6cbe2254eb3d9fd717fee242b474f8c0608aac30bf6c8f30ee0e5",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5920407487937371,
+          -0.199797887005488
+        ],
+        "source_observed_xy": [
+          0.5920383930206299,
+          -0.1996275931596756
+        ],
+        "source_xy_error_mm": 0.1703101394178077,
+        "cup_estimated_xy": [
+          0.5132231428037564,
+          -0.3543948989065028
+        ],
+        "cup_authored_xy": [
+          0.5131563690243799,
+          -0.3547262625291355
+        ],
+        "cup_xy_error_vs_authored_mm": 0.3380245375953035
+      },
+      "first_stop": {
+        "time_s": 33.20499999877671,
+        "reason": "fill_unconfirmed",
+        "mode": "Returning upright",
+        "pause_count": 10,
+        "predicted_settled_fraction": 0.9221222400665283,
+        "prediction_q25_last_six": 0.9211943745613098,
+        "sampled_current_rim_fraction": 0.9527671519447763,
+        "sampled_source_nominal_ml": 40.351608
+      },
+      "final_rim_fraction": 0.9290752523085639,
+      "final_source_nominal_ml": 40.351608,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 41.205,
+          "cup_fill_fraction": 0.9528930930530313,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.255,
+          "cup_fill_fraction": 0.9523438187206481,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.305,
+          "cup_fill_fraction": 0.9522935930420356,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.355,
+          "cup_fill_fraction": 0.9527480433968927,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.405,
+          "cup_fill_fraction": 0.9520248286864326,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.455,
+          "cup_fill_fraction": 0.9528016349848566,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.505,
+          "cup_fill_fraction": 0.9521144460229299,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.555,
+          "cup_fill_fraction": 0.9524910246624654,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.605,
+          "cup_fill_fraction": 0.9526208225418528,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.655,
+          "cup_fill_fraction": 0.9529258405461019,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.705,
+          "cup_fill_fraction": 0.9527134201105892,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 41.755,
+          "cup_fill_fraction": 0.9528904283747942,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 41.805,
+          "cup_fill_fraction": 0.9528300699065699,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 41.855,
+          "cup_fill_fraction": 0.9527095458086785,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 41.905,
+          "cup_fill_fraction": 0.9529020337497474,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 41.955,
+          "cup_fill_fraction": 0.9523306881680197,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.005,
+          "cup_fill_fraction": 0.9525641455369824,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.055,
+          "cup_fill_fraction": 0.9276291910339791,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.105,
+          "cup_fill_fraction": 0.9273063266978532,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.155,
+          "cup_fill_fraction": 0.9290752523085639,
+          "cup_ml": 65.650824,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_18",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [
+        "underfilled"
+      ],
+      "source_sha256": "4769800e85a9721fb907f4ea230db73a0b76e7c6ad97fb48df693846f3dd1b55",
+      "localization": {
+        "decision_time_s": 1.65499999877063,
+        "nearest_sample_time_s": 1.655,
+        "source_estimated_xy": [
+          0.48670744766481805,
+          -0.26190218882245464
+        ],
+        "source_observed_xy": [
+          0.4856424033641815,
+          -0.2621306777000427
+        ],
+        "source_xy_error_mm": 1.0892779854104366,
+        "cup_estimated_xy": [
+          0.48453008001024644,
+          -0.15162527189231811
+        ],
+        "cup_authored_xy": [
+          0.4844368373778946,
+          -0.15152702081641847
+        ],
+        "cup_xy_error_vs_authored_mm": 0.1354528050773988
+      },
+      "first_stop": {
+        "time_s": 16.30499999876977,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 1,
+        "predicted_settled_fraction": 0.9953862428665161,
+        "prediction_q25_last_six": 0.9758018106222153,
+        "sampled_current_rim_fraction": 0.8741494669633741,
+        "sampled_source_nominal_ml": 41.902919999999995
+      },
+      "final_rim_fraction": 0.8523809040293961,
+      "final_source_nominal_ml": 41.902919999999995,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 24.305,
+          "cup_fill_fraction": 0.8734898188534893,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.355,
+          "cup_fill_fraction": 0.8743518773247202,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.405,
+          "cup_fill_fraction": 0.8742870309773602,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.455,
+          "cup_fill_fraction": 0.873533821105956,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.505,
+          "cup_fill_fraction": 0.8742089313619265,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.555,
+          "cup_fill_fraction": 0.8738006746067709,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.605,
+          "cup_fill_fraction": 0.8739863956675799,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.655,
+          "cup_fill_fraction": 0.8740269443568047,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.705,
+          "cup_fill_fraction": 0.8741365292493022,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 24.755,
+          "cup_fill_fraction": 0.8747961072360756,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.805,
+          "cup_fill_fraction": 0.8746873813516941,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.855,
+          "cup_fill_fraction": 0.8740105706102697,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.905,
+          "cup_fill_fraction": 0.8743769813986375,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 24.955,
+          "cup_fill_fraction": 0.8749232053756703,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 25.005,
+          "cup_fill_fraction": 0.8742722174700558,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 25.055,
+          "cup_fill_fraction": 0.874326352512134,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 25.105,
+          "cup_fill_fraction": 0.8745832835926717,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 25.155,
+          "cup_fill_fraction": 0.854298297797931,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 25.205,
+          "cup_fill_fraction": 0.8515271376161001,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 25.255,
+          "cup_fill_fraction": 0.8523809040293961,
+          "cup_ml": 59.101487999999996,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_19",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [],
+      "source_sha256": "e1df0fc2ccb5d4a57becaf5b53929154adda00619554b97542404c53c205e2ca",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.4843279527231036,
+          -0.15131759938441003
+        ],
+        "source_observed_xy": [
+          0.48445209860801697,
+          -0.1515168845653534
+        ],
+        "source_xy_error_mm": 0.23479093697278233,
+        "cup_estimated_xy": [
+          0.48674580608907886,
+          -0.2609600812801309
+        ],
+        "cup_authored_xy": [
+          0.4864110896046577,
+          -0.2608597580496529
+        ],
+        "cup_xy_error_vs_authored_mm": 0.3494279260689024
+      },
+      "first_stop": {
+        "time_s": 18.704999998770997,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.4767470359802246,
+        "prediction_q25_last_six": 0.4752470329403877,
+        "sampled_current_rim_fraction": 0.46271290919359886,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.45732019648832334,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 26.705,
+          "cup_fill_fraction": 0.46339166585136754,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 26.755,
+          "cup_fill_fraction": 0.46074525468489597,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 26.805,
+          "cup_fill_fraction": 0.46375565739238855,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 26.855,
+          "cup_fill_fraction": 0.46209643938962053,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 26.905,
+          "cup_fill_fraction": 0.462193367060492,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 26.955,
+          "cup_fill_fraction": 0.4624083820511302,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.005,
+          "cup_fill_fraction": 0.46295639416750645,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.055,
+          "cup_fill_fraction": 0.4633194039849664,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.105,
+          "cup_fill_fraction": 0.46297166347503543,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 27.155,
+          "cup_fill_fraction": 0.46371963164385527,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.205,
+          "cup_fill_fraction": 0.4623463055666745,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.255,
+          "cup_fill_fraction": 0.4628294538049127,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.305,
+          "cup_fill_fraction": 0.4630534094922672,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.355,
+          "cup_fill_fraction": 0.4625195096520806,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.405,
+          "cup_fill_fraction": 0.4629330081098209,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.455,
+          "cup_fill_fraction": 0.46389318634481885,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.505,
+          "cup_fill_fraction": 0.4643688664716823,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.555,
+          "cup_fill_fraction": 0.45848213644588587,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.605,
+          "cup_fill_fraction": 0.4573250349830167,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 27.655,
+          "cup_fill_fraction": 0.45732019648832334,
+          "cup_ml": 27.999432,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_20",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "40bfe1bed7698885a722f2d7093d160660294d41c8aa1ec1712262167a15cfc7",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.4316390346311648,
+          -0.29267260593468736
+        ],
+        "source_observed_xy": [
+          0.43146899342536926,
+          -0.2932429015636444
+        ],
+        "source_xy_error_mm": 0.5951059704589814,
+        "cup_estimated_xy": [
+          0.5355201795922893,
+          -0.12739080842876338
+        ],
+        "cup_authored_xy": [
+          0.5354546611071531,
+          -0.12750044645895076
+        ],
+        "cup_xy_error_vs_authored_mm": 0.12772301890380802
+      },
+      "first_stop": {
+        "time_s": 20.104999998771714,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.5631839036941528,
+        "prediction_q25_last_six": 0.5597733110189438,
+        "sampled_current_rim_fraction": 0.5759147868436916,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.5672837888493246,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 28.055,
+          "cup_fill_fraction": 0.5758974313735952,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.105,
+          "cup_fill_fraction": 0.5769092552802132,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.155,
+          "cup_fill_fraction": 0.5770062004818625,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.205,
+          "cup_fill_fraction": 0.5757710344651156,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.255,
+          "cup_fill_fraction": 0.5754704868092246,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.305,
+          "cup_fill_fraction": 0.5761952792896934,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.355,
+          "cup_fill_fraction": 0.5761700174387753,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.405,
+          "cup_fill_fraction": 0.5763018488883962,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.455,
+          "cup_fill_fraction": 0.5758657006656412,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.505,
+          "cup_fill_fraction": 0.5756551034310274,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.555,
+          "cup_fill_fraction": 0.5760299815851089,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.605,
+          "cup_fill_fraction": 0.5762086202116563,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.655,
+          "cup_fill_fraction": 0.5750732744441303,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.705,
+          "cup_fill_fraction": 0.5763446765787451,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.755,
+          "cup_fill_fraction": 0.5758302008404441,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.805,
+          "cup_fill_fraction": 0.5754901563420005,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.855,
+          "cup_fill_fraction": 0.5768971590434793,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.905,
+          "cup_fill_fraction": 0.5762748514904684,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.955,
+          "cup_fill_fraction": 0.5686436162275416,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.005,
+          "cup_fill_fraction": 0.5672837888493246,
+          "cup_ml": 36.000935999999996,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_21",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": true,
+      "failure_reasons": [
+        "underfilled"
+      ],
+      "source_sha256": "da3cbc634f2fed03625ded9bd6e24909c545983ad39ffa7cd3a89aa3066f9079",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5358869075745247,
+          -0.12787491564467018
+        ],
+        "source_observed_xy": [
+          0.5354905724525452,
+          -0.12752097845077515
+        ],
+        "source_xy_error_mm": 0.5313690489074882,
+        "cup_estimated_xy": [
+          0.43177753360003035,
+          -0.29362062250979315
+        ],
+        "cup_authored_xy": [
+          0.4314474064529818,
+          -0.2932314970088881
+        ],
+        "cup_xy_error_vs_authored_mm": 0.5102965693329788
+      },
+      "first_stop": {
+        "time_s": 25.00499999877422,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 6,
+        "predicted_settled_fraction": 0.9273864030838013,
+        "prediction_q25_last_six": 0.926790177822113,
+        "sampled_current_rim_fraction": 0.8914753451066847,
+        "sampled_source_nominal_ml": 47.519135999999996
+      },
+      "final_rim_fraction": 0.8693232964066887,
+      "final_source_nominal_ml": 47.519135999999996,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 33.005,
+          "cup_fill_fraction": 0.8914013476932737,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.055,
+          "cup_fill_fraction": 0.8914530810187832,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.105,
+          "cup_fill_fraction": 0.8913844304926244,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.155,
+          "cup_fill_fraction": 0.8911541812560125,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.205,
+          "cup_fill_fraction": 0.8908932531581195,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.255,
+          "cup_fill_fraction": 0.8915098632083209,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.305,
+          "cup_fill_fraction": 0.8914093592587627,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.355,
+          "cup_fill_fraction": 0.8918321490287769,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.405,
+          "cup_fill_fraction": 0.8912779134862552,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 33.455,
+          "cup_fill_fraction": 0.8917598521008199,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.505,
+          "cup_fill_fraction": 0.8910217888214996,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.555,
+          "cup_fill_fraction": 0.8916690952637605,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.605,
+          "cup_fill_fraction": 0.8914713831508849,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.655,
+          "cup_fill_fraction": 0.891160860482383,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.705,
+          "cup_fill_fraction": 0.8912775278091419,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.755,
+          "cup_fill_fraction": 0.8909769976840288,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.805,
+          "cup_fill_fraction": 0.8911034647156199,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.855,
+          "cup_fill_fraction": 0.8698720623465135,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.905,
+          "cup_fill_fraction": 0.8683200275196737,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 33.955,
+          "cup_fill_fraction": 0.8693232964066887,
+          "cup_ml": 60.48367199999999,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_22",
+      "strict_pass": true,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "fbb0b031b1879fa80eae2323ef8bb7a3502d52c213f3f42d13c332ada1fe6327",
+      "localization": {
+        "decision_time_s": 0.45499999877065456,
+        "nearest_sample_time_s": 0.455,
+        "source_estimated_xy": [
+          0.5494040730224359,
+          -0.320361136934899
+        ],
+        "source_observed_xy": [
+          0.5491884350776672,
+          -0.3200635313987732
+        ],
+        "source_xy_error_mm": 0.3675170449880694,
+        "cup_estimated_xy": [
+          0.43978056327749465,
+          -0.13174332027120828
+        ],
+        "cup_authored_xy": [
+          0.4399389102884233,
+          -0.1319039543956583
+        ],
+        "cup_xy_error_vs_authored_mm": 0.2255595216519679
+      },
+      "first_stop": {
+        "time_s": 21.654999998772507,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 4,
+        "predicted_settled_fraction": 0.9252723455429077,
+        "prediction_q25_last_six": 0.9265236556529999,
+        "sampled_current_rim_fraction": 0.9502221387975345,
+        "sampled_source_nominal_ml": 32.670863999999995
+      },
+      "final_rim_fraction": 0.9254009941044962,
+      "final_source_nominal_ml": 32.670863999999995,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.9494442105293261,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.9489720190272598,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.755,
+          "cup_fill_fraction": 0.9495856313144446,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.805,
+          "cup_fill_fraction": 0.9498658958603343,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.855,
+          "cup_fill_fraction": 0.949832499728482,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.905,
+          "cup_fill_fraction": 0.9496458670672236,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.955,
+          "cup_fill_fraction": 0.9499670133871179,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.005,
+          "cup_fill_fraction": 0.9498859335394454,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.055,
+          "cup_fill_fraction": 0.9493780669044034,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.105,
+          "cup_fill_fraction": 0.9500882387161241,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.155,
+          "cup_fill_fraction": 0.9498053270227756,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.205,
+          "cup_fill_fraction": 0.9496068260248958,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.255,
+          "cup_fill_fraction": 0.9499092144124637,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.305,
+          "cup_fill_fraction": 0.9496898167273568,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.355,
+          "cup_fill_fraction": 0.9492874327827892,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.405,
+          "cup_fill_fraction": 0.9497841498431024,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.455,
+          "cup_fill_fraction": 0.9499551450504964,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.505,
+          "cup_fill_fraction": 0.9253376904655893,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.555,
+          "cup_fill_fraction": 0.9253548881586849,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.605,
+          "cup_fill_fraction": 0.9254009941044962,
+          "cup_ml": 65.330064,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_23",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [],
+      "source_sha256": "19254343342b074c2389729073daeb2fcc715e49da8a06fa8687fcf8b2f11f58",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.4394457516210139,
+          -0.13191434895642173
+        ],
+        "source_observed_xy": [
+          0.43983981013298035,
+          -0.1319313645362854
+        ],
+        "source_xy_error_mm": 0.39442571012968336,
+        "cup_estimated_xy": [
+          0.548785463004074,
+          -0.3190456529228342
+        ],
+        "cup_authored_xy": [
+          0.5491366161491454,
+          -0.3200363201449889
+        ],
+        "cup_xy_error_vs_authored_mm": 1.0510614046501796
+      },
+      "first_stop": {
+        "time_s": 20.904999998772123,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.610835611820221,
+        "prediction_q25_last_six": 0.6090094596147537,
+        "sampled_current_rim_fraction": 0.6279747107449689,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.616124939217286,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 28.905,
+          "cup_fill_fraction": 0.6271137216511884,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.955,
+          "cup_fill_fraction": 0.6273739660487445,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.005,
+          "cup_fill_fraction": 0.6275600727866667,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.055,
+          "cup_fill_fraction": 0.6278861627859217,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.105,
+          "cup_fill_fraction": 0.6276208519935597,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.155,
+          "cup_fill_fraction": 0.6281377820407632,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.205,
+          "cup_fill_fraction": 0.6277569434222042,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.255,
+          "cup_fill_fraction": 0.6274938590386324,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.305,
+          "cup_fill_fraction": 0.6279311642927271,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.355,
+          "cup_fill_fraction": 0.6269346973475277,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.405,
+          "cup_fill_fraction": 0.6274396714042204,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.455,
+          "cup_fill_fraction": 0.627484234641579,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.505,
+          "cup_fill_fraction": 0.6278114992029515,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.555,
+          "cup_fill_fraction": 0.6276287233128256,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.605,
+          "cup_fill_fraction": 0.6272881002987122,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.6269006525768943,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.626876127018647,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.755,
+          "cup_fill_fraction": 0.6182089630295238,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.805,
+          "cup_fill_fraction": 0.6147706690956555,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.855,
+          "cup_fill_fraction": 0.616124939217286,
+          "cup_ml": 40.001687999999994,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_24",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "dbc4c442dd75a7c00f9733ba3bd298165e3d793e491ea3349ecf0e27a9293583",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5707786228846139,
+          -0.3097749819444106
+        ],
+        "source_observed_xy": [
+          0.5705915689468384,
+          -0.3095354735851288
+        ],
+        "source_xy_error_mm": 0.3038970710671608,
+        "cup_estimated_xy": [
+          0.5860739661076754,
+          -0.15411167772923023
+        ],
+        "cup_authored_xy": [
+          0.5858623311272672,
+          -0.15389675558012308
+        ],
+        "cup_xy_error_vs_authored_mm": 0.30163039486965076
+      },
+      "first_stop": {
+        "time_s": 21.204999998772276,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.6841491460800171,
+        "prediction_q25_last_six": 0.6780356764793396,
+        "sampled_current_rim_fraction": 0.671333811563603,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.6541577163864575,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 29.205,
+          "cup_fill_fraction": 0.6668814322527707,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.255,
+          "cup_fill_fraction": 0.6676176022080804,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.305,
+          "cup_fill_fraction": 0.6666703616871543,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.355,
+          "cup_fill_fraction": 0.6667475321713604,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.405,
+          "cup_fill_fraction": 0.6668375351849715,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.455,
+          "cup_fill_fraction": 0.6664672150331375,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.505,
+          "cup_fill_fraction": 0.6667216041508833,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.555,
+          "cup_fill_fraction": 0.6662159288630756,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.605,
+          "cup_fill_fraction": 0.6669141096227298,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 29.655,
+          "cup_fill_fraction": 0.6669090607587018,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.705,
+          "cup_fill_fraction": 0.6667458141551287,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.755,
+          "cup_fill_fraction": 0.6673163007287408,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.805,
+          "cup_fill_fraction": 0.6670919067719393,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.855,
+          "cup_fill_fraction": 0.6669224016806649,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.905,
+          "cup_fill_fraction": 0.6663541415158429,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 29.955,
+          "cup_fill_fraction": 0.6668094859403711,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.005,
+          "cup_fill_fraction": 0.6667657817111285,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.055,
+          "cup_fill_fraction": 0.6566489451071784,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.105,
+          "cup_fill_fraction": 0.6547467329922834,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.155,
+          "cup_fill_fraction": 0.6541577163864575,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_25",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": true,
+      "failure_reasons": [
+        "fill_unconfirmed",
+        "wrong_stop_condition"
+      ],
+      "source_sha256": "400b2f9252d21678ab7f6d8db3e5594f2914c14afb09093bed34e2b091a72ae4",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5859893598138605,
+          -0.15452318030568918
+        ],
+        "source_observed_xy": [
+          0.5858619213104248,
+          -0.15383999049663544
+        ],
+        "source_xy_error_mm": 0.6949740191926665,
+        "cup_estimated_xy": [
+          0.5706187151572253,
+          -0.3095579352901063
+        ],
+        "cup_authored_xy": [
+          0.5705959170513427,
+          -0.3095242057716495
+        ],
+        "cup_xy_error_vs_authored_mm": 0.04071159597900608
+      },
+      "first_stop": {
+        "time_s": 33.404999998776525,
+        "reason": "fill_unconfirmed",
+        "mode": "Returning upright",
+        "pause_count": 10,
+        "predicted_settled_fraction": 0.9151498675346375,
+        "prediction_q25_last_six": 0.9126954227685928,
+        "sampled_current_rim_fraction": 0.9455079373191371,
+        "sampled_source_nominal_ml": 37.079856
+      },
+      "final_rim_fraction": 0.9217128339935741,
+      "final_source_nominal_ml": 37.079856,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 41.405,
+          "cup_fill_fraction": 0.945791672959046,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.455,
+          "cup_fill_fraction": 0.9451603721169851,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.505,
+          "cup_fill_fraction": 0.9456133674172783,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.555,
+          "cup_fill_fraction": 0.9454502961214839,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.605,
+          "cup_fill_fraction": 0.9454961391056272,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.655,
+          "cup_fill_fraction": 0.945584757187786,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.705,
+          "cup_fill_fraction": 0.9455475744079129,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.755,
+          "cup_fill_fraction": 0.9451641587650064,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.805,
+          "cup_fill_fraction": 0.9456561425152934,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.855,
+          "cup_fill_fraction": 0.9451766406788532,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 41.905,
+          "cup_fill_fraction": 0.945149169949923,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 41.955,
+          "cup_fill_fraction": 0.9455831618869995,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.005,
+          "cup_fill_fraction": 0.9449773157344132,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.055,
+          "cup_fill_fraction": 0.9447066405240216,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.105,
+          "cup_fill_fraction": 0.9446807475651,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.155,
+          "cup_fill_fraction": 0.9455141081529492,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.205,
+          "cup_fill_fraction": 0.9460869438507965,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.255,
+          "cup_fill_fraction": 0.9207302689552297,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.305,
+          "cup_fill_fraction": 0.9208780008203828,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 42.355,
+          "cup_fill_fraction": 0.9217128339935741,
+          "cup_ml": 64.921824,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_26",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": false,
+      "failure_reasons": [
+        "underfilled"
+      ],
+      "source_sha256": "27994abeaca81db62388b57c85248aba911d17a63ea1b7b2f01799d2210e23d3",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5276657850432986,
+          -0.3520941386756794
+        ],
+        "source_observed_xy": [
+          0.5278831124305725,
+          -0.352267324924469
+        ],
+        "source_xy_error_mm": 0.2778932709316594,
+        "cup_estimated_xy": [
+          0.58910680284473,
+          -0.21201163901801945
+        ],
+        "cup_authored_xy": [
+          0.5882600656177371,
+          -0.21145442127354067
+        ],
+        "cup_xy_error_vs_authored_mm": 1.0136348190239255
+      },
+      "first_stop": {
+        "time_s": 22.454999998772916,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 4,
+        "predicted_settled_fraction": 0.9288121461868286,
+        "prediction_q25_last_six": 0.9282985031604767,
+        "sampled_current_rim_fraction": 0.915657335169174,
+        "sampled_source_nominal_ml": 30.460535999999998
+      },
+      "final_rim_fraction": 0.8928623451906079,
+      "final_source_nominal_ml": 30.460535999999998,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 30.455,
+          "cup_fill_fraction": 0.9159603371339674,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.505,
+          "cup_fill_fraction": 0.9160908362444696,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.555,
+          "cup_fill_fraction": 0.9160514796481402,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.605,
+          "cup_fill_fraction": 0.9157500379225776,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.655,
+          "cup_fill_fraction": 0.9155720128732557,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.705,
+          "cup_fill_fraction": 0.9155125309439256,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.755,
+          "cup_fill_fraction": 0.916027357297784,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.805,
+          "cup_fill_fraction": 0.9156810893731946,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.855,
+          "cup_fill_fraction": 0.9151097963838004,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.905,
+          "cup_fill_fraction": 0.9154026129666485,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.955,
+          "cup_fill_fraction": 0.9156596842934092,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.005,
+          "cup_fill_fraction": 0.9157041072845447,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.055,
+          "cup_fill_fraction": 0.9162701059790206,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.105,
+          "cup_fill_fraction": 0.9154092220699074,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.155,
+          "cup_fill_fraction": 0.9156253414995517,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.205,
+          "cup_fill_fraction": 0.915497594721176,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.255,
+          "cup_fill_fraction": 0.9154001761885238,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.305,
+          "cup_fill_fraction": 0.8925439161412844,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.355,
+          "cup_fill_fraction": 0.8922777112792509,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.405,
+          "cup_fill_fraction": 0.8928623451906079,
+          "cup_ml": 62.542367999999996,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_27",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": true,
+      "failure_reasons": [],
+      "source_sha256": "8f5e3dc610414bad6a2eb0164feb9c0cb388216e0dd10a1e11260761863bc197",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5880368239885309,
+          -0.2111634452931372
+        ],
+        "source_observed_xy": [
+          0.5882376432418823,
+          -0.21150772273540497
+        ],
+        "source_xy_error_mm": 0.3985665938975414,
+        "cup_estimated_xy": [
+          0.5273837517772537,
+          -0.35199734827738965
+        ],
+        "cup_authored_xy": [
+          0.5279444864959918,
+          -0.3522451904562106
+        ],
+        "cup_xy_error_vs_authored_mm": 0.6130653883567301
+      },
+      "first_stop": {
+        "time_s": 22.454999998772916,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.6357320547103882,
+        "prediction_q25_last_six": 0.6313997060060501,
+        "sampled_current_rim_fraction": 0.671848006809458,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.654283815271713,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 30.455,
+          "cup_fill_fraction": 0.6679996504503127,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.505,
+          "cup_fill_fraction": 0.667662147914661,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.555,
+          "cup_fill_fraction": 0.6675702866385954,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.605,
+          "cup_fill_fraction": 0.6680751029182872,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.655,
+          "cup_fill_fraction": 0.6680984714451947,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.705,
+          "cup_fill_fraction": 0.6673678061541379,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.755,
+          "cup_fill_fraction": 0.6675851001458999,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.805,
+          "cup_fill_fraction": 0.667209170145146,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.855,
+          "cup_fill_fraction": 0.6673079560784723,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 30.905,
+          "cup_fill_fraction": 0.667399922539205,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 30.955,
+          "cup_fill_fraction": 0.6678022538914389,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.005,
+          "cup_fill_fraction": 0.6677944877568404,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.055,
+          "cup_fill_fraction": 0.6673060802852395,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.105,
+          "cup_fill_fraction": 0.6676329065771653,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.155,
+          "cup_fill_fraction": 0.6671088415033666,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.205,
+          "cup_fill_fraction": 0.66738041078343,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.255,
+          "cup_fill_fraction": 0.6670197676209831,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.305,
+          "cup_fill_fraction": 0.6564419942743627,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.355,
+          "cup_fill_fraction": 0.6549148882136615,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 31.405,
+          "cup_fill_fraction": 0.654283815271713,
+          "cup_ml": 42.999336,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_28",
+      "strict_pass": true,
+      "expected_stop": "bottle_empty",
+      "swapped": false,
+      "failure_reasons": [],
+      "source_sha256": "9ad59d36bea9f6b3a6e9dd4ebf340b12a11c920cdd8eb83e0b9ae0777501264a",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5008749756938227,
+          -0.26574391718364865
+        ],
+        "source_observed_xy": [
+          0.5004077553749084,
+          -0.26573118567466736
+        ],
+        "source_xy_error_mm": 0.46739375020131047,
+        "cup_estimated_xy": [
+          0.5017505599182697,
+          -0.14684890596855116
+        ],
+        "cup_authored_xy": [
+          0.501862898325467,
+          -0.14686044167173712
+        ],
+        "cup_xy_error_vs_authored_mm": 0.1129291378681258
+      },
+      "first_stop": {
+        "time_s": 20.004999998771662,
+        "reason": "bottle_empty",
+        "mode": "Returning upright",
+        "pause_count": 0,
+        "predicted_settled_fraction": 0.7331595420837402,
+        "prediction_q25_last_six": 0.7258025705814362,
+        "sampled_current_rim_fraction": 0.7128109483157876,
+        "sampled_source_nominal_ml": 0.0
+      },
+      "final_rim_fraction": 0.6952306810547313,
+      "final_source_nominal_ml": 0.0,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 28.005,
+          "cup_fill_fraction": 0.7093818931018594,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.055,
+          "cup_fill_fraction": 0.7103659131947675,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.105,
+          "cup_fill_fraction": 0.710278539797838,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.155,
+          "cup_fill_fraction": 0.7100148768985962,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.205,
+          "cup_fill_fraction": 0.7099842155680927,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.255,
+          "cup_fill_fraction": 0.7095412478727442,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.305,
+          "cup_fill_fraction": 0.7098735963597007,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.355,
+          "cup_fill_fraction": 0.7096542512669273,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.405,
+          "cup_fill_fraction": 0.7102285244885602,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 28.455,
+          "cup_fill_fraction": 0.7101667460273283,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.505,
+          "cup_fill_fraction": 0.7098010364700755,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.555,
+          "cup_fill_fraction": 0.709324111657983,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.605,
+          "cup_fill_fraction": 0.709902031281414,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.655,
+          "cup_fill_fraction": 0.710096061930936,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.705,
+          "cup_fill_fraction": 0.7096003616557391,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.755,
+          "cup_fill_fraction": 0.7096663825652169,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.805,
+          "cup_fill_fraction": 0.710355044112485,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.855,
+          "cup_fill_fraction": 0.6981728715055119,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.905,
+          "cup_fill_fraction": 0.6957009091096755,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 28.955,
+          "cup_fill_fraction": 0.6952306810547313,
+          "cup_ml": 45.996984,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    },
+    {
+      "name": "XW30_A_test_29",
+      "strict_pass": false,
+      "expected_stop": "cup_near_full",
+      "swapped": true,
+      "failure_reasons": [
+        "underfilled"
+      ],
+      "source_sha256": "49b49c89b9c1d852f71430c323362d1e99e83170fbb5eaab73a26d035d78fa49",
+      "localization": {
+        "decision_time_s": 0.4049999987706545,
+        "nearest_sample_time_s": 0.405,
+        "source_estimated_xy": [
+          0.5017010255451303,
+          -0.1468723597967484
+        ],
+        "source_observed_xy": [
+          0.5017497539520264,
+          -0.14691020548343658
+        ],
+        "source_xy_error_mm": 0.06169889496197976,
+        "cup_estimated_xy": [
+          0.500367913795005,
+          -0.2655367512646393
+        ],
+        "cup_authored_xy": [
+          0.5004540624622824,
+          -0.26569603095070143
+        ],
+        "cup_xy_error_vs_authored_mm": 0.18108454176355668
+      },
+      "first_stop": {
+        "time_s": 28.85499999877619,
+        "reason": "cup_near_full",
+        "mode": "Returning upright",
+        "pause_count": 8,
+        "predicted_settled_fraction": 0.9221506118774414,
+        "prediction_q25_last_six": 0.9235506802797318,
+        "sampled_current_rim_fraction": 0.9073371578665329,
+        "sampled_source_nominal_ml": 46.055304
+      },
+      "final_rim_fraction": 0.8847771329038273,
+      "final_source_nominal_ml": 46.055304,
+      "final_outside_nominal_ml": 0.0,
+      "ever_near_worktop_nominal_ml": 0.0,
+      "final_height_trace": [
+        {
+          "t": 36.855,
+          "cup_fill_fraction": 0.9070029686478995,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 36.905,
+          "cup_fill_fraction": 0.9070853983654684,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 36.955,
+          "cup_fill_fraction": 0.9074338401065142,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.005,
+          "cup_fill_fraction": 0.906946186458362,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.055,
+          "cup_fill_fraction": 0.9071722283082839,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.105,
+          "cup_fill_fraction": 0.9073770754477546,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.155,
+          "cup_fill_fraction": 0.9072727322578419,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.205,
+          "cup_fill_fraction": 0.9070694979499355,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.255,
+          "cup_fill_fraction": 0.907249100769266,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.305,
+          "cup_fill_fraction": 0.9068979943499834,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Retreating"
+        },
+        {
+          "t": 37.355,
+          "cup_fill_fraction": 0.9075681784573711,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.405,
+          "cup_fill_fraction": 0.9068955926334145,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.455,
+          "cup_fill_fraction": 0.9076457346186907,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.505,
+          "cup_fill_fraction": 0.9071193028898789,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.555,
+          "cup_fill_fraction": 0.9075726488057292,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.605,
+          "cup_fill_fraction": 0.9073343003497393,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.655,
+          "cup_fill_fraction": 0.9075430042603425,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.705,
+          "cup_fill_fraction": 0.8848819143631869,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.755,
+          "cup_fill_fraction": 0.8840539707857009,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        },
+        {
+          "t": 37.805,
+          "cup_fill_fraction": 0.8847771329038273,
+          "cup_ml": 61.941672,
+          "phase": "Visual guard: Holding completed pose"
+        }
+      ],
+      "recorded_table_loss_events": [],
+      "post_release_recontacts": []
+    }
+  ],
+  "scope": "Post-test diagnostics only; no fitting, threshold or score changes. Source error uses the nearest 20 Hz native pose to the first accepted localization; cup error uses the authored fixture center. Contact/loss timing is sampled evidence, not proof of the cause of a spill or of continuous collision-free motion."
+}

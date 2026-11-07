@@ -68,7 +68,8 @@ def main():
         for key in ('container','limits','asset_sha256'):assert s[key]==before[key],(label,key)
     assert before['container']==selection['container']
     assert before['asset_sha256']=='82ac39486428e51d8be58996ea817fd4b25a40c262936e2d2cc8823673e1387d'
-    final=snapshots['runtime-final']['health'];assert not final['queue'] and not final['recording']['active'] and not final['error'] and not final['learning_error']
+    # Healthy runtime state omits error keys until an error has occurred.
+    final=snapshots['runtime-final']['health'];assert not final['queue'] and not final['recording']['active'] and not final.get('error') and not final.get('learning_error')
     manifest=read(E/'data-manifest.json');assert sha(E/'data-manifest.json')==model['data_manifest_sha256']
     rounds=model.get('consumed_development_rounds',[0]);assert rounds in ([0],[0,1],[0,1,2])
     consumed={s['name']+f'_r{r}' for r in rounds for s in plan['development']}
