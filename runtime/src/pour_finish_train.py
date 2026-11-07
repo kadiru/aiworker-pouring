@@ -131,7 +131,8 @@ def train(state):
     recent=torch.tensor([n.startswith(('XW30_A_','FCAL_A_')) for n in data['train']['episode']],device='cuda')
     wideval=torch.tensor([n.startswith(('XW30_A_','FCAL_A_')) for n in data['validation']['episode']],device='cuda');near=vy>.8
     candidates=[]
-    feature_sets=[list(range(21)),list(range(60)),list(range(340)),list(range(21))+list(range(340,x.shape[1])),list(range(x.shape[1]))]
+    feature_sets=[list(range(21)),list(range(60)),list(range(340)),list(range(21))+list(range(340,604)),list(range(604)),
+                  list(range(21))+list(range(604,x.shape[1])),list(range(x.shape[1]))]
     for weight in (2.,8.,32.):
         weights=w*torch.where(recent,weight,1.);weights/=weights.mean()
         for columns in feature_sets:
@@ -149,28 +150,28 @@ def train(state):
     # Ridge leaves opposite perspective-dependent errors. Fit a bounded
     # nonlinear residual on training episodes; validation selects the epoch.
     base=min(candidates,key=lambda c:c['score'])['fit']
-    columns=list(range(7))+list(range(340,367))
-    with torch.inference_mode(False),torch.enable_grad():
-        xx=x[:,columns].float().clone();vv=vx[:,columns].float().clone()
-        mean=xx.mean(0);scale=xx.std(0).clamp(min=.001);xx=(xx-mean)/scale;vv=(vv-mean)/scale
-        baseline=predict(x,base).float().clone();vbase=predict(vx,base).float().clone()
-        yy=y.float().clone();vyy=vy.float().clone();weights=(w*torch.where(recent,16.,1.)).float().clone();weights/=weights.mean()
-        for width in (32,64):
-            torch.manual_seed(20261106+width)
-            net=torch.nn.Sequential(torch.nn.Linear(len(columns),width),torch.nn.Tanh(),torch.nn.Linear(width,16),torch.nn.Tanh(),torch.nn.Linear(16,1)).cuda()
-            torch.nn.init.zeros_(net[-1].weight);torch.nn.init.zeros_(net[-1].bias)
-            opt=torch.optim.AdamW(net.parameters(),lr=.001,weight_decay=.01)
-            for step in range(1,1201):
-                opt.zero_grad();delta=net(xx)[:,0];loss=((baseline+delta-yy).square()*weights).mean()+.02*delta.square().mean();loss.backward();opt.step()
-                if step%20:continue
-                with torch.no_grad():
-                    error=(vbase+net(vv)[:,0]).clamp(0,1)-vyy;mask=wideval&near
-                    metrics=dict(mae=float(error.abs().mean()),near_mae=float(error[near].abs().mean()),wide_near_mae=float(error[mask].abs().mean()),
-                        wide_near_max=float(error[mask].abs().max()),wide_near_overestimate=float(error[mask].max()),near_p95=float(torch.quantile(error[near].abs(),.95)))
-                    layers=[dict(weight=l.weight.cpu().tolist(),bias=l.bias.cpu().tolist()) for l in net if isinstance(l,torch.nn.Linear)]
-                    fitted=dict(base,residual_mlp=dict(columns=columns,mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),layers=layers))
-                    candidates.append(dict(fit=fitted,weight=16.,residual_width=width,optimizer_steps=step,metrics=metrics,
-                        score=metrics['wide_near_mae']+metrics['near_mae']+.3*metrics['wide_near_max']))
+    for columns in (list(range(7))+list(range(340,367)),list(range(7))+list(range(340,367))+list(range(604,x.shape[1]))):
+        with torch.inference_mode(False),torch.enable_grad():
+            xx=x[:,columns].float().clone();vv=vx[:,columns].float().clone()
+            mean=xx.mean(0);scale=xx.std(0).clamp(min=.001);xx=(xx-mean)/scale;vv=(vv-mean)/scale
+            baseline=predict(x,base).float().clone();vbase=predict(vx,base).float().clone()
+            yy=y.float().clone();vyy=vy.float().clone();weights=(w*torch.where(recent,16.,1.)).float().clone();weights/=weights.mean()
+            for width in (32,64):
+                torch.manual_seed(20261106+width)
+                net=torch.nn.Sequential(torch.nn.Linear(len(columns),width),torch.nn.Tanh(),torch.nn.Linear(width,16),torch.nn.Tanh(),torch.nn.Linear(16,1)).cuda()
+                torch.nn.init.zeros_(net[-1].weight);torch.nn.init.zeros_(net[-1].bias)
+                opt=torch.optim.AdamW(net.parameters(),lr=.001,weight_decay=.01)
+                for step in range(1,1201):
+                    opt.zero_grad();delta=net(xx)[:,0];loss=((baseline+delta-yy).square()*weights).mean()+.02*delta.square().mean();loss.backward();opt.step()
+                    if step%20:continue
+                    with torch.no_grad():
+                        error=(vbase+net(vv)[:,0]).clamp(0,1)-vyy;mask=wideval&near
+                        metrics=dict(mae=float(error.abs().mean()),near_mae=float(error[near].abs().mean()),wide_near_mae=float(error[mask].abs().mean()),
+                            wide_near_max=float(error[mask].abs().max()),wide_near_overestimate=float(error[mask].max()),near_p95=float(torch.quantile(error[near].abs(),.95)))
+                        layers=[dict(weight=l.weight.cpu().tolist(),bias=l.bias.cpu().tolist()) for l in net if isinstance(l,torch.nn.Linear)]
+                        fitted=dict(base,residual_mlp=dict(columns=columns,mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),layers=layers))
+                        candidates.append(dict(fit=fitted,weight=16.,residual_inputs=len(columns),residual_width=width,optimizer_steps=step,metrics=metrics,
+                            score=metrics['wide_near_mae']+metrics['near_mae']+.3*metrics['wide_near_max']))
     write('level-candidates.json',candidates)
     eligible=[c for c in candidates if c['metrics']['wide_near_max']<.04 and c['metrics']['wide_near_overestimate']<=.04]
     chosen=min(eligible or candidates,key=lambda c:c['score']);m=chosen['metrics']
@@ -187,7 +188,7 @@ def train(state):
                                coarse_flow_limit_ml_s=10.,coarse_brake_target=.87)
     saved['model_version']='visual_finish_hierarchy_v23'
     saved['parent_checkpoint_sha256']=PARENT_SHA
-    saved['method']='Supervised ridge'+(' with a validation-selected nonlinear residual' if 'residual_mlp' in chosen['fit'] else '')+' on cup-normalized RGB profiles and historical settling pauses; retained RGB localizer, wrist empty CNN and contextual behavioral cloning; slower pour/brake and continuous upright-to-table return without drain hold.'
+    saved['method']='Supervised ridge'+(' with a validation-selected nonlinear residual' if 'residual_mlp' in chosen['fit'] else '')+' on cup-normalized RGB surface profiles and spatial liquid-surface descriptors; historical settling pauses and stationary calibration; retained RGB localizer, wrist empty CNN and contextual behavioral cloning; slower pour/brake and continuous upright-to-table return without drain hold.'
     # A staged component fit records the exact files that must be deployed.
     saved['sources']={n:sha(next(p for p in (ROOT/'staged'/n,Path('/workspace/src')/n) if p.exists())) for n in RUNTIME_SOURCES}
     torch.save(saved,ROOT/'best.partial.pt');(ROOT/'best.partial.pt').replace(ROOT/'best.pt')

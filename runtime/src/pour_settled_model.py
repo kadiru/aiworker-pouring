@@ -37,7 +37,22 @@ def features(image, cnn, cup_xy):
     quadratic = torch.cat((view[:,:1].square(),view[:,:1]*view[:,1:],view[:,1:].square()),1)
     envelope = torch.cat((quantiles,quantiles*view[:,:1],quantiles*view[:,1:]),1)
     perspective = torch.cat([torch.cat((quantiles,fine),1)*quadratic[:,i:i+1] for i in range(3)],1)
-    return torch.cat((existing,envelope,perspective),1)
+    legacy_all=torch.cat((existing,envelope,perspective),1)
+    # Row averages discard the ellipse's lateral shape. Keep continuous red
+    # evidence in a small 2-D grid and in thirteen vertical surface profiles.
+    # A positive color margin excludes dark cup walls from the soft mask.
+    strength=(torch.minimum(r-1.4*g-.025,r-1.2*b-.02)/.12).clamp(0,1)
+    region=strength[:,12:84,30:82]
+    pooled=torch.nn.functional.adaptive_avg_pool2d(region[:,None],(8,8)).flatten(1)
+    profiles=region.reshape(len(image),72,13,4).mean(3)
+    profile_mass=profiles.sum(1);normalized=profiles/profile_mass[:,None].clamp(min=1e-6)
+    yy=torch.arange(12,84,device=image.device,dtype=normalized.dtype)[None,:,None]/95.
+    center=(normalized*yy).sum(1)
+    spread=(normalized*(yy-center[:,None]).square()).sum(1).sqrt()
+    total=profile_mass.sum(1,keepdim=True)
+    global_center=(center*profile_mass).sum(1,keepdim=True)/total.clamp(min=1e-6)
+    shape=torch.cat((pooled,center,spread,profile_mass/72.,global_center,total/(72*13)),1)
+    return torch.cat((legacy_all,shape),1)
 
 
 def predict(x, fitted):

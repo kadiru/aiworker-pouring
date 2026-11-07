@@ -25,10 +25,18 @@ class FinishTests(unittest.TestCase):
         a[0,35:75,35:73]=torch.tensor([180,15,30],dtype=torch.uint8)
         a[1,45:75,35:73]=torch.tensor([180,15,30],dtype=torch.uint8)
         x=features(a,torch.tensor([.9,.7]),[.49,-.15])
-        self.assertTrue(torch.isfinite(x).all());self.assertEqual(x.shape,(2,604))
+        self.assertTrue(torch.isfinite(x).all());self.assertEqual(x.shape,(2,709))
         self.assertLess(x[0,340],x[1,340])
         old=dict(columns=[0,4],mean=[0.,0.],scale=[1.,1.],coef=[0.,1.])
         np.testing.assert_allclose(predict(x,old),[.9,.7],atol=1e-6)
+
+    def test_spatial_surface_shape_distinguishes_equal_row_averages(self):
+        a=torch.full((2,96,96,3),180,dtype=torch.uint8)
+        a[0,35:65,40:48]=torch.tensor([180,15,30],dtype=torch.uint8)
+        a[1,35:65,60:68]=torch.tensor([180,15,30],dtype=torch.uint8)
+        x=features(a,torch.tensor([.9,.9]),[.49,-.15])
+        torch.testing.assert_close(x[0,:604],x[1,:604])
+        self.assertGreater(float((x[0,604:]-x[1,604:]).abs().max()),.1)
 
     def test_residual_uses_the_same_clipped_baseline_as_training(self):
         x=torch.tensor([[1.,1.2],[1.,-.2]])
