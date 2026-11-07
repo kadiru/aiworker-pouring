@@ -17,6 +17,31 @@ from pour_wide_train import RUNTIME_SOURCES as PREVIOUS_SOURCES
 RUNTIME_SOURCES=tuple(dict.fromkeys(PREVIOUS_SOURCES+('pour_finish_study.py','pour_finish_train.py','pour_finish_calibration.py')))
 def write(n,d):(ROOT/n).write_text(json.dumps(d,indent=2)+'\n')
 
+def reference_crop_anchors(saved,calibrations,device='cuda'):
+    """Reuse initial RGB anchors from matching historical low-fill fixtures.
+
+    The autonomous actor fixes its cup anchor before pouring. Re-localizing a
+    prefilled static cup is a different observation distribution and can match
+    a background edge. Training fixture poses select the corresponding record;
+    its RGB estimate, rather than the simulator pose, defines the crop.
+    """
+    def key(s):return tuple(s['cup_world'])+tuple(s['source_xy'])
+    needed={key(s):s['study_split'] for s in calibrations}
+    accepted=set(json.loads((PARENT/'reference-acceptance.json').read_text())['accepted']);anchors={}
+    for path in sorted(OUTPUTS.glob('*/*T30_A_demo_*/episode.hdf5')):
+        spec=json.loads((path.parent/'parameters.json').read_text());k=key(spec)
+        if spec['name'] not in accepted or k not in needed:continue
+        assert k not in anchors and spec['study_split']==needed[k]
+        with h5py.File(path) as f:
+            assert f.attrs['status']=='complete';d=f['data/demo_0']
+            uv=np.median([locate(decode(d['obs/task_image'][i],'jpeg95').copy(),saved['cup_bank'],device=device)[0] for i in range(8)],axis=0)
+        xy=plane_point(uv,1.078,saved['calibration'])[:2]
+        error=float(np.linalg.norm(xy-np.asarray(spec['cup_world'][:2]))*1000)
+        assert error<3.,(spec['name'],'Reference crop anchor error',error)
+        anchors[k]=dict(name=spec['name'],path=str(path),sha256=sha(path),initial_image_indices=list(range(8)),cup_xy=xy.tolist(),localization_error_mm=error,split=spec['study_split'])
+    assert set(anchors)==set(needed),'Every calibration layout needs its recorded RGB reference anchor'
+    return anchors
+
 def build(saved):
     cached=torch.load(PARENT/'wide-cache.pt',map_location='cpu',weights_only=False)
     arrays={s:{k:[] for k in ('image','target','cup_xy','episode')} for s in ('train','validation')}
@@ -55,6 +80,8 @@ def build(saved):
                             frames=[dict(index=j,target=v[0],view=v[1]) for j,v in selected.items()]))
     assert len(records)==38
     calibration=json.loads((ROOT/'calibration-plan.json').read_text())['cases']
+    anchors=reference_crop_anchors(saved,calibration)
+    write('calibration-anchor-manifest.json',dict(records=list(anchors.values()),scope='RGB crop anchors from matching accepted historical low-fill references. Fixed calibration layouts select records only during supervision; autonomous inference still estimates its own initial cup location.'))
     expected={s['name']:s for s in calibration};found=set()
     for path in sorted(OUTPUTS.glob('*/*FCAL_A_*/episode.hdf5')):
         spec=json.loads((path.parent/'parameters.json').read_text());name=spec['name']
@@ -63,15 +90,14 @@ def build(saved):
         rows=json.loads((path.parent/'samples.json').read_text());split=spec['study_split'];selected=[]
         with h5py.File(path) as f:
             assert f.attrs['status']=='complete';d=f['data/demo_0']
-            uv=np.median([locate(decode(d['obs/task_image'][j],'jpeg95'),saved['cup_bank'])[0] for j in range(8)],axis=0)
-            xy=plane_point(uv,1.078,saved['calibration'])[:2].tolist()
+            anchor=anchors[tuple(spec['cup_world'])+tuple(spec['source_xy'])];xy=anchor['cup_xy']
             for j in range(0,len(rows),2):
                 if rows[j]['t']<1.5:continue
                 image=cup_crop(decode(d['next_obs/task_image'][j],'jpeg95'),xy,saved['calibration'])
                 for k,v in dict(image=image,target=rows[-1]['cup_fill_fraction'],cup_xy=xy,episode=name).items():arrays[split][k].append(v)
                 selected.append(dict(index=j,target=rows[-1]['cup_fill_fraction'],view='static_calibration'))
         assert selected
-        records.append(dict(name=name,path=str(path),sha256=sha(path),split=split,former_split='new_supervised_calibration',frames=selected))
+        records.append(dict(name=name,path=str(path),sha256=sha(path),split=split,former_split='new_supervised_calibration',crop_anchor_reference=anchor,frames=selected))
     assert found==set(expected),'All planned static calibration recordings are required before fitting'
     data={}
     for split,a in arrays.items():

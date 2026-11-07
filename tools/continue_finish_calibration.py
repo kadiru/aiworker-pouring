@@ -6,7 +6,7 @@ STUDY=HOST_ROOT/'learning/A-finish-20261106-v1'
 
 def read(p):return json.loads(p.read_text())
 def main():
-    output=Path('/tmp/aiworker-finish-calibration-v2');output.mkdir(exist_ok=False)
+    output=Path('/tmp/aiworker-finish-calibration-v4');output.mkdir(exist_ok=False)
     expected={s['name']:s for s in read(STUDY/'calibration-plan.json')['cases']};assert len(expected)==51
     record=dict(stage='collecting',expected=len(expected),started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),snapshots=[isolation()])
     def save():
@@ -31,6 +31,14 @@ def main():
         subprocess.run(['docker','exec',CID,'/isaac-sim/python.sh','/workspace/src/audit_finish_study.py','--output','calibration-integrity.json','--scope','calibration'],check=True,timeout=900)
         audit=read(STUDY/'calibration-integrity.json');assert audit['native_checks_passed'] and audit['valid_recordings']==len(expected)
         subprocess.run(['docker','exec',CID,'/isaac-sim/python.sh','/workspace/learning/A-finish-20261106-v1/staged/check_finish_calibration.py'],check=True,timeout=300)
+        record['stage']='deploying_reference_anchor_fit';save()
+        subprocess.run(['python3','/tmp/deploy_finish_study.py','--expected-container',CID,'--phase','reference-anchored-calibration','pour_finish_train.py'],check=True,timeout=120)
+        for _ in range(36):
+            time.sleep(5)
+            try:h=health()
+            except OSError:continue
+            if (h.get('ready') or h.get('phase')=='Ready') and not h.get('error'):break
+        else:raise TimeoutError('Owned simulator did not become ready after fit-source deployment')
         assert not (STUDY/'best.pt').exists();command('finish_train');record['stage']='fitting';save()
         for _ in range(180):
             time.sleep(5);h=health();assert not h.get('error') and not h.get('learning_error'),h.get('learning_error')

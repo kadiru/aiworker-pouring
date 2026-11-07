@@ -8,7 +8,7 @@ The terminal motion now opts into zero stationary drain hold. It turns upright o
 
 All 38 new approach layouts and 38 continuous-return paths pass geometry screening. Return screening covers 63 poses and articulated closed-finger hull ranges; this is not dynamic, self-collision or no-spill validation. Thirty CPU controller/feature/calibration checks pass. Protocol 18 now uses the raised home and wide-layout path support already present in protocol 17.
 
-The first three valid stationary grid pilots reached 66.70%, 78.86% and 82.87% settled rim height with zero loss. Three new settled-seed pilots reach 84.28%, 90.00% and 94.10%, with zero command variation, zero tail arm motion, constant inventory and height standard deviation below 0.00030. Their three final task-camera frames are manually inspected. The remaining 45 calibration cases are queued; `/tmp/aiworker-finish-calibration-v2` is a finite audit → fit → development handoff. It stops on failed checks and cannot freeze or launch reserved tests.
+The first three valid stationary grid pilots reached 66.70%, 78.86% and 82.87% settled rim height with zero loss. Three new settled-seed pilots reach 84.28%, 90.00% and 94.10%, with zero command variation, zero tail arm motion, constant inventory and height standard deviation below 0.00030. Their three final task-camera frames are manually inspected. The remaining 45 calibration cases are queued; `/tmp/aiworker-finish-calibration-v4` is a finite audit → fit → development handoff. It stops on failed checks and cannot freeze or launch reserved tests.
 
 ## Task and evaluation
 
@@ -32,7 +32,7 @@ Candidate engineering parameters are slow tilt 2.5°/s (previously 4), braking 4
 
 ## Calibration and preserved failures
 
-The current calibration plan retains three stable low-level pilots plus 48 stationary seed-based cases: three levels at twelve training and four validation layouts from previously consumed references. The robot remains at its initial pose throughout each 2.5-second recording. Final measured settled height labels images from 1.5 seconds onward. These are camera calibration, never grasp/pour successes.
+The current calibration plan retains three stable low-level pilots plus 48 stationary seed-based cases: three levels at twelve training and four validation layouts from previously consumed references. The robot remains at its initial pose throughout each 2.5-second recording. Final measured settled height labels images from 1.5 seconds onward. These are camera calibration, never grasp/pour successes. A CPU diagnostic found initial localization on already-full calibration cups could select background edges, with a maximum 213.68 mm error among the first fifteen closed records. The fitter instead takes the initial RGB cup estimate from the matching accepted historical low-fill reference, as autonomous inference does before pouring. Known fixture positions select the corresponding supervision record only; simulator poses do not define runtime crops. Each anchor records its source hash, initial frame indices and measured localization error (<3 mm). The autonomous localizer is unchanged.
 
 The seed is the cup-contained particle arrangement from native historical trajectory `20261102T194804Z/076-robot_full-790609`. Its liquid settings and cup geometry match the current fixture. Particles are transformed into the cup frame, clipped at declared initial heights, translated to each calibration layout, initialized with zero velocity and allowed to settle natively. Source trajectory, parameters and derived seed hashes are recorded in `calibration-seed-provenance.json`. The historical source itself spilled; only its inside-cup arrangement is reused and no source success is implied.
 
@@ -54,3 +54,5 @@ The review pipeline audits all camera decodes/timestamps and inventory partition
 ## Next actions
 
 Finish calibration and audit; fit on the 4070; inspect eight autonomous development cases; freeze a reviewed candidate; run thirty fresh tests; independently score, render and inspect all videos; update results and push final evidence. No new success rate is available yet.
+
+Reference-anchor check: all sixteen matched historical RGB anchors pass the <3 mm gate; the first 22 calibration records have maximum anchor error 0.493 mm and parent-model level MAE 3.545 percentage points. This is CPU-only calibration evidence, not a new fit or task success.

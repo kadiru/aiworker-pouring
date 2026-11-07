@@ -89,7 +89,7 @@ assert hashlib.sha256((r/'best.pt').read_bytes()).hexdigest()==s['selected_check
 archive=r/'frozen-candidate';archive.mkdir(exist_ok=False);(archive/'src').mkdir()
 for n,h in s['runtime_sources'].items():
  assert hashlib.sha256((src/n).read_bytes()).hexdigest()==h;shutil.copy2(src/n,archive/'src'/n)
-for n in ('best.pt','model-summary.json','frozen-plan.json','data-manifest.json','calibration-plan.json','calibration-seed-provenance.json','calibration-particle-seed.npz'):shutil.copy2(r/n,archive/n)
+for n in ('best.pt','model-summary.json','frozen-plan.json','data-manifest.json','calibration-plan.json','calibration-seed-provenance.json','calibration-particle-seed.npz','calibration-anchor-manifest.json'):shutil.copy2(r/n,archive/n)
 payload=json.dumps(s,indent=2)+'\\n';(archive/'final-selection.json').write_text(payload)
 p=r/'final-selection.partial.json';p.write_text(payload);p.replace(r/'final-selection.json')
 """
