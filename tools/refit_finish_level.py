@@ -213,13 +213,19 @@ def main():
     fit, diagnostic = fit_level(data, saved, a.output)
     saved['settled_regressor'] = fit
     saved['settled_validation'] = diagnostic['chosen']['metrics']
+    saved['settled_training'] = dict(training=diagnostic['training'], parameters=diagnostic['parameters'],
+        selection_scope=diagnostic['selection_scope'], consumed_development_rounds=[0, 1, 2])
+    saved['data_manifest_sha256'] = sha(a.output / 'data-manifest.json')
+    # The parent checkpoint aliases this dict from vote_calibration. Preserve
+    # that historical metadata while assigning the new active threshold.
+    saved['thresholds'] = copy.deepcopy(saved['thresholds'])
     saved['thresholds']['full_settled_target'] = diagnostic['target']
     saved['late_mouth_shift_m'] = .008
     saved['sources'] = manifest['files']
     saved['parent_checkpoint_sha256'] = parent
     saved['model_version'] = 'visual_finish_hierarchy_v24'
     saved['method'] = 'Supervised RGB settled-level ridge and residual MLP refit with consumed development views; retained localization, empty CNN and contextual motion behavioral cloning with IK; programmed stop and direct return with late-pour lip alignment.'
-    allowed = {'settled_regressor','settled_validation','thresholds','late_mouth_shift_m','sources','parent_checkpoint_sha256','model_version','method'}
+    allowed = {'settled_regressor','settled_validation','settled_training','data_manifest_sha256','thresholds','late_mouth_shift_m','sources','parent_checkpoint_sha256','model_version','method'}
     assert equal({k:v for k,v in original.items() if k not in allowed}, {k:v for k,v in saved.items() if k not in allowed})
     assert equal({k:v for k,v in original['thresholds'].items() if k != 'full_settled_target'}, {k:v for k,v in saved['thresholds'].items() if k != 'full_settled_target'})
     torch.save(saved, a.output / 'best.pt')
