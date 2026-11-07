@@ -1,6 +1,6 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30; it is not relabeled. The spatial level fit passes and eight autonomous development cases are running. The first development case passes; seven remain. No reserved test has started.
+Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30; it is not relabeled. The spatial level fit passes and eight autonomous development cases are running. The first four development cases pass with zero measured loss; four remain. No reserved test has started.
 
 ## Current implementation and evidence
 
@@ -66,3 +66,5 @@ Passing spatial fit (r5): checkpoint `f26ff47868da35f47c9b8a6011132b25211a0cfd9c
 First development preview: `FN30_A_dev_00_r0` passes, with final settled rim height 96.1846%, zero measured loss, 0.05 seconds upright over-cup dwell and no post-release gripper contact. Return stage is 3.15 seconds, within one 20 Hz sample of the 3.1-second command. Complete native video is 23.05 seconds at labeled 2×; SHA `f2aa3b11e1eeb78f57d86f8580990d40d45b952da5f03e1e1a8cd4f569547670`. Full decoding and twelve native-camera comparisons pass. Four encoded stage views and ten return overview views are manually inspected; this is not continuous manual playback. The preview is development evidence only and remains excluded from reserved tests.
 
 Video clarity: the new renderer displays plain-language phase captions from each recorded transition (for example, Check liquid level, Small top-up, Return bottle, Withdraw hand). Four native development frames pass selected-frame layout review. The captions do not change camera pixels or simulator outcomes. The first two already-exported development previews retain their original hashes and formatting.
+
+Halfway development snapshot: 4/4 strict passes. Two full cups finish at 96.1846% and 95.8509% rim height; both empty cases have zero source particles. The owned 4070 binding, CPU/RAM limits, source/checkpoint identities and priority guard are retained. The separate 4090 process remains present and active at the snapshot. Four development cases and all thirty reserved tests are still pending.
