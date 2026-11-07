@@ -1,7 +1,9 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
-State: **Frozen V22 benchmark: 15/30 tests closed, 9 strict passes, 15 verified grasps, 11 zero-loss runs. Four attempts lost seven particles in total (0.040824 nominal mL); two additional attempts failed the full-cup criterion. The remaining 15 tests are running unchanged; final audit/videos pending.**
+State: **Frozen V22 benchmark: 25/30 tests closed, 16 strict passes, 25 verified grasps, 21 zero-loss runs. Four attempts lost seven particles in total (0.040824 nominal mL); five additional attempts failed the full-cup criterion. The remaining five tests are running unchanged; final audit/videos pending.**
+
+**Twenty-five-test evidence, November 6 at 16:35 PST:** `evidence/wide-A/test-progress-after25.json` retains all outcomes; `runtime-after-test25.json` again matches the initial sources/checkpoint, immutable container, asset and CPU/RAM/GPU limits, with the priority guard present. Since the halfway cutoff, cases 17/18/21 fail respectively for unconfirmed full stop (92.908% final height), underfill (85.238%) and underfill (86.932%). Cases 15/16/19/20/22/23/24 pass. No additional spill is recorded. The 4070 uses 4,904 MiB for our process; the 4090 has no compute process in this snapshot (its earlier process is no longer present; no cause is inferred). Available host RAM is 53,374 MiB. No foreign process was signaled or reconfigured by this task.
 
 **Halfway evidence, November 6 at 14:38 PST:** `evidence/wide-A/test-progress-after15.json` retains every outcome. Failures: 03/09/12 spill; 06 underfill plus spill; 05 unconfirmed full stop; 13 underfill (88.820% final rim height). Test 14 passes at 90.362%. Resource snapshot `runtime-after-test15.json` matches the initial container, GPU binding, CPU/RAM caps, sources, checkpoint and asset; the priority guard remains present. Our 4070 process uses 4,836 MiB; the same separate 4090 process remains present with 6,110 MiB. Host available RAM is 46,954 MiB. These are point-in-time observations, not proof of zero shared-host overhead. No other job was signaled or reconfigured.
 
