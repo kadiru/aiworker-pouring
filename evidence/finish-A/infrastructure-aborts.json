@@ -1,0 +1,37 @@
+{
+  "catalogued_utc": "2026-11-07T08:22:20.025045+00:00",
+  "attempts": {
+    "FN30_A_dev_05_r0": {
+      "recording": {
+        "relative_path": "20261107T064323Z/549-FN30_A_dev_05_r0-842935/episode.partial.hdf5",
+        "bytes": 121708854,
+        "sha256": "19fb54a8fb3c5c746c52ff27ba8d0d990891b13910a24dc675b59da2bbcb873e"
+      },
+      "parameters": {
+        "relative_path": "20261107T064323Z/549-FN30_A_dev_05_r0-842935/parameters.json",
+        "bytes": 1967,
+        "sha256": "8b258ce5155fe30d2aa026a41e04d0a6f92c8717664b7a2c2628ea58a5bb3720"
+      },
+      "transitions": 893,
+      "error": "Traceback (most recent call last):\n  File \"/workspace/src/run_fountain.py\", line 941, in <module>\n    trial['recording'].append(transition_start, transition_action, transition_start, row,\n  File \"/workspace/src/pour_recording.py\", line 193, in append\n    now = self.capture(row['t'])\n          ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/src/pour_recording.py\", line 168, in capture\n    raise RuntimeError('Training camera readback is stale at '+str(t)+': '+\nRuntimeError: Training camera readback is stale at 44.755: {'task': 44.754998999647796, 'wrist': 44.754998999647796, 'overview': 44.754998999647796}\n",
+      "last_recorded_time_s": 44.705,
+      "camera_audit": {
+        "task": {
+          "decoded_images": 1786,
+          "max_timestamp_skew_s": 9.992346150511366e-07
+        },
+        "wrist": {
+          "decoded_images": 1786,
+          "max_timestamp_skew_s": 9.992346150511366e-07
+        },
+        "overview": {
+          "decoded_images": 1786,
+          "max_timestamp_skew_s": 9.992346150511366e-07
+        }
+      },
+      "checkpoint_sha256": "f26ff47868da35f47c9b8a6011132b25211a0cfd9c85522a0caa1468b65647ab",
+      "cause": "Raw camera/physics roundoff crossed the old one-microsecond readiness bound; the failed capture is not stored.",
+      "scope": "Closed incomplete development recording. No completed task outcome is imputed."
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30; it is not relabeled. The spatial level fit passes and eight autonomous development cases are running. The first four development cases pass with zero measured loss; four remain. No reserved test has started.
+Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30; it is not relabeled. The spatial level fit passes and eight autonomous development cases are running. Five development cases are complete and pass with zero measured loss. One attempt was interrupted by the recorder and is being repeated explicitly; two layouts remain unstarted. No reserved test has started.
 
 ## Current implementation and evidence
 
@@ -75,4 +75,4 @@ On November 7, the sixth development attempt (`FN30_A_dev_05_r0`) aborted during
 
 The recorder now retains raw camera times with an explicit 100-microsecond bound, still 25 times smaller than a physics step and 500 times smaller than the control interval. Camera times must advance; stale 1 ms, 2.5 ms and 50 ms frames, nonfinite times and widened metadata bounds are rejected. Historical recordings retain their original one-microsecond validation bound. Fifteen clock/recovery/protocol checks pass.
 
-The fitted checkpoint, thresholds, robot control and fluid settings remain unchanged. Fitted-source identity is retained separately from the repaired recording runtime. Recovery will retain the original five complete results, repeat only interrupted case 05 as `FN30_A_dev_05_retry1_r0`, and run unstarted cases 06/07. The aborted attempt stays catalogued and incomplete. All thirty reserved tests remain unused and their once-only rules are unchanged. Source deployment and native recovery verification are pending.
+The fitted checkpoint, thresholds, robot control and fluid settings remain unchanged. Fitted-source identity is retained separately from the repaired recording runtime. Recovery will retain the original five complete results, repeat only interrupted case 05 as `FN30_A_dev_05_retry1_r0`, and run unstarted cases 06/07. The aborted attempt stays catalogued and incomplete. All thirty reserved tests remain unused and their once-only rules are unchanged. Repair runtime `2b81ff0` is deployed in run `20261107T082537Z`. The five complete recordings pass native audit (3,602 transitions), with the closed incomplete file catalogued separately. The unchanged checkpoint is being used for the declared retry and unstarted 06/07; final recovery verification is pending. Fitted source identity remains `74adfd1`, and the separately tracked runtime contains 42 files.
