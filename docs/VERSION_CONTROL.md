@@ -19,6 +19,8 @@ The working repository lives at `/Users/kadir/linkedin/projects/aiworker-pouring
 
 | Artifact | Existing location / identity |
 |---|---|
+| Active finish-study V23 candidate | Ubuntu `learning/A-finish-20261106-v1/best.pt`; local `evidence/finish-A/best.pt`; SHA `f9ffbce349aa5b3a0720205f28c5fc51499a5a0b72762bc5470aa41b2930bb27`. Round-1 development only; reserved evaluation not yet frozen. |
+| Finish-study r0 archive and records | Native `learning/A-finish-20261106-v1/candidates/v23-r0/` and local `evidence/finish-A/candidates/v23-r0/` preserve original checkpoint `f26ff47868da35f47c9b8a6011132b25211a0cfd9c85522a0caa1468b65647ab`. Native recordings stay Ubuntu; local `data/material-A-finish/` backs up scalar metadata only. Catalogued recorder abort remains incomplete. |
 | Frozen wider/swapped V22 candidate | Ubuntu `learning/A-wide-20261105-v1/best.pt` and `frozen-candidate/`; local `evidence/wide-A/best.pt`, SHA256 `4c8ab7bab4b5121004e47ac1458f6df8ead0bd481c381efa807c7be8195d3430`; core source commit `07cd41c321c7a00229618bc0db912a38be388001` |
 | Wider/swapped model provenance | Local `data/material-A-wide-models/fit-r5/`; earlier native `fit-attempts/r0`–`r4` retain failed/superseded models and sources. Fitted coefficient JSON and weights are external. |
 | Wider/swapped study recordings | Native `outputs/fountain/`; local `data/material-A-wide/`: 99 recordings and 359 sidecars, comprising 37 references, 32 development attempts and 30 fresh tests. Reviewed reference and r0/r1/r2 development HDF5 backups may be lossless `.hdf5.zst` archives; native originals stay unchanged. |

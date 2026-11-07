@@ -53,7 +53,7 @@ def main():
     assert .002 <= args.validation_margin < .005
     assert not (ROOT / 'final-selection.json').exists()
     assert not list(OUTPUTS.glob('*/*FN30_A_test*/parameters.json'))
-    with urllib.request.urlopen('http://127.0.0.1:8212/health', timeout=10) as response:
+    with urllib.request.urlopen('http://192.168.68.60:8212/health', timeout=10) as response:
         health = json.load(response)
     assert not health['queue'] and not (health.get('recording') or {}).get('active')
     assert not health.get('error') and not health.get('learning_error')

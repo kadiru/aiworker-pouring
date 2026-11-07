@@ -1,6 +1,6 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30; it is not relabeled. The spatial level fit passes and eight autonomous development cases are running. Six selected development cases are complete: five strict passes and one full-confirmation failure, all with zero measured loss. The recorder retry completed; its original incomplete attempt is retained separately. Two layouts remain running/queued. A scalar threshold calibration is prepared for a new development round, not yet applied. No reserved test has started.
+Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30 and is not relabeled. Round 0 finishes 7/8 strict passes and 8/8 zero measured loss, with one retained full-confirmation failure. All eight recordings and 144 selected native frames pass integrity/review; return dwell is at most 0.05 seconds with zero post-release contact. A scalar-only threshold calibration is applied, and eight round-1 development cases are running. No reserved test has started.
 
 ## Current implementation and evidence
 
@@ -79,3 +79,12 @@ The fitted checkpoint, thresholds, robot control and fluid settings remain uncha
 
 
 Development retry diagnosis: `FN30_A_dev_05_retry1_r0` closes normally with zero measured loss and final rim height 96.0458%, but fails strict scoring with `fill_unconfirmed`. Its last-six prediction quartile is 93.0459%, below target 93.2430%; standard deviation is 0.055 percentage points and the geometry cross-check is within tolerance. A scalar-only calibration is prepared: retain the consumed-validation maximum overestimate (2.743 points), reduce the added empirical margin from 0.5 to 0.2 points, and target 92.9430%. This is development-selected calibration, not additional gradient training or an unbiased result. Five CPU integrity checks verify that unintended tensor/array changes are rejected. It is not applied yet; all current cases finish unchanged, then the entire eight-case development round must be rerun. Reserved tests remain unused.
+
+
+## Applied scalar calibration and round 1
+
+After all eight r0 cases closed, their 6,054 transitions and 33 scalar sidecars passed integrity checks. Eight task/wrist/overview sheets and eight ten-frame return strips were inspected (144 frames); the failed confirmation label is retained. Actual sampled over-cup stationary dwell is at most 0.05 seconds in all eight, with no gripper recontact after release. The old r0 checkpoint and all source/recovery/provenance files are archived under `candidates/v23-r0`.
+
+At 09:21 UTC November 7, all eight layouts were queued again as r1. New checkpoint `f9ffbce349aa5b3a0720205f28c5fc51499a5a0b72762bc5470aa41b2930bb27` changes exactly one scalar: `thresholds.full_settled_target`, from 0.9324295210838318 to 0.9294295210838318. Recursive tensor/array/scalar comparison and serialization round-trip verify all other checkpoint values are unchanged. The target is 0.90 + 0.0274295210838318 consumed-validation overestimate + 0.002 empirical margin. This is a development-selected calibration, not a new GPU fit or a guaranteed error bound. No labels, scoring criteria, motor parameters, physics or source files change.
+
+The helper initially stopped before mutation because its loopback idle check did not match the server's LAN-only bind. Using the verified `192.168.68.60:8212` address resolved that preparation issue; the failed check's log is retained. The new checkpoint, complete calibration record and before/after resource snapshots are SHA-verified locally. The eight r1 native trials must pass task/motion checks and visual review before the untouched thirty-case evaluation. Use `runtime-source-manifest-target-r1.json` for the later freeze; runtime source remains `2b81ff0`, fitted source `74adfd1`.
