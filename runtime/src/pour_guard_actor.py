@@ -213,7 +213,8 @@ class Actor:
             from pour_wide_motion import CenteredTerminal
             try:
                 self.terminal=CenteredTerminal(self.history,t,profile,self.fk,self.pour_phase,
-                    self.source_xy,self.cup_xy,self.cal['table_z'],self.qlift,self.saved['pour_mouth_z'])
+                    self.source_xy,self.cup_xy,self.cal['table_z'],self.qlift,self.saved['pour_mouth_z'],
+                    drain_hold_s=self.saved.get('terminal_drain_hold_s',1.2))
             except ValueError as error:
                 self.return_planning_error=str(error)
                 self.stop_latched=robot.reason='return_planning_failed'
@@ -282,7 +283,7 @@ class Actor:
             if self.terminal is not None:targets,phase=self.terminal.act(t)
             else:
                 if self.fill_mode=='brake':
-                    self.pour_phase=max(80.,self.pour_phase-90*.05)
+                    self.pour_phase=max(80.,self.pour_phase-self.threshold.get('brake_rate_deg_s',90.)*.05)
                     if self.pour_phase<=80.:
                         self.fill_mode='settle';self.pause_start=t
                 elif self.fill_mode=='settle':

@@ -40,6 +40,7 @@ allowed_commands.update(('workspace_collect','workspace_train','workspace_develo
 allowed_commands.add('layout_variety_test')
 allowed_commands.add('layout_variety_extra')
 allowed_commands.update(('wide_pilot', 'wide_repair', 'wide_collect', 'wide_train', 'wide_development', 'wide_test'))
+allowed_commands.update(('finish_train','finish_development','finish_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -630,7 +631,20 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('wide_pilot','wide_repair','wide_collect','wide_development','wide_test'):
+                    if cmd in ('finish_train','finish_development','finish_test'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before finish-study work';continue
+                        if cmd=='finish_train':
+                            try:
+                                from pour_finish_train import train
+                                state['trained_checkpoint']=train(state)
+                                state.pop('learning_error',None)
+                            except Exception:
+                                state['learning_error']=traceback.format_exc();state['phase']='Finish-study fitting failed'
+                        else:
+                            from pour_finish_study import development,tests
+                            pending.extend(development() if cmd=='finish_development' else tests())
+                    elif cmd in ('wide_pilot','wide_repair','wide_collect','wide_development','wide_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before queuing wider-table cases';continue
                         from pour_wide_study import references,repairs,development,tests

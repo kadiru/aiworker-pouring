@@ -1,0 +1,19 @@
+# Settled-level repair and natural bottle withdrawal
+
+Authorized follow-up, November 6, 2026 (America/Los_Angeles). In progress; no new autonomous success claim yet. Parent benchmark remains 18/30 and is not relabeled.
+
+Task: locate, grasp and lift the bottle, pour red liquid into material-A cup, stop at at least 90% settled rim height or when the source is empty, then turn upright, withdraw, place, release and retreat. Same zero-measured-loss definition as the previous study. No-pour aborts fail. Native particle measurements are labels/scoring only; runtime uses task/wrist RGB, joints, own history and fixed calibration.
+
+New namespace `FN30_A_`, protocol 18, native root `/workspace/learning/A-finish-20261106-v1`. Eight development scenes and thirty new reserved scenes use seeds 2026110613 and 2026110614, screened for geometry only. Fifteen exact swap pairs, fifteen full and fifteen empty goals, five placement families, ±12 mm jitter. Maximum episode duration is declared as 60 seconds to accommodate slower pours. No reserved test retries or test-based fitting; freeze source/weights before all thirty tests.
+
+The cup crop already normalizes image position, scale and shear from visual localization and calibrated rim/base geometry. The repair adds compact color-envelope quantiles and spatial interactions, and stable-inventory settling-pause supervision. It retains the existing localizer, empty CNN and contextual behavioral-cloning weights. This is supervised ridge regression plus engineered feedback/motion changes, not reinforcement learning.
+
+The completed wide benchmark's thirty test recordings and eight r3 development recordings are explicitly consumed. Former test swap pairs 3, 8 and 13 supply model-selection validation; other former tests and r3 are training, alongside the prior cache. These historical validation outcomes are already known and are not an unbiased fresh-performance estimate. FN30 development and reserved images do not enter the initial fit. The per-frame manifest records native hashes, phases, image indices and simulator labels. Failed historical attempts are retained rather than erased.
+
+The new terminal motion opts into zero stationary drain hold, preserving the old model's 1.2-second default. It turns upright over the receiving cup, immediately follows the raised transfer to the original bottle location, and keeps the existing gentle placement, release and open-hand retreat. New commanded return duration is 3.1 seconds instead of 4.3 seconds. Native video and motion traces must confirm that the pause is gone without increased loss or collision. No stream, collision, or particle parameters are changed.
+
+Candidate pouring parameters: slow tilt 2.5°/s (previously 4), braking 45°/s (90), trim pulses 18°/s (35), flow cap 10 nominal mL/s (18), coarse brake target 0.87 (0.89), trim timeout 2.5 seconds (1.5). These are engineering changes to validate on development, not learned motor skills. Full-cup threshold is derived from consumed validation uncertainty, bounded at 0.945; independent success remains 0.90. No score is relaxed to make the candidate pass.
+
+Isolation: use only existing immutable `aiworker_pouring_4070` container, 4070 UUID `GPU-cde23916-c5fa-f18e-a343-127f732cc2f6`, four-core quota, CPUs 16–23, 256 CPU shares, 16 GiB memory/swap. Other jobs are never stopped or reconfigured. The existing priority guard remains active. A separate 4090 process was observed at preflight.
+
+Validation so far: 27 CPU controller/feature/return regression checks passed inside the owned container. Fresh-layout geometry screening is in progress. Next: complete approach and return clearance checks, deploy to the idle owned simulator, fit on the 4070, inspect development results/videos, freeze, and run the thirty reserved tests. Preserve native recordings, independent scores, resource snapshots and complete labeled videos; commit source and small reports, keep binaries outside Git.

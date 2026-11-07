@@ -1,6 +1,10 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
 Updated: November 6, 2026 (America/Los_Angeles).
+
+Active follow-up: user authorized pause-view level repair, spill control, a natural bottle withdrawal, 4070 retraining and thirty fresh tests with videos. New isolated study `A-finish-20261106-v1`, prefix `FN30_A_`, protocol 18. Eight development layouts and thirty reserved layouts use new seeds; prior `XW30_A_` results remain unchanged. Historical tests will be explicitly consumed as training/validation, never counted as fresh results. Candidate removes the 1.2-second upright drain hold (upright then immediately translate home), slows tilt/braking and learns from stable pause images. Geometry preflight is running; no new native performance claim yet. Existing 4090 job remains untouched; owned container retains 4070-only access, four-core quota and 16 GiB memory cap.
+
+Prior completed study:
 State: **The wider/swapped localization repair, 4070 retraining, thirty fresh tests and video delivery are complete: 18 strict passes, 30 verified grasps/transfers/returns, 26 zero-loss runs. All recording audits, local backups, independent scores and video review checks pass. Zero spill across all attempts was not achieved.**
 
 Near-full tasks pass 5/15; empty-bottle tasks pass 13/15. Six full cups finish below 90%, three stop `fill_unconfirmed`, and four attempts spill seven particles total (0.040824 nominal mL); one underfill also spills. All fifteen empty-target bottles finish with zero particles. Localization/pickup succeeds across the thirty tested layouts, but full-stop generalization and zero spill across all attempts remain unresolved. No retries or test-based model changes were made.

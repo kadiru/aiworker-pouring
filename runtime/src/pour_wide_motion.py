@@ -29,7 +29,7 @@ def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth
     return q
 
 
-def centered_return_path(planner,current,phase,source_xy,cup_xy,table_z,lift,mouth_z):
+def centered_return_path(planner,current,phase,source_xy,cup_xy,table_z,lift,mouth_z,drain_hold_s=DRAIN_HOLD_SECONDS):
     """Timed upright-over-cup, drain pause, then raised translation to lift.
 
     Geometry and timing are engineered. Joint history and RGB-localized XY
@@ -41,7 +41,8 @@ def centered_return_path(planner,current,phase,source_xy,cup_xy,table_z,lift,mou
     for t in np.arange(.05,UPRIGHT_SECONDS+.0001,.05):
         angle=phase*(1-ease(t/UPRIGHT_SECONDS))
         path.append(project_target(planner,path[-1],source_xy,cup_xy,table_z,angle,mouth_z,centered=True));times.append(float(t))
-    departure=UPRIGHT_SECONDS+DRAIN_HOLD_SECONDS
+    assert 0. <= drain_hold_s <= DRAIN_HOLD_SECONDS
+    departure=UPRIGHT_SECONDS+drain_hold_s
     for t in np.arange(UPRIGHT_SECONDS+.05,departure+.0001,.05):
         path.append(path[-1].copy());times.append(float(t))
     transit=clearance_approach(planner,path[-1],lift,clearance_m=.04,level_transit=True)
@@ -56,9 +57,9 @@ def timed_target(times,path,t):
 
 class CenteredTerminal:
     """Programmed over-cup return followed by the learned terminal profiles."""
-    def __init__(self,history,start,profile,planner,phase,source_xy,cup_xy,table_z,lift,mouth_z):
+    def __init__(self,history,start,profile,planner,phase,source_xy,cup_xy,table_z,lift,mouth_z,drain_hold_s=DRAIN_HOLD_SECONDS):
         from pour_stop_sequence import TerminalPrimitive
-        self.times,self.path=centered_return_path(planner,history[-1][1],phase,source_xy,cup_xy,table_z,lift,mouth_z)
+        self.times,self.path=centered_return_path(planner,history[-1][1],phase,source_xy,cup_xy,table_z,lift,mouth_z,drain_hold_s)
         self.start=start;self.profile=dict(profile,return_s=float(self.times[-1]))
         self.inner=TerminalPrimitive(history,start,self.profile);self.stage=0
 

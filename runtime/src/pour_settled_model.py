@@ -29,7 +29,12 @@ def features(image, cnn, cup_xy):
     red = torch.sigmoid((r - 1.4*g - .025) / .04) * torch.sigmoid((r - 1.2*b - .02) / .04)
     fine = hist[:, 14:84]
     soft = red[:, 14:84, 35:73].mean(2)
-    return torch.cat((legacy, fine, soft, fine * view[:, :1], fine * view[:, 1:]), 1)
+    existing = torch.cat((legacy, fine, soft, fine * view[:, :1], fine * view[:, 1:]), 1)
+    # Color-envelope quantiles retain a compact level signal across cup views.
+    cumulative = hist.cumsum(1) / hist.sum(1, keepdim=True).clamp(min=1e-6)
+    qs = torch.tensor([.02,.05,.1,.25,.5,.75,.9,.95,.98],device=image.device)
+    quantiles = (cumulative[:,:,None] >= qs).float().argmax(1).float() / 95.
+    return torch.cat((existing, quantiles, quantiles*view[:,:1], quantiles*view[:,1:]),1)
 
 
 def predict(x, fitted):
