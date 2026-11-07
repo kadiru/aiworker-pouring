@@ -9,6 +9,7 @@ import numpy as np
 sys.path.insert(0,'/workspace/src')
 from validate_pour_recording import validate,decode,h5py
 from pour_finish_study import ROOT,OUTPUTS,PREFIX
+from pour_camera_clock import recording_tolerance
 
 
 def digest(path):
@@ -23,7 +24,9 @@ def item(path):
 
 
 def audit(output,scope="evaluation"):
-    files=[];sidecars=[];partials=[];partial_sidecars=[];checks=[];names=set();excluded=[]
+    files=[];sidecars=[];partials=[];partial_sidecars=[];checks=[];names=set();excluded=[];retained=[];closed_partials=[]
+    abort_path=ROOT/'infrastructure-aborts.json'
+    aborts=json.loads(abort_path.read_text())['attempts'] if abort_path.exists() else {}
     expected={s['name'] for s in json.loads((ROOT/'calibration-plan.json').read_text())['cases']} if scope=='calibration' else None
     for prefix in (("FCAL_A_",) if scope=="calibration" else (PREFIX,)):
         for parameters in sorted(OUTPUTS.glob(f'*/*{prefix}*/parameters.json')):
@@ -36,6 +39,18 @@ def audit(output,scope="evaluation"):
             name=spec['name'];assert name not in names;names.add(name);folder=parameters.parent
             ep=folder/'episode.hdf5';partial=folder/'episode.partial.hdf5'
             if not ep.exists():
+                if name in aborts:
+                    # Only explicitly catalogued, closed infrastructure aborts
+                    # may be read. An active partial is never opened here.
+                    known=aborts[name];identity=item(partial)
+                    assert identity==known['recording'] and item(parameters)==known['parameters']
+                    with h5py.File(partial,'r') as f:
+                        assert f.attrs['status']=='incomplete' and f.attrs['error']==known['error']
+                        d=f['data/demo_0'];assert len(d['actions'])==known['transitions'] and not d['dones'][:].any()
+                        assert np.isfinite(d['actions'][:]).all()
+                    retained.append(dict(name=name,status='incomplete',outcome=None,**known))
+                    closed_partials.append(dict(name=name,**identity));partial_sidecars.append(item(parameters))
+                    continue
                 # Never read a partial HDF5 file while its writer is running.
                 # Its existence is retained as pending, not a failed checksum.
                 partials.append(dict(name=name,path=str(partial),status='incomplete',outcome=None))
@@ -67,12 +82,13 @@ def audit(output,scope="evaluation"):
                         ds=d[group+'/'+cam+'_image'];assert ds.shape==(n,)
                         ts=d[group+'/'+cam+'_time'][:]
                         skew=float(np.max(abs(ts-d[key][:])));maximum=max(maximum,skew)
-                        assert skew<1e-6 and (np.diff(ts)>0).all()
+                        assert skew<recording_tolerance(f.attrs) and (np.diff(ts)>0).all()
                         for i in range(n):
                             frame=decode(ds[i],'jpeg95');assert frame.shape==(384,384,3) and frame.std()>5.
                     for i in range(1,n):
                         assert np.array_equal(d['obs/'+cam+'_image'][i],d['next_obs/'+cam+'_image'][i-1])
-                    cameras[cam]=dict(decoded_images=2*n,max_timestamp_skew_s=maximum)
+                    cameras[cam]=dict(decoded_images=2*n,max_timestamp_skew_s=maximum,
+                        timestamp_tolerance_s=recording_tolerance(f.attrs))
             checks.append(dict(name=name,transitions=result['transitions'],cameras=cameras,particle_inventory_constant=True,
                                all_sample_partitions_accounted=True,visual_review='pending'))
             files.append(dict(name=name,**item(ep),valid=True,transitions=result['transitions'],
@@ -82,10 +98,11 @@ def audit(output,scope="evaluation"):
                 if filename=='policy-decisions.json' and not spec['policy_evaluation']:assert not p.exists();continue
                 assert p.exists();sidecars.append(item(p))
             print(json.dumps(dict(name=name,frames=result['transitions'],integrity=True)),flush=True)
-    report=dict(files=files,sidecar_files=sidecars,partial_files=[],partial_sidecar_files=partial_sidecars,
+    report=dict(files=files,sidecar_files=sidecars,partial_files=closed_partials,partial_sidecar_files=partial_sidecars,
                 pending_attempts=partials,checks=checks,valid_recordings=len(files),
+                retained_incomplete_attempts=retained,
                 native_checks_passed=not partials,transitions=sum(r['transitions'] for r in files),
-                scope=scope,excluded_calibrations=excluded,note='Integrity is distinct from task success. No missing outcome is imputed. Manual image review is separate.')
+                scope=scope,excluded_calibrations=excluded,note='Integrity is distinct from task success. Catalogued closed infrastructure aborts remain incomplete with no imputed outcome; they are not active pending writers or valid complete episodes. Manual image review is separate.')
     output.write_text(json.dumps(report,indent=2)+'\n')
     return report
 

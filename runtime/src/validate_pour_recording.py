@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 sys.path.append('/workspace/pydeps51')
 import h5py
+from pour_camera_clock import recording_tolerance
 
 
 def decode(frame,codec):
@@ -39,6 +40,7 @@ def validate(path):
         codec=file.attrs.get('image_encoding','raw')
         cameras = {}
         max_skew = 0.
+        camera_tolerance = recording_tolerance(file.attrs)
         for name in ('task','wrist'):
             first, last = [], []
             for group, timestamps in [('obs',starts),('next_obs',ends)]:
@@ -51,7 +53,7 @@ def validate(path):
                 camera_time = demo[group+'/'+name+'_time'][:]
                 skew = float(np.max(abs(camera_time-timestamps)))
                 max_skew = max(max_skew,skew)
-                assert skew < 1e-6, 'Stale camera frame'
+                assert skew < camera_tolerance, 'Stale camera frame'
                 reference = demo[group+'/'+name+'_reference'][:]
                 assert (reference[:,1]>0).all(), 'Invalid render reference'
                 assert (np.diff(camera_time)>0).all(), 'Repeated camera timestamp'
@@ -86,6 +88,7 @@ def validate(path):
             recovery_labels=len(indices)>20 and indices[0]>0 if len(indices) else False
         return dict(valid=True,path=str(path),transitions=count,control_hz=1/dt,
                     duration_sim_s=float(ends[-1]-starts[0]),max_camera_state_skew_s=max_skew,
+                    camera_timestamp_tolerance_s=camera_tolerance,
                     physical_success=bool(file.attrs['physical_success']),
                     training_eligible=not prefix and bool(file.attrs['physical_success']) and reviewed and
                         file.attrs['evidence_kind'] in ('scripted_reference','noisy_expert_reference'),camera=cameras,

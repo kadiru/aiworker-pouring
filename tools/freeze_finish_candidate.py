@@ -32,8 +32,9 @@ def main():
     assert sha(STUDY/'frozen-plan.json')==model['scene_plan_sha256']
     assert '4070' in model['device']
     assert model['terminal_drain_hold_s']==0.
-    for n,digest in model['sources'].items():assert manifest['files'][n]==sha(HOST_ROOT/'src'/n)==digest,n
-    expected={s['name']+f'_r{a.round}':s for s in plan['development']};assert len(expected)==8
+    runtime_sources=model.get('runtime_sources',model['sources'])
+    for n,digest in runtime_sources.items():assert manifest['files'][n]==sha(HOST_ROOT/'src'/n)==digest,n
+    expected={model.get('development_aliases',{}).get(s['name']+f'_r{a.round}',s['name']+f'_r{a.round}'):s for s in plan['development']};assert len(expected)==8
     rows=[];seen=set()
     for p in sorted((HOST_ROOT/'outputs/fountain').glob('*/*FN30_A_dev_*/parameters.json')):
         s=read(p);name=s['name']
@@ -70,7 +71,9 @@ def main():
     own={int(x.strip()) for x in subprocess.check_output(['docker','top',CID,'-eo','pid'],text=True).splitlines()[1:]}
     assert all(int(r.split(',')[1]) in own for r in witness['gpu_processes'].splitlines() if r.startswith(GPU))
     selection=dict(frozen_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),selected_checkpoint_sha256=checkpoint,
-        scene_plan_sha256=model['scene_plan_sha256'],runtime_sources=model['sources'],source_commit=manifest['source_commit'],
+        scene_plan_sha256=model['scene_plan_sha256'],runtime_sources=runtime_sources,source_commit=manifest['source_commit'],
+        fitted_sources=model['sources'],recording_repair=model.get('recording_repair'),
+        retained_incomplete_attempts=integrity.get('retained_incomplete_attempts',[]),
         container=CID,development=rows,development_round=a.round,development_visual_review_sha256=sha(a.review),
         development_integrity_sha256=sha(STUDY/'development-recording-integrity.json'),
         development_withdrawal_sha256=sha(a.withdrawal),
@@ -90,6 +93,8 @@ archive=r/'frozen-candidate';archive.mkdir(exist_ok=False);(archive/'src').mkdir
 for n,h in s['runtime_sources'].items():
  assert hashlib.sha256((src/n).read_bytes()).hexdigest()==h;shutil.copy2(src/n,archive/'src'/n)
 for n in ('best.pt','model-summary.json','frozen-plan.json','data-manifest.json','calibration-plan.json','calibration-seed-provenance.json','calibration-particle-seed.npz','calibration-anchor-manifest.json'):shutil.copy2(r/n,archive/n)
+for n in ('infrastructure-aborts.json','development-resume-plan.json','recording-repair.json'):
+ if (r/n).exists():shutil.copy2(r/n,archive/n)
 payload=json.dumps(s,indent=2)+'\\n';(archive/'final-selection.json').write_text(payload)
 p=r/'final-selection.partial.json';p.write_text(payload);p.replace(r/'final-selection.json')
 """

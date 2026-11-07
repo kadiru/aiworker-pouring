@@ -34,6 +34,7 @@ def main():
     metadata=read(STUDY/('final-selection.json' if a.part=='test' else 'model-summary.json'))
     sources=metadata.get('runtime_sources',metadata.get('sources'));checkpoint=metadata.get('selected_checkpoint_sha256',metadata.get('checkpoint_sha256'))
     plan=read(STUDY/'frozen-plan.json');names={s['name']+(f'_r{a.round}' if a.part=='development' else '') for s in plan[a.part]}
+    if a.part=='development':names={metadata.get('development_aliases',{}).get(n,n) for n in names}
     assert len(names)==(30 if a.part=='test' else 8)
     seen={};started=time.monotonic();snapshots=set()
     def snapshot(label):

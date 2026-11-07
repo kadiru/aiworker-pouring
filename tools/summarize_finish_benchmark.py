@@ -14,7 +14,7 @@ def main():
     checkpoint=sha(E/'best.pt')
     assert checkpoint==selection['selected_checkpoint_sha256']==model['checkpoint_sha256']==report['checkpoint_sha256']
     assert sha(E/'frozen-plan.json')==selection['scene_plan_sha256']==report['scene_plan_sha256']==model['scene_plan_sha256']
-    assert model['sources']==selection['runtime_sources']
+    assert model.get('runtime_sources',model['sources'])==selection['runtime_sources']
     for n,digest in selection['runtime_sources'].items():
         assert sha(PROJECT/'runtime/src'/n)==digest,n
         committed=subprocess.check_output(['git','show',selection['source_commit']+':runtime/src/'+n],cwd=PROJECT)
@@ -24,7 +24,7 @@ def main():
     assert not integrity['pending_attempts'] and integrity['native_checks_passed'] and integrity['scope']=='evaluation'
     indexed={r['name']:r for r in integrity['files']}
     assert set(expected)<=set(indexed)
-    for identity in integrity['sidecar_files']:
+    for identity in integrity['sidecar_files']+integrity.get('partial_sidecar_files',[]):
         path=DATA/identity['relative_path'];assert path.stat().st_size==identity['bytes'] and sha(path)==identity['sha256']
     for r in report['cases']:
         folder=(DATA/indexed[r['name']]['relative_path']).parent;spec=read(folder/'parameters.json')
@@ -66,6 +66,8 @@ def main():
         rows=[r for r in report['cases'] if r['expected_stop']==reason];assert len(rows)==15
         groups[reason]=dict(attempts=15,strict_passes=sum(r['strict_pass'] for r in rows))
     final_report=dict(**report,groups=groups,native_audited_recordings=len(integrity['files']),
+        retained_incomplete_recordings=integrity.get('retained_incomplete_attempts',[]),
+        recording_repair=model.get('recording_repair'),
         verified_local_sidecars=len(integrity['sidecar_files']),independently_recomputed_primary_scores=30,
         recording_storage='Original HDF5 recordings remain on Ubuntu; each video source is fetched temporarily and byte/SHA-verified. No complete local raw-data backup is claimed.')
     (E/'final-benchmark.json').write_text(json.dumps(final_report,indent=2)+'\n')

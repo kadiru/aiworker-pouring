@@ -29,7 +29,7 @@ def main():
     assert caps['NanoCpus']==4000000000 and caps['CpusetCpus']=='16-23' and caps['CpuShares']==256
     assert caps['Memory']==caps['MemorySwap']==17179869184
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10))
-    assert not h['queue'] and not h.get('recording',{}).get('active') and not h.get('error')
+    assert not h['queue'] and not (h.get('recording') or {}).get('active') and not h.get('error')
     assert not (STUDY/'final-selection.json').exists(), 'Never mutate a frozen reserved evaluation'
     own={int(s.strip()) for s in out('docker','top',a.expected_container,'-eo','pid').splitlines()[1:]}
     gpu=out('nvidia-smi','--query-compute-apps=gpu_uuid,pid','--format=csv,noheader')

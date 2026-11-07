@@ -14,7 +14,8 @@ from pour_guard_vision import cup_crop,locate,plane_point
 from pour_settled_model import features,predict
 from pour_finish_study import ROOT,PARENT,PARENT_SHA,PREFIX,OUTPUTS,sha,plan
 from pour_wide_train import RUNTIME_SOURCES as PREVIOUS_SOURCES
-RUNTIME_SOURCES=tuple(dict.fromkeys(PREVIOUS_SOURCES+('pour_finish_study.py','pour_finish_train.py','pour_finish_calibration.py')))
+RUNTIME_SOURCES=tuple(dict.fromkeys(PREVIOUS_SOURCES+('pour_finish_study.py','pour_finish_train.py','pour_finish_calibration.py',
+    'pour_camera_clock.py','validate_pour_recording.py','audit_finish_study.py')))
 def write(n,d):(ROOT/n).write_text(json.dumps(d,indent=2)+'\n')
 
 def reference_crop_anchors(saved,calibrations,device='cuda'):

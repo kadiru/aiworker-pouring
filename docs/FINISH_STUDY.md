@@ -68,3 +68,11 @@ First development preview: `FN30_A_dev_00_r0` passes, with final settled rim hei
 Video clarity: the new renderer displays plain-language phase captions from each recorded transition (for example, Check liquid level, Small top-up, Return bottle, Withdraw hand). Four native development frames pass selected-frame layout review. The captions do not change camera pixels or simulator outcomes. The first two already-exported development previews retain their original hashes and formatting.
 
 Halfway development snapshot: 4/4 strict passes. Two full cups finish at 96.1846% and 95.8509% rim height; both empty cases have zero source particles. The owned 4070 binding, CPU/RAM limits, source/checkpoint identities and priority guard are retained. The separate 4090 process remains present and active at the snapshot. Four development cases and all thirty reserved tests are still pending.
+
+## Recorder interruption and bounded recovery
+
+On November 7, the sixth development attempt (`FN30_A_dev_05_r0`) aborted during retreat at 44.755 simulated seconds because raw camera time 44.754998999647796 differed by just over one microsecond. Its closed incomplete HDF5 retains 893 transitions; all 5,358 stored camera images decode and maximum recorded skew is 0.999235 microseconds. No successful outcome is assigned to it. Five completed cases remain valid. The partial file, exception and original model/provenance are preserved.
+
+The recorder now retains raw camera times with an explicit 100-microsecond bound, still 25 times smaller than a physics step and 500 times smaller than the control interval. Camera times must advance; stale 1 ms, 2.5 ms and 50 ms frames, nonfinite times and widened metadata bounds are rejected. Historical recordings retain their original one-microsecond validation bound. Fifteen clock/recovery/protocol checks pass.
+
+The fitted checkpoint, thresholds, robot control and fluid settings remain unchanged. Fitted-source identity is retained separately from the repaired recording runtime. Recovery will retain the original five complete results, repeat only interrupted case 05 as `FN30_A_dev_05_retry1_r0`, and run unstarted cases 06/07. The aborted attempt stays catalogued and incomplete. All thirty reserved tests remain unused and their once-only rules are unchanged. Source deployment and native recovery verification are pending.

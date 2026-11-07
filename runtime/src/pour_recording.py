@@ -12,6 +12,7 @@ from PIL import Image
 
 sys.path.append('/workspace/pydeps51')
 import h5py
+from pour_camera_clock import CAMERA_TOLERANCE_S, camera_time_is_current
 
 CAMERA_SIZE = (384, 384)
 DT = .05
@@ -124,7 +125,10 @@ class PourRecording:
         self.file.attrs['joint_names'] = json.dumps(NAMES)
         self.file.attrs['control_dt'] = DT
         self.file.attrs['action_semantics'] = 'Absolute joint position targets in radians, held for the following 0.05 simulation seconds'
-        self.file.attrs['time_semantics'] = 'obs(t), action(t), next_obs(t+0.05); camera rendering_time equals the associated physics time'
+        self.file.attrs['camera_timestamp_tolerance_s'] = CAMERA_TOLERANCE_S
+        self.file.attrs['time_semantics'] = ('Raw camera rendering_time is preserved. Camera/physics skew must be below '
+            '100 microseconds (1/25 of the 2.5 ms physics step and 1/500 of the control interval). '
+            'This bound admits numerical clock roundoff, not an old physics frame.')
         self.file.attrs['camera_pose_convention'] = 'world_T_camera in USD camera axes (+Y up, -Z forward), metres'
         self.file.attrs['variant'] = 'A'
         self.file.attrs['task_scope']='approach_lift_prefix' if spec.get('corrective_prefix') else 'full_pour'
@@ -159,7 +163,9 @@ class PourRecording:
         for attempt in range(10):
             frames = {name:camera.get_current_frame() for name,camera in self.cameras.items()}
             ready = all(frame.get('rgb') is not None and np.asarray(frame['rgb']).shape[:2]==CAMERA_SIZE
-                        and abs(float(frame.get('rendering_time', -1))-t)<1e-6 for frame in frames.values())
+                        and camera_time_is_current(float(frame.get('rendering_time', -1)),t)
+                        and (self.last is None or float(frame['rendering_time'])>self.last[name+'_time'])
+                        for name,frame in frames.items())
             if ready:
                 break
             self.sim.render()

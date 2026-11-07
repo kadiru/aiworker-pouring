@@ -11,6 +11,29 @@ def plan():return json.loads((ROOT/'frozen-plan.json').read_text())
 def seen():return [json.loads(p.read_text()) for p in OUTPUTS.glob(f'*/*{PREFIX}*/parameters.json')]
 def development():
     assert not (ROOT/'final-selection.json').exists()
+    recovery=ROOT/'development-resume-plan.json'
+    if recovery.exists():
+        request=json.loads(recovery.read_text())
+        assert request['kind']=='recording_infrastructure_resume'
+        assert sha(ROOT/'best.pt')==request['checkpoint_sha256']
+        assert sha(ROOT/'frozen-plan.json')==request['scene_plan_sha256']
+        started={s['name'] for s in seen()}
+        original={s['name']:s for s in plan()['development']}
+        assert request['round']==0
+        assert len({item['name'] for item in request['cases']})==len(request['cases'])
+        aborts=json.loads((ROOT/'infrastructure-aborts.json').read_text())['attempts']
+        result=[]
+        for item in request['cases']:
+            base=original[item['planned_name']]
+            ordinary=base['name']+f"_r{request['round']}"
+            if item.get('retry_of'):
+                assert item['retry_of']==ordinary and ordinary in aborts
+                assert item['name']==base['name']+f"_retry1_r{request['round']}"
+            else:assert item['name']==ordinary
+            actual=dict(base,name=item['name'],development_round=request['round'])
+            if item.get('retry_of'):actual['infrastructure_retry_of']=item['retry_of']
+            if actual['name'] not in started:result.append(actual)
+        return result
     r=max((s.get('development_round',-1) for s in seen()),default=-1)+1
     return [dict(s,name=s['name']+f'_r{r}',development_round=r) for s in plan()['development']]
 def tests():

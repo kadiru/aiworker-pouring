@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0,'/workspace/src')
 from audit_finish_study import item
 from validate_pour_recording import validate,decode,h5py,np
+from pour_camera_clock import recording_tolerance
 name=sys.argv[1]
 root=Path('/workspace/outputs/fountain')
 matches=[p for p in root.glob('*/*'+name+'*/parameters.json') if json.loads(p.read_text())['name']==name]
@@ -40,7 +41,7 @@ with h5py.File(ep) as f:
   for group,key in (('obs','time'),('next_obs','next_time')):
    ds=d[group+'/'+camera+'_image'];assert ds.shape==(n,)
    ts=d[group+'/'+camera+'_time'][:]
-   assert np.max(abs(ts-d[key][:]))<1e-6 and (np.diff(ts)>0).all()
+   assert np.max(abs(ts-d[key][:]))<recording_tolerance(f.attrs) and (np.diff(ts)>0).all()
    for i in range(n):
     im=decode(ds[i],'jpeg95');assert im.shape==(384,384,3) and im.std()>5
   for i in range(1,n):assert np.array_equal(d['obs/'+camera+'_image'][i],d['next_obs/'+camera+'_image'][i-1])
@@ -53,7 +54,7 @@ print(json.dumps(dict(files=[dict(name=name,**item(ep),valid=True,transitions=n)
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--name',required=True);a=p.parse_args()
-    assert re.fullmatch(r'FN30_A_dev_0[0-7]_r[0-9]+',a.name)
+    assert re.fullmatch(r'FN30_A_dev_0[0-7](?:_retry[0-9]+)?_r[0-9]+',a.name)
     output=PROJECT/'evidence/finish-A'/(a.name+'-preview-integrity.json')
     assert not output.exists()
     command=shlex.join(['docker','exec','-i',CID,'/isaac-sim/python.sh','-c',NATIVE,a.name])

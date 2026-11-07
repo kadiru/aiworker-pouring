@@ -9,7 +9,8 @@ DATA=PROJECT/'data/material-A-finish'
 def main():
     p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,required=True);a=p.parse_args()
     audit=json.loads(a.manifest.read_text());assert audit['native_checks_passed'] and not audit['pending_attempts']
-    for identity in audit['sidecar_files']:
+    scalar_files=audit['sidecar_files']+audit.get('partial_sidecar_files',[])
+    for identity in scalar_files:
         rel=PurePosixPath(identity['relative_path'])
         assert not rel.is_absolute() and '..' not in rel.parts and rel.suffix=='.json'
         target=DATA/str(rel);target.parent.mkdir(parents=True,exist_ok=True)
@@ -19,7 +20,7 @@ def main():
             assert temporary.stat().st_size==identity['bytes'] and sha(temporary)==identity['sha256']
             temporary.replace(target)
         assert target.stat().st_size==identity['bytes'] and sha(target)==identity['sha256']
-    print(json.dumps(dict(verified_sidecars=len(audit['sidecar_files']),native_recordings=len(audit['files']),
+    print(json.dumps(dict(verified_sidecars=len(scalar_files),native_recordings=len(audit['files']),
         scope='Scalar metadata backed up locally. Raw recordings remain on Ubuntu and are temporarily fetched and SHA-verified for media review.')))
 
 if __name__=='__main__':main()
