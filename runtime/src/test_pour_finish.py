@@ -45,4 +45,14 @@ class FinishTests(unittest.TestCase):
             robot.drive(t);np.testing.assert_allclose(robot.command,np.r_[np.ones(7),np.zeros(4)])
         self.assertFalse(robot.complete(2.4));self.assertTrue(robot.complete(2.5))
 
+    def test_calibration_pack_stays_inside_tapered_cup(self):
+        from pour_finish_calibration import cup_points
+        from bottle_pour import CUP
+        spec=dict(calibration_only=True,calibration_version=1,calibration_pitch_fraction=.8,calibration_initial_height=.99,spacing=.0018)
+        points=cup_points(spec)
+        self.assertGreater(len(points),10000)
+        self.assertLess(points[:,2].max(),CUP[-1][0])
+        radius=np.interp(points[:,2],[p[0] for p in CUP],[p[1] for p in CUP])
+        self.assertTrue((np.linalg.norm(points[:,:2],axis=1)<radius-.002).all())
+
 if __name__=='__main__':unittest.main()

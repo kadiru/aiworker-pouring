@@ -4,7 +4,9 @@ from bottle_pour import CUP,SIDES
 
 def cup_points(spec):
     assert spec.get('calibration_only') and spec['calibration_version']==1
-    spacing=spec['spacing'];pitch=.85*spacing
+    spacing=spec['spacing'];pitch_fraction=spec.get('calibration_pitch_fraction',.85)
+    assert .80<=pitch_fraction<=.85
+    pitch=pitch_fraction*spacing
     fraction=spec['calibration_initial_height']
     assert .7<=fraction<=1.
     top=CUP[0][0]+fraction*(CUP[-1][0]-CUP[0][0])

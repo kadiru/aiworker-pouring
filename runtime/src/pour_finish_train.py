@@ -70,7 +70,7 @@ def build(saved):
                 selected.append(dict(index=j,target=rows[-1]['cup_fill_fraction'],view='static_calibration'))
         assert selected
         records.append(dict(name=name,path=str(path),sha256=sha(path),split=split,former_split='new_supervised_calibration',frames=selected))
-    assert found==set(expected),'All 48 static calibration recordings are required before fitting'
+    assert found==set(expected),'All planned static calibration recordings are required before fitting'
     data={}
     for split,a in arrays.items():
         old=cached['data'][split]
@@ -164,7 +164,7 @@ def train(state):
     saved['sources']={n:sha(next(p for p in (ROOT/'staged'/n,Path('/workspace/src')/n) if p.exists())) for n in RUNTIME_SOURCES}
     torch.save(saved,ROOT/'best.partial.pt');(ROOT/'best.partial.pt').replace(ROOT/'best.pt')
     report.update(status='fit_complete',checkpoint_sha256=sha(ROOT/'best.pt'),parent_checkpoint_sha256=PARENT_SHA,sources=saved['sources'],
-                  scene_plan_sha256=sha(ROOT/'frozen-plan.json'),data_manifest_sha256=sha(ROOT/'data-manifest.json'),thresholds=saved['thresholds'],
+                  scene_plan_sha256=sha(ROOT/'frozen-plan.json'),calibration_plan_sha256=sha(ROOT/'calibration-plan.json'),data_manifest_sha256=sha(ROOT/'data-manifest.json'),thresholds=saved['thresholds'],
                   terminal_drain_hold_s=0.,method=saved['method'],no_privileged_runtime_inputs=True,elapsed_s=time.monotonic()-start)
     write('model-summary.json',report)
     state.update(phase='Finish-study fit complete',learning=dict(stage='fit_complete',elapsed_s=report['elapsed_s']))
