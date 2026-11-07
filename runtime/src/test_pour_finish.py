@@ -8,7 +8,7 @@ from pour_settled_model import features,predict
 
 class FinishTests(unittest.TestCase):
     def test_natural_return_has_no_stationary_drain_segment(self):
-        def pose(planner,q,source,cup,z,angle,mouth_z,centered):return np.full(7,angle/180.)
+        def pose(planner,q,source,cup,z,angle,mouth_z,centered,late_mouth_shift_m=0.):return np.full(7,angle/180.)
         def transit(planner,start,end,**kw):return np.stack((start,end))
         with patch('pour_wide_motion.project_target',side_effect=pose),patch('pour_workspace_path.clearance_approach',side_effect=transit):
             args=(None,np.ones(7),100.,[.5,-.1],[.5,-.3],1.04,np.full(7,.4),.052)

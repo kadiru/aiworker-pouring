@@ -214,7 +214,8 @@ class Actor:
             try:
                 self.terminal=CenteredTerminal(self.history,t,profile,self.fk,self.pour_phase,
                     self.source_xy,self.cup_xy,self.cal['table_z'],self.qlift,self.saved['pour_mouth_z'],
-                    drain_hold_s=self.saved.get('terminal_drain_hold_s',1.2))
+                    drain_hold_s=self.saved.get('terminal_drain_hold_s',1.2),
+                    late_mouth_shift_m=self.saved.get('late_mouth_shift_m',0.))
             except ValueError as error:
                 self.return_planning_error=str(error)
                 self.stop_latched=robot.reason='return_planning_failed'
@@ -351,7 +352,8 @@ class Actor:
                         from pour_wide_motion import project_target
                         try:
                             arm=project_target(self.fk,arm,self.source_xy,self.cup_xy,
-                                self.cal['table_z'],self.pour_phase,self.saved['pour_mouth_z'])
+                                self.cal['table_z'],self.pour_phase,self.saved['pour_mouth_z'],
+                                late_mouth_shift_m=self.saved.get('late_mouth_shift_m',0.))
                         except ValueError:
                             self.latch('trajectory_unreachable',t,robot)
                             targets,phase=self.terminal.act(t)

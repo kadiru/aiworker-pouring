@@ -57,6 +57,10 @@ def main():
     if model.get('initial_pour_calibration'):
         for name in ('initial-pour-calibration.json','coarse-brake-window-probe.json'):
             subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
+    if model.get('late_drip_alignment'):
+        for name in ('late-drip-calibration.json','late-drip-clearance-r3.json',
+                     'late-loss-diagnostic-r2.json','runtime-source-manifest-drip-r3.json'):
+            subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
     for name in ('runtime-after-test05.json','runtime-after-test15.json',
                  'runtime-after-test25.json','runtime-final.json','progress.json'):
         target = 'test-progress.json' if name == 'progress.json' else name
