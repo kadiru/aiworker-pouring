@@ -58,7 +58,7 @@ def main():
         for name in ('initial-pour-calibration.json','coarse-brake-window-probe.json'):
             subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
     if model.get('level_refit'):
-        for name in ('level-refit.json','late-drip-clearance-r3.json','late-loss-diagnostic-r2.json',
+        for name in ('level-refit.json','settled-target-supervision.json','late-drip-clearance-r3.json','late-loss-diagnostic-r2.json',
                      'full-stop-diagnostic-r2.json','runtime-source-manifest-drip-r3.json'):
             subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
     elif model.get('late_drip_alignment'):

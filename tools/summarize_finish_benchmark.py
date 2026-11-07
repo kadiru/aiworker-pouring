@@ -60,6 +60,7 @@ def main():
     development=[r for r in records if r['name'].startswith('FN30_A_dev_')]
     if model.get('level_refit'):
         refit=model['level_refit'];assert selection['level_refit']==refit
+        assert sha(E/'settled-target-supervision.json')==refit['settled_supervision_sha256']==manifest['settled_supervision_sha256']
         consumed={r['name']:r for r in refit['consumed_development_records']}
         assert {r['name'] for r in development}==set(consumed) and len(development)==24
         assert manifest['consumed_development_rounds']==[0,1,2]

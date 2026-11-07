@@ -36,7 +36,59 @@ def write(root, name, value):
     (root / name).write_text(json.dumps(value, indent=2) + '\n')
 
 
-def add_development(data, saved, integrity):
+def settled_supervision(output):
+    expected = {r['name']:r for r in read(ROOT / 'calibration-plan.json')['cases']}
+    groups, records = {}, []
+    for path in sorted(OUTPUTS.glob('*/*FCAL*/samples.json')):
+        spec = read(path.parent / 'parameters.json')
+        if spec['name'] not in expected:
+            continue
+        assert spec == expected[spec['name']]
+        rows = read(path)
+        last = rows[-1]
+        assert not last['ever_table_ml'] and not last['airborne_ml']
+        record = dict(name=spec['name'], split=spec['study_split'], cup_ml=last['cup_ml'],
+            height=last['cup_fill_fraction'], samples_sha256=sha(path))
+        records.append(record)
+        if spec['study_split'] == 'train':
+            groups.setdefault(last['cup_ml'], []).append(last['cup_fill_fraction'])
+    assert len(records) == 51 and {r['name'] for r in records} == set(expected)
+    x = np.array(sorted(groups))
+    y = np.array([np.mean(groups[v]) for v in x])
+    assert np.all(np.diff(y) > 0)
+    def label(volume):
+        assert volume >= x[0]
+        if volume > x[-1]:
+            return min(1., float(y[-1]+(volume-x[-1])*(y[-1]-y[-2])/(x[-1]-x[-2])))
+        return float(np.interp(volume, x, y))
+    validation = [dict(r, predicted_height=label(r['cup_ml']), error=label(r['cup_ml'])-r['height']) for r in records if r['split']=='validation']
+    assert len(validation) == 12 and max(abs(r['error']) for r in validation) < .005
+    report = dict(x=x.tolist(), y=y.tolist(), records=records, validation=validation,
+        scope='Training-only static inventory-to-settled-height interpolation, with linear upper extrapolation capped at 1. Used solely for supervised labels of pre-spill training pauses; no inventory input at runtime. Existing validation image labels remain unchanged, including their transient-height limitations.')
+    write(output, 'settled-target-supervision.json', report)
+    return label, float(x[0])
+
+
+def relabel_historical_training_pauses(data, manifest, label, minimum):
+    count = 0
+    for record in manifest['consumed_historical_records']:
+        if record['split'] != 'train':
+            continue
+        positions = [i for i,n in enumerate(data['train']['episode']) if n == record['name']]
+        assert len(positions) == len(record['frames'])
+        rows = read(Path(record['path']).parent / 'samples.json')
+        for i, frame in zip(positions, record['frames']):
+            observed = rows[frame['index']]
+            if frame['view'] != 'settle' or observed['cup_ml'] < minimum or observed['ever_table_ml']:
+                continue
+            frame.update(original_target=frame['target'], target=label(observed['cup_ml']),
+                target_source='static_train_inventory_to_settled_height', nominal_cup_ml=observed['cup_ml'])
+            data['train']['target'][i] = frame['target']
+            count += 1
+    return count
+
+
+def add_development(data, saved, integrity, label, minimum):
     records = []
     arrays = {k: [] for k in ('image', 'target', 'cup_xy', 'episode')}
     quantum = .0018**3*1e6
@@ -64,11 +116,12 @@ def add_development(data, saved, integrity):
             end = i-1
             if rows[end]['t']-rows[start]['t'] < .65 or rows[end]['ever_table_ml']:
                 continue
-            label = rows[-1] if (not rows[-1]['ever_table_ml'] and
+            plateau = rows[-1] if (not rows[-1]['ever_table_ml'] and
                 abs(rows[end]['cup_ml']-rows[-1]['cup_ml']) <= 8*quantum) else rows[end]
             for j in range(start, end+1, 2):
-                if rows[j]['t']-rows[start]['t'] >= .5 and abs(rows[j]['cup_ml']-label['cup_ml']) <= 8*quantum:
-                    selected[j] = (label['cup_fill_fraction'], 'settle')
+                if rows[j]['t']-rows[start]['t'] >= .5 and abs(rows[j]['cup_ml']-plateau['cup_ml']) <= 8*quantum:
+                    target = label(plateau['cup_ml']) if plateau is not rows[-1] and plateau['cup_ml'] >= minimum else plateau['cup_fill_fraction']
+                    selected[j] = (target, 'settle')
         if not rows[-1]['ever_table_ml']:
             for j in range(0, len(rows), 3):
                 if decisions[j]['mode'] in ('Setting bottle down', 'Releasing bottle', 'Holding completed pose') and abs(rows[j]['cup_ml']-rows[-1]['cup_ml']) <= 8*quantum:
@@ -83,6 +136,7 @@ def add_development(data, saved, integrity):
         records.append(dict(name=name, path=str(path), sha256=identity['sha256'], split='train',
             former_split='consumed_development', development_round=spec['development_round'],
             frames=[dict(index=j, target=v[0], view=v[1]) for j, v in selected.items()],
+            pause_target_scope='Measured final height for a final-inventory plateau; otherwise static-training inventory-to-settled-height mapping where covered, or measured low-level plateau height.',
             excluded_after_measured_loss=True,
             exclusion_reason=None if selected else 'No eligible stable view before measured loss'))
     assert len(records) == 24 and all(sum(r['development_round'] == n for r in records) == 8 for n in (0, 1, 2))
@@ -147,10 +201,13 @@ def main():
     original = copy.deepcopy(saved)
     started = time.monotonic()
     data = original_fit.build(saved)
-    additions = add_development(data, saved, integrity)
     data_manifest = read(a.output / 'data-manifest.json')
+    label, minimum = settled_supervision(a.output)
+    relabeled = relabel_historical_training_pauses(data, data_manifest, label, minimum)
+    additions = add_development(data, saved, integrity, label, minimum)
     data_manifest['consumed_historical_records'] += additions
     data_manifest.update(consumed_development_rounds=[0, 1, 2],
+        settled_supervision_sha256=sha(a.output / 'settled-target-supervision.json'), historical_training_pause_labels_replaced=relabeled,
         scope='Historical train/validation split retained. Twenty-four closed FN30 development records explicitly consumed for training; only eligible zero-loss views included. No FN30 development in validation and no reserved FN30 test images used.')
     write(a.output, 'data-manifest.json', data_manifest)
     fit, diagnostic = fit_level(data, saved, a.output)
@@ -175,6 +232,7 @@ def main():
         historical_builder_sha256=sha(Path(original_fit.__file__)),
         source_manifest_sha256=sha(a.manifest), runtime_source_commit=manifest['source_commit'],
         integrity_sha256=sha(ROOT / 'development-recording-integrity.json'),
+        settled_supervision_sha256=sha(a.output / 'settled-target-supervision.json'),
         review_sha256=sha(a.review), withdrawal_sha256=sha(a.withdrawal),
         consumed_development_records=[dict(name=r['name'], sha256=r['sha256'], frames=len(r['frames'])) for r in additions],
         old_full_target=model['thresholds']['full_settled_target'], new_full_target=diagnostic['target'],

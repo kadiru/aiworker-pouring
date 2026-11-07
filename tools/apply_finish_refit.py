@@ -40,6 +40,7 @@ def main():
     assert refit['review_sha256'] == sha(a.review) and refit['withdrawal_sha256'] == sha(a.withdrawal)
     assert refit['integrity_sha256'] == sha(ROOT / 'development-recording-integrity.json')
     assert new['data_manifest_sha256'] == sha(a.candidate / 'data-manifest.json')
+    assert refit['settled_supervision_sha256'] == sha(a.candidate / 'settled-target-supervision.json')
     assert new['scene_plan_sha256'] == sha(ROOT / 'frozen-plan.json')
     assert '4070' in new['device'] and new['terminal_drain_hold_s'] == 0.
     assert new['late_mouth_shift_m'] == .008
@@ -73,7 +74,7 @@ def main():
         shutil.copy2(a.candidate_sources / origin, ROOT / name)
     for n in changed:
         shutil.copy2(a.candidate_sources / n, ROOT / 'staged' / n)
-    for n in ('data-manifest.json','calibration-anchor-manifest.json','level-refit.json'):
+    for n in ('data-manifest.json','calibration-anchor-manifest.json','level-refit.json','settled-target-supervision.json'):
         shutil.copy2(a.candidate / n, ROOT / n)
     release = copy.deepcopy(manifest)
     release.update(checkpoint_sha256=new['checkpoint_sha256'], fitted_sources=new['sources'],

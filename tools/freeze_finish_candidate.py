@@ -97,7 +97,7 @@ archive=r/'frozen-candidate';archive.mkdir(exist_ok=False);(archive/'src').mkdir
 for n,h in s['runtime_sources'].items():
  assert hashlib.sha256((src/n).read_bytes()).hexdigest()==h;shutil.copy2(src/n,archive/'src'/n)
 for n in ('best.pt','model-summary.json','frozen-plan.json','data-manifest.json','calibration-plan.json','calibration-seed-provenance.json','calibration-particle-seed.npz','calibration-anchor-manifest.json'):shutil.copy2(r/n,archive/n)
-for n in ('infrastructure-aborts.json','development-resume-plan.json','development-resume-plan-r0.json','recording-repair.json','full-stop-calibration.json','initial-pour-calibration.json','coarse-brake-window-probe.json','late-drip-calibration.json','late-drip-clearance-r3.json','late-loss-diagnostic-r2.json','full-stop-diagnostic-r2.json','level-refit.json','runtime-source-manifest-drip-r3.json'):
+for n in ('infrastructure-aborts.json','development-resume-plan.json','development-resume-plan-r0.json','recording-repair.json','full-stop-calibration.json','initial-pour-calibration.json','coarse-brake-window-probe.json','late-drip-calibration.json','late-drip-clearance-r3.json','late-loss-diagnostic-r2.json','full-stop-diagnostic-r2.json','level-refit.json','settled-target-supervision.json','runtime-source-manifest-drip-r3.json'):
  if (r/n).exists():shutil.copy2(r/n,archive/n)
 payload=json.dumps(s,indent=2)+'\\n';(archive/'final-selection.json').write_text(payload)
 p=r/'final-selection.partial.json';p.write_text(payload);p.replace(r/'final-selection.json')
