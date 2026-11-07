@@ -1,6 +1,6 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30; it is not relabeled. No new autonomous development or reserved test has completed yet.
+Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30; it is not relabeled. The spatial level fit passes and eight autonomous development cases are running. No new autonomous development or reserved test has completed yet.
 
 ## Current implementation and evidence
 
@@ -53,10 +53,12 @@ The review pipeline audits all camera decodes/timestamps and inventory partition
 
 ## Next actions
 
-Refit the spatial-surface candidate on the 4070; inspect eight autonomous development cases; freeze a reviewed candidate; run thirty fresh tests; independently score, render and inspect all videos; update results and push final evidence. No new success rate is available yet.
+Inspect the eight active autonomous development cases; freeze a reviewed candidate; run thirty fresh tests; independently score, render and inspect all videos; update results and push final evidence. No new success rate is available yet.
 
 Reference-anchor check: all sixteen matched historical RGB anchors pass the <3 mm gate; the first 22 calibration records have maximum anchor error 0.493 mm and parent-model level MAE 3.545 percentage points. This is CPU-only calibration evidence, not a new fit or task success.
 
 Collection is queued in bounded batches: the simulator truncates each pending queue to 32 entries. After 38 total closed calibration records (six pilots plus the first 32-case batch), `finish_calibrate` was invoked again while idle for the final thirteen unstarted cases. Completed names are never requeued. The finite v4 handoff continues to require all 51 records.
 
 Spatial feature candidate: preserve the first 604 columns, then add 105 continuous spatial descriptors (8×8 red-surface grid, thirteen column-group centroids, spreads and masses, and global center/mass). Positive red margins exclude dark cup-wall pixels. The 709-feature candidate retains all former ridge choices and tests 34- versus 139-input residual networks; the four-point error gate and fresh-test goals remain unchanged. Worst-crop inspection found opposite errors for 84% and 94% fills in the same view, so a constant output offset alone cannot repair the selected r4 model.
+
+Passing spatial fit (r5): checkpoint `f26ff47868da35f47c9b8a6011132b25211a0cfd9c85522a0caa1468b65647ab`, runtime source `74adfd1`, 24.86 seconds on the RTX 4070. Uses 217/54 train/validation episodes and 6,247/1,476 images. Selected baseline has 126 ridge coefficients and the residual has 139 inputs with layers 64→16→1 (tanh), selected optimizer step 60, 10,143 fitted parameters total. Wider near-full validation MAE 0.834 points, maximum absolute/overestimate 2.743 points; derived full-stop target 93.243%. The retained CNN/localizer/motor models are not included in that parameter count. This passes the unchanged accuracy gate; it does not establish autonomous task performance. All sixteen near-full calibration layout frames are manually inspected. Eight development cases are now queued; thirty reserved tests remain unused.
