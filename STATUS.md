@@ -12,6 +12,8 @@ The first refit attempt completed the component screen but its metadata-preserva
 
 Next: finish and review all eight r3 cases, inspect any remaining failures, then freeze a candidate for thirty once-only reserved tests and complete the labeled videos, verification and GitHub push. No reserved attempt or new benchmark success is claimed yet.
 
+First r3 case `FN30_A_dev_00_r3` passes: final settled height 92.53698%, zero measured loss, correct stop and complete return/release. The full native preview is `evidence/finish-A/FN30_A_dev_00_r3-preview.mp4`, 19.85 seconds at labeled 2× speed, SHA `372efeac5a7ee4f3ad188c4e301eb2e97c1788865e06844d2ef2e4de64f4d446`. Full decode and twelve native-camera comparisons pass (maximum mean pixel error 0.8862/255); four selected encoded frames are inspected. This is development evidence only, not continuous manual playback or a reserved test result.
+
 ## Historical development notes
 
 The entries below retain preparation states and observations from earlier candidates. The current state and next action are above.
