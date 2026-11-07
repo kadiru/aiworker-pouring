@@ -73,6 +73,7 @@ def main():
     selection=dict(frozen_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),selected_checkpoint_sha256=checkpoint,
         scene_plan_sha256=model['scene_plan_sha256'],runtime_sources=runtime_sources,source_commit=manifest['source_commit'],
         fitted_sources=model['sources'],recording_repair=model.get('recording_repair'),
+        full_stop_calibration=model.get('full_stop_calibration'),
         retained_incomplete_attempts=integrity.get('retained_incomplete_attempts',[]),
         container=CID,development=rows,development_round=a.round,development_visual_review_sha256=sha(a.review),
         development_integrity_sha256=sha(STUDY/'development-recording-integrity.json'),
@@ -93,7 +94,7 @@ archive=r/'frozen-candidate';archive.mkdir(exist_ok=False);(archive/'src').mkdir
 for n,h in s['runtime_sources'].items():
  assert hashlib.sha256((src/n).read_bytes()).hexdigest()==h;shutil.copy2(src/n,archive/'src'/n)
 for n in ('best.pt','model-summary.json','frozen-plan.json','data-manifest.json','calibration-plan.json','calibration-seed-provenance.json','calibration-particle-seed.npz','calibration-anchor-manifest.json'):shutil.copy2(r/n,archive/n)
-for n in ('infrastructure-aborts.json','development-resume-plan.json','recording-repair.json'):
+for n in ('infrastructure-aborts.json','development-resume-plan.json','development-resume-plan-r0.json','recording-repair.json','full-stop-calibration.json'):
  if (r/n).exists():shutil.copy2(r/n,archive/n)
 payload=json.dumps(s,indent=2)+'\\n';(archive/'final-selection.json').write_text(payload)
 p=r/'final-selection.partial.json';p.write_text(payload);p.replace(r/'final-selection.json')

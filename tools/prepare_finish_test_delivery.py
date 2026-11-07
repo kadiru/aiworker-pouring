@@ -47,8 +47,12 @@ def main():
     names = ('finish-results.json','final-benchmark.csv','recording-integrity.json',
              'final-selection.json','frozen-plan.json','data-manifest.json',
              'calibration-plan.json','calibration-seed-provenance.json','calibration-anchor-manifest.json','model-summary.json','best.pt',
-             'infrastructure-aborts.json','development-resume-plan.json','recording-repair.json')
+             'infrastructure-aborts.json','recording-repair.json')
     for name in names:
+        subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
+    model = json.loads((EVIDENCE/'model-summary.json').read_text())
+    extra = ('development-resume-plan-r0.json','full-stop-calibration.json') if model.get('full_stop_calibration') else ('development-resume-plan.json',)
+    for name in extra:
         subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
     for name in ('runtime-after-test05.json','runtime-after-test15.json',
                  'runtime-after-test25.json','runtime-final.json','progress.json'):

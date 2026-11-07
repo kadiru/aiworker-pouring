@@ -68,6 +68,7 @@ def main():
     final_report=dict(**report,groups=groups,native_audited_recordings=len(integrity['files']),
         retained_incomplete_recordings=integrity.get('retained_incomplete_attempts',[]),
         recording_repair=model.get('recording_repair'),
+        full_stop_calibration=model.get('full_stop_calibration'),
         verified_local_sidecars=len(integrity['sidecar_files']),independently_recomputed_primary_scores=30,
         recording_storage='Original HDF5 recordings remain on Ubuntu; each video source is fetched temporarily and byte/SHA-verified. No complete local raw-data backup is claimed.')
     (E/'final-benchmark.json').write_text(json.dumps(final_report,indent=2)+'\n')
