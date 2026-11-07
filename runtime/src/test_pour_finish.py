@@ -25,9 +25,14 @@ class FinishTests(unittest.TestCase):
         a[0,35:75,35:73]=torch.tensor([180,15,30],dtype=torch.uint8)
         a[1,45:75,35:73]=torch.tensor([180,15,30],dtype=torch.uint8)
         x=features(a,torch.tensor([.9,.7]),[.49,-.15])
-        self.assertTrue(torch.isfinite(x).all());self.assertEqual(x.shape,(2,367))
+        self.assertTrue(torch.isfinite(x).all());self.assertEqual(x.shape,(2,604))
         self.assertLess(x[0,340],x[1,340])
         old=dict(columns=[0,4],mean=[0.,0.],scale=[1.,1.],coef=[0.,1.])
         np.testing.assert_allclose(predict(x,old),[.9,.7],atol=1e-6)
+
+    def test_residual_uses_the_same_clipped_baseline_as_training(self):
+        x=torch.tensor([[1.,1.2],[1.,-.2]])
+        fitted=dict(columns=[0,1],mean=[0.,0.],scale=[1.,1.],coef=[0.,1.],residual_mlp=dict(columns=[0],mean=[0.],scale=[1.],layers=[dict(weight=[[0.]],bias=[-.1])]))
+        np.testing.assert_allclose(predict(x,fitted),[.9,0.],atol=1e-6)
 
 if __name__=='__main__':unittest.main()

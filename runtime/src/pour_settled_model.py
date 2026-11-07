@@ -34,13 +34,24 @@ def features(image, cnn, cup_xy):
     cumulative = hist.cumsum(1) / hist.sum(1, keepdim=True).clamp(min=1e-6)
     qs = torch.tensor([.02,.05,.1,.25,.5,.75,.9,.95,.98],device=image.device)
     quantiles = (cumulative[:,:,None] >= qs).float().argmax(1).float() / 95.
-    return torch.cat((existing, quantiles, quantiles*view[:,:1], quantiles*view[:,1:]),1)
+    quadratic = torch.cat((view[:,:1].square(),view[:,:1]*view[:,1:],view[:,1:].square()),1)
+    envelope = torch.cat((quantiles,quantiles*view[:,:1],quantiles*view[:,1:]),1)
+    perspective = torch.cat([torch.cat((quantiles,fine),1)*quadratic[:,i:i+1] for i in range(3)],1)
+    return torch.cat((existing,envelope,perspective),1)
 
 
 def predict(x, fitted):
     columns = fitted['columns']
     a = (x[:, columns] - x.new_tensor(fitted['mean'])) / x.new_tensor(fitted['scale'])
-    return (a @ x.new_tensor(fitted['coef'])).clamp(0., 1.)
+    value = a @ x.new_tensor(fitted['coef']) + fitted.get('output_bias',0.)
+    if 'residual_mlp' in fitted:
+        value=value.clamp(0.,1.)
+        m=fitted['residual_mlp'];h=(x[:,m['columns']]-x.new_tensor(m['mean']))/x.new_tensor(m['scale'])
+        for i,layer in enumerate(m['layers']):
+            h=h@x.new_tensor(layer['weight']).T+x.new_tensor(layer['bias'])
+            if i<len(m['layers'])-1:h=torch.tanh(h)
+        value=value+h[:,0]
+    return value.clamp(0., 1.)
 
 
 def assess(levels, other, target, deviation, tolerance, mass):

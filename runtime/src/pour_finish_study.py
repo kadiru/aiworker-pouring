@@ -20,3 +20,8 @@ def tests():
     for n,h in frozen['runtime_sources'].items():assert sha(Path('/workspace/src')/n)==h,n
     started={s['name'] for s in seen()}
     return [s for s in plan()['test'] if s['name'] not in started]
+
+def calibrations():
+    assert not (ROOT/'final-selection.json').exists()
+    started={s['name'] for s in seen()}
+    return [s for s in json.loads((ROOT/'calibration-plan.json').read_text())['cases'] if s['name'] not in started]
