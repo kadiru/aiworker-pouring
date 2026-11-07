@@ -1,6 +1,16 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress.** Round 0 finishes 7/8 strict passes and 8/8 zero measured loss. Round 1 finishes 7/8 with one retained overflow. Both rounds verify over-cup dwell ≤0.05 seconds and no post-release gripper contact. The reviewed initial-braking repair is applied, and eight r2 development checks are running. No reserved test has started. The previous wider/swapped benchmark remains 18/30 and is not relabeled.
+Authorized November 6, 2026 (America/Los_Angeles). **In progress; updated November 7 at 14:22 PST.** Eight V24 development attempts are running on the isolated RTX 4070. The thirty reserved tests remain unused. The previous wider/swapped benchmark remains 18/30 and is not relabeled.
+
+Across all 24 completed r0–r2 development attempts, upright stationary dwell over the cup is at most 0.05 seconds, with no post-release gripper contact. The bottle turns upright, immediately clears the cup, returns to its original position, releases and leaves the hand withdrawn. Strict task scores are 7/8, 7/8 and 4/8 respectively; zero-loss counts are 8/8, 7/8 and 4/8. All failures remain retained. R2 loses nine particles across four attempts, totaling 0.052488 nominal mL; the return itself completes in all eight.
+
+V24 refits only the settled-level predictor, using 238 training / 54 validation episodes and 7,116 / 1,476 images. The 4070 fit takes 33.1 seconds. Its 126-coefficient ridge model plus 139→32→16→1 tanh residual has 5,151 fitted parameters. Existing near-full validation MAE is 0.8997 percentage points, maximum absolute/overestimate 2.3414 points. The resulting full-stop threshold is 92.5414%. These component measurements are not fresh autonomous task results. Twenty-one of the 24 consumed development records supply eligible training views; the other three remain in the manifest with zero eligible images. Existing validation membership and image labels are retained.
+
+Training-pause labels now predict expected settled height using a monotonic map fitted from static calibration; final/static measured labels remain unchanged. Runtime uses RGB, not particle inventory. The V24 motion also shifts the lip 8 mm toward cup center between 116° and 122° tilt to address two observed late-empty losses. All 38 authored-layout geometry checks pass, but fluid success is unproven. It does not directly change the 80° settling pose where another r2 loss occurred. Physics and the natural return timing remain unchanged.
+
+Current checkpoint: `5068af6b18583afcb3eff231110c63896e0be898f389b9aad940f9e9405179d3`. Runtime contains 42 files from `76302c480dd0cbf16ca4621c8b90b470c13cf5cc`; fitting helper source is `1ec4405eff9880f64dbb9078afbda926348b7331`. Native run `20261107T222043Z` is observed by `/tmp/aiworker-finish-development-r3/`. Only the owned container was restarted, with its GPU binding, four-core/16 GiB caps and priority guard preserved. The separate 4090 job is active in the deployment snapshot; no foreign job was signaled or reconfigured.
+
+The remaining sections preserve the method and chronological preparation history. Current evidence is in `level-refit.json`, `settled-target-supervision.json`, `runtime-source-manifest-drip-r3.json`, the deployment snapshots and the eventual reviewed r3 outcomes.
 
 ## Current implementation and evidence
 

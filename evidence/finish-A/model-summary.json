@@ -3,80 +3,86 @@
   "chosen": {
     "weight": 16.0,
     "residual_inputs": 139,
-    "residual_width": 64,
-    "optimizer_steps": 60,
+    "residual_width": 32,
+    "optimizer_steps": 80,
     "metrics": {
-      "mae": 0.009372303262352943,
-      "near_mae": 0.00987069122493267,
-      "wide_near_mae": 0.008342824876308441,
-      "wide_near_max": 0.027429521083831787,
-      "wide_near_overestimate": 0.027429521083831787,
-      "near_p95": 0.022112155333161354
+      "mae": 0.010897109284996986,
+      "near_mae": 0.010325951501727104,
+      "wide_near_mae": 0.008997095748782158,
+      "wide_near_max": 0.023414015769958496,
+      "wide_near_overestimate": 0.023414015769958496,
+      "near_p95": 0.025005986914038658,
+      "consumed_development_near_mae": 0.005773899659585299,
+      "consumed_development_near_max": 0.023844200414502748,
+      "consumed_development_near_underestimate": -0.023844200414502748
     },
-    "score": 0.026442372426390647
+    "score": 0.02634725198149681
   },
-  "target": 0.9294295210838318,
+  "target": 0.9254140157699585,
   "training": {
     "train": {
-      "episodes": 217,
-      "frames": 6247
+      "episodes": 238,
+      "frames": 7116
     },
     "validation": {
       "episodes": 54,
       "frames": 1476
     }
   },
-  "elapsed_s": 24.85835940700781,
+  "elapsed_s": 33.11224500698154,
   "device": "NVIDIA GeForce RTX 4070",
-  "parameters": 10143,
-  "checkpoint_sha256": "bc9dc0e2d0afd2d090ff36f283be2276a9090f5fc48d3bf8290291dfcf2ee81e",
+  "parameters": 5151,
+  "checkpoint_sha256": "5068af6b18583afcb3eff231110c63896e0be898f389b9aad940f9e9405179d3",
   "parent_checkpoint_sha256": "4c8ab7bab4b5121004e47ac1458f6df8ead0bd481c381efa807c7be8195d3430",
   "sources": {
-    "pour_guard_actor.py": "0a3011cb7e36fc23d83071538c467beb57abc152585eec98549ee0fb1c7e5914",
-    "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
-    "pour_guard_vision.py": "529945a3df3db41dabec65ef4a10f44bef8148d3a680e10491b8aafd54ab8691",
-    "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
-    "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
-    "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
-    "pour_stop_sequence.py": "886832a6593cf0c8a084013d14f5e608bcfa49c8d7864fa7b4b239847ca7395b",
-    "run_fountain.py": "0754e9a9c6c1e07f07ec6a09cf3bef49ec6f4a7b93841287b3466be313edd688",
-    "robot_pour.py": "e17f40de81fde3a345008c9dc85b3a775d507d85821cf716cd69fe38fdfd0959",
-    "pour_recording.py": "e874d163e0182663426d80d69767b1c022465f4e01fc6bbafd16fa67e2e8d4cd",
+    "audit_finish_study.py": "ba4a83f66e7588838e75b41cbd36e6e51fa7850a1dfa0a46eefe1bcdf659522c",
     "bottle_pour.py": "7205b6279d540c595eca12cc8554694c8b133e3ae79dfd61c2036f6dbbcc1e76",
+    "pour_camera_clock.py": "d670232fd5b0cc23bac913c603b4675a411d2b2862c89caf8c9fe2c9d2fc4989",
+    "pour_finish_calibration.py": "05e93a1a9ac1ddeb57ab2e040a4e7a9ddb66ee7e20da1a2c54258c34a9c4fc6c",
+    "pour_finish_study.py": "738ec809569a835f37f9e775c4576096365b027a702f80641f23dc9a718a7bc7",
+    "pour_finish_train.py": "23f5efebdd19a9944048a17a8a41b9ecfd9c2aa327e6fc1c589d7f189ea2a138",
     "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
     "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
-    "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
-    "pour_settled_model.py": "d621c3630909087293a9c5ffff1eea9809985f9cf733a08690d2c0536b8803ba",
-    "pour_settled_data.py": "c18409bffa1d49a0783174aa0bad95cfe6e22115bc81331ce1c894a7fe7d1fa7",
-    "pour_settled_train.py": "144494fe6c3b29dcdc4969cb2630902e9054e7ab8287256c9a033c724dbba5a5",
-    "pour_settled_study.py": "60e33261bc28546b5907d2e5573e4b38fcb4b8b6bd8bb573221ab127be386e2c",
-    "pour_temporal_localization.py": "9edb27f9889b1e312ea908a45179663e18dde25256eee36f1716441662036374",
-    "pour_reliable_train.py": "fa7fdb54eeae126fc2a99cfc0bf01b8b1f7becd46853e5ee2dd7bc471cbfeee3",
-    "pour_reliable_study.py": "84478b6db7cbb6a2ca4bc7fad325822be93ab72a00610b9225eb1b215fffcc63",
-    "pour_reliable_data.py": "0a5a06a66a141fc07ef666cdbcb9a0a1732a0746af850dd5718be1cc5ddaa524",
-    "pour_workspace_study.py": "2f46291cce308ab04305f8b2895d5f2f460a06c1fd0ecc662d3aad9cc1b67759",
-    "pour_workspace_data.py": "7c2deb5619b24e4c17fde76cab8c74c4b4d81d8fa72009572c5be4d12258e84e",
-    "pour_workspace_train.py": "79f457202ad069f22044a34c38e0927dfb3b1217fcc347d6e3e958b2ca6fa561",
-    "pour_workspace_motion.py": "22bf921ed4c90596c53cd09bc4095bee35b6a1fed811a0878de6dcb7b706ebed",
-    "pour_workspace_path.py": "d19dddde3b17469ef6592bbfb887ec36b02f82cebb024dbc7f9dcb9387499998",
-    "pour_source_alignment.py": "9e037df0188b96c465d58fb3e7da01162dee275f8c1cdca853ba3a7fcc29127e",
-    "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
+    "pour_guard_actor.py": "d8089e991449f7509cc6aaa9db151dec8dec554b6efeba62167727284e1b8d0d",
+    "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
+    "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
+    "pour_guard_vision.py": "529945a3df3db41dabec65ef4a10f44bef8148d3a680e10491b8aafd54ab8691",
     "pour_learning.py": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a",
+    "pour_recording.py": "44834916dd15b2a3b3b6515b4c63014064c227a8ea5f2550fc2020801c774c75",
+    "pour_reliable_data.py": "0a5a06a66a141fc07ef666cdbcb9a0a1732a0746af850dd5718be1cc5ddaa524",
+    "pour_reliable_study.py": "84478b6db7cbb6a2ca4bc7fad325822be93ab72a00610b9225eb1b215fffcc63",
+    "pour_reliable_train.py": "fa7fdb54eeae126fc2a99cfc0bf01b8b1f7becd46853e5ee2dd7bc471cbfeee3",
+    "pour_settled_data.py": "c18409bffa1d49a0783174aa0bad95cfe6e22115bc81331ce1c894a7fe7d1fa7",
+    "pour_settled_model.py": "d621c3630909087293a9c5ffff1eea9809985f9cf733a08690d2c0536b8803ba",
+    "pour_settled_study.py": "60e33261bc28546b5907d2e5573e4b38fcb4b8b6bd8bb573221ab127be386e2c",
+    "pour_settled_train.py": "144494fe6c3b29dcdc4969cb2630902e9054e7ab8287256c9a033c724dbba5a5",
+    "pour_source_alignment.py": "9e037df0188b96c465d58fb3e7da01162dee275f8c1cdca853ba3a7fcc29127e",
+    "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
+    "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
+    "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
+    "pour_stop_sequence.py": "886832a6593cf0c8a084013d14f5e608bcfa49c8d7864fa7b4b239847ca7395b",
+    "pour_temporal_localization.py": "9edb27f9889b1e312ea908a45179663e18dde25256eee36f1716441662036374",
+    "pour_wide_empty.py": "fdcba3bb6e4490267468728d026bc327424359f968b3cbe56ec62a459fd40ad1",
+    "pour_wide_geometry.py": "5a4aec3ed1154cbdfd7e7d1f5bb8636e71fade06ab1079ca03cf6235a93ff12c",
+    "pour_wide_motion.py": "6d12993d81fcfcf36cc40e4bda76926140f0a2b4ade0b906917b929c8221d3db",
+    "pour_wide_source.py": "2341a53d9b33828f55824669126e25975c21d37abb6d637998dbcfc21e451692",
     "pour_wide_study.py": "1637a365d6b151f7a1c42313586697bc008fcd84f020df0cc1bd9c5e9d47a02e",
     "pour_wide_train.py": "848f4b031e8563f9a0bcdaa0bbb2ec1a57f3a2840212185c2be862f14d2c3dd7",
-    "pour_wide_motion.py": "8d27e4d983c1522b5a8c2071d7dae1b168739b10453086b51877a445325a0d49",
-    "pour_wide_geometry.py": "5a4aec3ed1154cbdfd7e7d1f5bb8636e71fade06ab1079ca03cf6235a93ff12c",
-    "pour_wide_source.py": "2341a53d9b33828f55824669126e25975c21d37abb6d637998dbcfc21e451692",
-    "pour_wide_empty.py": "fdcba3bb6e4490267468728d026bc327424359f968b3cbe56ec62a459fd40ad1",
-    "pour_finish_study.py": "cc9e9a527f5f1c583e6fbc6fa015ac045ad928e5f9f512b5cdafc1e71040217a",
-    "pour_finish_train.py": "df9b082568f061b8f8831d28aec9c8cfe78a80f8f8263c177a57230f2dd0d43d",
-    "pour_finish_calibration.py": "05e93a1a9ac1ddeb57ab2e040a4e7a9ddb66ee7e20da1a2c54258c34a9c4fc6c"
+    "pour_workspace_data.py": "7c2deb5619b24e4c17fde76cab8c74c4b4d81d8fa72009572c5be4d12258e84e",
+    "pour_workspace_motion.py": "22bf921ed4c90596c53cd09bc4095bee35b6a1fed811a0878de6dcb7b706ebed",
+    "pour_workspace_path.py": "d19dddde3b17469ef6592bbfb887ec36b02f82cebb024dbc7f9dcb9387499998",
+    "pour_workspace_study.py": "2f46291cce308ab04305f8b2895d5f2f460a06c1fd0ecc662d3aad9cc1b67759",
+    "pour_workspace_train.py": "79f457202ad069f22044a34c38e0927dfb3b1217fcc347d6e3e958b2ca6fa561",
+    "robot_pour.py": "e17f40de81fde3a345008c9dc85b3a775d507d85821cf716cd69fe38fdfd0959",
+    "run_fountain.py": "0754e9a9c6c1e07f07ec6a09cf3bef49ec6f4a7b93841287b3466be313edd688",
+    "validate_pour_recording.py": "d7319b7f217f7ac4795cc289d574b269317539e7198cc793bbefbe55a034a3a6",
+    "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe"
   },
   "scene_plan_sha256": "25d5ee5221ce280ad05bf793e3552fd0ddd00fe9cb6a6738e069d50d4e357e45",
   "calibration_plan_sha256": "c720f4a6c9536f0d5ef36e751a1184024150f4fab77279546a3a29d1ec82f3ce",
-  "data_manifest_sha256": "6b505659336b62d1e73855e138dae2fcdd652e77cfb1a5d863104ddf39bf4655",
+  "data_manifest_sha256": "6528e529163bfd887b8f62febc400d5bc136449fd72052a15e389f400814a9de",
   "thresholds": {
-    "full_settled_target": 0.9294295210838318,
+    "full_settled_target": 0.9254140157699585,
     "coarse_brake_target": 0.82,
     "runoff_seconds": 0.25,
     "empty_probability": 0.97,
@@ -114,7 +120,7 @@
     "brake_rate_deg_s": 45.0
   },
   "terminal_drain_hold_s": 0.0,
-  "method": "Supervised ridge with a validation-selected nonlinear residual on cup-normalized RGB surface profiles and spatial liquid-surface descriptors; historical settling pauses and stationary calibration; retained RGB localizer, wrist empty CNN and contextual behavioral cloning; slower pour/brake and continuous upright-to-table return without drain hold.",
+  "method": "Supervised RGB settled-level ridge and residual MLP refit with consumed development views; retained localization, empty CNN and contextual motion behavioral cloning with IK; programmed stop and direct return with late-pour lip alignment.",
   "no_privileged_runtime_inputs": true,
   "runtime_sources": {
     "audit_finish_study.py": "ba4a83f66e7588838e75b41cbd36e6e51fa7850a1dfa0a46eefe1bcdf659522c",
@@ -125,7 +131,7 @@
     "pour_finish_train.py": "23f5efebdd19a9944048a17a8a41b9ecfd9c2aa327e6fc1c589d7f189ea2a138",
     "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
     "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
-    "pour_guard_actor.py": "0a3011cb7e36fc23d83071538c467beb57abc152585eec98549ee0fb1c7e5914",
+    "pour_guard_actor.py": "d8089e991449f7509cc6aaa9db151dec8dec554b6efeba62167727284e1b8d0d",
     "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
     "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
     "pour_guard_vision.py": "529945a3df3db41dabec65ef4a10f44bef8148d3a680e10491b8aafd54ab8691",
@@ -146,7 +152,7 @@
     "pour_temporal_localization.py": "9edb27f9889b1e312ea908a45179663e18dde25256eee36f1716441662036374",
     "pour_wide_empty.py": "fdcba3bb6e4490267468728d026bc327424359f968b3cbe56ec62a459fd40ad1",
     "pour_wide_geometry.py": "5a4aec3ed1154cbdfd7e7d1f5bb8636e71fade06ab1079ca03cf6235a93ff12c",
-    "pour_wide_motion.py": "8d27e4d983c1522b5a8c2071d7dae1b168739b10453086b51877a445325a0d49",
+    "pour_wide_motion.py": "6d12993d81fcfcf36cc40e4bda76926140f0a2b4ade0b906917b929c8221d3db",
     "pour_wide_source.py": "2341a53d9b33828f55824669126e25975c21d37abb6d637998dbcfc21e451692",
     "pour_wide_study.py": "1637a365d6b151f7a1c42313586697bc008fcd84f020df0cc1bd9c5e9d47a02e",
     "pour_wide_train.py": "848f4b031e8563f9a0bcdaa0bbb2ec1a57f3a2840212185c2be862f14d2c3dd7",
@@ -294,7 +300,7 @@
     "scope": "Recording clock validation, incomplete-attempt audit and development recovery only. Learned checkpoint, policy/vision/physics/motion files and reserved-test builder are unchanged."
   },
   "development_aliases": {},
-  "parent_candidate_checkpoint_sha256": "f9ffbce349aa5b3a0720205f28c5fc51499a5a0b72762bc5470aa41b2930bb27",
+  "parent_candidate_checkpoint_sha256": "bc9dc0e2d0afd2d090ff36f283be2276a9090f5fc48d3bf8290291dfcf2ee81e",
   "full_stop_calibration": {
     "calibrated_utc": "2026-11-07T09:20:49.400283+00:00",
     "parent_checkpoint_sha256": "f26ff47868da35f47c9b8a6011132b25211a0cfd9c85522a0caa1468b65647ab",
@@ -2573,5 +2579,207 @@
     "helper_sha256": "1553c9d1b7b76d72a11fb1a7d1762a7b6d83061ee17930d06743971a3b45e6ff",
     "comparison_helper_sha256": "9a3963304c17dce0d575870142b7870199c2d8d0c7ece526460e5b9769eff2f7",
     "scope": "Development-selected initial brake at 82% projected CNN level, then at most thirteen pause/top-up cycles. Full-stop target, 60-second limit, physics, motion, learned weights and scoring are unchanged. Native r2 remains required; no previous outcome is relabeled."
+  },
+  "selection_scope": "Historical validation selects among fits meeting the declared consumed-development residual screen; development residuals are training error, not generalization evidence.",
+  "late_mouth_shift_m": 0.008,
+  "level_refit": {
+    "parent_checkpoint_sha256": "bc9dc0e2d0afd2d090ff36f283be2276a9090f5fc48d3bf8290291dfcf2ee81e",
+    "checkpoint_sha256": "5068af6b18583afcb3eff231110c63896e0be898f389b9aad940f9e9405179d3",
+    "completed_utc": "2026-11-07T22:18:56.986140+00:00",
+    "elapsed_s": 33.11224500698154,
+    "device": "NVIDIA GeForce RTX 4070",
+    "source_helper_sha256": "4cce346cbc0ce746e36d0b2671db29aa66725e1d1c2fb24d5b5aafc7a7715151",
+    "source_helper_commit": "1ec4405eff9880f64dbb9078afbda926348b7331",
+    "historical_builder_sha256": "23f5efebdd19a9944048a17a8a41b9ecfd9c2aa327e6fc1c589d7f189ea2a138",
+    "source_manifest_sha256": "458555beffb1cf5c56b7f42787346a161a7455e054182c54ef6faf33d0f5ddcb",
+    "runtime_source_commit": "76302c480dd0cbf16ca4621c8b90b470c13cf5cc",
+    "integrity_sha256": "80ba874d823e97fe6c8f2bc4e9fdc698ca6fb5d371e807033488a8a963f6b4d4",
+    "settled_supervision_sha256": "92ce91a8aaf89d46a59297ebbcc453f7009f17d33e04ea9abd21188ae8fe9c6f",
+    "review_sha256": "16eb837dfe7c2568d5f5f920e7359f7c6257ad96c0f880059250f5d33e7d5b4d",
+    "withdrawal_sha256": "3f8219def5291b63d786f0bbeaec903369d48ae54cee06e534e89f1c14dc634f",
+    "consumed_development_records": [
+      {
+        "name": "FN30_A_dev_00_r0",
+        "sha256": "e718d8f9d5634a69eb419122b7d0d03aa894d2855088ba3da2753dc7d5e42ea2",
+        "frames": 60
+      },
+      {
+        "name": "FN30_A_dev_00_r1",
+        "sha256": "a2051fe71cd3782b73a14b913fcfb3a2c75849691f4d8a9ac4def9b37e6ab52f",
+        "frames": 62
+      },
+      {
+        "name": "FN30_A_dev_00_r2",
+        "sha256": "38541ff6b2c37f996abe1aa502c28ca3def10baa41d63e740a64141c23dcaec5",
+        "frames": 61
+      },
+      {
+        "name": "FN30_A_dev_01_r0",
+        "sha256": "8b0b9d8fa03a74e2f22d0a311a2a9f6a64647e631aa4483ab1e4081c8b9f9f30",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_01_r1",
+        "sha256": "d1d52a793fbbb4926c51b754db148aa7138a7832f853680d16158eb78fcc617e",
+        "frames": 17
+      },
+      {
+        "name": "FN30_A_dev_01_r2",
+        "sha256": "19ad502c8c453697edc47e340bd7375b6ae1592f0c8b86e44d2915c36972103b",
+        "frames": 17
+      },
+      {
+        "name": "FN30_A_dev_02_r0",
+        "sha256": "2284162295efd1132072398f33f0be410b9fa6dce279bc494444555364669235",
+        "frames": 61
+      },
+      {
+        "name": "FN30_A_dev_02_r1",
+        "sha256": "b58652855e49e54443355a72c231d4d3ceba1e9de1a8b8cb5d17144fddd0aec1",
+        "frames": 61
+      },
+      {
+        "name": "FN30_A_dev_02_r2",
+        "sha256": "bbb0e3535d536aae85aa8a77e3e6be04b7eeb952725819c2603cc6e93c0da7ae",
+        "frames": 69
+      },
+      {
+        "name": "FN30_A_dev_03_r0",
+        "sha256": "37184529cb320ac20769fbcd977f0690346f4f6c8e26c7458296da49d426cafe",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_03_r1",
+        "sha256": "7115be64df7e36e7c3077d2e639febb74b40358a38da16ded0ed64439f35c4e7",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_03_r2",
+        "sha256": "209759bd35e6763ec70777969f79ad9243cd0a0880cf8cf92996a23219dbdfc7",
+        "frames": 0
+      },
+      {
+        "name": "FN30_A_dev_04_r0",
+        "sha256": "d135f8a0780e94ddef179208ccb616836e8236cbbca56d5d56ac61ea551de82f",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_04_r1",
+        "sha256": "2488ffcb0b29a68d011a63e5b8e6ffd6e3947e7b028d0c871807c1a0365d8be7",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_04_r2",
+        "sha256": "b08c1ae3ad43eff164e8ac19b470763e290f0b8c28076de327b81d0c48916035",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_05_r1",
+        "sha256": "b1974b1b85381e5c1f6de0ff32df37997bcc60e2357a0158d1d4a0251e4a0775",
+        "frames": 0
+      },
+      {
+        "name": "FN30_A_dev_05_r2",
+        "sha256": "d0ca57a865758faae7952823239f3c7031b6c4c8125dd7e78e526893672395b4",
+        "frames": 82
+      },
+      {
+        "name": "FN30_A_dev_05_retry1_r0",
+        "sha256": "414d8f8d1b62fefff4c9a820e4c5ff8b59eb2e7a87037c1cbfb12879e78d131b",
+        "frames": 92
+      },
+      {
+        "name": "FN30_A_dev_06_r0",
+        "sha256": "dc66029fc6c4b85398048a17f69667b734c456512f0905fb8d9c858a6615e80a",
+        "frames": 61
+      },
+      {
+        "name": "FN30_A_dev_06_r1",
+        "sha256": "b750af70537298c47ec3cfd33a1cca5675173b33d3e0b75a55deb26bf886992f",
+        "frames": 61
+      },
+      {
+        "name": "FN30_A_dev_06_r2",
+        "sha256": "a7c10e422d33fbfd348dc1e9f0166cae249d5d5121a4b26db06cf28a61ca3dd3",
+        "frames": 21
+      },
+      {
+        "name": "FN30_A_dev_07_r0",
+        "sha256": "3316a4a0692daaf889c0a65dcce6572f7e67e6ffc9ec73395d38f6a0b3ac3b47",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_07_r1",
+        "sha256": "bef8af8d864b8c4ca1e8b3b012e007e63268154429e7df1f3e17c28e02813494",
+        "frames": 18
+      },
+      {
+        "name": "FN30_A_dev_07_r2",
+        "sha256": "ba57280da713372f2c9071766c1adee11ea925809d5b9ead985ec1f3103c8500",
+        "frames": 0
+      }
+    ],
+    "old_full_target": 0.9294295210838318,
+    "new_full_target": 0.9254140157699585,
+    "old_fitted_sources": {
+      "pour_guard_actor.py": "0a3011cb7e36fc23d83071538c467beb57abc152585eec98549ee0fb1c7e5914",
+      "pour_guard_models.py": "524540d5cbb2282c4e3760bf307638f6e547865fa5a98ba932d55960a9ead028",
+      "pour_guard_vision.py": "529945a3df3db41dabec65ef4a10f44bef8148d3a680e10491b8aafd54ab8691",
+      "pour_guard_trajectory.py": "99d8ec90e2ad59ca2a6227bdca33be31679e1ded0cff3af85ffa5934e04c2ad1",
+      "pour_stop_actor.py": "1a71dc9e46fdfdf867a23fe1b5114117c895b45d6acef85136905d56738c93d7",
+      "pour_stop_models.py": "4c6ebc7be966e2e0b69ed24a4a28b6659386298ce23d265af472586259deb12e",
+      "pour_stop_sequence.py": "886832a6593cf0c8a084013d14f5e608bcfa49c8d7864fa7b4b239847ca7395b",
+      "run_fountain.py": "0754e9a9c6c1e07f07ec6a09cf3bef49ec6f4a7b93841287b3466be313edd688",
+      "robot_pour.py": "e17f40de81fde3a345008c9dc85b3a775d507d85821cf716cd69fe38fdfd0959",
+      "pour_recording.py": "e874d163e0182663426d80d69767b1c022465f4e01fc6bbafd16fa67e2e8d4cd",
+      "bottle_pour.py": "7205b6279d540c595eca12cc8554694c8b133e3ae79dfd61c2036f6dbbcc1e76",
+      "pour_fluid.py": "88670a57c8e57176566d035dae12d0d66af0b2e152330c6ab9ea2abecfd32eaf",
+      "pour_geometry.py": "ddb81994482ce9f28bc23f5e6691aefd5521696656d8c7df1c4de9f485ac0190",
+      "vessel_appearance.py": "62e0b7bf18cff14b59de13dcd0434e11e3f3759f78140c20c62b7c2d598a0abe",
+      "pour_settled_model.py": "d621c3630909087293a9c5ffff1eea9809985f9cf733a08690d2c0536b8803ba",
+      "pour_settled_data.py": "c18409bffa1d49a0783174aa0bad95cfe6e22115bc81331ce1c894a7fe7d1fa7",
+      "pour_settled_train.py": "144494fe6c3b29dcdc4969cb2630902e9054e7ab8287256c9a033c724dbba5a5",
+      "pour_settled_study.py": "60e33261bc28546b5907d2e5573e4b38fcb4b8b6bd8bb573221ab127be386e2c",
+      "pour_temporal_localization.py": "9edb27f9889b1e312ea908a45179663e18dde25256eee36f1716441662036374",
+      "pour_reliable_train.py": "fa7fdb54eeae126fc2a99cfc0bf01b8b1f7becd46853e5ee2dd7bc471cbfeee3",
+      "pour_reliable_study.py": "84478b6db7cbb6a2ca4bc7fad325822be93ab72a00610b9225eb1b215fffcc63",
+      "pour_reliable_data.py": "0a5a06a66a141fc07ef666cdbcb9a0a1732a0746af850dd5718be1cc5ddaa524",
+      "pour_workspace_study.py": "2f46291cce308ab04305f8b2895d5f2f460a06c1fd0ecc662d3aad9cc1b67759",
+      "pour_workspace_data.py": "7c2deb5619b24e4c17fde76cab8c74c4b4d81d8fa72009572c5be4d12258e84e",
+      "pour_workspace_train.py": "79f457202ad069f22044a34c38e0927dfb3b1217fcc347d6e3e958b2ca6fa561",
+      "pour_workspace_motion.py": "22bf921ed4c90596c53cd09bc4095bee35b6a1fed811a0878de6dcb7b706ebed",
+      "pour_workspace_path.py": "d19dddde3b17469ef6592bbfb887ec36b02f82cebb024dbc7f9dcb9387499998",
+      "pour_source_alignment.py": "9e037df0188b96c465d58fb3e7da01162dee275f8c1cdca853ba3a7fcc29127e",
+      "pour_stop_data.py": "38cb34900e8b351317abc95f55243f8e0be7c171bd895291334cdd5e425660c4",
+      "pour_learning.py": "289e51f4cd53c1d5cdf509fa31a841e1be093b91b70bb2f87ffc8bc6a5f64b9a",
+      "pour_wide_study.py": "1637a365d6b151f7a1c42313586697bc008fcd84f020df0cc1bd9c5e9d47a02e",
+      "pour_wide_train.py": "848f4b031e8563f9a0bcdaa0bbb2ec1a57f3a2840212185c2be862f14d2c3dd7",
+      "pour_wide_motion.py": "8d27e4d983c1522b5a8c2071d7dae1b168739b10453086b51877a445325a0d49",
+      "pour_wide_geometry.py": "5a4aec3ed1154cbdfd7e7d1f5bb8636e71fade06ab1079ca03cf6235a93ff12c",
+      "pour_wide_source.py": "2341a53d9b33828f55824669126e25975c21d37abb6d637998dbcfc21e451692",
+      "pour_wide_empty.py": "fdcba3bb6e4490267468728d026bc327424359f968b3cbe56ec62a459fd40ad1",
+      "pour_finish_study.py": "cc9e9a527f5f1c583e6fbc6fa015ac045ad928e5f9f512b5cdafc1e71040217a",
+      "pour_finish_train.py": "df9b082568f061b8f8831d28aec9c8cfe78a80f8f8263c177a57230f2dd0d43d",
+      "pour_finish_calibration.py": "05e93a1a9ac1ddeb57ab2e040a4e7a9ddb66ee7e20da1a2c54258c34a9c4fc6c"
+    },
+    "unchanged_components": [
+      "localizer",
+      "cup_CNN",
+      "empty_CNN",
+      "motion_BC",
+      "physics",
+      "grasp logic",
+      "return timing"
+    ],
+    "scope": "Candidate only. Refit changes the settled regressor and validation-derived full threshold; adds 8 mm late lip alignment. No active deployment, native success or reserved result claimed."
+  },
+  "late_drip_alignment": {
+    "shift_m": 0.008,
+    "shift_angle_range_deg": [
+      116.0,
+      122.0
+    ],
+    "geometry_sha256": "29f580e584da716a491f5d78d1223ba1ac09da077121ef063d73afc9470d1434",
+    "scope": "Programmed geometry adjustment combined with refit; dynamic validation pending."
   }
 }
