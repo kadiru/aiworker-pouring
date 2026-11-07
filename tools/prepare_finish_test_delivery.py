@@ -54,6 +54,9 @@ def main():
     extra = ('development-resume-plan-r0.json','full-stop-calibration.json') if model.get('full_stop_calibration') else ('development-resume-plan.json',)
     for name in extra:
         subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
+    if model.get('initial_pour_calibration'):
+        for name in ('initial-pour-calibration.json','coarse-brake-window-probe.json'):
+            subprocess.run(['scp','-q','kfuUbuntu:'+STUDY+'/'+name,str(EVIDENCE/name)],check=True)
     for name in ('runtime-after-test05.json','runtime-after-test15.json',
                  'runtime-after-test25.json','runtime-final.json','progress.json'):
         target = 'test-progress.json' if name == 'progress.json' else name

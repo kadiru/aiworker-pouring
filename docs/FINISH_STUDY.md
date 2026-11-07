@@ -1,6 +1,6 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress.** The previous wider/swapped benchmark remains 18/30 and is not relabeled. Round 0 finishes 7/8 strict passes and 8/8 zero measured loss, with one retained full-confirmation failure. All eight recordings and 144 selected native frames pass integrity/review; return dwell is at most 0.05 seconds with zero post-release contact. A scalar-only threshold calibration is applied, and eight round-1 development cases are running. No reserved test has started.
+Authorized November 6, 2026 (America/Los_Angeles). **In progress.** Round 0 finishes 7/8 strict passes and 8/8 zero measured loss; return dwell is at most 0.05 seconds with zero post-release contact. A scalar full-stop calibration is applied. Round 1 has five passes and one retained swapped-layout overflow failure, with two cases still running/queued. A separate coarse-braking repair is prepared, not applied. No reserved test has started. The previous wider/swapped benchmark remains 18/30 and is not relabeled.
 
 ## Current implementation and evidence
 
@@ -91,3 +91,12 @@ The helper initially stopped before mutation because its loopback idle check did
 
 
 Round-1 halfway: 4/4 strict passes, all zero measured loss and completed return/release. Full cases settle at 95.8102% and 95.5568%; both empty bottles have zero source particles. The 10:17 UTC snapshot verifies unchanged checkpoint/sources, owned container, caps and guard. A separate 4090 process is active; its PID changed since the prior snapshot, with no cause inferred. No foreign job was signaled or reconfigured. Four development cases and all thirty reserved tests remain pending.
+
+
+## Initial-pour failure and prepared braking repair
+
+`FN30_A_dev_05_r1` overfills before its first brake. The coarse CNN estimate plateaus near 0.83 while the actual cup rises from 79% to overflowing; the positive derivative falls near zero, so its runoff predictor also stops signaling rising flow. The unchanged initial-brake target is 0.87. First brake occurs at 17.905 seconds, after the first measured loss; the attempt ends `level_unconfirmed`, final rim measure 1.0, final outside 7.791552 nominal mL, ever-near-worktop 5.079672 nominal mL. Its failure is preserved. The cup anchor differs from the safe r0 retry by only about 0.033 mm; the recorded level-feedback plateau is the directly observed failure mechanism.
+
+`probe_finish_coarse_braking.py` exactly reconstructs each original first-brake command in fourteen closed r0/r1 attempts, using the actual filtered CNN and recorded visual derivative. At proposed target 0.82, the failed trace requests braking at 14.955 seconds (2.95 seconds earlier), where its recorded rim height is 74.4371%. All seven full-case candidate windows are below 90% and have zero loss at that recorded point; all seven empty cases remain without a coarse brake. These are first-changed-command diagnostics, not counterfactual trajectory or success claims.
+
+Prepared repair: initial-brake target 0.82, maximum pause count 13 (including the initial brake/check), unchanged full-stop target 0.9294295210838318 and 60-second limit. Earlier braking leaves more work for small bounded top-ups. `calibrate_finish_braking.py` requires all r1 cases closed/reviewed, the complete sixteen-record probe, archived prior checkpoint and exact tensor/array/scalar equality outside those two threshold fields. It will not change learned weights, runtime sources, fluid physics, return motion, scoring, or original outcomes. The repair is not yet applied; native r2 remains required before reserved evaluation.
