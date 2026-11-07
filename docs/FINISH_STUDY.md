@@ -1,6 +1,6 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress.** Round 0 finishes 7/8 strict passes and 8/8 zero measured loss; return dwell is at most 0.05 seconds with zero post-release contact. A scalar full-stop calibration is applied. Round 1 has five passes and one retained swapped-layout overflow failure, with two cases still running/queued. A separate coarse-braking repair is prepared, not applied. No reserved test has started. The previous wider/swapped benchmark remains 18/30 and is not relabeled.
+Authorized November 6, 2026 (America/Los_Angeles). **In progress.** Round 0 finishes 7/8 strict passes and 8/8 zero measured loss. Round 1 finishes 7/8 with one retained overflow. Both rounds verify over-cup dwell ≤0.05 seconds and no post-release gripper contact. The reviewed initial-braking repair is applied, and eight r2 development checks are running. No reserved test has started. The previous wider/swapped benchmark remains 18/30 and is not relabeled.
 
 ## Current implementation and evidence
 
@@ -100,3 +100,19 @@ Round-1 halfway: 4/4 strict passes, all zero measured loss and completed return/
 `probe_finish_coarse_braking.py` exactly reconstructs each original first-brake command in fourteen closed r0/r1 attempts, using the actual filtered CNN and recorded visual derivative. At proposed target 0.82, the failed trace requests braking at 14.955 seconds (2.95 seconds earlier), where its recorded rim height is 74.4371%. All seven full-case candidate windows are below 90% and have zero loss at that recorded point; all seven empty cases remain without a coarse brake. These are first-changed-command diagnostics, not counterfactual trajectory or success claims.
 
 Prepared repair: initial-brake target 0.82, maximum pause count 13 (including the initial brake/check), unchanged full-stop target 0.9294295210838318 and 60-second limit. Earlier braking leaves more work for small bounded top-ups. `calibrate_finish_braking.py` requires all r1 cases closed/reviewed, the complete sixteen-record probe, archived prior checkpoint and exact tensor/array/scalar equality outside those two threshold fields. It will not change learned weights, runtime sources, fluid physics, return motion, scoring, or original outcomes. The repair is not yet applied; native r2 remains required before reserved evaluation.
+
+Consumed prior-wide trace cross-check: the same first-brake reconstruction exactly matches all thirty original 0.89 triggers. A proposed 0.82 trigger appears in all fifteen full goals at recorded rim heights 65.63–88.19%, with zero measured loss at those instants. It also adds a pause in historical empty case `XW30_A_test_27`, at 63.59% height with 2.44944 nominal mL still in the bottle. The current slower tilt differs from that historical trajectory, so neither successful draining nor regression can be inferred. This is a retained regression risk, not a new simulator result. See `evidence/finish-A/consumed-wide-coarse-brake-probe.json`; none of the FN30 reserved scenes was inspected or run for this diagnostic.
+
+## Applied initial-braking calibration and r2 development
+
+Round 1 is fully closed: seven strict passes and one visible overflow, all eight complete return/release sequences. Native integrity covers sixteen complete r0/r1 recordings, 11,742 transitions and 65 scalar sidecars, retaining the catalogued incomplete original r0 recording. All 144 selected r1 frames are inspected, including the failed pour and ten return frames per case. No continuous manual playback is claimed.
+
+`tools/calibrate_finish_braking.py` accepts only the reviewed r1 identities, unchanged 42 runtime sources, the declared single overflow failure, verified motion and sixteen matching scalar probes. It archives `candidates/v23-r1/`, then changes exactly `coarse_brake_target` 0.87→0.82 and `max_pauses` 10→13. Recursive comparison and serialization round-trip establish all other checkpoint values unchanged. The active full-stop target remains 0.9294295210838318. This is CPU calibration, not another weight fit. New checkpoint: `bc9dc0e2d0afd2d090ff36f283be2276a9090f5fc48d3bf8290291dfcf2ee81e`; source commit remains `2b81ff055fb1cf980ae9e422c2d0ce90907deb47`.
+
+Development r2 was explicitly queued at 11:13:55 UTC November 7. Native observer PID 2956886 writes `/tmp/aiworker-finish-development-r2/`; its scoped, finite local review command is:
+
+```sh
+.venv/bin/python tools/prepare_finish_development_review.py --round 2 --checkpoint bc9dc0e2d0afd2d090ff36f283be2276a9090f5fc48d3bf8290291dfcf2ee81e
+```
+
+The already-running observer/review must not be duplicated. R2 outcomes remain pending. Freeze must use the new `runtime-source-manifest-braking-r2.json`, reviewed r2 sheets and r2 withdrawal evidence. The old r0/r1 manifests do not describe the active checkpoint. The thirty reserved scenes remain unused.
