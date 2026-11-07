@@ -56,7 +56,19 @@ def main():
     manifest=read(E/'data-manifest.json');assert sha(E/'data-manifest.json')==model['data_manifest_sha256']
     assert sha(E/'calibration-plan.json')==model['calibration_plan_sha256']
     records=manifest['consumed_historical_records'];assert len({r['name'] for r in records})==len(records)
-    assert all(not r['name'].startswith(('FN30_A_dev_','FN30_A_test_')) for r in records)
+    assert all(not r['name'].startswith('FN30_A_test_') for r in records)
+    development=[r for r in records if r['name'].startswith('FN30_A_dev_')]
+    if model.get('level_refit'):
+        refit=model['level_refit'];assert selection['level_refit']==refit
+        consumed={r['name']:r for r in refit['consumed_development_records']}
+        assert {r['name'] for r in development}==set(consumed) and len(development)==24
+        assert manifest['consumed_development_rounds']==[0,1,2]
+        for r in development:
+            assert r['split']=='train' and r['development_round'] in (0,1,2)
+            assert r['sha256']==consumed[r['name']]['sha256'] and len(r['frames'])==consumed[r['name']]['frames']
+        fitting_helper=subprocess.check_output(['git','show',refit['source_helper_commit']+':tools/refit_finish_level.py'],cwd=PROJECT)
+        assert hashlib.sha256(fitting_helper).hexdigest()==refit['source_helper_sha256']
+    else:assert not development
     train={r['name'] for r in records if r['split']=='train'};valid={r['name'] for r in records if r['split']=='validation'}
     assert train.isdisjoint(valid)
     calibrations={s['name'] for s in read(E/'calibration-plan.json')['cases']}
@@ -71,6 +83,7 @@ def main():
         full_stop_calibration=model.get('full_stop_calibration'),
         initial_pour_calibration=model.get('initial_pour_calibration'),
         late_drip_alignment=model.get('late_drip_alignment'),
+        level_refit=model.get('level_refit'),
         verified_local_sidecars=len(integrity['sidecar_files']),independently_recomputed_primary_scores=30,
         recording_storage='Original HDF5 recordings remain on Ubuntu; each video source is fetched temporarily and byte/SHA-verified. No complete local raw-data backup is claimed.')
     (E/'final-benchmark.json').write_text(json.dumps(final_report,indent=2)+'\n')
