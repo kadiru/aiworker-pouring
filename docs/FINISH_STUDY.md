@@ -116,3 +116,5 @@ Development r2 was explicitly queued at 11:13:55 UTC November 7. Native observer
 ```
 
 The already-running observer/review must not be duplicated. R2 outcomes remain pending. Freeze must use the new `runtime-source-manifest-braking-r2.json`, reviewed r2 sheets and r2 withdrawal evidence. The old r0/r1 manifests do not describe the active checkpoint. The thirty reserved scenes remain unused.
+
+**First r2 preview:** `FN30_A_dev_00_r2` passes with final settled rim height 93.3998%, zero measured loss and complete return/release. Its full native 22.75-second, labeled 2× preview is `evidence/finish-A/FN30_A_dev_00_r2-preview.mp4`, SHA `ff90b57e9c072b118df2c399b9eee9f41bd98a144833925ef5ed06d40c3ecf26`. Full decode and twelve native-camera comparisons pass (maximum mean pixel error 0.871/255); four selected encoded frames are inspected. This is development-only evidence, not continuous manual playback or a reserved result. Seven r2 cases remain.
