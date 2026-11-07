@@ -21,6 +21,29 @@ def read(p):return json.loads(p.read_text())
 def picture(ds,i):return Image.open(io.BytesIO(ds[i].tobytes())).convert('RGB')
 
 
+def phase_label(ds,group,index):
+    if group=='obs' and index==0:return 'Ready'
+    raw=ds['ground_truth/phase'][index if group=='next_obs' else index-1]
+    if isinstance(raw,bytes):raw=raw.decode()
+    mode=raw.removeprefix('Visual guard: ')
+    return {
+        'Waiting for consistent localization':'Locate bottle and cup',
+        'Visual grasp: approach':'Approach bottle',
+        'Visual grasp: close':'Close gripper',
+        'Visual grasp: lift':'Lift bottle',
+        'Visual grasp: verify':'Check grasp',
+        'Pour control: coarse':'Pour',
+        'Pour control: brake':'Reduce flow',
+        'Pour control: settle':'Check liquid level',
+        'Pour control: trim':'Small top-up',
+        'Returning upright':'Return bottle',
+        'Setting bottle down':'Set bottle down',
+        'Releasing bottle':'Release bottle',
+        'Retreating':'Withdraw hand',
+        'Holding completed pose':'Hold finished pose',
+    }.get(mode,mode)
+
+
 def verdict(row):
     if row['strict_pass']:return prior_verdict(row)
     if (row['stop_reason'] in ('localization_unconfirmed','approach_unconfirmed') or not row['grasp_verified']
@@ -52,6 +75,7 @@ def frame(row,ds,group,index,t,speed,hold=None):
     assert y<651,(row['name'],y)
     text(d,(24,645),f'SIM {t:05.2f} s',18,WHITE,True,max_width=200)
     text(d,(228,645),hold or f'{speed:g}x playback',18,MUTED,max_width=305)
+    text(d,(568,645),phase_label(ds,group,index),18,WHITE,max_width=670)
     text(d,(24,681),'Stop near full' if row['expected_stop']=='cup_near_full' else 'Stop when empty',16,MUTED,max_width=500)
     text(d,(568,674),'One frozen controller  ·  Each test runs once',16,MUTED,max_width=670)
     return im
