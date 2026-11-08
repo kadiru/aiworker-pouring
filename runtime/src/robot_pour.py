@@ -195,12 +195,19 @@ class RobotPour(Pour):
 
         self.drives=[]
         self.states=[]
+        calibration_initial=self.calibration_command.copy()
+        if 'calibration_finger_initial_deg' in spec:
+            assert spec.get('calibration_only') and 'calibration_hold_angle_deg' in spec
+            initial_fingers=np.asarray(spec['calibration_finger_initial_deg'],dtype=float)
+            assert initial_fingers.shape==(4,) and np.isfinite(initial_fingers).all()
+            calibration_initial[7:]=initial_fingers
         for i in range(11):
             arm=i<7
             name=('arm_r_joint'+str(i+1)) if arm else ('gripper_r_joint'+str(i-6))
             prim=stage.GetPrimAtPath(ROOT+'/joints/'+name)
             drive=UsdPhysics.DriveAPI(prim,'angular')
-            initial=float(self.calibration_command[i])
+            initial=float(calibration_initial[i])
+            assert float(prim.GetAttribute('physics:lowerLimit').Get())<=initial<=float(prim.GetAttribute('physics:upperLimit').Get())
             prim.GetAttribute('state:angular:physics:position').Set(initial)
             prim.GetAttribute('state:angular:physics:velocity').Set(0.)
             drive.CreateStiffnessAttr((600 if i<6 else 200)*math.pi/180 if arm else .50)

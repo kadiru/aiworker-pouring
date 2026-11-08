@@ -82,7 +82,7 @@ def localize(seq,detail,gate):
         method='Supervised gradient-template banks and confidence/temporal-consensus calibration; fixture dimensions are declared, not visually inferred. Synthetic absent masks are a diagnostic, not an independent real missing-cup test.')
 
 def fit_level(seq,cal,gate,parent):
-    data={s:dict(image=[],target=[],name=[]) for s in ('train','validation')}
+    data={s:dict(image=[],target=[],name=[],domain=[]) for s in ('train','validation')}
     for e in seq:
         label=e['entry']['label'];s=e['spec']
         if not label['accepted']:continue
@@ -91,14 +91,44 @@ def fit_level(seq,cal,gate,parent):
             d=f['data/demo_0'];times=d['next_time'][:];ids=np.flatnonzero(times>=times[-1]-1.-1e-7)
             for i in ids[::2]:
                 image=cup_crop(decode(d['next_obs/cup_detail_image'][i],'jpeg95'),e['localized_xy'],actual)
-                a['image'].append(image);a['target'].append(label['target']);a['name'].append(s['name'])
+                a['image'].append(image);a['target'].append(label['target']);a['name'].append(s['name']);a['domain'].append('native_detail')
+    # Rehearse earlier real pouring appearances to avoid replacing dynamic
+    # perception with a model trained only on stationary high-resolution cups.
+    # These remain original lower-resolution task images, never synthetic
+    # detail-camera recordings. Only established train/validation references
+    # are read; no historical or new reserved test images enter this fit.
+    replay=[]
+    for entry in read(Path('/workspace/learning/A-wide-20261105-v1/empty-readout-candidates.json'))['data_manifest']:
+        path=Path(entry['path']);assert sha(path)==entry['sha256'];rows=read(path.parent/'samples.json');used=[]
+        with h5py.File(path) as f:
+            d=f['data/demo_0'];uv,score=locate(decode(d['obs/task_image'][0],'jpeg95'),parent['cup_bank'])
+            assert score>=parent['thresholds']['cup_localization_score']
+            xy=plane_point(uv,1.078,parent['calibration'])[:2];a=data[entry['split']]
+            for i in np.unique(np.linspace(0,len(rows)-1,24,dtype=int)):
+                r=rows[i]
+                if r['ever_table_ml'] or r['spilled_ml']:continue
+                target=r['cup_fill_fraction'];label_source='instantaneous_dynamic_surface'
+                if i>=20:
+                    window=rows[:i+1];stable=settled_label(window)
+                    if stable['accepted']:target=stable['target'];label_source='measured_trailing_stable_median'
+                image=cup_crop(decode(d['next_obs/task_image'][int(i)],'jpeg95'),xy,parent['calibration'])
+                a['image'].append(image);a['target'].append(target);a['name'].append(entry['name']);a['domain'].append('historical_task_replay')
+                used.append(dict(index=int(i),target=target,label_source=label_source))
+        replay.append(dict(name=entry['name'],split=entry['split'],path=str(path),sha256=entry['sha256'],frames=used))
+    write('cup-replay-manifest.json',replay)
     assert set(data['train']['name']).isdisjoint(data['validation']['name'])
     for s,a in data.items():
-        assert len(set(a['name']))>=(20 if s=='train' else 14),f'Insufficient stable episodes in {s}'
+        assert len({n for n,d in zip(a['name'],a['domain']) if d=='native_detail'})>=(20 if s=='train' else 14),f'Insufficient stable episodes in {s}'
         a['x']=torch.from_numpy(np.stack(a.pop('image'))).cuda();a['y']=torch.tensor(a['target'],device='cuda')
-    tr,va=data['train'],data['validation'];near=va['y']>.85
-    assert int(near.sum())>=20 and float(va['y'].max())>=.94,'No near-full validation coverage'
-    model=CupEstimator().cuda();model.load_state_dict(parent['cup_model']);opt=torch.optim.AdamW(model.parameters(),lr=2e-4,weight_decay=1e-4)
+    tr,va=data['train'],data['validation'];native=torch.tensor([d=='native_detail' for d in va['domain']],device='cuda')
+    near=(va['y']>.85)&native
+    assert int(near.sum())>=20 and float(va['y'][native].max())>=.94,'No near-full validation coverage'
+    model=CupEstimator().cuda();model.load_state_dict(parent['cup_model']);model.eval()
+    with torch.no_grad():
+        baseline=torch.cat([model(x) for x in va['x'].split(128)])+parent['cup_bias']
+        replay_baseline_mae=float((baseline.clamp(0,1)-va['y'])[~native].abs().mean())
+    opt=torch.optim.AdamW(model.parameters(),lr=2e-4,weight_decay=1e-4)
+    domain_weight=torch.tensor([4. if d=='native_detail' else 1. for d in tr['domain']],device='cuda')
     history=[];best=None;steps=0
     for epoch in range(1,241):
         model.train()
@@ -106,26 +136,30 @@ def fit_level(seq,cal,gate,parent):
             for g in opt.param_groups:g['lr']/=3
         for ids in torch.randperm(len(tr['y']),device='cuda').split(64):
             x=tr['x'][ids].float();x=(x*(.98+.04*torch.rand(len(x),1,1,1,device='cuda'))).clamp(0,255)
-            opt.zero_grad();error=model(x)-tr['y'][ids];loss=(error.square()*torch.where(tr['y'][ids]>.8,3.,1.)).mean()
+            opt.zero_grad();error=model(x)-tr['y'][ids];loss=(error.square()*torch.where(tr['y'][ids]>.8,3.,1.)*domain_weight[ids]).mean()
             assert torch.isfinite(loss);loss.backward();torch.nn.utils.clip_grad_norm_(model.parameters(),5);opt.step();steps+=1
         model.eval()
         with torch.no_grad():
             pred=torch.cat([model(x) for x in va['x'].split(128)]);error=pred-va['y'];row=dict(epoch=epoch,
-                mae=float(error.abs().mean()),near_mae=float(error[near].abs().mean()),near_max=float(error[near].abs().max()),near_overestimate=float(error[near].max()))
+                mae=float(error[native].abs().mean()),near_mae=float(error[near].abs().mean()),near_max=float(error[near].abs().max()),near_overestimate=float(error[near].max()),
+                historical_replay_mae=float(error[~native].abs().mean()))
             history.append(row);score=row['mae']+row['near_mae']+.3*row['near_max']
-            eligible=row['mae']<gate['level_validation_mae'] and row['near_max']<gate['level_validation_near_max_error'] and row['near_overestimate']<gate['level_validation_near_overestimate']
+            eligible=row['mae']<gate['level_validation_mae'] and row['near_max']<gate['level_validation_near_max_error'] and row['near_overestimate']<gate['level_validation_near_overestimate'] and row['historical_replay_mae']<=max(.05,replay_baseline_mae+.015)
             if eligible and (best is None or score<best['score']):best=dict(row=row,score=score,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()})
         if epoch%20==0:print('CUP_LEVEL',json.dumps(row),flush=True)
     with torch.no_grad():
-        x=surface_features(tr['x'])[0].double();vx=surface_features(va['x'])[0].double();y=tr['y'].double();geo=[]
+        train_native=torch.tensor([d=='native_detail' for d in tr['domain']],device='cuda')
+        x=surface_features(tr['x'][train_native])[0].double();vx=surface_features(va['x'][native])[0].double();y=tr['y'][train_native].double();geo=[]
         for ridge in (1e-6,1e-4,.01,.1):
             reg=torch.eye(4,device='cuda',dtype=torch.float64)*ridge;reg[0,0]=1e-12
-            coef=torch.linalg.solve(x.T@x+reg,x.T@y);err=(vx@coef).clamp(0,1)-va['y']
+            coef=torch.linalg.solve(x.T@x+reg,x.T@y);err=(vx@coef).clamp(0,1)-va['y'][native]
             geo.append(dict(coef=coef.cpu().tolist(),dimensions=4,bias=0.,ridge=ridge,mae=float(err.abs().mean()),max_error=float(err.abs().max())))
         geometry=min(geo,key=lambda g:g['max_error'])
     passed=best is not None and geometry['max_error']<gate['geometry_validation_max_error']
     report=dict(passed=passed,selected=None if best is None else best['row'],geometry={k:v for k,v in geometry.items() if k!='coef'},
-        counts={s:dict(episodes=len(set(a['name'])),images=len(a['y']),min_target=float(a['y'].min()),max_target=float(a['y'].max())) for s,a in data.items()},
+        counts={s:dict(episodes=len(set(a['name'])),images=len(a['y']),min_target=float(a['y'].min()),max_target=float(a['y'].max()),
+            domains={d:dict(images=sum(v==d for v in a['domain']),episodes=len({n for n,v in zip(a['name'],a['domain']) if v==d})) for d in set(a['domain'])}) for s,a in data.items()},
+        historical_replay_baseline_mae=replay_baseline_mae,replay_scope='Original lower-resolution task views from 24/8 train/validation references. New-record weight 4, replay weight 1. Dynamic appearances retained; no reserved tests or generated detail pixels.',
         candidates=history,learned_parameters=sum(p.numel() for p in model.parameters())+4,epochs=240,optimizer_steps=steps,
         method='Supervised RGB cup-level regression; pretrained CNN fine-tuned with weighted squared error, AdamW and mild photometric augmentation. Separate four-coefficient surface-geometry least squares. Episode-disjoint validation selects epoch; no reserved test images.',
         target_source='Measured final-second surface median for each stationary native recording; image-localized crops, declared cup dimensions. No inventory-derived target lookup.')

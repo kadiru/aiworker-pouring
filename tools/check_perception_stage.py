@@ -3,6 +3,7 @@ import hashlib,json,sys
 from pathlib import Path
 import numpy as np
 import torch
+from collections import Counter
 from PIL import Image,ImageDraw
 sys.path[:0]=['/workspace/src','/workspace']
 from validate_pour_recording import h5py,decode,validate
@@ -62,6 +63,8 @@ def main():
         scope='Native static perception calibration; authored held poses are not autonomous task successes.',helper_sha256=sha(Path(__file__)))
     (ROOT/'recording-audit.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(complete=len(result),accepted_labels=sum(r.get('label',{}).get('accepted',False) for r in result),
-        cases=[dict(name=r['name'],label=r.get('label'),detail_inner_height_px=r['cameras']['cup_detail']['projected_inner_height_px']) for r in result],incomplete=report['started_incomplete'])))
+        closed_by_split=dict(Counter(r['split'] for r in result)),
+        rejected_labels=[r['name'] for r in result if 'label' in r and not r['label']['accepted']],
+        latest_cases=[dict(name=r['name'],label=r.get('label'),detail_inner_height_px=r['cameras']['cup_detail']['projected_inner_height_px']) for r in result[-3:]],incomplete=report['started_incomplete'])))
 
 if __name__=='__main__':main()

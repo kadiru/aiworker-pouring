@@ -16,8 +16,10 @@ this is not continuous manual video review.
 
 The close lens does not cover every wider/swapped fixture. A 1024×1024
 camera with a 30 mm lens is therefore prepared, with the same fixed eye and
-lower cup-centered aim. A full-fixture projection screen and three native
-wide-view pilots gate larger collection. Task/wrist cameras remain 384×384.
+lower cup-centered aim. The 71-fixture ideal projection screen and three native
+wide-view pilots pass. A fourth native pilot verifies the revised static grip.
+These final views project 72.7–84.5 pixels across usable cup height; four
+three-camera composites and two full-resolution detail frames were inspected. Task/wrist cameras remain 384×384.
 
 Two high-fill pilots retain exactly 63.504648 nominal mL, but their original
 surface labels differ by 2.3841 percentage points. A separate spatial
@@ -41,7 +43,14 @@ eligible absent-object validation examples under the projected-envelope
 label. The first fitting preparation therefore stopped before optimization.
 The new fixtures address that data gap; they are authored calibration,
 not autonomous grasp successes. Held-bottle static fixtures explicitly use
-a kinematic bottle; autonomous episodes retain the dynamic bottle.
+a kinematic bottle; autonomous episodes retain the dynamic bottle. Initial
+finger positions now come from 272 observed bilateral-contact frames in a
+consumed recovery episode: [38.1420, 45.9844, 38.4342, 45.3812] degrees,
+with the original 45-degree drive targets. The corrected native pilot ends
+at [40.0999, 52.4642, 39.9889, 54.9947] degrees with bilateral contact and no
+loss. Earlier authored open-finger held poses are diagnostic only. All 68
+planned collection, holdout and autonomous geometry checks pass; native
+fluid and autonomous success still require their respective evaluations.
 
 The separate presence fit now passes its component gate: 48,001 parameters,
 1,895 training / 659 validation images from 26 / 10 episodes, 80 epochs and
@@ -64,14 +73,19 @@ reinforcement learning or end-to-end motor learning.
   coordinates to tabletop coordinates; size is not visually inferred.
 - Level: fine-tune the cup CNN on image-localized, normalized detail-camera
   crops, minimizing weighted squared error to measured settled surface.
-  A separate four-coefficient surface-geometry fit checks agreement.
+  A separate four-coefficient surface-geometry fit checks agreement. Replay
+  retains original lower-resolution task-camera images from 24/8 earlier
+  training/validation reference episodes. New stationary records have weight
+  four; replay has weight one. Stable replay windows use measured trailing
+  medians; flowing frames retain transient labels. This protects prior visual
+  coverage without inventing detail-camera images or consuming reserved tests.
 - Presence: separate wrist CNN, binary cross entropy, AdamW and augmentation.
   Offline bottle pose is used only to label projected presence/absence in a
   fixed wrist crop. Live control combines RGB probability with previously
   verified grasp and measured finger obstruction. Empty recognition is
   retained separately.
 
-Planned cup collection: 27 training and 20 validation scenes over nine
+Active cup collection: 27 training and 20 validation scenes over nine
 declared cup geometries (height/diameter independently 0.9/1.0/1.1), three
 fill cuts and wider/swapped training fixtures. Nine separate perception
 holdout scenes are not queued before component selection. Six development
@@ -113,4 +127,5 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=runtime/src .venv/bin/python -m unittest te
 ```
 
 Controller/geometry checks requiring Torch run CPU-only in the existing
-native environment. The current 42 local and 44 native CPU checks pass.
+native environment. Forty-three local tests now pass; the previous 44 native CPU controller/geometry
+checks pass. Exact later check totals are recorded with each source revision.

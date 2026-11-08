@@ -31,7 +31,8 @@ def main():
         method='Supervised cup-level CNN (weighted squared error), wrist bottle-presence CNN (binary cross entropy), and calibrated cup-template localization; retained empty CNN and contextual motion BC/IK; programmed grasp/stop/return. No reinforcement learning.',
         inputs='Task RGB, wrist RGB, cup-detail RGB, measured joints/velocities, fixed camera/robot calibration, own history; no runtime simulator object/particle state.',
         perception_components=dict(cup_sha256=cup['checkpoint_sha256'],presence_sha256=presence['checkpoint_sha256']))
-    manifest['runtime_sources']['pour_guard_actor.py']=sha(ROOT/'staged/pour_guard_actor.py');saved['sources']=manifest['runtime_sources']
+    for name in ('pour_guard_actor.py','pour_perception_study.py'):manifest['runtime_sources'][name]=sha(ROOT/'staged'/name)
+    saved['sources']=manifest['runtime_sources']
     torch.save(saved,ROOT/'best.pt')
     manifest.update(trained=True,component_gates_passed=True,checkpoint_sha256=sha(ROOT/'best.pt'))
     (ROOT/'candidate.json').write_text(json.dumps(manifest,indent=2)+'\n')

@@ -410,6 +410,8 @@ class Actor:
             source_watchdog=None if self.source_watchdog is None else self.source_watchdog.diagnostic,
             return_planning_error=getattr(self,'return_planning_error',None),
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
+            cup_level_camera='cup_detail' if 'cup_detail_calibration' in self.saved else 'task',
+            source_presence_model='wrist_presence_cnn' if self.presence_detector is not None else 'legacy_source_fusion',
             settled_prediction=settled_prediction,empty_views=empty_views,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,

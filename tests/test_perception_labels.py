@@ -3,8 +3,16 @@ from pathlib import Path
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runtime/src'))
 from pour_perception_geometry import settled_label,calibration_seed_points,upper_surface
+from pour_perception_study import check_freeze
 
 class Labels(unittest.TestCase):
+    def test_frozen_evaluation_rejects_changed_identity(self):
+        import copy
+        selection=dict(checkpoint_sha256='weights',plan_sha256='plan',runtime_sources={'actor.py':'source'})
+        check_freeze(selection,copy.deepcopy(selection))
+        for key,value in [('checkpoint_sha256','other'),('plan_sha256','other'),('runtime_sources',{'actor.py':'other'})]:
+            changed=copy.deepcopy(selection);changed[key]=value
+            with self.assertRaises(AssertionError):check_freeze(selection,changed)
     def rows(self):
         return [dict(t=i*.05,cup_fill_fraction=.93,cup_ml=60.,ever_table_ml=0.,spilled_ml=0.,airborne_ml=0.) for i in range(61)]
     def test_endpoint_dip_retains_raw_and_robust_training_target(self):
