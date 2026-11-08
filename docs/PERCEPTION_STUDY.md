@@ -493,3 +493,13 @@ color maximum is 4.193 points. Maximum CPU/GPU prediction difference is
 preparation/fitting takes 30.036 seconds on the guarded 4070. Raw CNN errors
 remain reported; the final runtime readout is the accepted estimator.
 Fresh-scene and autonomous evaluations are still required.
+
+Accepted components combine to checkpoint
+`595aeb7e478b165aa3c50aea4eba35358f3b7486e579838f0684417d9abdb7a7`,
+SHA-verified locally (2,876,273 bytes). Only `pour_settled_model.py` changes
+in the active runtime. An identity-checked idle restart deploys it to the
+same owned container, retaining the 4070 binding, four-core quota, CPU set,
+16 GiB cap and existing priority guard. No foreign process is signaled or
+reconfigured. All deployed source hashes match the candidate. The nine
+predeclared fresh perception cases start in run `20261108T232827Z`; no new
+autonomous success is yet claimed.
