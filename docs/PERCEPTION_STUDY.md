@@ -518,3 +518,35 @@ run `20261108T232827Z`, observed by `/tmp/aiworker-perception-development-r3`.
 The model, sources and criteria remain fixed throughout this batch. Only
 six strict passes, six ordered returns and actual camera review permit
 the original six reserved tests; cup/bottle size variation remains gated.
+
+The first new autonomous attempt (`PV_A_development_r1_00`) closes with
+a strict pass: verified grasp, zero source particles, `bottle_empty`,
+completed return/release and zero measured loss. Full-batch audit and
+selected-frame review are still pending. The remaining five cases continue
+with unchanged source/checkpoint hashes.
+
+A separate read-only particle-motion helper recomputes cup membership and
+spatial surface from 32 post-stop snapshots of this recording, matching the
+logged values. Between 32.055 and 32.305 simulation seconds, all 6,345 cup
+particles remain in the cup; the column height drops 1.059 points and
+median particle vertical displacement is -0.270 mm. These 0.25-second
+snapshots do not establish the causal mechanism. Final-sample scoring is
+unchanged. The helper consumes only closed, hash-checked observations and
+will analyze the full batch after its integrity audit.
+
+One untested explanation is a change in effective solver iterations when
+the robot sleeps. The offline robot asset authors 32 position iterations;
+the fluid specification requests 16. NVIDIA documents that GPU scenes use
+the highest iteration setting among awake objects, which can change when
+an object sleeps ([simulation control](https://docs.omniverse.nvidia.com/kit/docs/omni_physics/107.3/dev_guide/simulation_control/simulation_control.html#sleeping)).
+Actual sleep state/effective iterations were not recorded, so this is a
+hypothesis requiring a separate controlled experiment after the fixed batch.
+No sleep, iteration, fluid or renderer setting has been changed.
+
+The reader currently records `PointInstancer.positions`. NVIDIA also
+provides `physxParticle:simulationPoints` when smoothing writes render
+positions ([particle-set API](https://docs.omniverse.nvidia.com/kit/docs/usdrt.scenegraph/7.5.0/api/classusdrt_1_1_physx_schema_physx_particle_set_a_p_i.html)).
+The setup authors isosurface mesh smoothing but no particle-position
+smoothing component. That code inspection does not prove live attribute
+equality; a future instrumentation check should compare the available
+arrays directly. No historical result is rescored on this hypothesis.
