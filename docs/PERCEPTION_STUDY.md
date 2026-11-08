@@ -415,3 +415,13 @@ views use the autonomous initial grid. Both require native stable-label and
 containment checks. No geometry, fluid, rendering or acceptance limits are
 relaxed. Declaration: `task-supplement-preparation.json`; plan SHA
 `d6c98cb1bcac547ce6a611237bbb6c4b358bf646aea93bf558cd2302d28c8ed2`.
+
+The eight additional recordings pass native integrity, zero-loss containment,
+and stable labels. Final measured heights span 7.06%–86.04%; seed cuts are
+initialization choices, not imposed labels. Eight final three-camera native
+composites were inspected, not continuous playback. The study now has 114
+complete recordings, 108 accepted stationary labels and six autonomous
+attempts; all 462 scalar sidecars are SHA-verified locally. Original raw
+HDF5/trajectory files remain on Ubuntu. The second 240-epoch locator fit
+starts from the same preserved round-2 weights, using the augmented training
+set and unchanged validation cases/gates.
