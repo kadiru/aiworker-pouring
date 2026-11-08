@@ -15,6 +15,8 @@ def main():
     names={s['name'] for k in ('collect','level_supplement','consumed_perception_training') for s in plan.get(k,[])}|set(plan.get('perception_training_pilots',[]))
     assert names<={r['name'] for r in audit['records']} and not audit['started_incomplete']
     assert all(r.get('label',{}).get('accepted') for r in audit['records'] if r['name'] in names)
+    tasks={s['name'] for s in plan.get('consumed_task_development',[])}
+    assert tasks<={r['name'] for r in audit['records']}
     assert sha(ROOT/'plan.json')==manifest['plan_sha256'] and sha(ROOT/'best.pt')==manifest['checkpoint_sha256']
     assert all(sha(w.HOST_ROOT/'src'/n)==d for n,d in manifest['runtime_sources'].items())
     assert all(sha(w.HOST_ROOT/Path(p).relative_to('/workspace'))==d for p,d in manifest['protected_parent_files'].items())

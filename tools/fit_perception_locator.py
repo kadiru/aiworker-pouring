@@ -9,7 +9,7 @@ sys.path[:0]=['/workspace/learning/A-perception-20261108-v1/staged','/workspace/
 from validate_pour_recording import h5py,decode
 from pour_guard_vision import project,plane_point
 from pour_cup_locator import CupLocator,centers
-from perception_fit_data import admitted_scenes
+from perception_fit_data import admitted_scenes,admitted_tasks
 ROOT=Path('/workspace/learning/A-perception-20261108-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -30,7 +30,7 @@ def collect(dense=False):
                 image=np.asarray(Image.fromarray(decode(d[group+'/'+camera+'_image'][i],'jpeg95')).resize((384,384),Image.Resampling.BILINEAR)).copy()
                 data[split]['images'].append(image);data[split]['uv'].append(uv)
                 data[split]['meta'].append(dict(name=spec['name'],domain=domain,baseline_cup=spec.get('cup_height_scale',1.)==spec.get('cup_diameter_scale',1.)==1.,camera=cal,z=z,xy=spec['cup_world'][:2],group=group,index=i))
-    for s,split,admission in admitted_scenes(plan):
+    for s,split,admission in admitted_scenes(plan)+admitted_tasks(plan):
         r=indexed[s['name']];path=Path(r['path']);assert sha(path)==r['sha256']
         indices=[('obs',i) for i in range(12)]+[('next_obs',-1)] if dense else [('obs',0),('obs',11),('next_obs',-1)]
         add(path,s,split,'cup_detail','native_detail',indices)

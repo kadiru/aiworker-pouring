@@ -321,3 +321,32 @@ The development observer refuses to start unless that report passes for the
 same checkpoint. After development, `summarize_perception_tasks.py`,
 `review_perception_tasks.py` and actual manual inspection precede
 `freeze_perception_candidate.py`. No final freeze or reserved run is yet claimed.
+
+## Actual-pour development diagnosis (in progress)
+
+Round-2 stationary perception passes, but the first two autonomous attempts
+fail. Dev00 abstains at cup confidence 0.007–0.011; CPU replay reproduces it,
+with matching camera calibration. Dev01 grasps, pours, stops and returns
+without loss but finishes at 87.8221% height. Immediately before its full stop,
+CNN output is 96.530% against an aligned observed surface of 90.010%. A
+diagnostic exact-center crop gives 96.404%; the 0.879 mm localization error
+does not explain the main bias. The final-sample height later falls to 87.8221%
+with unchanged inventory; the separate column-height diagnostic also falls.
+The cause of that physical/surface change is not established. Original scores
+remain unchanged. See `development-01-level-diagnostic.json`; two selected
+stop/final observation images were inspected.
+
+Task-domain fitting helpers are prepared locally, not activated in this
+batch. The proposed explicit reuse is dev00/01/04/05 for training and
+dev02/03 for development validation, declared before the next fit. Failed
+task outcomes retain their recorded split and scores. Passed round-2 static
+holdouts stay excluded from training; fresh static and autonomous IDs will
+be declared before fitting. The original six reserved tests remain unstarted.
+Actual task labels use the stable preceding half second, constant inventory,
+no loss or airborne fluid, and at most one point of instantaneous deviation.
+They align obs[i] with samples[i-1]; future final levels never label earlier
+images. The CNN fit requires separate near-full actual-pour validation,
+besides the existing static/replay gates. Color prototypes separate each
+recorded pause and level bin instead of averaging an entire pour. No live
+particle state is added to controller inputs. All 55 local checks pass; no
+new fit or task success is yet claimed.
