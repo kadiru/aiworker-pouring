@@ -12,7 +12,9 @@ OUT=Path('/tmp/aiworker-perception-cup-fit')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
-    OUT.mkdir();manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');helper=sha(ROOT/'fit_perception_cup.py')
+    resume='--resume' in sys.argv
+    OUT.mkdir(exist_ok=resume);assert not (OUT/'fit.log').exists() and not (OUT/'completion.json').exists()
+    manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');helper=sha(ROOT/'fit_perception_cup.py')
     assert not manifest['trained'] and not (ROOT/'cup-component.json').exists()
     names={s['name'] for s in plan['collect']};deadline=time.monotonic()+3*3600
     while time.monotonic()<deadline:
@@ -27,7 +29,7 @@ def main():
     assert sha(ROOT/'fit_perception_cup.py')==helper
     own={int(x.strip()) for x in subprocess.check_output(['docker','top',w.CID,'-eo','pid'],text=True).splitlines()[1:]}
     assert all(int(r.split(',')[1]) in own for r in witness['gpu_processes'].splitlines() if r.startswith(w.GPU))
-    assert all(sha(Path(p))==d for p,d in manifest['protected_parent_files'].items())
+    assert all(sha(w.HOST_ROOT/Path(p).relative_to('/workspace'))==d for p,d in manifest['protected_parent_files'].items())
     (OUT/'runtime-before.json').write_text(json.dumps(dict(witness,helper_sha256=helper),indent=2)+'\n')
     print('COLLECTION AUDITED; starting one cup-component fit on idle guarded 4070.',flush=True)
     with (OUT/'fit.log').open('x') as log:

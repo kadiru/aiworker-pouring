@@ -1,0 +1,29 @@
+"""Supervised RGB rim-center heatmap and subpixel offsets."""
+import numpy as np
+import torch
+from torch import nn
+
+class CupLocator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net=nn.Sequential(nn.Conv2d(3,16,5,2,2),nn.ReLU(),nn.Conv2d(16,32,3,2,1),nn.ReLU(),
+            nn.Conv2d(32,32,3,1,1),nn.ReLU(),nn.Conv2d(32,32,3,padding=2,dilation=2),nn.ReLU(),
+            nn.Conv2d(32,32,3,padding=4,dilation=4),nn.ReLU(),nn.Conv2d(32,3,1))
+        with torch.no_grad():self.net[-1].bias[0]=-4.4
+    def forward(self,image):return self.net(image.float().permute(0,3,1,2)/255.)
+
+def centers(output):
+    batch,_,height,width=output.shape
+    score,flat=output[:,0].sigmoid().flatten(1).max(1)
+    y=flat//width;x=flat%width;ids=torch.arange(batch,device=output.device)
+    offsets=output[ids,1:,y,x].sigmoid()
+    return (torch.stack((x,y),1)+offsets)*4,score
+
+_CACHE={}
+@torch.inference_mode()
+def locate_cup(image,bank,device='cuda'):
+    key=(bank['identity'],str(device))
+    if key not in _CACHE:
+        model=CupLocator().to(device).eval();model.load_state_dict(bank['state']);_CACHE[key]=model
+    uv,score=centers(_CACHE[key](torch.as_tensor(np.asarray(image).copy(),device=device)[None]))
+    return uv[0].cpu().numpy(),float(score[0])

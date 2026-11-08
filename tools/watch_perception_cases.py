@@ -14,7 +14,7 @@ def capture(manifest):
     witness=w.isolation()
     assert sha(ROOT/'best.pt')==manifest['checkpoint_sha256'] and sha(ROOT/'plan.json')==manifest['plan_sha256']
     assert all(sha(w.HOST_ROOT/'src'/n)==d for n,d in manifest['runtime_sources'].items())
-    assert all(sha(Path(p))==d for p,d in manifest['protected_parent_files'].items())
+    assert all(sha(w.HOST_ROOT/Path(p).relative_to('/workspace'))==d for p,d in manifest['protected_parent_files'].items())
     return dict(witness,checkpoint_sha256=manifest['checkpoint_sha256'],plan_sha256=manifest['plan_sha256'],runtime_sources=manifest['runtime_sources'])
 
 def main():

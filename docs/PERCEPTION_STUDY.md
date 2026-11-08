@@ -62,6 +62,33 @@ The original empty detector and active controller remain unchanged at this
 stage. The fitted component SHA is
 `f61fe036112778ea16499778b3091731a00bbda6860b5a31d811f9be6138b2f0`.
 
+## Completed collection and rejected localizers
+
+All 47 cup scenes are complete: 27 training / 20 validation. Together with
+14 preparation records, all 61 pass native recording and stable-label audits,
+with zero measured loss. All 244 scalar sidecars are SHA-verified locally.
+Four contact sheets cover all 47 selected final cup views; they were inspected.
+The detail view projects 60.9–94.2 pixels across usable height. Actual stable
+levels range 27.93–97.67%; near-full baseline validation is 95.09% and 97.67%.
+The finite reused seed does not provide near-full coverage for all wider cups.
+
+The first 24 gradient-template localizers are rejected: best maximum error
+6.089 mm and negative confidence separation, versus the declared 3 mm and
+positive absent-mask separation requirements. This 28.589-second 4070 run
+stopped before cup-level optimization. A separate geometric rim probe also
+fails: some early frames lack the fully rendered liquid surface, and stronger
+reflections/lower glass edges distract matching. Later-frame constant optical
+depth calibration improves detection but still has 16.002 mm maximum error.
+All candidates remain preserved; no validation gate was relaxed.
+
+A supervised fully convolutional rim-center heatmap with subpixel offsets is
+being fitted next. Its targets are offline projected physical rim centers;
+runtime input is RGB. The loss is focal heatmap loss plus twice smooth-L1
+offset loss. Training adds integer image translations, mild photometric
+changes and explicitly synthetic absent-cup masks. Old train/validation task
+views are replayed alongside the new detail views. No reserved images or
+autonomous outcomes have been consumed for this repair.
+
 ## Prepared learning and evaluation
 
 The method is supervised perception plus the existing contextual motion
