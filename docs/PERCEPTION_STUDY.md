@@ -138,22 +138,46 @@ reserved autonomous attempts remain gated behind these checks. The
 candidate is deployed only to the owned simulator; no autonomous result
 is claimed from component validation.
 
+## Independent round-0 failure and round-1 repair
+
+The nine once-only baseline checks completed with accepted stable labels and
+temporal confirmations for every cup. The batch fails: maximum localization
+3.147 mm (limit 3), level MAE 2.167 percentage points (limit 2), and near-full
+maximum overestimate 3.300 points (limit 2.5). Near-full maximum absolute
+error 3.300 points and color maximum error 5.858 points pass their respective
+3.5- and 6-point gates. This is stationary perception evidence, not nine
+autonomous task outcomes. See `baseline-holdout-r0.json`.
+
+Round 0 is immutable in `rounds/baseline-r0`, including its weights, source,
+plan and failed report. Each archived file is included in protected-parent
+hashes. The nine records are explicitly admitted as training for round 1;
+their recorded splits and old failure result do not change. Plan version 8
+declares nine fresh original-cup checks before refitting, with different seed
+cuts and small position offsets. Their geometry and frustum checks pass;
+their images are not used in fitting. Six autonomous development and six
+reserved tests remain unstarted, as do the deferred size holdouts.
+
+A six-parameter affine correction on the frozen localizer failed at 3.159 mm
+maximum training error / 2.811 mm validation; its report is retained. The
+next bounded fit refines detector weights using all admitted training records,
+initialized from round-0 ensemble member 0. Current data contains 82 complete
+native records; all 328 scalar sidecars are SHA-verified locally. This is not
+a full local backup of raw HDF5 images or particle trajectories.
+
 ## Prepared learning and evaluation
 
 The method is supervised perception plus the existing contextual motion
 behavioral cloning/IK and programmed grasp/stop/return sequence. It is not
 reinforcement learning or end-to-end motor learning.
 
-- Cup localization: supervised RGB center heatmap and subpixel offsets,
-  calibrated rejection confidence and temporal consensus. Known fixture dimensions convert image
+- Cup localization: two supervised RGB center heatmaps and subpixel offsets,
+  fixed averaging, calibrated rejection confidence and temporal consensus. Known fixture dimensions convert image
   coordinates to tabletop coordinates; size is not visually inferred.
 - Level: fine-tune the cup CNN on image-localized, normalized detail-camera
   crops, minimizing weighted squared error to measured settled surface.
-  An independent spatial-color-envelope ridge regression checks agreement.
-  Its current 19-feature version still fails: 9.720-point maximum error
-  against the unchanged 6-point gate. The CNN alone passes (1.506-point
-  MAE, 3.473-point near-full maximum error), so the combined component is
-  rejected until both pass. Replay
+  An independent RBF regression over explicit color features checks agreement;
+  the preceding linear and viewing-angle candidates remain rejected. Both
+  current components pass train/validation gates, as quantified above. Replay
   retains original lower-resolution task-camera images from 24/8 earlier
   training/validation reference episodes. New stationary records have weight
   four; replay has weight one. Stable replay windows use measured trailing
@@ -165,10 +189,13 @@ reinforcement learning or end-to-end motor learning.
   verified grasp and measured finger obstruction. Empty recognition is
   retained separately.
 
-Active cup collection: 27 training and 20 validation scenes over nine
-declared cup geometries (height/diameter independently 0.9/1.0/1.1), three
-fill cuts and wider/swapped training fixtures. Nine separate perception
-holdout scenes are not queued before component selection. Six development
+Completed cup data: 27 original training and 20 validation scenes over nine
+declared geometries, twelve extra baseline training scenes, and four
+explicitly reused calibration pilots. Only crops passing offline localization
+quality checks enter level fitting; rejected views and all original records
+remain retained. The first nine baseline perception holdouts failed and are
+now explicitly consumed training; nine newly declared checks remain unused.
+Original size holdouts remain deferred. Six development
 and six reserved autonomous realizations have separate IDs and small
 position jitter. Training/validation split by whole episodes and fixture
 sources, never by random frames from the same recording.
@@ -207,5 +234,15 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=runtime/src .venv/bin/python -m unittest te
 ```
 
 Controller/geometry checks requiring Torch run CPU-only in the existing
-native environment. Forty-seven local and 62 native CPU checks pass. Native checks use the staged
-controller before deployment, with CUDA disabled. See `source-checks.json`.
+native environment. Forty-eight local and 62 round-0 native CPU checks pass. Native checks use the staged
+controller before deployment, with CUDA disabled. See `source-checks-components.json`.
+
+The finite holdout observer writes host-side progress to
+`/tmp/aiworker-perception-baseline-holdout-r0/progress.json` and runs the native
+recording audit after all nine close. It does not queue autonomous tasks.
+Run `evaluate_perception_holdout.py` inside the owned container only after
+that audit completes; its once-only report is `perception-holdout.json`.
+The development observer refuses to start unless that report passes for the
+same checkpoint. After development, `summarize_perception_tasks.py`,
+`review_perception_tasks.py` and actual manual inspection precede
+`freeze_perception_candidate.py`. No final freeze or reserved run is yet claimed.

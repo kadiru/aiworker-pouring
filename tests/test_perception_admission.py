@@ -20,5 +20,15 @@ class Admission(unittest.TestCase):
     def test_rejects_validation_record_disguised_as_pilot(self):
         plan=self.plan();plan['camera_pilot'][0]['study_split']='validation'
         with self.assertRaises(AssertionError):admitted_scenes(plan)
+    def test_failed_holdout_reuse_requires_explicit_history(self):
+        plan=self.plan();old=dict(name='old_holdout',study_split='perception_test',calibration_only=True)
+        plan['consumed_perception_training']=[old]
+        with self.assertRaises(AssertionError):admitted_scenes(plan)
+        plan['perception_history']=[dict(passed=False,consumed_training_names=['old_holdout'])]
+        entries=admitted_scenes(plan)
+        self.assertEqual(next(split for s,split,_ in entries if s['name']=='old_holdout'),'train')
+        self.assertEqual(old['study_split'],'perception_test')
+        plan['perception_holdout']=[old]
+        with self.assertRaises(AssertionError):admitted_scenes(plan)
 
 if __name__=='__main__':unittest.main()

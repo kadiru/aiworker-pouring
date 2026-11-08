@@ -63,20 +63,23 @@ def validate(model,data):
         margin=minimum-maximum,threshold=(minimum+maximum)/2,rows=rows)
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--refine-from',type=Path);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--refine-from',type=Path);parser.add_argument('--member',type=int,choices=(0,1));args=parser.parse_args()
     refinement=None
     if args.refine_from is not None:
         refinement=(ROOT/args.refine_from).resolve();assert refinement.is_relative_to(ROOT) and refinement.is_file() and refinement.suffix=='.pt'
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10));assert not h['queue'] and not h['recording']['active'] and not h.get('error')
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name()
-    assert not (ROOT/'cup-neural-localization.json').exists();torch.set_num_threads(4);torch.manual_seed(261109)
+    assert not (ROOT/'cup-neural-localization.json').exists();torch.set_num_threads(4);torch.manual_seed(261109+(args.member or 0))
     start=time.perf_counter();plan,data,cal=collect(dense=refinement is not None);assert plan['primary_perception_scope']=='baseline_cup_only'
     train=data['train'];validation=data['validation'];model=CupLocator().cuda()
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     state=model.state_dict()
     for i in (0,2,4):
         for suffix in ('weight','bias'):state[f'net.{i}.{suffix}']=parent['cup_model'][f'encoder.net.{i}.{suffix}']
-    if refinement is not None:state=torch.load(refinement,map_location='cpu',weights_only=False)['bank']['state']
+    if refinement is not None:
+        bank=torch.load(refinement,map_location='cpu',weights_only=False)['bank']
+        state=bank['members'][args.member]['state'] if args.member is not None else bank['state']
+    else:assert args.member is None
     model.load_state_dict(state);opt=torch.optim.AdamW(model.parameters(),lr=3e-5 if refinement is not None else 3e-4,weight_decay=1e-4)
     yy,xx=torch.meshgrid(torch.arange(96,device='cuda'),torch.arange(96,device='cuda'),indexing='ij');best=None;best_attempt=None;history=[];steps=0
     fit_start=time.perf_counter()
@@ -112,7 +115,7 @@ def main():
                 best=dict(epoch=epoch,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()},validation=result,training=training,threshold=(minimum+maximum)/2)
             if epoch%20==0:print(json.dumps(row),flush=True)
     report=dict(passed=best is not None,scope='baseline_cup_only',epochs=epochs,optimizer_steps=steps,learned_parameters=sum(p.numel() for p in model.parameters()),
-        initialization=None if refinement is None else dict(path=str(refinement),sha256=sha(refinement)),native_frames_per_episode=13 if refinement is not None else 3,
+        initialization=None if refinement is None else dict(path=str(refinement),sha256=sha(refinement),member=args.member),native_frames_per_episode=13 if refinement is not None else 3,
         fit_seconds=time.perf_counter()-fit_start,total_seconds=time.perf_counter()-start,device=torch.cuda.get_device_name(),source_sha256=sha(Path(__file__)),module_sha256=sha(ROOT/'staged/pour_cup_locator.py'),admission_helper_sha256=sha(ROOT/'perception_fit_data.py'),
         counts={s:dict(images=len(a['x']),episodes=len({m['name'] for m in a['meta']}),native_images=sum(m['domain']=='native_detail' for m in a['meta'])) for s,a in data.items()},
         history=history,selected=None if best is None else dict(epoch=best['epoch'],**best['validation']),

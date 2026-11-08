@@ -18,7 +18,8 @@ def main():
     assert sha(ROOT/'cup-component.pt')==cup['checkpoint_sha256'] and sha(ROOT/'presence-component.pt')==presence['checkpoint_sha256']
     assert not any(Path('/workspace/outputs/fountain').glob('*/*PV_A_test_*/parameters.json'))
     assert not any(Path('/workspace/outputs/fountain').glob('*/*PV_A_perception_test_*/parameters.json'))
-    archive=ROOT/'before-component-combination';archive.mkdir()
+    round_number=read(ROOT/'plan.json').get('perception_round',0)
+    archive=ROOT/('before-component-combination' if round_number==0 else f'before-component-combination-r{round_number}');archive.mkdir()
     for n in ('candidate.json','best.pt'):shutil.copy2(ROOT/n,archive/n)
     saved=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     c=torch.load(ROOT/'cup-component.pt',map_location='cpu',weights_only=False)
@@ -28,7 +29,7 @@ def main():
     saved['thresholds']['cup_localization_score']=c['localization']['threshold']
     saved['localization_consensus']['cup']=c['localization']['consensus']
     saved['thresholds']['full_settled_target']=read(ROOT/'plan.json')['component_gates']['stop_target_surface_fraction']
-    saved.update(model_version='visual_perception_v26_r0',
+    saved.update(model_version=f'visual_perception_v26_r{round_number}',
         method='Supervised cup-level CNN (weighted squared error), wrist bottle-presence CNN (binary cross entropy), and RGB center-heatmap localization (focal heatmap plus smooth-L1 offset loss); retained empty CNN and contextual motion BC/IK; programmed grasp/stop/return. No reinforcement learning.',
         inputs='Task RGB, wrist RGB, cup-detail RGB, measured joints/velocities, fixed camera/robot calibration, own history; no runtime simulator object/particle state.',
         perception_components=dict(cup_sha256=cup['checkpoint_sha256'],presence_sha256=presence['checkpoint_sha256']))

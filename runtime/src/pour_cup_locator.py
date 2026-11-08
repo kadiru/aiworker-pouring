@@ -26,13 +26,21 @@ def combine_predictions(predictions,max_disagreement_px):
     if np.linalg.norm(uv[0]-uv[1])>max_disagreement_px:score=0.
     return uv.mean(0),float(score)
 
+def correct_prediction(prediction,bank):
+    if 'affine_uv_correction' not in bank:return prediction
+    uv,score=prediction;uv=np.asarray(uv)
+    delta=np.r_[1.,(uv-192.)/192.]@np.asarray(bank['affine_uv_correction'])
+    if np.linalg.norm(delta)>bank['max_correction_px']:score=0.
+    return uv+delta,float(score)
+
 @torch.inference_mode()
 def locate_cup(image,bank,device='cuda'):
     if bank['kind']=='cup_heatmap_ensemble':
         assert len(bank['members'])==2
-        return combine_predictions([locate_cup(image,b,device) for b in bank['members']],bank['max_disagreement_px'])
+        result=combine_predictions([locate_cup(image,b,device) for b in bank['members']],bank['max_disagreement_px'])
+        return correct_prediction(result,bank)
     key=(bank['identity'],str(device))
     if key not in _CACHE:
         model=CupLocator().to(device).eval();model.load_state_dict(bank['state']);_CACHE[key]=model
     uv,score=centers(_CACHE[key](torch.as_tensor(np.asarray(image).copy(),device=device)[None]))
-    return uv[0].cpu().numpy(),float(score[0])
+    return correct_prediction((uv[0].cpu().numpy(),float(score[0])),bank)

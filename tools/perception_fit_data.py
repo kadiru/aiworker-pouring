@@ -3,6 +3,10 @@
 def admitted_scenes(plan):
     entries=[(s,s['study_split'],'declared_collection') for s in plan['collect']]
     entries.extend((s,'train','declared_level_supplement') for s in plan.get('level_supplement',[]))
+    declared={n for h in plan.get('perception_history',[]) if not h['passed'] for n in h['consumed_training_names']}
+    for s in plan.get('consumed_perception_training',[]):
+        assert s['name'] in declared and s['study_split']=='perception_test' and s['calibration_only']
+        entries.append((s,'train','explicit_consumed_failed_perception_holdout'))
     pilots={s['name']:s for s in plan.get('camera_pilot',[])}
     for name in plan.get('perception_training_pilots',[]):
         s=pilots[name]

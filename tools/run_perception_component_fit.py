@@ -7,12 +7,12 @@ ROOT=w.HOST_ROOT/'learning/A-perception-20261108-v1'
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--component',choices=('locator','cup'),required=True);p.add_argument('--round',required=True);p.add_argument('--refine-from');p.add_argument('--cnn-from');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--component',choices=('locator','correction','cup'),required=True);p.add_argument('--round',required=True);p.add_argument('--refine-from');p.add_argument('--cnn-from');p.add_argument('--member',type=int,choices=(0,1));a=p.parse_args()
     assert a.round.replace('-','').isalnum()
     out=Path('/tmp')/('aiworker-perception-'+a.component+'-'+a.round);out.mkdir(exist_ok=False)
     manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');audit=read(ROOT/'recording-audit.json')
     assert not manifest['trained'] and not (ROOT/'component-selection.json').exists()
-    names={s['name'] for k in ('collect','level_supplement') for s in plan.get(k,[])}|set(plan.get('perception_training_pilots',[]))
+    names={s['name'] for k in ('collect','level_supplement','consumed_perception_training') for s in plan.get(k,[])}|set(plan.get('perception_training_pilots',[]))
     assert names<={r['name'] for r in audit['records']} and not audit['started_incomplete']
     assert all(r.get('label',{}).get('accepted') for r in audit['records'] if r['name'] in names)
     assert sha(ROOT/'plan.json')==manifest['plan_sha256'] and sha(ROOT/'best.pt')==manifest['checkpoint_sha256']
@@ -21,14 +21,16 @@ def main():
     witness=w.isolation();h=w.health();assert not h['queue'] and not h.get('recording',{}).get('active',False) and not h.get('error')
     own={int(x.strip()) for x in subprocess.check_output(['docker','top',w.CID,'-eo','pid'],text=True).splitlines()[1:]}
     assert all(int(r.split(',')[1]) in own for r in witness['gpu_processes'].splitlines() if r.startswith(w.GPU))
-    report='cup-neural-localization.json' if a.component=='locator' else 'cup-component.json'
+    report={'locator':'cup-neural-localization.json','correction':'cup-locator-correction.json','cup':'cup-component.json'}[a.component]
     assert not (ROOT/report).exists(),'Archive previous reports before starting a new fit'
-    helper='fit_perception_locator.py' if a.component=='locator' else 'fit_perception_cup.py'
+    helper={'locator':'fit_perception_locator.py','correction':'fit_perception_locator_correction.py','cup':'fit_perception_cup.py'}[a.component]
     extra=[]
     if a.refine_from:
         assert a.component=='locator'
         initial=(ROOT/a.refine_from).resolve();assert initial.is_relative_to(ROOT) and initial.is_file() and initial.suffix=='.pt'
         extra=['--refine-from',a.refine_from]
+    if a.member is not None:
+        assert a.component=='locator' and a.refine_from;extra+=['--member',str(a.member)]
     if a.cnn_from:
         assert a.component=='cup' and not a.refine_from
         initial=(ROOT/a.cnn_from).resolve();assert initial.is_relative_to(ROOT) and initial.is_file() and initial.suffix=='.pt'
