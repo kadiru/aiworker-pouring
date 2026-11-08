@@ -3,9 +3,15 @@ from pathlib import Path
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runtime/src'))
 from pour_perception_geometry import settled_label,calibration_seed_points,upper_surface
-from pour_perception_study import check_freeze
+from pour_perception_study import check_freeze,check_vessel_scope
 
 class Labels(unittest.TestCase):
+    def test_baseline_validation_does_not_authorize_resized_autonomy(self):
+        manifest={'validated_cup_scope':'baseline_only'}
+        check_vessel_scope({},manifest)
+        for key in ('cup_height_scale','cup_diameter_scale','bottle_height_scale','bottle_diameter_scale','bottle_neck_scale'):
+            for size in (.9,1.1):
+                with self.assertRaises(AssertionError):check_vessel_scope({key:size},manifest)
     def test_frozen_evaluation_rejects_changed_identity(self):
         import copy
         selection=dict(checkpoint_sha256='weights',plan_sha256='plan',runtime_sources={'actor.py':'source'})

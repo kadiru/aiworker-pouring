@@ -1,5 +1,5 @@
 """CPU IK and collision-envelope screen; no physics or policy success claim."""
-import hashlib,json,os,sys
+import argparse,hashlib,json,os,sys
 os.environ.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
 sys.path[:0]=['/workspace/src','/workspace/learning/A-finish-20261106-v1/staged','/workspace']
 from pathlib import Path
@@ -12,6 +12,9 @@ from pour_vessel_geometry import cup_profile
 from wide_gripper_geometry import finger_meshes
 ROOT=Path('/workspace/learning/A-perception-20261108-v1')
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--part',choices=('collect','perception_holdout','development','test','level_supplement'));parser.add_argument('--output',default='geometry-preflight.json');args=parser.parse_args()
+    assert Path(args.output).name==args.output and args.output.endswith('.json')
+    parts=[args.part] if args.part else ('collect','perception_holdout','development','test')
     plan=json.loads((ROOT/'plan.json').read_text());stage,planner,meshes=geometry();cache=UsdGeom.XformCache()
     inv=np.linalg.inv(np.array(cache.GetLocalToWorldTransform(stage.GetPrimAtPath(ROBOT+'/right_arm/arm_r_link7'))).T)
     for prim in stage.Traverse():
@@ -20,7 +23,7 @@ def main():
         points=np.asarray(UsdGeom.Mesh(prim).GetPointsAttr().Get());m=inv@np.array(cache.GetLocalToWorldTransform(prim)).T
         local=points@m[:3,:3].T+m[:3,3];hull=ConvexHull(local);meshes.append((6,name,local[hull.vertices],hull.equations))
     rows=[]
-    for spec in [s for k in ('collect','perception_holdout','development','test') for s in plan[k]]:
+    for spec in [s for k in parts for s in plan[k]]:
         row=dict(name=spec['name'],passed=False)
         try:
             approach,_,_,own=build_path(stage,spec,include_planner=True);approach=np.radians(approach)
@@ -46,7 +49,7 @@ def main():
                 row['passed']=not initial and not bench and not hits
         except ValueError as e:row['error']=str(e)
         rows.append(row);print(json.dumps(row),flush=True)
-        (ROOT/'geometry-preflight.json').write_text(json.dumps(dict(cases=rows,passed=all(r['passed'] for r in rows),complete=len(rows)==sum(len(plan[k]) for k in ('collect','perception_holdout','development','test')),
+        (ROOT/args.output).write_text(json.dumps(dict(cases=rows,passed=all(r['passed'] for r in rows),complete=len(rows)==sum(len(plan[k]) for k in parts),
             plan_sha256=hashlib.sha256((ROOT/'plan.json').read_bytes()).hexdigest(),scope='IK and sampled conservative collision envelopes; does not establish dynamic grasp, fluid containment or task success.'),indent=2)+'\n')
     assert all(r['passed'] for r in rows)
 if __name__=='__main__':main()

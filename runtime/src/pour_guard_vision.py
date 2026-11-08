@@ -82,6 +82,9 @@ def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gr
 
 @torch.inference_mode()
 def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
+    if bank.get('kind')=='cup_heatmap':
+        from pour_cup_locator import locate_cup
+        return locate_cup(image,bank,device)
     if bank.get('alternatives'):
         # Each family retains robust median matching; keep older appearance coverage.
         matches=[locate(image,b,tracking,device,expected_uv) for b in bank['alternatives']]
@@ -148,3 +151,28 @@ def surface_features(image):
     std=((hist*(yy-mean[:,None]).square()).sum(1)/mass).sqrt()
     features=torch.stack([torch.ones_like(mean),mean,mean.square(),std],1)
     return features,hist,mass
+
+
+def color_geometry_features(image):
+    """Spatial color-envelope features independent of the level CNN."""
+    base,hist,mass=surface_features(image)
+    qs=image.new_tensor([.02,.05,.1,.25,.5,.75,.9,.95,.98],dtype=torch.float32)
+    cumulative=hist.cumsum(1)/hist.sum(1,keepdim=True).clamp(min=1e-6)
+    quantiles=(cumulative[:,:,None]>=qs).float().argmax(1).float()/95.
+    rgb=image.float()/255.;r,g,b=rgb.unbind(-1)
+    red=((r>1.4*g+.025)&(r>1.2*b+.02)).float();red[:,:14]=0;red[:,83:]=0
+    side=[];yy=torch.arange(96,device=image.device)[None]/95.
+    for low,high in ((35,48),(48,61),(61,74)):
+        rows=red[:,:,low:high].mean(2);total=rows.sum(1).clamp(min=1e-6)
+        center=(rows*yy).sum(1)/total
+        top=(rows.cumsum(1)/total[:,None]>=.05).float().argmax(1).float()/95.
+        side.extend((center,top))
+    return torch.cat((base,quantiles,torch.stack(side,1)),1)
+
+
+def color_geometry_readout(image,fitted):
+    if fitted.get('feature_kind')=='color_envelope_v1':
+        x=color_geometry_features(image)[:,:fitted['dimensions']]
+        x=(x-x.new_tensor(fitted['mean']))/x.new_tensor(fitted['scale'])
+    else:x=surface_features(image)[0][:,:fitted['dimensions']]
+    return (x@x.new_tensor(fitted['coef'])+fitted.get('bias',0.)).clamp(0,1)

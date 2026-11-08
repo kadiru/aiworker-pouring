@@ -255,8 +255,9 @@ class Actor:
                 self.outbound.append((self.pour_phase,q[:7].copy()))
             normalized=cup_crop(level_image,self.cup_xy,self.level_cal);a=torch.as_tensor(normalized,device='cuda')[None]
             cnn=float(self.cup_model(a)[0])+self.saved['cup_bias'];features,_,n=surface_features(a);mass=float(n[0])
-            geom=self.saved['surface_geometry'];coef=torch.as_tensor(geom['coef'],device='cuda')
-            geo=float(features[0,:geom['dimensions']]@coef)+geom['bias'] if mass>1. else 0.
+            from pour_guard_vision import color_geometry_readout
+            geom=self.saved['surface_geometry']
+            geo=float(color_geometry_readout(a,geom)[0]) if mass>1. else 0.
             geo=float(np.clip(geo,0,1));cnn=float(np.clip(cnn,0,1))
             self.filtered=cnn if self.filtered is None else .6*self.filtered+.4*cnn
             self.level_history.append((t,geo,cnn,self.filtered))

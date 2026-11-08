@@ -1,5 +1,5 @@
 """Finite host observer for the authorized 47-scene training/validation split."""
-import datetime,hashlib,json,subprocess,sys,time
+import argparse,datetime,hashlib,json,subprocess,sys,time
 from pathlib import Path
 sys.path.insert(0,'/tmp')
 import watch_wide_collection as w
@@ -12,10 +12,13 @@ def check():
     h=w.health();assert not h.get('error') and not h.get('learning_error'),h.get('error')
     return h
 def main():
-    resume='--resume' in sys.argv
+    global OUT
+    parser=argparse.ArgumentParser();parser.add_argument('--resume',action='store_true');parser.add_argument('--part',choices=('collect','level_supplement'),default='collect');args=parser.parse_args()
+    resume=args.resume
+    if args.part=='level_supplement':OUT=Path('/tmp/aiworker-perception-level-supplement')
     OUT.mkdir(exist_ok=resume);plan=read(ROOT/'plan.json');candidate=read(ROOT/'candidate.json')
     plan_sha=hashlib.sha256((ROOT/'plan.json').read_bytes()).hexdigest();assert plan_sha==candidate['plan_sha256']
-    names={s['name'] for s in plan['collect']};assert len(names)==47
+    names={s['name'] for s in plan[args.part]};assert len(names)==(47 if args.part=='collect' else 12)
     review=read(ROOT/'camera-review.json');assert review['passed'] and review['gripper_pilot_passed']
     snapshot='runtime-resume-'+str(time.time_ns())+'.json' if resume else 'runtime-before.json'
     if resume:assert (OUT/'runtime-before.json').exists()
@@ -23,9 +26,9 @@ def main():
     deadline=time.monotonic()+10800
     while True:
         assert time.monotonic()<deadline
-        h=check();g=read(ROOT/'geometry-preflight.json');passed={r['name'] for r in g['cases'] if r['passed']}
+        h=check();g=read(ROOT/('geometry-preflight.json' if args.part=='collect' else 'level-supplement-geometry.json'));passed={r['name'] for r in g['cases'] if r['passed']}
         failed=[r for r in g['cases'] if r['name'] in names and not r['passed']];assert not failed,failed
-        if names.issubset(passed) and (resume or (not h['queue'] and not h['recording']['active'])):break
+        if names.issubset(passed) and (resume or (not h['queue'] and not h.get('recording',{}).get('active',False))):break
         print(json.dumps(dict(stage='waiting_geometry',passed_collection=len(passed&names),total=len(names),utc=datetime.datetime.now(datetime.timezone.utc).isoformat())),flush=True)
         time.sleep(20)
     assert hashlib.sha256((ROOT/'plan.json').read_bytes()).hexdigest()==plan_sha
@@ -40,8 +43,8 @@ def main():
             current=(h.get('recording') or {}).get('path'),frames=(h.get('recording') or {}).get('frames'),queue=len(h['queue']))
         (OUT/'progress.json').write_text(json.dumps(row,indent=2)+'\n')
         if len(closed)!=last:print(json.dumps(row),flush=True);last=len(closed)
-        if closed==names and not h['queue'] and not h['recording']['active']:break
-        if not h['queue'] and not h['recording']['active']:
+        if closed==names and not h['queue'] and not h.get('recording',{}).get('active',False):break
+        if not h['queue'] and not h.get('recording',{}).get('active',False):
             started={read(p)['name'] for p in Path('/home/kadir/aiworker-pouring-4070/outputs/fountain').glob('*/*PV_A_*/parameters.json')}&names
             assert started==closed,'Retain and diagnose incomplete attempts; never retry them under the same ID'
             assert names-started

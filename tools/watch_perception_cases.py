@@ -27,6 +27,9 @@ def main():
         heldout=read(ROOT/'perception-holdout.json');assert heldout['passed'] and heldout['checkpoint_sha256']==manifest['checkpoint_sha256']
     plan=read(ROOT/'plan.json');expected={s['name']:s for s in plan['perception_holdout' if a.part=='holdout' else a.part]}
     assert len(expected)==(9 if a.part=='holdout' else 6)
+    if a.part=='holdout':
+        geometry=read(ROOT/'baseline-holdout-geometry.json')
+        assert geometry['complete'] and geometry['passed'] and {r['name'] for r in geometry['cases']}==expected.keys()
     outputs=w.HOST_ROOT/'outputs/fountain'
     existing={read(p)['name'] for p in outputs.glob('*/*PV_A_*/parameters.json')}
     assert not expected.keys()&existing,'Never retry or silently resume a started split'

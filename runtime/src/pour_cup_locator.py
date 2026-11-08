@@ -8,7 +8,8 @@ class CupLocator(nn.Module):
         super().__init__()
         self.net=nn.Sequential(nn.Conv2d(3,16,5,2,2),nn.ReLU(),nn.Conv2d(16,32,3,2,1),nn.ReLU(),
             nn.Conv2d(32,32,3,1,1),nn.ReLU(),nn.Conv2d(32,32,3,padding=2,dilation=2),nn.ReLU(),
-            nn.Conv2d(32,32,3,padding=4,dilation=4),nn.ReLU(),nn.Conv2d(32,3,1))
+            nn.Conv2d(32,32,3,padding=4,dilation=4),nn.ReLU(),
+            nn.Conv2d(32,32,3,padding=8,dilation=8),nn.ReLU(),nn.Conv2d(32,3,1))
         with torch.no_grad():self.net[-1].bias[0]=-4.4
     def forward(self,image):return self.net(image.float().permute(0,3,1,2)/255.)
 

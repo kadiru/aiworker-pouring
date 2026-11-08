@@ -81,8 +81,16 @@ reflections/lower glass edges distract matching. Later-frame constant optical
 depth calibration improves detection but still has 16.002 mm maximum error.
 All candidates remain preserved; no validation gate was relaxed.
 
-A supervised fully convolutional rim-center heatmap with subpixel offsets is
-being fitted next. Its targets are offline projected physical rim centers;
+A supervised fully convolutional rim-center heatmap with subpixel offsets
+was fitted in two retained revisions. The first (33,699 parameters) failed;
+the wider-context version (42,947 parameters, 108.711 seconds fitting) still
+fails all-size validation at 6.782 mm maximum for its best all-size candidate.
+Its original-cup views pass: 2.476 mm maximum validation / 2.566 mm training
+error. This narrower scope was declared before any reserved evaluation.
+An additional fit will include twelve new low/near-full baseline scenes at
+six existing training layouts and four explicitly reused camera/grip pilots.
+The twelve new geometry screens pass; native collection is ongoing.
+Recorded splits stay unchanged, and the fit manifest records pilot reuse. Its targets are offline projected physical rim centers;
 runtime input is RGB. The loss is focal heatmap loss plus twice smooth-L1
 offset loss. Training adds integer image translations, mild photometric
 changes and explicitly synthetic absent-cup masks. Old train/validation task
@@ -95,12 +103,16 @@ The method is supervised perception plus the existing contextual motion
 behavioral cloning/IK and programmed grasp/stop/return sequence. It is not
 reinforcement learning or end-to-end motor learning.
 
-- Cup localization: training-image gradient templates, calibrated rejection
-  confidence and temporal consensus. Known fixture dimensions convert image
+- Cup localization: supervised RGB center heatmap and subpixel offsets,
+  calibrated rejection confidence and temporal consensus. Known fixture dimensions convert image
   coordinates to tabletop coordinates; size is not visually inferred.
 - Level: fine-tune the cup CNN on image-localized, normalized detail-camera
   crops, minimizing weighted squared error to measured settled surface.
-  A separate four-coefficient surface-geometry fit checks agreement. Replay
+  An independent spatial-color-envelope ridge regression checks agreement.
+  Its current 19-feature version still fails: 9.720-point maximum error
+  against the unchanged 6-point gate. The CNN alone passes (1.506-point
+  MAE, 3.473-point near-full maximum error), so the combined component is
+  rejected until both pass. Replay
   retains original lower-resolution task-camera images from 24/8 earlier
   training/validation reference episodes. New stationary records have weight
   four; replay has weight one. Stable replay windows use measured trailing
@@ -154,5 +166,5 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=runtime/src .venv/bin/python -m unittest te
 ```
 
 Controller/geometry checks requiring Torch run CPU-only in the existing
-native environment. Forty-three local and 56 native CPU checks pass. Native checks use the staged
+native environment. Forty-seven local and 58 native CPU checks pass. Native checks use the staged
 controller before deployment, with CUDA disabled. See `source-checks.json`.

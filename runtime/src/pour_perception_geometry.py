@@ -7,8 +7,8 @@ def calibration_seed_points(spec, seed):
     from bottle_pour import SIDES
     assert spec.get('calibration_only') and not spec.get('policy_evaluation')
     fraction=float(spec['calibration_initial_height'])
-    if not .15 <= fraction <= 1.:
-        raise ValueError('Calibration seed cut must be in [.15, 1]')
+    if not .08 <= fraction <= 1.:
+        raise ValueError('Calibration seed cut must be in [.08, 1]')
     profile=cup_profile(spec);spacing=spec['spacing'];p=np.asarray(seed,dtype=np.float32)
     assert p.ndim==2 and p.shape[1]==3 and np.isfinite(p).all()
     z=p[:,2];angle=(np.arctan2(p[:,1],p[:,0])%(2*np.pi/SIDES))-np.pi/SIDES

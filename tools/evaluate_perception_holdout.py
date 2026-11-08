@@ -11,7 +11,7 @@ import torch
 sys.path[:0]=['/workspace/src','/workspace']
 from validate_pour_recording import h5py,decode
 from pour_guard_models import CupEstimator
-from pour_guard_vision import locate,plane_point,cup_crop,surface_features
+from pour_guard_vision import locate,plane_point,cup_crop,surface_features,color_geometry_readout
 from pour_perception_geometry import settled_label
 from pour_perception_study import check_freeze
 from pour_temporal_localization import consensus
@@ -55,7 +55,7 @@ def main():
                     rgb=decode(d['next_obs/cup_detail_image'][i],'jpeg95')
                     crop=torch.from_numpy(cup_crop(rgb,xy,detail))[None]
                     cnn=float((model(crop)[0]+saved['cup_bias']).clamp(0,1));features,_,mass=surface_features(crop)
-                    geometry=saved['surface_geometry'];geo=float((features[0,:geometry['dimensions']]@torch.tensor(geometry['coef'])+geometry['bias']).clamp(0,1)) if mass[0]>1 else 0.
+                    geometry=saved['surface_geometry'];geo=float(color_geometry_readout(crop,geometry)[0]) if mass[0]>1 else 0.
                     estimates.append(dict(index=int(i),cnn=cnn,geometry=geo,error=cnn-label['target'],geometry_error=geo-label['target']))
         results.append(dict(name=name,source_sha256=record['sha256'],height_scale=spec['cup_height_scale'],diameter_scale=spec['cup_diameter_scale'],
             measured_label=label,temporal_confirmation=accepted,frames_considered=len(history),localization_error_mm=localization_error,
@@ -74,10 +74,11 @@ def main():
         and metrics['max_localization_error_mm']<gate['localization_max_error_mm']
         and metrics['level_mae']<gate['level_validation_mae']
         and metrics['geometry_max_abs']<gate['geometry_validation_max_error']
-        and (not near or (metrics['near_full_max_abs']<gate['level_validation_near_max_error']
-            and metrics['near_full_max_overestimate']<gate['level_validation_near_overestimate'])))
+        and metrics['near_full_frames']>=20 and metrics['max_target']>=.94 and metrics['min_target']<=.15
+        and metrics['near_full_max_abs']<gate['level_validation_near_max_error']
+        and metrics['near_full_max_overestimate']<gate['level_validation_near_overestimate'])
     report=dict(passed=passed,metrics=metrics,cases=results,checkpoint_sha256=manifest['checkpoint_sha256'],plan_sha256=manifest['plan_sha256'],
         component_selection_sha256=sha(ROOT/'component-selection.json'),audit_sha256=sha(ROOT/'recording-audit.json'),helper_sha256=sha(Path(__file__)),
-        scope='Nine once-only static native holdouts across declared cup dimensions and small position jitters. Known size, image-localized position. No autonomous grasp/pour claim; absent near-full coverage cannot establish near-full reliability. No fitting or threshold selection.')
+        scope='Nine once-only static native original-cup holdouts with small position jitters. Known original size, image-localized position. Low and near-full measured coverage required. Resized autonomy remains gated. No autonomous grasp/pour claim and no fitting or threshold selection.')
     output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(dict(passed=passed,metrics=metrics)))
 if __name__=='__main__':main()

@@ -9,26 +9,29 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 import torch
-sys.path[:0]=['/workspace/src','/workspace']
+sys.path[:0]=['/workspace/learning/A-perception-20261108-v1/staged','/workspace/src','/workspace']
 from validate_pour_recording import h5py,decode
-from pour_guard_vision import make_bank,locate,project,plane_point,cup_crop,surface_features
+from pour_guard_vision import make_bank,locate,project,plane_point,cup_crop,surface_features,color_geometry_features
 from pour_guard_models import CupEstimator
 from pour_perception_geometry import settled_label
 from pour_temporal_localization import consensus
+from perception_fit_data import admitted_scenes
 ROOT=Path('/workspace/learning/A-perception-20261108-v1')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text())
 def write(n,v):(ROOT/n).write_text(json.dumps(v,indent=2)+'\n')
 
 def collect():
-    plan=read(ROOT/'plan.json');expected={s['name']:s for s in plan['collect']}
+    plan=read(ROOT/'plan.json');admitted={s['name']:(s,split,reason) for s,split,reason in admitted_scenes(plan)}
+    expected={n:a[0] for n,a in admitted.items()}
     seq=[];manifest=[];cal=None
     for path in sorted(Path('/workspace/outputs/fountain').glob('*/*PV_A_*/parameters.json')):
         spec=read(path)
         if spec['name'] not in expected:continue
-        assert spec['study_split'] in ('train','validation') and all(spec[k]==v for k,v in expected[spec['name']].items())
+        assert all(spec[k]==v for k,v in expected[spec['name']].items())
+        _,split,admission=admitted[spec['name']]
         h5=path.parent/'episode.hdf5';assert h5.exists();rows=read(path.parent/'samples.json');label=settled_label(rows)
-        entry=dict(name=spec['name'],split=spec['study_split'],path=str(h5),sha256=sha(h5),label=label)
+        entry=dict(name=spec['name'],split=split,recorded_split=spec['study_split'],admission=admission,path=str(h5),sha256=sha(h5),label=label)
         manifest.append(entry)
         with h5py.File(h5) as f:
             assert f.attrs['status']=='complete';d=f['data/demo_0'];current=dict(K=f['calibration/cup_detail/intrinsics'][:].tolist(),
@@ -36,13 +39,13 @@ def collect():
             if cal is None:cal=current
             else:assert np.allclose(cal['K'],current['K']) and np.allclose(cal['T'],current['T'])
             images=[np.asarray(Image.fromarray(decode(d['obs/cup_detail_image'][i],'jpeg95')).resize((384,384),Image.Resampling.BILINEAR)).copy() for i in range(12)]
-        seq.append(dict(spec=spec,entry=entry,images=images))
+        seq.append(dict(spec=spec,fit_split=split,entry=entry,images=images))
     assert len(seq)==len(expected) and len({e['spec']['name'] for e in seq})==len(expected)
     write('cup-data-manifest.json',manifest)
     return plan,seq,cal
 
 @torch.inference_mode()
-def localize(seq,detail,gate):
+def template_localize_rejected(seq,detail,gate):
     cal=copy.deepcopy(detail);K=np.array(cal['K']);K[:2]*=384/1024;cal['K']=K.tolist();cal['resolution_wh']=[384,384]
     train=[e for e in seq if e['spec']['study_split']=='train'];anchors=[]
     for e in train:anchors.append(project(np.array(e['spec']['cup_world'])+[0,0,e['spec']['declared_cup_geometry']['rim_z_m']],cal))
@@ -81,12 +84,36 @@ def localize(seq,detail,gate):
     return dict(bank=bank,calibration=cal,threshold=chosen['threshold'],consensus=config),dict(passed=True,chosen=chosen,windows=windows,
         method='Supervised gradient-template banks and confidence/temporal-consensus calibration; fixture dimensions are declared, not visually inferred. Synthetic absent masks are a diagnostic, not an independent real missing-cup test.')
 
+@torch.inference_mode()
+def localize(seq,detail,gate):
+    selection=read(ROOT/'scope-selection.json');assert selection['passed'] and selection['scope']=='baseline_cup_only'
+    assert sha(ROOT/'cup-neural-localization.pt')==selection['checkpoint_sha256']
+    selected=torch.load(ROOT/'cup-neural-localization.pt',map_location='cpu',weights_only=False)
+    cal=selected['calibration'];windows=[]
+    for e in seq:
+        history=[];accepted=None;s=e['spec'];z=1.04+s['declared_cup_geometry']['rim_z_m']
+        for image in e['images']:
+            uv,score=locate(image,selected['bank']);history.append((uv.tolist(),score))
+            accepted=consensus(history,selected['threshold'],selected['consensus'])
+            if accepted is not None:break
+        baseline=s['cup_height_scale']==s['cup_diameter_scale']==1.
+        e['localized_xy']=None if accepted is None else plane_point(accepted['uv'],z,cal)[:2]
+        error=None if accepted is None else float(np.linalg.norm(e['localized_xy']-s['cup_world'][:2])*1000)
+        windows.append(dict(name=s['name'],baseline_cup=baseline,confirmed=accepted is not None,error_mm=error,frames=len(history)))
+        if baseline and (accepted is None or error>=gate['localization_max_error_mm']):
+            return None,dict(passed=False,scope='baseline_cup_only',reason='Baseline temporal localization failed',windows=windows)
+    return selected,dict(passed=True,scope='baseline_cup_only',windows=windows,
+        max_baseline_error_mm=max(r['error_mm'] for r in windows if r['baseline_cup']),
+        all_size_temporal_checks_passed=all(r['confirmed'] and r['error_mm']<gate['localization_max_error_mm'] for r in windows),
+        resized_autonomy_authorized=False,selection_sha256=sha(ROOT/'scope-selection.json'),
+        method='Supervised RGB center heatmap plus subpixel offsets and unchanged eight-vote temporal confirmation. Original vessel dimensions only; resized autonomy remains gated.')
+
 def fit_level(seq,cal,gate,parent):
     data={s:dict(image=[],target=[],name=[],domain=[]) for s in ('train','validation')}
     for e in seq:
         label=e['entry']['label'];s=e['spec']
-        if not label['accepted']:continue
-        actual=copy.deepcopy(cal);actual['cup_geometry']=s['declared_cup_geometry'];a=data[s['study_split']]
+        if not label['accepted'] or e['localized_xy'] is None:continue
+        actual=copy.deepcopy(cal);actual['cup_geometry']=s['declared_cup_geometry'];a=data[e['fit_split']]
         with h5py.File(e['entry']['path']) as f:
             d=f['data/demo_0'];times=d['next_time'][:];ids=np.flatnonzero(times>=times[-1]-1.-1e-7)
             for i in ids[::2]:
@@ -120,16 +147,18 @@ def fit_level(seq,cal,gate,parent):
     for s,a in data.items():
         assert len({n for n,d in zip(a['name'],a['domain']) if d=='native_detail'})>=(20 if s=='train' else 14),f'Insufficient stable episodes in {s}'
         a['x']=torch.from_numpy(np.stack(a.pop('image'))).cuda();a['y']=torch.tensor(a['target'],device='cuda')
-    tr,va=data['train'],data['validation'];native=torch.tensor([d=='native_detail' for d in va['domain']],device='cuda')
+    tr,va=data['train'],data['validation'];all_native=torch.tensor([d=='native_detail' for d in va['domain']],device='cuda')
+    baseline_names={e['spec']['name'] for e in seq if e['spec']['cup_height_scale']==e['spec']['cup_diameter_scale']==1.}
+    native=all_native & torch.tensor([n in baseline_names for n in va['name']],device='cuda');replay_mask=~all_native
     near=(va['y']>.85)&native
     assert int(near.sum())>=20 and float(va['y'][native].max())>=.94,'No near-full validation coverage'
     model=CupEstimator().cuda();model.load_state_dict(parent['cup_model']);model.eval()
     with torch.no_grad():
         baseline=torch.cat([model(x) for x in va['x'].split(128)])+parent['cup_bias']
-        replay_baseline_mae=float((baseline.clamp(0,1)-va['y'])[~native].abs().mean())
+        replay_baseline_mae=float((baseline.clamp(0,1)-va['y'])[replay_mask].abs().mean())
     opt=torch.optim.AdamW(model.parameters(),lr=2e-4,weight_decay=1e-4)
     domain_weight=torch.tensor([4. if d=='native_detail' else 1. for d in tr['domain']],device='cuda')
-    history=[];best=None;steps=0
+    history=[];best=None;best_attempt=None;steps=0
     for epoch in range(1,241):
         model.train()
         if epoch in (121,181):
@@ -142,27 +171,49 @@ def fit_level(seq,cal,gate,parent):
         with torch.no_grad():
             pred=torch.cat([model(x) for x in va['x'].split(128)]);error=pred-va['y'];row=dict(epoch=epoch,
                 mae=float(error[native].abs().mean()),near_mae=float(error[near].abs().mean()),near_max=float(error[near].abs().max()),near_overestimate=float(error[near].max()),
-                historical_replay_mae=float(error[~native].abs().mean()))
+                historical_replay_mae=float(error[replay_mask].abs().mean()),unvalidated_size_mae=float(error[all_native & ~native].abs().mean()))
             history.append(row);score=row['mae']+row['near_mae']+.3*row['near_max']
             eligible=row['mae']<gate['level_validation_mae'] and row['near_max']<gate['level_validation_near_max_error'] and row['near_overestimate']<gate['level_validation_near_overestimate'] and row['historical_replay_mae']<=max(.05,replay_baseline_mae+.015)
+            if best_attempt is None or score<best_attempt['score']:best_attempt=dict(row=row,score=score,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()})
             if eligible and (best is None or score<best['score']):best=dict(row=row,score=score,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()})
         if epoch%20==0:print('CUP_LEVEL',json.dumps(row),flush=True)
     with torch.no_grad():
         train_native=torch.tensor([d=='native_detail' for d in tr['domain']],device='cuda')
-        x=surface_features(tr['x'][train_native])[0].double();vx=surface_features(va['x'][native])[0].double();y=tr['y'][train_native].double();geo=[]
-        for ridge in (1e-6,1e-4,.01,.1):
-            reg=torch.eye(4,device='cuda',dtype=torch.float64)*ridge;reg[0,0]=1e-12
-            coef=torch.linalg.solve(x.T@x+reg,x.T@y);err=(vx@coef).clamp(0,1)-va['y'][native]
-            geo.append(dict(coef=coef.cpu().tolist(),dimensions=4,bias=0.,ridge=ridge,mae=float(err.abs().mean()),max_error=float(err.abs().max())))
+        train_baseline=train_native & torch.tensor([n in baseline_names for n in tr['name']],device='cuda')
+        all_features=color_geometry_features(tr['x']).double();valid_features=color_geometry_features(va['x'][native]).double();geo=[]
+        _,_,valid_mass=surface_features(va['x'][native])
+        for domain,mask in (('all_native',train_native),('baseline_native',train_baseline),('native_and_replay',torch.ones_like(train_native))):
+            for dimensions in (4,13,19):
+                raw=all_features[mask,:dimensions];mean=raw.mean(0);scale=raw.std(0).clamp(min=.01);mean[0]=0;scale[0]=1
+                x=(raw-mean)/scale;vx=(valid_features[:,:dimensions]-mean)/scale;y=tr['y'][mask].double()
+                for ridge in (1e-4,.01,.1,1.,10.):
+                    reg=torch.eye(dimensions,device='cuda',dtype=torch.float64)*ridge;reg[0,0]=1e-12
+                    coef=torch.linalg.solve(x.T@x+reg,x.T@y);pred=torch.where(valid_mass>1.,(vx@coef).clamp(0,1),0.);err=pred-va['y'][native]
+                    geo.append(dict(feature_kind='color_envelope_v1',coef=coef.cpu().tolist(),mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),
+                        dimensions=dimensions,bias=0.,ridge=ridge,training_domain=domain,mae=float(err.abs().mean()),max_error=float(err.abs().max())))
         geometry=min(geo,key=lambda g:g['max_error'])
     passed=best is not None and geometry['max_error']<gate['geometry_validation_max_error']
-    report=dict(passed=passed,selected=None if best is None else best['row'],geometry={k:v for k,v in geometry.items() if k!='coef'},
+    public_geo=lambda g:{k:v for k,v in g.items() if k not in ('coef','mean','scale')}
+    report=dict(passed=passed,scope='baseline_cup_only',selected=None if best is None else best['row'],geometry=public_geo(geometry),geometry_candidates=[public_geo(g) for g in geo],
+        primary_native_validation=dict(episodes=len({n for n,m in zip(va['name'],native.tolist()) if m}),images=int(native.sum()),near_full_images=int(near.sum())),
         counts={s:dict(episodes=len(set(a['name'])),images=len(a['y']),min_target=float(a['y'].min()),max_target=float(a['y'].max()),
             domains={d:dict(images=sum(v==d for v in a['domain']),episodes=len({n for n,v in zip(a['name'],a['domain']) if v==d})) for d in set(a['domain'])}) for s,a in data.items()},
         historical_replay_baseline_mae=replay_baseline_mae,replay_scope='Original lower-resolution task views from 24/8 train/validation references. New-record weight 4, replay weight 1. Dynamic appearances retained; no reserved tests or generated detail pixels.',
-        candidates=history,learned_parameters=sum(p.numel() for p in model.parameters())+4,epochs=240,optimizer_steps=steps,
-        method='Supervised RGB cup-level regression; pretrained CNN fine-tuned with weighted squared error, AdamW and mild photometric augmentation. Separate four-coefficient surface-geometry least squares. Episode-disjoint validation selects epoch; no reserved test images.',
+        candidates=history,learned_parameters=sum(p.numel() for p in model.parameters())+geometry['dimensions'],epochs=240,optimizer_steps=steps,
+        method='Supervised RGB cup-level regression; pretrained CNN fine-tuned with weighted squared error, AdamW and mild photometric augmentation. Independent spatial-color envelope ridge regression; no CNN features in that cross-check. Episode-disjoint validation selects candidates; no reserved test images.',
         target_source='Measured final-second surface median for each stationary native recording; image-localized crops, declared cup dimensions. No inventory-derived target lookup.')
+    attempt=best or best_attempt
+    torch.save(dict(cup_model=attempt['state'],geometry=geometry,selected=attempt['row'],accepted=passed),ROOT/'cup-level-attempt.pt')
+    report['attempt_checkpoint_sha256']=sha(ROOT/'cup-level-attempt.pt')
+    model.load_state_dict(attempt['state']);model.eval();predictions=[]
+    with torch.no_grad():
+        from pour_guard_vision import color_geometry_readout
+        for split,a in data.items():
+            cnn=torch.cat([model(x) for x in a['x'].split(128)]).clamp(0,1)
+            color=color_geometry_readout(a['x'],geometry);_,_,mass=surface_features(a['x']);color=torch.where(mass>1.,color,0.)
+            predictions.extend(dict(name=n,split=split,domain=d,target=y,cnn=c,geometry=g,baseline_cup=n in baseline_names)
+                for n,d,y,c,g in zip(a['name'],a['domain'],a['target'],cnn.cpu().tolist(),color.cpu().tolist()))
+    write('cup-level-predictions.json',predictions)
     artifact=None if not passed else dict(cup_model=best['state'],cup_bias=0.,surface_geometry=geometry,
         settled_regressor=dict(columns=[4],mean=[0.],scale=[1.],coef=[1.],output_bias=0.,method='Identity of fitted settled-level CNN output; no additional learned parameters.'))
     return artifact,report
@@ -174,7 +225,8 @@ def main():
     assert not (ROOT/'cup-component.json').exists();torch.set_num_threads(4);torch.manual_seed(261108)
     start=time.perf_counter();plan,seq,cal=collect();parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     loc,loc_report=localize(seq,cal,plan['component_gates']);write('cup-localization-validation.json',loc_report)
-    report=dict(passed=False,device=torch.cuda.get_device_name(),localization_passed=loc is not None,source_sha256=sha(Path(__file__)))
+    report=dict(passed=False,scope='baseline_cup_only',device=torch.cuda.get_device_name(),localization_passed=loc is not None,source_sha256=sha(Path(__file__)),
+        admission_helper_sha256=sha(ROOT/'perception_fit_data.py'),vision_module_sha256=sha(ROOT/'staged/pour_guard_vision.py'))
     if loc is not None:
         level,level_report=fit_level(seq,cal,plan['component_gates'],parent);write('cup-level-validation.json',level_report)
         report.update(level_passed=level is not None)
