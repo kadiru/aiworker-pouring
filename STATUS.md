@@ -22,6 +22,8 @@ R3 halfway snapshot (November 7, 15:19 PST): 4/4 strict passes and zero measured
 
 First r3 case `FN30_A_dev_00_r3` passes: final settled height 92.53698%, zero measured loss, correct stop and complete return/release. The full native preview is `evidence/finish-A/FN30_A_dev_00_r3-preview.mp4`, 19.85 seconds at labeled 2× speed, SHA `372efeac5a7ee4f3ad188c4e301eb2e97c1788865e06844d2ef2e4de64f4d446`. Full decode and twelve native-camera comparisons pass (maximum mean pixel error 0.8862/255); four selected encoded frames are inspected. This is development evidence only, not continuous manual playback or a reserved test result.
 
+Final-report addition: after the already-running delivery pipeline has produced `final-benchmark.json` and verified sidecars, run `.venv/bin/python tools/analyze_finish_outcomes.py --report evidence/finish-A/final-benchmark.json --integrity evidence/finish-A/recording-integrity.json --output evidence/finish-A/final-outcome-timing.json`. This read-only helper separates observed loss timing from the terminal return; it reproduces three independently diagnosed r2 loss times exactly and preserves all four original r2 failures. No frozen runtime/model changes are made.
+
 ## Historical development notes
 
 The entries below retain preparation states and observations from earlier candidates. The current state and next action are above.

@@ -128,3 +128,16 @@ Development r2 was explicitly queued at 11:13:55 UTC November 7. Native observer
 The already-running observer/review must not be duplicated. R2 outcomes remain pending. Freeze must use the new `runtime-source-manifest-braking-r2.json`, reviewed r2 sheets and r2 withdrawal evidence. The old r0/r1 manifests do not describe the active checkpoint. The thirty reserved scenes remain unused.
 
 **First r2 preview:** `FN30_A_dev_00_r2` passes with final settled rim height 93.3998%, zero measured loss and complete return/release. Its full native 22.75-second, labeled 2× preview is `evidence/finish-A/FN30_A_dev_00_r2-preview.mp4`, SHA `ff90b57e9c072b118df2c399b9eee9f41bd98a144833925ef5ed06d40c3ecf26`. Full decode and twelve native-camera comparisons pass (maximum mean pixel error 0.871/255); four selected encoded frames are inspected. This is development-only evidence, not continuous manual playback or a reserved result. Seven r2 cases remain.
+
+
+## Read-only outcome timing report
+
+`tools/analyze_finish_outcomes.py` reads byte/SHA-verified scalar sidecars and retains the existing strict scores. It pairs each control decision with its next-state sample 50 ms later, reports the first sampled cumulative near-worktop loss, the first stop command, final level/inventory, and terminal stage times. It also records the first nonairborne outside reading, which can be a transient droplet that returns. Aggregate counts do not identify individual particle trajectories or establish a physical cause.
+
+A check against r2 reproduces the independently documented first-loss times for cases 03/06/07 exactly: 25.755, 25.555 and 24.905 seconds. All occur before the terminal stop. The report preserves all four r2 failures, including case 05's first near-worktop loss at 46.055 seconds. See `evidence/finish-A/development-r2-outcome-timing.json`. This diagnostic does not change the frozen candidate or current test scores.
+
+After all thirty current tests and their audit/backup finish, run:
+
+```sh
+.venv/bin/python tools/analyze_finish_outcomes.py --report evidence/finish-A/final-benchmark.json --integrity evidence/finish-A/recording-integrity.json --output evidence/finish-A/final-outcome-timing.json
+```
