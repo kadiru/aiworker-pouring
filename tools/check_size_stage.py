@@ -91,7 +91,7 @@ def main():
         all_calibration_contained=len(calibration)==9 and all(r['stable_contained'] for r in calibration),
         all_seed_calibration_contained=len(seed_calibration)==9 and all(r['stable_contained'] for r in seed_calibration),
         development_closed=len(development)==6,
-        candidate_checkpoint_sha256=candidate['checkpoint_sha256'])
+        candidate_checkpoint_sha256=candidate['checkpoint_sha256'],helper_sha256=sha(Path(__file__)))
     (ROOT/'stage-results.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(calibration=len(calibration),contained=sum(r['stable_contained'] for r in calibration),
         seed_calibration=len(seed_calibration),seed_contained=sum(r['stable_contained'] for r in seed_calibration),

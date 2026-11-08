@@ -1,8 +1,11 @@
 """Close the size pilot from verified native records, without promoting a policy."""
 import csv
 import hashlib
+import io
 import json
+import subprocess
 import sys
+import tarfile
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -27,6 +30,7 @@ def main():
     backup = read(E / 'scalar-backup.json')
     review = read(E / 'visual-review-progress.json')
     probe = read(E / 'low-fill-temporal-perception-probe.json')
+    diagnosis = read(E / 'recovery-diagnostics.json')
     parent = read(PROJECT / 'evidence/finish-A/final-benchmark.json')
     assert report['development_closed'] and not report['pending'] and not report['unstarted']
     assert len(report['integrity']) == 24 and len(report['development']) == 6
@@ -36,8 +40,21 @@ def main():
     assert checkpoint == candidate['checkpoint_sha256'] == report['candidate_checkpoint_sha256'] == probe['checkpoint_sha256']
     assert sha(E / 'plan.json') == candidate['plan_sha256']
     assert sha(E / 'stage-results.json') == backup['report_sha256']
+    for artifact, helper in (('stage-results.json', 'check_size_stage.py'),
+                             ('recovery-keyframes.json', 'review_size_recovery.py'),
+                             ('recovery-diagnostics.json', 'diagnose_size_recovery.py'),
+                             ('localization-diagnostics.json', 'diagnose_size_localization.py'),
+                             ('camera-resolution.json', 'measure_size_camera_resolution.py'),
+                             ('low-fill-temporal-perception-probe.json', 'probe_size_perception.py')):
+        assert read(E / artifact)['helper_sha256'] == sha(PROJECT / 'tools' / helper)
+    source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=PROJECT, text=True).strip()
+    committed = subprocess.check_output(['git', 'archive', source_commit, 'runtime/src'], cwd=PROJECT)
+    with tarfile.open(fileobj=io.BytesIO(committed)) as archive:
+        source_hashes = {m.name: hashlib.sha256(archive.extractfile(m).read()).hexdigest()
+                         for m in archive.getmembers() if m.isfile()}
     for name, digest in candidate['runtime_sources'].items():
         assert sha(PROJECT / 'runtime/src' / name) == digest, name
+        assert source_hashes['runtime/src/' + name] == digest, name
     for item in backup['entries']:
         p = DATA / item['relative_path']
         assert p.stat().st_size == item['bytes'] and sha(p) == item['sha256']
@@ -45,9 +62,14 @@ def main():
     expected = {s['name']: s for part in plan.values() if isinstance(part, list) for s in part}
     assert set(indexed) == set(expected)
     previous = {r['name']: r for r in parent['cases']}
+    diagnosed = {r['name']: r for r in diagnosis['cases']}
+    assert len(diagnosed) == 6 and diagnosis['checkpoint_sha256'] == checkpoint
     rows = []
     for r in report['development']:
         identity = indexed[r['name']]
+        diagnostic = diagnosed[r['name']]
+        assert all(digest == identity['sidecars'][name] for name, digest in diagnostic['hashes'].items())
+        assert diagnostic['strict_pass'] == r['strict_pass']
         path = Path(identity['path'])
         folder = DATA / path.parent.parent.name / path.parent.name
         spec = read(folder / 'parameters.json')
@@ -85,6 +107,8 @@ def main():
                          final_height=r['cup_surface_height_fraction'], source_remaining_nominal_ml=r['source_remaining_ml'],
                          loss_nominal_ml=max(r['final_outside_ml'], r['ever_below_worktop_ml']),
                          return_release_complete=r['completed_return_release_sequence'],
+                         sampled_over_cup_dwell_s=diagnostic['withdrawal']['longest_sampled_upright_stationary_over_cup_s'],
+                         post_release_gripper_contact_frames=diagnostic['withdrawal']['post_release_gripper_contact_frames'],
                          failure_reasons=r['failure_reasons']))
     inspected = []
     for group in review['calibration_groups']:
@@ -102,9 +126,13 @@ def main():
     before, after = snapshots.values()
     assert before['container'] == after['container'] and before['limits'] == after['limits']
     assert before['guard'] and after['guard']
+    health = read(E / 'runtime-final-health.json')
+    assert not health['queue'] and not health['recording']['active']
+    assert not health.get('error') and not health.get('learning_error')
     summary = dict(
         scope='Completed stationary size pilot and six reused-layout development regressions. Not fresh held-out evaluation, not size-generalizing training.',
         checkpoint_sha256=checkpoint, parent_checkpoint_sha256=candidate['parent_checkpoint_sha256'],
+        runtime_source_commit=source_commit,
         no_new_weight_fitting=True, resized_autonomy_ready=False,
         counts=dict(grid_contained=sum(r['stable_contained'] for r in report['calibration']), grid_cases=9,
                     seed_contained=sum(r['stable_contained'] for r in report['seed_calibration']), seed_cases=9,
@@ -117,9 +145,9 @@ def main():
         review_scope='Selected frames, not continuous playback. Original HDF5 recordings remain on Ubuntu.',
         resource_scope='Owned container, 4070 binding, caps and priority guard preserved. No foreign job signaled or reconfigured; snapshots cannot prove zero shared-host overhead.',
         artifacts={n: sha(E / n) for n in ('candidate.json', 'plan.json', 'stage-results.json', 'scalar-backup.json',
-                                         'visual-review-progress.json', 'low-fill-temporal-perception-probe.json',
-                                         'localization-diagnostics.json', 'recovery-diagnostics.json',
-                                         'runtime-before-recovery.json', 'runtime-final.json')},
+                                         'visual-review-progress.json', 'recovery-keyframes.json', 'low-fill-temporal-perception-probe.json',
+                                         'localization-diagnostics.json', 'camera-resolution.json', 'recovery-diagnostics.json',
+                                         'runtime-before-recovery.json', 'runtime-final.json', 'runtime-final-health.json')},
         helper_sha256=sha(Path(__file__)),
     )
     (E / 'stage-summary.json').write_text(json.dumps(summary, indent=2) + '\n')

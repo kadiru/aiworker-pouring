@@ -26,7 +26,7 @@ def main():
         loss=next((i for i,x in enumerate(samples) if x['ever_table_ml']),None)
         event=loss if loss is not None else int(np.argmax([abs(x['bottle_tilt_deg']) for x in samples]))
         selected=[('Initial',0,'task'),('No grasp confirmation' if grasp is None else 'Grasp confirmed',0 if grasp is None else grasp,'wrist'),
-            ('Before loss' if loss is not None else 'Maximum tilt',max(0,event-1),'task'),
+            ('Before loss' if loss is not None else 'Maximum tilt',max(0,event-1) if loss is not None else event,'task'),
             ('First worktop loss' if loss is not None else 'Wrist view',event,'wrist'),
             ('No stop decision' if stop_found is None else 'Stop decision',stop,'task'),
             ('After stop' if stop_found is not None else 'Final control state',int(np.argmin(abs(times-(times[stop]+1.1)))),'task'),
@@ -49,7 +49,8 @@ def main():
         records.append(dict(name=spec['name'],source_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
             sheet_sha256=hashlib.sha256(dest.read_bytes()).hexdigest(),strict_pass=passed,
             failure_reasons=reasons(r),frames=frames,manual_review='pending'))
-    (ROOT/'recovery-keyframes.json').write_text(json.dumps(dict(scope='Selected native frames only, not continuous playback or synthetic camera imagery.',cases=records),indent=2)+'\n')
+    (ROOT/'recovery-keyframes.json').write_text(json.dumps(dict(scope='Selected native frames only, not continuous playback or synthetic camera imagery.',
+        helper_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),cases=records),indent=2)+'\n')
     print(json.dumps(dict(closed_cases=len(records),keyframes=sum(len(r['frames']) for r in records))))
 
 
