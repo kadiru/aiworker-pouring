@@ -50,11 +50,12 @@ def frame(row,record,ds,group,index,t,speed,part,number,total,hold=None):
     return im
 def main():
     p=argparse.ArgumentParser();p.add_argument('--part',choices=('development','test'),required=True);p.add_argument('--round',type=int,required=True);p.add_argument('--preview',action='store_true');a=p.parse_args()
-    report=read(E/(a.part+'-outcomes.json'));audit=read(E/(a.part+'-audit.json'))
+    stem=f'{a.part}-r{a.round}'
+    report=read(E/(stem+'-outcomes.json'));audit=read(E/(stem+'-audit.json'))
     assert report['status']=='complete' and len(report['cases'])==6 and not audit['started_incomplete']
     selection=read(E/f'component-selection-r{a.round}.json');assert selection['checkpoint_sha256']==report['checkpoint_sha256']
     indexed={r['name']:r for r in audit['records']};rows=sorted(report['cases'],key=lambda r:r['name'])
-    stem=f'{a.part}-r{a.round}';folder=E/(stem+'-video-preview');folder.mkdir(exist_ok=True)
+    folder=E/(stem+'-video-preview');folder.mkdir(exist_ok=True)
     opening=card(report,a.part);opening.save(folder/'opening.png')
     output=E/(stem+'.mp4');assert a.preview or not output.exists(),'Preserve existing videos'
     proc=None if a.preview else subprocess.Popen(['/opt/homebrew/bin/ffmpeg','-v','error','-f','rawvideo','-pixel_format','rgb24','-video_size','1280x720','-framerate',str(FPS),'-i','pipe:0','-an','-c:v','libx264','-preset','fast','-threads','2','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(output)],stdin=subprocess.PIPE)
@@ -88,7 +89,7 @@ def main():
     except BaseException:
         if proc:proc.kill();proc.wait()
         raise
-    result=dict(video=str(output),sha256=sha(output),bytes=output.stat().st_size,checkpoint_sha256=report['checkpoint_sha256'],report_sha256=sha(E/(a.part+'-outcomes.json')),audit_sha256=sha(E/(a.part+'-audit.json')),helper_sha256=sha(Path(__file__)),frames=count,fps=FPS,duration_s=count/FPS,resolution=list(SIZE),clips=clips,visual_review='pending',scope='All six native attempts at labeled 1x/2x speed, with initial/final holds and no internal cuts or generated camera frames. Cup-detail display window uses known fixture center only for human review; the controller uses image-localized position.')
+    result=dict(video=str(output),sha256=sha(output),bytes=output.stat().st_size,checkpoint_sha256=report['checkpoint_sha256'],report_sha256=sha(E/(stem+'-outcomes.json')),audit_sha256=sha(E/(stem+'-audit.json')),helper_sha256=sha(Path(__file__)),frames=count,fps=FPS,duration_s=count/FPS,resolution=list(SIZE),clips=clips,visual_review='pending',scope='All six native attempts at labeled 1x/2x speed, with initial/final holds and no internal cuts or generated camera frames. Cup-detail display window uses known fixture center only for human review; the controller uses image-localized position.')
     (E/(stem+'-video.json')).write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps({k:v for k,v in result.items() if k!='clips'}))
 if __name__=='__main__':main()

@@ -187,6 +187,7 @@ def fit_level(seq,cal,gate,parent,fixed_cnn=None):
         replay_baseline_mae=float((baseline.clamp(0,1)-va['y'])[replay_mask].abs().mean())
     opt=torch.optim.AdamW(model.parameters(),lr=2e-4,weight_decay=1e-4)
     domain_weight=torch.tensor([6. if d=='consumed_task_detail' else 4. if d=='native_detail' else 1. for d in tr['domain']],device='cuda')
+    train_near=torch.tensor([d!='historical_task_replay' and n in baseline_names for d,n in zip(tr['domain'],tr['name'])],device='cuda') & (tr['y']>.85)
     history=[];best=None;best_attempt=None;steps=0
     if fixed_cnn is not None:
         model.load_state_dict(fixed_cnn['cup_model']);model.eval()
@@ -217,6 +218,10 @@ def fit_level(seq,cal,gate,parent,fixed_cnn=None):
             if task_mask.any():
                 row.update(actual_pour_mae=float(error[task_mask].abs().mean()),actual_pour_near_max=float(error[task_near].abs().max()),actual_pour_near_overestimate=float(error[task_near].max()))
                 eligible=eligible and row['actual_pour_mae']<gate['level_validation_mae'] and row['actual_pour_near_max']<gate['level_validation_near_max_error'] and row['actual_pour_near_overestimate']<gate['level_validation_near_overestimate']
+            if eligible and task_mask.any():
+                train_error=torch.cat([model(x) for x in tr['x'][train_near].split(128)])-tr['y'][train_near]
+                row.update(training_near_max=float(train_error.abs().max()),training_near_overestimate=float(train_error.max()))
+                eligible=row['training_near_max']<gate['level_validation_near_max_error'] and row['training_near_overestimate']<gate['level_validation_near_overestimate']
             if best_attempt is None or score<best_attempt['score']:best_attempt=dict(row=row,score=score,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()})
             if eligible and (best is None or score<best['score']):best=dict(row=row,score=score,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()})
         if epoch%20==0:print('CUP_LEVEL',json.dumps(row),flush=True)
@@ -239,6 +244,11 @@ def fit_level(seq,cal,gate,parent,fixed_cnn=None):
         # stationary scene or task pause/level bin avoids weighting a long hold
         # as hundreds of independent scenes and never averages distinct levels.
         from pour_guard_vision import color_geometry_readout
+        retained=copy.deepcopy(parent['surface_geometry'])
+        pred=color_geometry_readout(va['x'][native],retained,va['xy'][native]);pred=torch.where(valid_mass>1.,pred,0.)
+        err=pred-va['y'][native]
+        retained.update(retained_from_parent=True,mae=float(err.abs().mean()),max_error=float(err.abs().max()))
+        geo.append(retained)
         for domain,mask in (('all_native',train_native),('baseline_native',train_baseline)):
             names=sorted({n for n,keep in zip(tr['prototype'],mask.tolist()) if keep});prototypes=[];targets=[]
             for name in names:
@@ -265,7 +275,7 @@ def fit_level(seq,cal,gate,parent,fixed_cnn=None):
             domains={d:dict(images=sum(v==d for v in a['domain']),episodes=len({n for n,v in zip(a['name'],a['domain']) if v==d})) for d in set(a['domain'])}) for s,a in data.items()},
         historical_replay_baseline_mae=replay_baseline_mae,replay_scope='Original lower-resolution task views from 24/8 train/validation references. New-record weight 4, replay weight 1. Dynamic appearances retained; no reserved tests or generated detail pixels.',
         candidates=history,learned_parameters=sum(p.numel() for p in model.parameters())+color_parameters,epochs=epochs,optimizer_steps=steps,cnn_weights_retained=fixed_cnn is not None,
-        newly_fitted_parameters=color_parameters if fixed_cnn is not None else sum(p.numel() for p in model.parameters())+color_parameters,
+        newly_fitted_parameters=(0 if geometry.get('retained_from_parent') else color_parameters)+(0 if fixed_cnn is not None else sum(p.numel() for p in model.parameters())),
         method='Supervised RGB cup-level regression, with optional reuse of an already accepted CNN. Independent explicit-color ridge or RBF kernel regression; optional image-localized XY handles viewing angle. Kernel candidates use one prototype per training episode, fixed unit bandwidth and .01 ridge. No level-CNN features or runtime ground truth. Episode-disjoint validation selects candidates; no reserved test images.',
         target_source='Measured final-second surface median for stationary native recordings; consumed actual task observations use a causal stable half-second window with constant inventory and <=1 point instantaneous deviation. No future-final labels on earlier frames. Image-localized crops, declared cup dimensions; >=3 mm baseline localization error rejects the component. No truth-centered fitting crops or inventory-derived target lookup.',
         task_label_helper_sha256=sha(ROOT/'perception_task_labels.py'))

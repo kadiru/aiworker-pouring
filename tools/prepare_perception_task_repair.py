@@ -21,6 +21,11 @@ def main():
     assert plan['perception_round']==2 and report['counts']['completed']==6 and report['counts']['strict_passes']<6
     assert holdout['passed'] and review['reviewed'] and not audit['started_incomplete']
     assert review['outcomes_sha256']==sha(ROOT/'development-outcomes.json')
+    assert review['manual_review']=='inspected' and review['checkpoint_sha256']==manifest['checkpoint_sha256']
+    assert {r['name'] for r in review['cases']}=={s['name'] for s in plan['development']}
+    for row in review['cases']:
+        assert row['manual_review']=='inspected' and row['reviewed_files']
+        assert all(sha(Path(p))==digest for p,digest in row['reviewed_files'].items())
     assert report['checkpoint_sha256']==holdout['checkpoint_sha256']==manifest['checkpoint_sha256']==sha(ROOT/'best.pt')
     assert report['plan_sha256']==manifest['plan_sha256']==sha(ROOT/'plan.json')
     assert all(sha(Path(p))==d for p,d in manifest['protected_parent_files'].items())

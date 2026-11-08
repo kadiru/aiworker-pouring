@@ -350,3 +350,18 @@ besides the existing static/replay gates. Color prototypes separate each
 recorded pause and level bin instead of averaging an entire pour. No live
 particle state is added to controller inputs. All 55 local checks pass; no
 new fit or task success is yet claimed.
+
+Dev02 also finishes underfilled, at 88.5937%, with zero measured loss and a
+completed return. At stopping, its CNN predicts 96.4745% against 90.8494%
+observed height; exact-center diagnostic output is 96.5246% (0.902 mm
+localization error). Dev03 repeats the low-confidence localization failure,
+with unchanged intrinsics/extrinsics; it does not grasp or pour. These
+completed cases and their failures remain part of the fixed round-2 batch.
+
+The end-of-record code review found no deliberate fluid reset before final
+scoring. The cause of the late measured-height changes remains unknown.
+NVIDIA documents particle smoothing and isosurface extraction as rendering
+post-processing, distinct from the dynamics; that distinction alone does
+not diagnose these recordings. Reference:
+[Omni Physics particle documentation](https://docs.omniverse.nvidia.com/kit/docs/omni_physics/107.3/dev_guide/particles/particles.html#post-processing-for-fluid-rendering).
+No fluid or rendering settings have been changed during this evaluation.
