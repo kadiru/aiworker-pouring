@@ -1,5 +1,5 @@
 """Preserve failed task development, declare training reuse and fresh attempts."""
-import copy,hashlib,json,shutil,sys,urllib.request
+import copy,hashlib,json,shutil,sys,urllib.request,runpy
 from pathlib import Path
 import numpy as np
 ROOT=Path('/workspace/learning/A-perception-20261108-v1')
@@ -8,7 +8,6 @@ from pour_perception_geometry import calibration_seed_points
 from pour_vessel_geometry import cup_geometry,cup_profile
 from pour_guard_vision import project
 from bottle_pour import vessel_mask
-from perception_fit_data import admitted_scenes,admitted_tasks
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
@@ -73,7 +72,10 @@ def main():
     plan.setdefault('consumed_task_development',[]).extend(old_tasks)
     plan.setdefault('archived_perception_holdout',[]).extend(old_holdout)
     plan.update(version=plan['version']+1,perception_round=3,perception_holdout=scenes,development=tasks)
-    admitted_scenes(plan);admitted_tasks(plan)
+    # Load the pending admission helper outside the study so the archive above
+    # retains the exact previous fitter/admission sources before replacement.
+    admission=runpy.run_path('/tmp/perception_fit_data_repair.py')
+    admission['admitted_scenes'](plan);admission['admitted_tasks'](plan)
     (ROOT/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')
     manifest['protected_parent_files'].update({str(p):sha(p) for p in archive.rglob('*') if p.is_file()})
     manifest.update(trained=False,component_gates_passed=False,plan_sha256=sha(ROOT/'plan.json'),perception_round=3,
@@ -87,6 +89,7 @@ def main():
         if p.exists():assert sha(p)==sha(archive/n);p.unlink()
     if (ROOT/'development-review').exists():shutil.rmtree(ROOT/'development-review')
     (ROOT/'task-repair-preparation-r3.json').write_text(json.dumps(dict(history=history,static_cases=checks,
-        fresh_tasks=[s['name'] for s in tasks],plan_sha256=sha(ROOT/'plan.json'),helper_sha256=sha(Path(__file__))),indent=2)+'\n')
+        fresh_tasks=[s['name'] for s in tasks],plan_sha256=sha(ROOT/'plan.json'),helper_sha256=sha(Path(__file__)),
+        pending_admission_helper_sha256=sha(Path('/tmp/perception_fit_data_repair.py'))),indent=2)+'\n')
     print(json.dumps(dict(round=3,consumed_tasks=len(old_tasks),new_holdouts=len(scenes),new_development=len(tasks),archive=str(archive))))
 if __name__=='__main__':main()
