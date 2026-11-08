@@ -127,5 +127,5 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=runtime/src .venv/bin/python -m unittest te
 ```
 
 Controller/geometry checks requiring Torch run CPU-only in the existing
-native environment. Forty-three local tests now pass; the previous 44 native CPU controller/geometry
-checks pass. Exact later check totals are recorded with each source revision.
+native environment. Forty-three local and 56 native CPU checks pass. Native checks use the staged
+controller before deployment, with CUDA disabled. See `source-checks.json`.

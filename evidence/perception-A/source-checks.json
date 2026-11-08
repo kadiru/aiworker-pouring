@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "local_tests": 43,
+  "native_cpu_tests": 56,
+  "native_modules": [
+    "test_pour_guard",
+    "test_pour_finish",
+    "test_pour_size",
+    "test_pour_temporal_localization",
+    "test_pour_source_alignment",
+    "test_pour_settled"
+  ],
+  "scope": "Native CPU tests ran with staged new pour_guard_actor.py first on PYTHONPATH, existing native dependencies, CUDA_VISIBLE_DEVICES empty; simulator and other jobs kept running.",
+  "controller_sha256": "d5dda3ebec7ea504a3e65de3bb79f665bbb6ccd718c22c7afb4acab6038838bc",
+  "command": "docker exec -e CUDA_VISIBLE_DEVICES= -e PYTHONPATH=/tmp/perception-tests:/workspace/src:/workspace <owned-container> /isaac-sim/python.sh -m unittest test_pour_guard test_pour_finish test_pour_size test_pour_temporal_localization test_pour_source_alignment test_pour_settled -v"
+}

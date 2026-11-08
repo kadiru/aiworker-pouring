@@ -60,7 +60,7 @@ def main():
         result.append(r)
     report=dict(records=result,protected_parent_files_unchanged=True,unstarted=sorted(set(expected)-seen),
         started_incomplete=sorted(seen-{r['name'] for r in result}),
-        scope='Native static perception calibration; authored held poses are not autonomous task successes.',helper_sha256=sha(Path(__file__)))
+        scope='Native recording integrity and camera audit. Authored stationary/held fixtures are calibration only; autonomous outcomes are scored separately.',helper_sha256=sha(Path(__file__)))
     (ROOT/'recording-audit.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(complete=len(result),accepted_labels=sum(r.get('label',{}).get('accepted',False) for r in result),
         closed_by_split=dict(Counter(r['split'] for r in result)),
