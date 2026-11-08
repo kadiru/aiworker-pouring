@@ -1,5 +1,5 @@
 """4070 supervised point localization using whole-episode train/validation splits."""
-import copy,hashlib,json,sys,time,urllib.request
+import argparse,copy,hashlib,json,sys,time,urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -15,7 +15,7 @@ def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def write(n,v):(ROOT/n).write_text(json.dumps(v,indent=2)+'\n')
 
-def collect():
+def collect(dense=False):
     plan=read(ROOT/'plan.json');audit=read(ROOT/'recording-audit.json');indexed={r['name']:r for r in audit['records']}
     data={s:dict(images=[],uv=[],meta=[]) for s in ('train','validation')};manifest=[];native_cal=None
     def add(path,spec,split,camera,domain,indices):
@@ -32,7 +32,8 @@ def collect():
                 data[split]['meta'].append(dict(name=spec['name'],domain=domain,baseline_cup=spec.get('cup_height_scale',1.)==spec.get('cup_diameter_scale',1.)==1.,camera=cal,z=z,xy=spec['cup_world'][:2],group=group,index=i))
     for s,split,admission in admitted_scenes(plan):
         r=indexed[s['name']];path=Path(r['path']);assert sha(path)==r['sha256']
-        add(path,s,split,'cup_detail','native_detail',[('obs',0),('obs',11),('next_obs',-1)])
+        indices=[('obs',i) for i in range(12)]+[('next_obs',-1)] if dense else [('obs',0),('obs',11),('next_obs',-1)]
+        add(path,s,split,'cup_detail','native_detail',indices)
         manifest.append(dict(name=s['name'],split=split,recorded_split=s['study_split'],admission=admission,path=str(path),sha256=r['sha256'],domain='native_detail'))
     for r in read(Path('/workspace/learning/A-wide-20261105-v1/empty-readout-candidates.json'))['data_manifest']:
         path=Path(r['path']);assert sha(path)==r['sha256'];s=read(path.parent/'parameters.json')
@@ -62,21 +63,27 @@ def validate(model,data):
         margin=minimum-maximum,threshold=(minimum+maximum)/2,rows=rows)
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--refine-from',type=Path);args=parser.parse_args()
+    refinement=None
+    if args.refine_from is not None:
+        refinement=(ROOT/args.refine_from).resolve();assert refinement.is_relative_to(ROOT) and refinement.is_file() and refinement.suffix=='.pt'
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10));assert not h['queue'] and not h['recording']['active'] and not h.get('error')
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name()
     assert not (ROOT/'cup-neural-localization.json').exists();torch.set_num_threads(4);torch.manual_seed(261109)
-    start=time.perf_counter();plan,data,cal=collect();assert plan['primary_perception_scope']=='baseline_cup_only'
+    start=time.perf_counter();plan,data,cal=collect(dense=refinement is not None);assert plan['primary_perception_scope']=='baseline_cup_only'
     train=data['train'];validation=data['validation'];model=CupLocator().cuda()
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     state=model.state_dict()
     for i in (0,2,4):
         for suffix in ('weight','bias'):state[f'net.{i}.{suffix}']=parent['cup_model'][f'encoder.net.{i}.{suffix}']
-    model.load_state_dict(state);opt=torch.optim.AdamW(model.parameters(),lr=3e-4,weight_decay=1e-4)
+    if refinement is not None:state=torch.load(refinement,map_location='cpu',weights_only=False)['bank']['state']
+    model.load_state_dict(state);opt=torch.optim.AdamW(model.parameters(),lr=3e-5 if refinement is not None else 3e-4,weight_decay=1e-4)
     yy,xx=torch.meshgrid(torch.arange(96,device='cuda'),torch.arange(96,device='cuda'),indexing='ij');best=None;best_attempt=None;history=[];steps=0
     fit_start=time.perf_counter()
-    for epoch in range(1,601):
+    epochs=240 if refinement is not None else 600
+    for epoch in range(1,epochs+1):
         model.train()
-        if epoch in (301,451):
+        if epoch in ((121,181) if refinement is not None else (301,451)):
             for g in opt.param_groups:g['lr']/=3
         for ids in torch.randperm(len(train['x']),device='cuda').split(16):
             x=train['x'][ids].float();u=train['u'][ids].clone();n=len(x)
@@ -99,11 +106,13 @@ def main():
                 best_attempt=dict(epoch=epoch,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()},validation=result)
             training=validate(model,train)
             minimum=min(result['minimum_positive_score'],training['minimum_positive_score']);maximum=max(result['maximum_synthetic_absent_score'],training['maximum_synthetic_absent_score'])
+            row.update(training_max_error_mm=training['max_error_mm'],joint_absence_margin=minimum-maximum)
             eligible=max(result['max_error_mm'],training['max_error_mm'])<plan['component_gates']['localization_max_error_mm'] and minimum-maximum>plan['component_gates']['localization_negative_margin']
             if eligible and (best is None or result['max_error_mm']<best['validation']['max_error_mm']):
                 best=dict(epoch=epoch,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()},validation=result,training=training,threshold=(minimum+maximum)/2)
             if epoch%20==0:print(json.dumps(row),flush=True)
-    report=dict(passed=best is not None,scope='baseline_cup_only',epochs=600,optimizer_steps=steps,learned_parameters=sum(p.numel() for p in model.parameters()),
+    report=dict(passed=best is not None,scope='baseline_cup_only',epochs=epochs,optimizer_steps=steps,learned_parameters=sum(p.numel() for p in model.parameters()),
+        initialization=None if refinement is None else dict(path=str(refinement),sha256=sha(refinement)),native_frames_per_episode=13 if refinement is not None else 3,
         fit_seconds=time.perf_counter()-fit_start,total_seconds=time.perf_counter()-start,device=torch.cuda.get_device_name(),source_sha256=sha(Path(__file__)),module_sha256=sha(ROOT/'staged/pour_cup_locator.py'),admission_helper_sha256=sha(ROOT/'perception_fit_data.py'),
         counts={s:dict(images=len(a['x']),episodes=len({m['name'] for m in a['meta']}),native_images=sum(m['domain']=='native_detail' for m in a['meta'])) for s,a in data.items()},
         history=history,selected=None if best is None else dict(epoch=best['epoch'],**best['validation']),

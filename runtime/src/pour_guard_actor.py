@@ -257,7 +257,7 @@ class Actor:
             cnn=float(self.cup_model(a)[0])+self.saved['cup_bias'];features,_,n=surface_features(a);mass=float(n[0])
             from pour_guard_vision import color_geometry_readout
             geom=self.saved['surface_geometry']
-            geo=float(color_geometry_readout(a,geom)[0]) if mass>1. else 0.
+            geo=float(color_geometry_readout(a,geom,self.cup_xy)[0]) if mass>1. else 0.
             geo=float(np.clip(geo,0,1));cnn=float(np.clip(cnn,0,1))
             self.filtered=cnn if self.filtered is None else .6*self.filtered+.4*cnn
             self.level_history.append((t,geo,cnn,self.filtered))

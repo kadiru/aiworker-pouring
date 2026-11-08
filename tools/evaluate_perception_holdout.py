@@ -55,7 +55,7 @@ def main():
                     rgb=decode(d['next_obs/cup_detail_image'][i],'jpeg95')
                     crop=torch.from_numpy(cup_crop(rgb,xy,detail))[None]
                     cnn=float((model(crop)[0]+saved['cup_bias']).clamp(0,1));features,_,mass=surface_features(crop)
-                    geometry=saved['surface_geometry'];geo=float(color_geometry_readout(crop,geometry)[0]) if mass[0]>1 else 0.
+                    geometry=saved['surface_geometry'];geo=float(color_geometry_readout(crop,geometry,xy)[0]) if mass[0]>1 else 0.
                     estimates.append(dict(index=int(i),cnn=cnn,geometry=geo,error=cnn-label['target'],geometry_error=geo-label['target']))
         results.append(dict(name=name,source_sha256=record['sha256'],height_scale=spec['cup_height_scale'],diameter_scale=spec['cup_diameter_scale'],
             measured_label=label,temporal_confirmation=accepted,frames_considered=len(history),localization_error_mm=localization_error,

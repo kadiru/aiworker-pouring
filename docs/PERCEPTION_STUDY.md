@@ -89,13 +89,54 @@ Its original-cup views pass: 2.476 mm maximum validation / 2.566 mm training
 error. This narrower scope was declared before any reserved evaluation.
 An additional fit will include twelve new low/near-full baseline scenes at
 six existing training layouts and four explicitly reused camera/grip pilots.
-The twelve new geometry screens pass; native collection is ongoing.
+The twelve new geometry screens and native settled-label checks pass;
+collection is complete. All twelve final native stills are inspected, with
+visible low/near-full surfaces and partial bottle occlusion in held views.
+There are now 73 complete records and 292 SHA-verified local scalar sidecars.
+Supplemental measured levels span 7.06–97.67%.
 Recorded splits stay unchanged, and the fit manifest records pilot reuse. Its targets are offline projected physical rim centers;
 runtime input is RGB. The loss is focal heatmap loss plus twice smooth-L1
 offset loss. Training adds integer image translations, mild photometric
 changes and explicitly synthetic absent-cup masks. Old train/validation task
 views are replayed alongside the new detail views. No reserved images or
 autonomous outcomes have been consumed for this repair.
+
+## Accepted baseline candidate and retained failures
+
+After the extra data, a 600-epoch / 7,200-update localizer fit passed on
+sampled views but failed its actual temporal check at 3.106 mm. A separate
+240-epoch / 9,120-update refinement used all twelve early frames plus the
+final image: 607/276 images, 67/28 train/validation episodes. It improved
+training precision but still failed validation at 4.287 mm. Both are retained.
+
+A fixed equal-weight average of these two 42,947-parameter models passes
+both per-frame and eight-vote temporal checks. It uses the lesser confidence
+and rejects model disagreement above 6 pixels. Original-cup maximum errors
+are 2.576 mm training / 2.699 mm validation; no size-generalization pass is
+claimed. No ensemble-weight search or reserved images were used.
+
+The new 58,561-parameter cup CNN used 240 epochs / 4,080 updates and
+1,049/368 train/validation images. Primary original-cup validation is only
+four episodes / 44 images, including 33 near-full frames. Selected epoch
+235 has 1.753-point MAE, 1.854-point near-full maximum error and 1.573-point
+maximum overestimate. The independent linear color model failed at 6.730
+points; adding image-derived view position did not improve it. Those fits
+and source are preserved. Four predefined nonlinear color candidates were
+then compared with CNN weights fixed: two feature sets and two native
+training domains, fixed unit RBF bandwidth and .01 ridge. The selected
+thirteen-color-feature model uses one prototype per 43 training episodes
+and 44 coefficients/intercept; maximum validation error is 5.916 points
+against the unchanged 6-point gate. It uses no level-CNN features or live
+particle/object truth. Its narrow margin requires independent evaluation.
+
+The combined candidate is
+`7c872d14a588b913f9a62d30762775a0d4ee6de909571f7e4cf2fd266ad85fd1`.
+Nine new original-cup holdouts span low through near-full seed cuts and
+small position jitters; geometry/frustum checks pass. The original nine
+size holdouts remain unstarted and deferred. Six development and six
+reserved autonomous attempts remain gated behind these checks. The
+candidate is deployed only to the owned simulator; no autonomous result
+is claimed from component validation.
 
 ## Prepared learning and evaluation
 
@@ -166,5 +207,5 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=runtime/src .venv/bin/python -m unittest te
 ```
 
 Controller/geometry checks requiring Torch run CPU-only in the existing
-native environment. Forty-seven local and 58 native CPU checks pass. Native checks use the staged
+native environment. Forty-seven local and 62 native CPU checks pass. Native checks use the staged
 controller before deployment, with CUDA disabled. See `source-checks.json`.

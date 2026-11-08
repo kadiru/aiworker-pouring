@@ -3,7 +3,7 @@
 Writes component artifacts only. No active checkpoint replacement, test-data
 access, or changes to physics/task scores occur in this helper.
 """
-import copy,hashlib,json,sys,time,urllib.request
+import argparse,copy,hashlib,json,sys,time,urllib.request
 from itertools import product
 from pathlib import Path
 import numpy as np
@@ -99,7 +99,8 @@ def localize(seq,detail,gate):
         baseline=s['cup_height_scale']==s['cup_diameter_scale']==1.
         e['localized_xy']=None if accepted is None else plane_point(accepted['uv'],z,cal)[:2]
         error=None if accepted is None else float(np.linalg.norm(e['localized_xy']-s['cup_world'][:2])*1000)
-        windows.append(dict(name=s['name'],baseline_cup=baseline,confirmed=accepted is not None,error_mm=error,frames=len(history)))
+        e['level_fit_usable']=error is not None and error<gate['localization_max_error_mm']
+        windows.append(dict(name=s['name'],baseline_cup=baseline,confirmed=accepted is not None,error_mm=error,frames=len(history),level_fit_usable=e['level_fit_usable']))
         if baseline and (accepted is None or error>=gate['localization_max_error_mm']):
             return None,dict(passed=False,scope='baseline_cup_only',reason='Baseline temporal localization failed',windows=windows)
     return selected,dict(passed=True,scope='baseline_cup_only',windows=windows,
@@ -108,17 +109,18 @@ def localize(seq,detail,gate):
         resized_autonomy_authorized=False,selection_sha256=sha(ROOT/'scope-selection.json'),
         method='Supervised RGB center heatmap plus subpixel offsets and unchanged eight-vote temporal confirmation. Original vessel dimensions only; resized autonomy remains gated.')
 
-def fit_level(seq,cal,gate,parent):
-    data={s:dict(image=[],target=[],name=[],domain=[]) for s in ('train','validation')}
+def fit_level(seq,cal,gate,parent,fixed_cnn=None):
+    data={s:dict(image=[],target=[],name=[],domain=[],xy=[]) for s in ('train','validation')}
     for e in seq:
         label=e['entry']['label'];s=e['spec']
-        if not label['accepted'] or e['localized_xy'] is None:continue
+        if not label['accepted'] or not e['level_fit_usable']:continue
         actual=copy.deepcopy(cal);actual['cup_geometry']=s['declared_cup_geometry'];a=data[e['fit_split']]
         with h5py.File(e['entry']['path']) as f:
             d=f['data/demo_0'];times=d['next_time'][:];ids=np.flatnonzero(times>=times[-1]-1.-1e-7)
             for i in ids[::2]:
                 image=cup_crop(decode(d['next_obs/cup_detail_image'][i],'jpeg95'),e['localized_xy'],actual)
                 a['image'].append(image);a['target'].append(label['target']);a['name'].append(s['name']);a['domain'].append('native_detail')
+                a['xy'].append(e['localized_xy'])
     # Rehearse earlier real pouring appearances to avoid replacing dynamic
     # perception with a model trained only on stationary high-resolution cups.
     # These remain original lower-resolution task images, never synthetic
@@ -140,6 +142,7 @@ def fit_level(seq,cal,gate,parent):
                     if stable['accepted']:target=stable['target'];label_source='measured_trailing_stable_median'
                 image=cup_crop(decode(d['next_obs/task_image'][int(i)],'jpeg95'),xy,parent['calibration'])
                 a['image'].append(image);a['target'].append(target);a['name'].append(entry['name']);a['domain'].append('historical_task_replay')
+                a['xy'].append(xy)
                 used.append(dict(index=int(i),target=target,label_source=label_source))
         replay.append(dict(name=entry['name'],split=entry['split'],path=str(path),sha256=entry['sha256'],frames=used))
     write('cup-replay-manifest.json',replay)
@@ -147,6 +150,7 @@ def fit_level(seq,cal,gate,parent):
     for s,a in data.items():
         assert len({n for n,d in zip(a['name'],a['domain']) if d=='native_detail'})>=(20 if s=='train' else 14),f'Insufficient stable episodes in {s}'
         a['x']=torch.from_numpy(np.stack(a.pop('image'))).cuda();a['y']=torch.tensor(a['target'],device='cuda')
+        a['xy']=torch.tensor(np.asarray(a['xy']),device='cuda',dtype=torch.float32)
     tr,va=data['train'],data['validation'];all_native=torch.tensor([d=='native_detail' for d in va['domain']],device='cuda')
     baseline_names={e['spec']['name'] for e in seq if e['spec']['cup_height_scale']==e['spec']['cup_diameter_scale']==1.}
     native=all_native & torch.tensor([n in baseline_names for n in va['name']],device='cuda');replay_mask=~all_native
@@ -159,7 +163,18 @@ def fit_level(seq,cal,gate,parent):
     opt=torch.optim.AdamW(model.parameters(),lr=2e-4,weight_decay=1e-4)
     domain_weight=torch.tensor([4. if d=='native_detail' else 1. for d in tr['domain']],device='cuda')
     history=[];best=None;best_attempt=None;steps=0
-    for epoch in range(1,241):
+    if fixed_cnn is not None:
+        model.load_state_dict(fixed_cnn['cup_model']);model.eval()
+        with torch.no_grad():
+            pred=torch.cat([model(x) for x in va['x'].split(128)]);error=pred-va['y']
+            row=dict(epoch=fixed_cnn['selected']['epoch'],mae=float(error[native].abs().mean()),near_mae=float(error[near].abs().mean()),
+                near_max=float(error[near].abs().max()),near_overestimate=float(error[near].max()),historical_replay_mae=float(error[replay_mask].abs().mean()),
+                unvalidated_size_mae=float(error[all_native & ~native].abs().mean()))
+            assert row['mae']<gate['level_validation_mae'] and row['near_max']<gate['level_validation_near_max_error'] and row['near_overestimate']<gate['level_validation_near_overestimate']
+            assert row['historical_replay_mae']<=max(.05,replay_baseline_mae+.015)
+            best=best_attempt=dict(row=row,state=fixed_cnn['cup_model'],score=row['mae']+row['near_mae']+.3*row['near_max'])
+    epochs=0 if fixed_cnn is not None else 240
+    for epoch in range(1,epochs+1):
         model.train()
         if epoch in (121,181):
             for g in opt.param_groups:g['lr']/=3
@@ -180,28 +195,49 @@ def fit_level(seq,cal,gate,parent):
     with torch.no_grad():
         train_native=torch.tensor([d=='native_detail' for d in tr['domain']],device='cuda')
         train_baseline=train_native & torch.tensor([n in baseline_names for n in tr['name']],device='cuda')
-        all_features=color_geometry_features(tr['x']).double();valid_features=color_geometry_features(va['x'][native]).double();geo=[]
+        all_features=color_geometry_features(tr['x'],tr['xy']).double();valid_features=color_geometry_features(va['x'][native],va['xy'][native]).double();geo=[]
         _,_,valid_mass=surface_features(va['x'][native])
         for domain,mask in (('all_native',train_native),('baseline_native',train_baseline),('native_and_replay',torch.ones_like(train_native))):
-            for dimensions in (4,13,19):
+            for dimensions in (4,13,19,27):
                 raw=all_features[mask,:dimensions];mean=raw.mean(0);scale=raw.std(0).clamp(min=.01);mean[0]=0;scale[0]=1
                 x=(raw-mean)/scale;vx=(valid_features[:,:dimensions]-mean)/scale;y=tr['y'][mask].double()
                 for ridge in (1e-4,.01,.1,1.,10.):
                     reg=torch.eye(dimensions,device='cuda',dtype=torch.float64)*ridge;reg[0,0]=1e-12
                     coef=torch.linalg.solve(x.T@x+reg,x.T@y);pred=torch.where(valid_mass>1.,(vx@coef).clamp(0,1),0.);err=pred-va['y'][native]
-                    geo.append(dict(feature_kind='color_envelope_v1',coef=coef.cpu().tolist(),mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),
+                    geo.append(dict(feature_kind='color_envelope_pose_v2' if dimensions==27 else 'color_envelope_v1',coef=coef.cpu().tolist(),mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),
                         dimensions=dimensions,bias=0.,ridge=ridge,training_domain=domain,mae=float(err.abs().mean()),max_error=float(err.abs().max())))
+        # Four predefined nonlinear candidates: two feature sets x two native
+        # domains, fixed bandwidth and ridge. One prototype per training
+        # episode prevents correlated stationary frames from multiplying weight.
+        from pour_guard_vision import color_geometry_readout
+        for domain,mask in (('all_native',train_native),('baseline_native',train_baseline)):
+            names=sorted({n for n,keep in zip(tr['name'],mask.tolist()) if keep});prototypes=[];targets=[]
+            for name in names:
+                ids=torch.tensor([n==name for n in tr['name']],device='cuda')&mask
+                prototypes.append(all_features[ids].mean(0));targets.append(tr['y'][ids].double().mean())
+            targets=torch.stack(targets)
+            for dimensions in (13,27):
+                raw=torch.stack(prototypes)[:,:dimensions];mean=raw.mean(0);scale=raw.std(0).clamp(min=.01);mean[0]=0;scale[0]=1
+                centers=(raw-mean)/scale;distance=(centers[:,None]-centers[None]).square().mean(-1)
+                kernel=torch.exp(-distance/2);bias=targets.mean();alpha=torch.linalg.solve(kernel+.01*torch.eye(len(names),device='cuda',dtype=torch.float64),targets-bias)
+                fitted=dict(feature_kind='color_kernel_v3',dimensions=dimensions,mean=mean.cpu().tolist(),scale=scale.cpu().tolist(),
+                    centers=centers.cpu().tolist(),alpha=alpha.cpu().tolist(),bias=float(bias),length_scale=1.,ridge=.01,
+                    training_domain=domain,training_episodes=names,parameter_count=len(names)+1)
+                pred=color_geometry_readout(va['x'][native],fitted,va['xy'][native]);pred=torch.where(valid_mass>1.,pred,0.)
+                err=pred-va['y'][native];fitted.update(mae=float(err.abs().mean()),max_error=float(err.abs().max()));geo.append(fitted)
         geometry=min(geo,key=lambda g:g['max_error'])
     passed=best is not None and geometry['max_error']<gate['geometry_validation_max_error']
-    public_geo=lambda g:{k:v for k,v in g.items() if k not in ('coef','mean','scale')}
+    public_geo=lambda g:{k:v for k,v in g.items() if k not in ('coef','mean','scale','centers','alpha','training_episodes')}
+    color_parameters=geometry.get('parameter_count',geometry['dimensions'])
     report=dict(passed=passed,scope='baseline_cup_only',selected=None if best is None else best['row'],geometry=public_geo(geometry),geometry_candidates=[public_geo(g) for g in geo],
         primary_native_validation=dict(episodes=len({n for n,m in zip(va['name'],native.tolist()) if m}),images=int(native.sum()),near_full_images=int(near.sum())),
         counts={s:dict(episodes=len(set(a['name'])),images=len(a['y']),min_target=float(a['y'].min()),max_target=float(a['y'].max()),
             domains={d:dict(images=sum(v==d for v in a['domain']),episodes=len({n for n,v in zip(a['name'],a['domain']) if v==d})) for d in set(a['domain'])}) for s,a in data.items()},
         historical_replay_baseline_mae=replay_baseline_mae,replay_scope='Original lower-resolution task views from 24/8 train/validation references. New-record weight 4, replay weight 1. Dynamic appearances retained; no reserved tests or generated detail pixels.',
-        candidates=history,learned_parameters=sum(p.numel() for p in model.parameters())+geometry['dimensions'],epochs=240,optimizer_steps=steps,
-        method='Supervised RGB cup-level regression; pretrained CNN fine-tuned with weighted squared error, AdamW and mild photometric augmentation. Independent spatial-color envelope ridge regression; no CNN features in that cross-check. Episode-disjoint validation selects candidates; no reserved test images.',
-        target_source='Measured final-second surface median for each stationary native recording; image-localized crops, declared cup dimensions. No inventory-derived target lookup.')
+        candidates=history,learned_parameters=sum(p.numel() for p in model.parameters())+color_parameters,epochs=epochs,optimizer_steps=steps,cnn_weights_retained=fixed_cnn is not None,
+        newly_fitted_parameters=color_parameters if fixed_cnn is not None else sum(p.numel() for p in model.parameters())+color_parameters,
+        method='Supervised RGB cup-level regression, with optional reuse of an already accepted CNN. Independent explicit-color ridge or RBF kernel regression; optional image-localized XY handles viewing angle. Kernel candidates use one prototype per training episode, fixed unit bandwidth and .01 ridge. No level-CNN features or runtime ground truth. Episode-disjoint validation selects candidates; no reserved test images.',
+        target_source='Measured final-second surface median for each stationary native recording; image-localized crops, declared cup dimensions. Native scenes with >=3 mm offline measured localization error are excluded from level fitting; any baseline localization failure rejects the component. No truth-centered crops or inventory-derived target lookup.')
     attempt=best or best_attempt
     torch.save(dict(cup_model=attempt['state'],geometry=geometry,selected=attempt['row'],accepted=passed),ROOT/'cup-level-attempt.pt')
     report['attempt_checkpoint_sha256']=sha(ROOT/'cup-level-attempt.pt')
@@ -210,7 +246,7 @@ def fit_level(seq,cal,gate,parent):
         from pour_guard_vision import color_geometry_readout
         for split,a in data.items():
             cnn=torch.cat([model(x) for x in a['x'].split(128)]).clamp(0,1)
-            color=color_geometry_readout(a['x'],geometry);_,_,mass=surface_features(a['x']);color=torch.where(mass>1.,color,0.)
+            color=color_geometry_readout(a['x'],geometry,a['xy']);_,_,mass=surface_features(a['x']);color=torch.where(mass>1.,color,0.)
             predictions.extend(dict(name=n,split=split,domain=d,target=y,cnn=c,geometry=g,baseline_cup=n in baseline_names)
                 for n,d,y,c,g in zip(a['name'],a['domain'],a['target'],cnn.cpu().tolist(),color.cpu().tolist()))
     write('cup-level-predictions.json',predictions)
@@ -219,6 +255,11 @@ def fit_level(seq,cal,gate,parent):
     return artifact,report
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--cnn-from',type=Path);args=parser.parse_args()
+    fixed_path=None;fixed=None
+    if args.cnn_from is not None:
+        fixed_path=(ROOT/args.cnn_from).resolve();assert fixed_path.is_relative_to(ROOT) and fixed_path.suffix=='.pt' and fixed_path.is_file()
+        fixed=torch.load(fixed_path,map_location='cpu',weights_only=False)
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10))
     assert not h['queue'] and not h['recording']['active'] and not h.get('error')
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name()
@@ -228,7 +269,9 @@ def main():
     report=dict(passed=False,scope='baseline_cup_only',device=torch.cuda.get_device_name(),localization_passed=loc is not None,source_sha256=sha(Path(__file__)),
         admission_helper_sha256=sha(ROOT/'perception_fit_data.py'),vision_module_sha256=sha(ROOT/'staged/pour_guard_vision.py'))
     if loc is not None:
-        level,level_report=fit_level(seq,cal,plan['component_gates'],parent);write('cup-level-validation.json',level_report)
+        level,level_report=fit_level(seq,cal,plan['component_gates'],parent,fixed_cnn=fixed)
+        if fixed_path is not None:level_report['cnn_initialization']=dict(path=str(fixed_path),sha256=sha(fixed_path))
+        write('cup-level-validation.json',level_report)
         report.update(level_passed=level is not None)
         if level is not None:
             torch.save(dict(localization=loc,level=level,detail_calibration=cal),ROOT/'cup-component.pt')

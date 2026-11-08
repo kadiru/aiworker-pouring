@@ -7,7 +7,7 @@ ROOT=w.HOST_ROOT/'learning/A-perception-20261108-v1'
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--component',choices=('locator','cup'),required=True);p.add_argument('--round',required=True);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--component',choices=('locator','cup'),required=True);p.add_argument('--round',required=True);p.add_argument('--refine-from');p.add_argument('--cnn-from');a=p.parse_args()
     assert a.round.replace('-','').isalnum()
     out=Path('/tmp')/('aiworker-perception-'+a.component+'-'+a.round);out.mkdir(exist_ok=False)
     manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');audit=read(ROOT/'recording-audit.json')
@@ -24,10 +24,19 @@ def main():
     report='cup-neural-localization.json' if a.component=='locator' else 'cup-component.json'
     assert not (ROOT/report).exists(),'Archive previous reports before starting a new fit'
     helper='fit_perception_locator.py' if a.component=='locator' else 'fit_perception_cup.py'
+    extra=[]
+    if a.refine_from:
+        assert a.component=='locator'
+        initial=(ROOT/a.refine_from).resolve();assert initial.is_relative_to(ROOT) and initial.is_file() and initial.suffix=='.pt'
+        extra=['--refine-from',a.refine_from]
+    if a.cnn_from:
+        assert a.component=='cup' and not a.refine_from
+        initial=(ROOT/a.cnn_from).resolve();assert initial.is_relative_to(ROOT) and initial.is_file() and initial.suffix=='.pt'
+        extra=['--cnn-from',a.cnn_from]
     identity=sha(ROOT/helper)
     (out/'runtime-before.json').write_text(json.dumps(dict(witness,helper_sha256=identity),indent=2)+'\n')
     with (out/'fit.log').open('x') as log:
-        result=subprocess.run(['docker','exec',w.CID,'nice','-n','10','/isaac-sim/python.sh','/workspace/learning/A-perception-20261108-v1/'+helper],stdout=log,stderr=subprocess.STDOUT)
+        result=subprocess.run(['docker','exec',w.CID,'nice','-n','10','/isaac-sim/python.sh','/workspace/learning/A-perception-20261108-v1/'+helper]+extra,stdout=log,stderr=subprocess.STDOUT)
     (out/'runtime-after.json').write_text(json.dumps(w.isolation(),indent=2)+'\n')
     assert sha(ROOT/'best.pt')==manifest['checkpoint_sha256'] and sha(ROOT/'plan.json')==manifest['plan_sha256']
     assert sha(ROOT/helper)==identity

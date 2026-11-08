@@ -21,8 +21,16 @@ def centers(output):
     return (torch.stack((x,y),1)+offsets)*4,score
 
 _CACHE={}
+def combine_predictions(predictions,max_disagreement_px):
+    uv=np.asarray([p[0] for p in predictions]);score=min(p[1] for p in predictions)
+    if np.linalg.norm(uv[0]-uv[1])>max_disagreement_px:score=0.
+    return uv.mean(0),float(score)
+
 @torch.inference_mode()
 def locate_cup(image,bank,device='cuda'):
+    if bank['kind']=='cup_heatmap_ensemble':
+        assert len(bank['members'])==2
+        return combine_predictions([locate_cup(image,b,device) for b in bank['members']],bank['max_disagreement_px'])
     key=(bank['identity'],str(device))
     if key not in _CACHE:
         model=CupLocator().to(device).eval();model.load_state_dict(bank['state']);_CACHE[key]=model

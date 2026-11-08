@@ -82,7 +82,7 @@ def make_bank(images,anchors,kind,device='cuda',aggregation='median',absolute_gr
 
 @torch.inference_mode()
 def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
-    if bank.get('kind')=='cup_heatmap':
+    if bank.get('kind') in ('cup_heatmap','cup_heatmap_ensemble'):
         from pour_cup_locator import locate_cup
         return locate_cup(image,bank,device)
     if bank.get('alternatives'):
@@ -153,7 +153,7 @@ def surface_features(image):
     return features,hist,mass
 
 
-def color_geometry_features(image):
+def color_geometry_features(image,xy=None):
     """Spatial color-envelope features independent of the level CNN."""
     base,hist,mass=surface_features(image)
     qs=image.new_tensor([.02,.05,.1,.25,.5,.75,.9,.95,.98],dtype=torch.float32)
@@ -167,12 +167,29 @@ def color_geometry_features(image):
         center=(rows*yy).sum(1)/total
         top=(rows.cumsum(1)/total[:,None]>=.05).float().argmax(1).float()/95.
         side.extend((center,top))
-    return torch.cat((base,quantiles,torch.stack(side,1)),1)
+    features=torch.cat((base,quantiles,torch.stack(side,1)),1)
+    if xy is None:return features
+    position=torch.as_tensor(xy,device=image.device,dtype=torch.float32).reshape(-1,2)
+    if len(position)==1:position=position.expand(len(image),2)
+    assert len(position)==len(image)
+    position=(position-position.new_tensor([.5,-.225]))/.15
+    interactions=(features[:,[1,5,8],None]*position[:,None,:]).flatten(1)
+    return torch.cat((features,position,interactions),1)
 
 
-def color_geometry_readout(image,fitted):
-    if fitted.get('feature_kind')=='color_envelope_v1':
-        x=color_geometry_features(image)[:,:fitted['dimensions']]
+def color_geometry_readout(image,fitted,xy=None):
+    if fitted.get('feature_kind')=='color_kernel_v3':
+        use_pose=fitted['dimensions']==27
+        if use_pose:assert xy is not None,'Image-localized cup position is required'
+        x=color_geometry_features(image,xy if use_pose else None)[:,:fitted['dimensions']].double()
+        x=(x-x.new_tensor(fitted['mean']))/x.new_tensor(fitted['scale'])
+        centers=x.new_tensor(fitted['centers']);distance=(x[:,None]-centers[None]).square().mean(-1)
+        kernel=torch.exp(-distance/(2*fitted['length_scale']**2))
+        return (kernel@x.new_tensor(fitted['alpha'])+fitted['bias']).clamp(0,1)
+    if fitted.get('feature_kind') in ('color_envelope_v1','color_envelope_pose_v2'):
+        use_pose=fitted['feature_kind']=='color_envelope_pose_v2'
+        if use_pose:assert xy is not None,'Image-localized cup position is required'
+        x=color_geometry_features(image,xy if use_pose else None)[:,:fitted['dimensions']]
         x=(x-x.new_tensor(fitted['mean']))/x.new_tensor(fitted['scale'])
     else:x=surface_features(image)[0][:,:fitted['dimensions']]
     return (x@x.new_tensor(fitted['coef'])+fitted.get('bias',0.)).clamp(0,1)

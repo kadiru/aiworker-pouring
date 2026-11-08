@@ -33,7 +33,7 @@ def main():
     outputs=w.HOST_ROOT/'outputs/fountain'
     existing={read(p)['name'] for p in outputs.glob('*/*PV_A_*/parameters.json')}
     assert not expected.keys()&existing,'Never retry or silently resume a started split'
-    h=w.health();assert not h['queue'] and not h['recording']['active'] and not h.get('error')
+    h=w.health();assert not h['queue'] and not h.get('recording',{}).get('active',False) and not h.get('error')
     a.output.mkdir();(a.output/'runtime-before.json').write_text(json.dumps(capture(manifest),indent=2)+'\n')
     w.command('perception_'+a.part);seen={};deadline=time.monotonic()+6*3600
     while time.monotonic()<deadline:
