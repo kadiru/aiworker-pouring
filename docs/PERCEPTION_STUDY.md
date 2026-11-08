@@ -159,8 +159,25 @@ reserved tests remain unstarted, as do the deferred size holdouts.
 
 A six-parameter affine correction on the frozen localizer failed at 3.159 mm
 maximum training error / 2.811 mm validation; its report is retained. The
-next bounded fit refines detector weights using all admitted training records,
-initialized from round-0 ensemble member 0. Current data contains 82 complete
+bounded fit refined detector weights using all admitted training records,
+initialized from round-0 ensemble member 0. The selected single-model epoch
+60 passes at 2.088 mm training / 2.075 mm validation; actual eight-vote temporal
+maximum is 1.596 mm. The full fit used 240 epochs / 11,040 updates / 240.171
+seconds, with 724/276 images from 76/28 train/validation episodes. Later
+epochs and all resized-cup errors remain in the report; resized autonomy
+remains blocked.
+
+The round-1 level fit passes: selected epoch 118, 1.106-point MAE,
+1.179-point near-full maximum absolute error, and 0.823-point maximum
+overestimate. It used 240 epochs / 4,320 updates and 1,137/379 images;
+the whole level preparation/fit took 42.203 seconds. The selected independent
+color check is now a 27-feature ridge model (baseline native training,
+ridge .01), maximum error 4.141 points. It uses explicit color features and
+image-localized viewing position, with no level-CNN features or live truth.
+The round-1 checkpoint is
+`d229c16180e2fc06d068a898bab3dfa970913b0f6a6d9a29f7a17c9ee8a73a21`;
+its local backup and tested source hashes are verified. The nine fresh
+checks are now running with this candidate fixed. Current data contains 82 complete
 native records; all 328 scalar sidecars are SHA-verified locally. This is not
 a full local backup of raw HDF5 images or particle trajectories.
 
@@ -234,7 +251,7 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=runtime/src .venv/bin/python -m unittest te
 ```
 
 Controller/geometry checks requiring Torch run CPU-only in the existing
-native environment. Forty-eight local and 62 round-0 native CPU checks pass. Native checks use the staged
+native environment. Forty-eight local and 63 round-1 native CPU checks pass. Native checks use the staged
 controller before deployment, with CUDA disabled. See `source-checks-components.json`.
 
 The finite holdout observer writes host-side progress to
