@@ -146,3 +146,21 @@ After all thirty current tests and their audit/backup finish, run:
 The timing report also locates the final uninterrupted zero-source stretch and its interval to the first stop command. This is diagnostic only, not a new scoring criterion; a negative interval can be valid under the declared near-empty tolerance. R3 development intervals are −0.20 to +0.50 seconds across its four empty cases. The original r3 pass counts and frozen selection are unchanged.
 
 A fresh test exposes missing terminal motion, so the withdrawal report now explicitly counts observed return/post-release samples and records absent measurements as `null`. A trajectory that never returns or releases must not be described as a zero-dwell or zero-recontact success. The reporting-only update exactly preserves every original measurement for all eight completed r3 returns; `development-r3-withdrawal-reporting-check.json` records that comparison input/output. Runtime controls and existing strict test criteria remain frozen.
+
+## Read-only diagnosis during frozen evaluation
+
+At seventeen closed tests, fourteen pass strictly and sixteen have zero measured loss. The controller remains frozen. Two retained failures are diagnosed from SHA-verified scalar copies in `failure-diagnostic-sources.json`; the complete benchmark/recording audit remains pending.
+
+- Case 13 stays empty from 25.455 s to its 60.005 s endpoint without stopping. All 691 subsequent commands have a wrist empty score above 98.6%, but fused bottle presence remains 58.9–65.7%. Presence must be at least 70% for either empty-stop path; the separate lost-source abort requires below 5%. This interval therefore blocks both terminal actions. Encoder obstruction remains true, but the physical two-finger score is only 42.05% of tipping samples. Neither encoder obstruction nor the visual empty score establishes secure grasp; the physical cause is not proven.
+- Case 15 exhausts thirteen pauses with a six-estimate lower quartile of 91.6981%, below the 92.5414% fullness threshold. It returns safely with `fill_unconfirmed` and final settled height 95.6051%. The physical fill does not turn the unconfirmed stop into a strict pass.
+
+Reproduce this reporting-only diagnostic with:
+
+```sh
+.venv/bin/python tools/diagnose_finish_stop_gates.py \
+  --sources evidence/finish-A/failure-diagnostic-sources.json \
+  --model evidence/finish-A/model-summary.json \
+  --output /tmp/aiworker-finish-stop-gates-check.json
+```
+
+This command verifies scalar bytes/hashes and the frozen controller source hashes. It does not run inference, change thresholds, retry tests or predict a counterfactual outcome. Failure video labels preserve these distinctions; two selected native final-frame previews have been inspected.

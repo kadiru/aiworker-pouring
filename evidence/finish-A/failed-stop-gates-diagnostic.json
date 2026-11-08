@@ -1,0 +1,71 @@
+{
+  "sources_sha256": "fb48e1108d0a4497d6df6805c7b30df40603f927f0d4293c74b1ee16c0650353",
+  "model_summary_sha256": "634eae6b84eef8e6de82256820075f64f8e320dc27d454d35490cac9ee953c4a",
+  "analysis_source_sha256": "325828ad3a3b8ad8d4f0a3bda260a262737495f508269b8a33a70b4e4ba5ce0c",
+  "checkpoint_sha256": "5068af6b18583afcb3eff231110c63896e0be898f389b9aad940f9e9405179d3",
+  "cases": [
+    {
+      "name": "FN30_A_test_13",
+      "recording_sha256": "9dc6a6a0d03cb96e28a281beccf5d138dd59b42742d003938b924bbbc8a20675",
+      "stop_reason": null,
+      "final_mode": "Pour control: coarse",
+      "sustained_two_finger_fraction": 0.42052679382379654,
+      "final_source_ml": 0.0,
+      "final_rim_fraction": 0.581021151823155,
+      "empty_gate": {
+        "first_final_zero_sample_s": 25.455,
+        "end_of_record_s": 60.005,
+        "decisions_while_known_empty": 691,
+        "failed_normal_gates": {
+          "source_present": 691
+        },
+        "normal_longest_qualifying_streak": 0,
+        "normal_required_streak": 12,
+        "empty_probability_range": [
+          0.986136794090271,
+          0.9986259937286377
+        ],
+        "source_present_probability_range": [
+          0.5888344645500183,
+          0.6570296883583069
+        ],
+        "source_presence_deadband_count": 691,
+        "encoder_hold_count": 691,
+        "slow_empty_max_votes": 0,
+        "final_cap_dwell_seconds": 32.399999999976856
+      },
+      "full_gate": null
+    },
+    {
+      "name": "FN30_A_test_15",
+      "recording_sha256": "90b8ce0f191ba30ca862e7c89b908efc51e52d8167fa996cf89e9f175ff1b3fc",
+      "stop_reason": "fill_unconfirmed",
+      "final_mode": "Holding completed pose",
+      "sustained_two_finger_fraction": 1.0,
+      "final_source_ml": 28.086911999999998,
+      "final_rim_fraction": 0.956051297748789,
+      "empty_gate": null,
+      "full_gate": {
+        "command_time_s": 51.304999998760245,
+        "six_level_predictions": [
+          0.9165127277374268,
+          0.9181520938873291,
+          0.9168550968170166,
+          0.9178343415260315,
+          0.9173581004142761,
+          0.9175624251365662
+        ],
+        "q25_level": 0.9169808477163315,
+        "std": 0.000557373859057819,
+        "median_geometry": 0.8557880520820618,
+        "required_level": 0.9254140157699585,
+        "below_required_level": true,
+        "pause_count": 13,
+        "max_pauses": 13,
+        "next_sample_height": 0.980222909590776,
+        "final_settled_height": 0.956051297748789
+      }
+    }
+  ],
+  "scope": "Recorded-decision diagnosis only. Source presence below 0.7 blocks both empty-stop paths; presence below 0.05 is required for the separate lost-source abort. Encoder obstruction is not proof of two-finger contact. Full-stop quantile is reconstructed from six recorded estimates; a below-target value alone blocks fullness confirmation. No counterfactual outcome or physical cause of lost contact is established. Full benchmark audit is separate."
+}
