@@ -114,6 +114,7 @@ class RobotPour(Pour):
         self.position.Set(Gf.Vec3d(*(self.cup_world + FRAME @ [*self.start_xy,.0002])))
         self.points[:,:2] += self.start_xy - [START_X,0.]
         self.points=(self.points @ FRAME.T+self.cup_world+[0.,0.,.0002]).astype(np.float32)
+        self.initial_bottle_count=len(self.points)
         if spec.get('cup_initial_ml',0)>0:
             spacing=spec['spacing']
             radius=.020-2*spacing
@@ -126,7 +127,7 @@ class RobotPour(Pour):
             if 'cup_height_scale' in spec or 'cup_diameter_scale' in spec:
                 from pour_vessel_geometry import initial_cup_points
                 cup_points=initial_cup_points(spec)
-            if spec.get('calibration_version') in (1,2):
+            if spec.get('calibration_version') in (1,2,3):
                 from pour_finish_calibration import cup_points as calibration_points
                 cup_points=calibration_points(spec)
                 assert abs(len(cup_points)*spacing**3*1e6-spec['cup_initial_ml'])<1e-6
@@ -299,6 +300,13 @@ class RobotPour(Pour):
         row=super().observe((p-self.cup_world) @ FRAME,v @ FRAME,t)
         self.last_observation=row
         local=(p-self.cup_world) @ FRAME
+        if self.spec.get('record_particle_diagnostics'):
+            from bottle_pour import vessel_mask,BOTTLE
+            outside=~(vessel_mask(local,self.cup_profile)|vessel_mask((local-self.base)@self.rotation,BOTTLE))
+            ids=np.flatnonzero(outside)
+            row['diagnostic_outside_particles']=[dict(index=int(i),origin='bottle' if i<self.initial_bottle_count else 'cup',
+                xyz_cup_frame_m=local[i].tolist(),velocity_m_s=(v[i]@FRAME).tolist()) for i in ids[:32]]
+            row['diagnostic_outside_count']=len(ids)
         if self.ever_table_particles is None: self.ever_table_particles=np.zeros(len(p),dtype=bool)
         self.ever_table_particles |= (local[:,2]<.0035)
         row['ever_table_ml']=float(self.ever_table_particles.sum()*self.spec['spacing']**3*1e6)

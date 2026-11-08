@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from bottle_pour import CUP, CAPACITY_ML, vessel_mask
-from pour_vessel_geometry import cup_profile, cup_geometry, initial_cup_points, capacity_ml
+from pour_vessel_geometry import cup_profile, cup_geometry, initial_cup_points, capacity_ml,settled_cup_points
 from pour_source_watchdog import SourceWatchdog, DEFAULT
 
 
@@ -25,6 +25,16 @@ class SizeTests(unittest.TestCase):
         for key,value in [('cup_height_scale',float('nan')),('cup_diameter_scale',1.2),('bottle_neck_scale',.9)]:
             with self.assertRaises(ValueError):cup_profile({key:value})
         with self.assertRaises(ValueError):initial_cup_points(dict(spacing=.0018,cup_initial_ml=100))
+
+    def test_settled_seed_preserves_particle_positions_and_inventory(self):
+        seed=initial_cup_points(dict(spacing=.0018,cup_initial_ml=20.))
+        spec=dict(spacing=.0018,cup_initial_ml=4.,cup_height_scale=1.1,cup_diameter_scale=.9)
+        points=settled_cup_points(spec,seed)
+        self.assertEqual(len(points),round(4./.0018**3/1e6))
+        self.assertTrue(vessel_mask(points,cup_profile(spec)).all())
+        originals={tuple(v) for v in seed}
+        self.assertTrue(all(tuple(v) in originals for v in points))
+        with self.assertRaises(ValueError):settled_cup_points(dict(spec,cup_initial_ml=40.),seed)
 
 
 class WatchdogTests(unittest.TestCase):

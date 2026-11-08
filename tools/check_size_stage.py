@@ -33,7 +33,7 @@ def main():
     assert sha(ROOT/'best.pt')==candidate['checkpoint_sha256']
     for n,h in candidate['runtime_sources'].items():assert sha(Path('/workspace/src')/n)==h,n
     expected={s['name']:s for part in plan.values() if isinstance(part,list) for s in part}
-    calibration=[];development=[];images=[];pending=[];seen=set();integrity=[]
+    calibration=[];seed_calibration=[];development=[];images={};pending=[];seen=set();integrity=[]
     out=ROOT/'review';out.mkdir(exist_ok=True)
     for path in sorted(OUTPUTS.glob('*/*SZ_A_*/parameters.json')):
         spec=read(path);name=spec['name'];assert name in expected and name not in seen
@@ -60,29 +60,33 @@ def main():
                     tail_inventory_range_ml=float(np.ptp([r['cup_ml'] for r in tail])))
                 record['stable_contained']=bool(commands<1e-7 and motion<.3 and record['tail_height_std']<.01 and
                     record['tail_inventory_range_ml']<.05 and record['final_outside_nominal_ml']==record['ever_table_nominal_ml']==0.)
-                calibration.append(record);images.append((record,rgb))
+                seeded=spec.get('calibration_version')==3
+                (seed_calibration if seeded else calibration).append(record)
+                images.setdefault('seed' if seeded else 'grid',[]).append((record,rgb))
             else:
                 r=completed_row(folder,m['policy']['checkpoint_sha256'])
                 r.update(strict_pass=strict_success(r),failure_reasons=reasons(r),former_test_case=spec['former_test_case'])
                 development.append(r)
-    if images:
+    for group,frames in images.items():
         canvas=Image.new('RGB',(3*384,3*424),(245,245,245));draw=ImageDraw.Draw(canvas)
-        for i,(r,rgb) in enumerate(images):
+        for i,(r,rgb) in enumerate(frames):
             x=(i%3)*384;y=(i//3)*424
             canvas.paste(Image.fromarray(rgb),(x,y+40))
             draw.text((x+8,y+7),f"H {r['height_scale']:.1f} / D {r['diameter_scale']:.1f} | {'contained' if r['stable_contained'] else 'CHECK'}",fill=(20,20,20))
             draw.text((x+8,y+22),f"settled level {100*r['final_height']:.1f}%",fill=(20,20,20))
-        canvas.save(out/'cup-size-contact-sheet.jpg')
+        canvas.save(out/('cup-size-seed-contact-sheet.jpg' if group=='seed' else 'cup-size-contact-sheet.jpg'))
     report=dict(scope='Stationary cup geometry/containment pilots and development on consumed V24 layouts, not fresh held-out tests. Learned weights unchanged.',
         parent_files_unchanged=True,learned_weights_and_original_thresholds_unchanged=True,
         expected_calibration=9,expected_development=6,
-        calibration=calibration,development=development,integrity=integrity,pending=pending,
+        calibration=calibration,seed_calibration=seed_calibration,development=development,integrity=integrity,pending=pending,
         unstarted=sorted(set(expected)-seen),calibration_closed=len(calibration)==9,
         all_calibration_contained=len(calibration)==9 and all(r['stable_contained'] for r in calibration),
+        all_seed_calibration_contained=len(seed_calibration)==9 and all(r['stable_contained'] for r in seed_calibration),
         development_closed=len(development)==6,
         candidate_checkpoint_sha256=candidate['checkpoint_sha256'])
     (ROOT/'stage-results.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(calibration=len(calibration),contained=sum(r['stable_contained'] for r in calibration),
+        seed_calibration=len(seed_calibration),seed_contained=sum(r['stable_contained'] for r in seed_calibration),
         development=len(development),passes=sum(r['strict_pass'] for r in development),pending=pending,unstarted=report['unstarted'])))
 
 

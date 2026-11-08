@@ -42,6 +42,7 @@ allowed_commands.add('layout_variety_extra')
 allowed_commands.update(('wide_pilot', 'wide_repair', 'wide_collect', 'wide_train', 'wide_development', 'wide_test'))
 allowed_commands.update(('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'))
 allowed_commands.update(('size_calibration','size_recovery_development'))
+allowed_commands.add('size_seed_calibration')
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -637,11 +638,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('size_calibration','size_recovery_development'):
+                    if cmd in ('size_calibration','size_seed_calibration','size_recovery_development'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before size-curriculum work';continue
                         from pour_size_study import pending as size_pending
-                        pending.extend(size_pending('calibration' if cmd=='size_calibration' else 'recovery_development'))
+                        pending.extend(size_pending({'size_calibration':'calibration','size_seed_calibration':'calibration_seed',
+                            'size_recovery_development':'recovery_development'}[cmd]))
                     elif cmd in ('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before finish-study work';continue

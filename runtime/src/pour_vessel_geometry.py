@@ -57,3 +57,21 @@ def initial_cup_points(spec):
     if len(points) and points[:,2].max() >= p[-1][0]-spacing:
         raise ValueError('Initial grid exceeds cup rim; reduce calibration inventory')
     return points
+
+
+def settled_cup_points(spec, seed):
+    """Select a low settled layer without stretching particle separations."""
+    from bottle_pour import SIDES
+    p=cup_profile(spec);spacing=float(spec['spacing'])
+    seed=np.asarray(seed,dtype=np.float32)
+    if seed.ndim!=2 or seed.shape[1]!=3 or not np.isfinite(seed).all():
+        raise ValueError('Malformed settled particle seed')
+    z=seed[:,2];angle=(np.arctan2(seed[:,1],seed[:,0])%(2*math.pi/SIDES))-math.pi/SIDES
+    radius=np.interp(z,[v[0] for v in p],[v[1] for v in p])*math.cos(math.pi/SIDES)/np.cos(angle)
+    keep=(z>=p[0][0])&(z<p[-1][0]-2*spacing)&(np.linalg.norm(seed[:,:2],axis=1)<radius-.5*spacing)
+    candidates=seed[keep]
+    count=round(spec['cup_initial_ml']/(spacing**3*1e6))
+    if count<1 or len(candidates)<count:
+        raise ValueError('Settled seed does not cover requested cup inventory')
+    order=np.argsort(candidates[:,2],kind='stable')
+    return candidates[order[:count]].copy()

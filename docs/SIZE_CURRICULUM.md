@@ -19,6 +19,20 @@ baseline of 16 **nominal** mL. That inventory reference is not a measured
 physical capacity or a full-level calibration. The stationary pilots are
 low-fill containment/camera checks, not pouring or grasp demonstrations.
 
+The first grid-initialized round closed **8/9 contained**. Tall/narrow case 06
+lost one particle (0.005832 nominal mL): outside by 0.105 s, near the worktop
+by 0.405 s. Source inventory stayed unchanged. The precise mechanism is not
+established because this first round lacks per-particle trajectories. All
+nine original outcomes and hashes remain in `grid-stage-results.json`.
+
+A separate nine-case revision selects the required number of particles from
+the lowest available layer of the previously validated native settled seed,
+clipped to each cup's interior with wall clearance. Coordinates and spacing
+are not rescaled. The revision changes initial arrangement only; liquid and
+collision settings remain unchanged. It records sparse outside-particle
+positions/origins for diagnosis. This tests a better initialization; it does
+not establish leak-free dynamic pouring or explain the original loss.
+
 Camera crop normalization accepts declared cup geometry. These dimensions
 are known fixture configuration, not camera-inferred size. Resized autonomous
 episodes are rejected unless a checkpoint carries the matching declared
@@ -99,12 +113,18 @@ Native audit inside the owned container:
 ```
 
 `tools/prepare_size_stage.py` prepares a separate candidate and plan.
+`tools/prepare_size_seed.py` archives the original grid round and prepares
+the independently retained settled-seed revision. Forty-four CPU checks
+pass after adding this initializer.
 `tools/continue_size_stage.py` is a finite coordinator: wait for nine
 stationary pilots, require containment, archive the first candidate, apply
 the replay-checked timeout, restart only the idle owned container, run six
 development regressions, audit, and stop. A failed guard, audit, runtime
 identity check or deadline stops the coordinator. It is not an automation
 and does not restart a container stopped by the GPU priority guard.
+Its first run stopped at the 8/9 containment gate, before any autonomous
+attempt. `--seed-calibration` gates the next regression queue on all nine
+revised pilots; it cannot erase the original failed round.
 
 The 4070-only binding, four-core quota, CPU set 16–23, shares 256, 16 GiB
 memory/swap cap and foreign-job priority guard are preserved. Point-in-time

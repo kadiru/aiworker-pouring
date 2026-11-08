@@ -5,12 +5,15 @@ from pathlib import Path
 from bottle_pour import CUP,SIDES
 
 def cup_points(spec):
-    assert spec.get('calibration_only') and spec['calibration_version'] in (1,2)
-    if spec['calibration_version']==2:
+    assert spec.get('calibration_only') and spec['calibration_version'] in (1,2,3)
+    if spec['calibration_version'] in (2,3):
         path=Path(spec['calibration_particle_seed'])
         assert hashlib.sha256(path.read_bytes()).hexdigest()==spec['calibration_particle_seed_sha256']
         with np.load(path,allow_pickle=False) as seed:points=seed['cup_local_points'].copy()
         assert points.ndim==2 and points.shape[1]==3 and np.isfinite(points).all()
+        if spec['calibration_version']==3:
+            from pour_vessel_geometry import settled_cup_points
+            return settled_cup_points(spec,points)
         top=CUP[0][0]+spec['calibration_initial_height']*(CUP[-1][0]-CUP[0][0])
         return points[points[:,2]<=top].astype(np.float32)
     spacing=spec['spacing'];pitch_fraction=spec.get('calibration_pitch_fraction',.85)

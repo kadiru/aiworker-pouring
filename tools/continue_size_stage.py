@@ -3,7 +3,7 @@
 Stops on failure, changed runtime, foreign GPU use or deadline. Never restarts
 automatically after a priority-guard shutdown. Not an automation/service.
 """
-import datetime,hashlib,json,pathlib,subprocess,sys,time,urllib.request
+import argparse,datetime,hashlib,json,pathlib,subprocess,sys,time,urllib.request
 sys.path.insert(0,'/tmp')
 from watch_wide_collection import health,isolation,command,CID,GPU,HOST_ROOT
 ROOT=HOST_ROOT/'learning/A-size-20261108-v1'
@@ -44,12 +44,14 @@ def wait_cases(prefix,n,seconds,run):
 
 
 def main():
-    assert not (STAGED/'coordinator-started.json').exists()
-    (STAGED/'coordinator-started.json').write_text(json.dumps(dict(utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),container=CID)))
-    first=health()['run'];wait_cases('SZ_A_cup_static_',9,45*60,first)
+    parser=argparse.ArgumentParser();parser.add_argument('--seed-calibration',action='store_true');args=parser.parse_args()
+    marker=STAGED/('coordinator-started-seed.json' if args.seed_calibration else 'coordinator-started.json')
+    assert not marker.exists()
+    marker.write_text(json.dumps(dict(utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),container=CID)))
+    first=health()['run'];wait_cases('SZ_A_cup_seed_' if args.seed_calibration else 'SZ_A_cup_static_',9,45*60,first)
     snapshot=owned_idle();print(execute('docker','exec',CID,'/isaac-sim/python.sh','/workspace/learning/A-size-20261108-v1/check_size_stage.py'),flush=True)
     report=json.loads((ROOT/'stage-results.json').read_text())
-    assert report['all_calibration_contained'],'Retain failed containment pilots; no autonomous regression queue'
+    assert report['all_seed_calibration_contained' if args.seed_calibration else 'all_calibration_contained'],'Retain failed containment pilots; no autonomous regression queue'
     (STAGED/'runtime-after-calibration.json').write_text(json.dumps(snapshot,indent=2)+'\n')
     for name in ('pour_source_watchdog.py','test_pour_size.py'):
         execute('docker','cp',str(STAGED/name),CID+':/workspace/learning/A-size-20261108-v1/staged/'+name)
