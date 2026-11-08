@@ -222,6 +222,23 @@ Its local backup is verified, runtime sources are unchanged from the
 passing CPU checks, and no simulator restart was needed. All nine new
 geometry/frustum checks pass; independent evaluation is now running.
 
+Round 2's independent evaluation is now complete and passes all unchanged
+gates: 9/9 confirmations, maximum localization 1.257 mm, level MAE 1.691
+points, near-full maximum absolute error/overestimate 2.261 points, and
+color-check maximum 4.203 points. All 100 native stationary records pass
+integrity and stable-label checks; 400 scalar sidecars are SHA-verified
+locally. All nine final frames were inspected. Low-fill case 00 has a bumpy
+rendered surface despite its stable scalar label; this limitation is retained.
+
+The six autonomous development attempts have started. The first stops at
+`localization_unconfirmed`, with no grasp/transfer and zero measured loss.
+Bottle localization confirms; cup confidence stays about .007–.011. A CPU
+replay of the actual saved start frames reproduces the rejection and confirms
+that detail-camera intrinsics match the model exactly. The next attempt has
+grasped and begun pouring; outcomes remain pending. This is a real task
+generalization check, separate from stationary perception accuracy. All six
+reserved tests remain unstarted.
+
 ## Prepared learning and evaluation
 
 The method is supervised perception plus the existing contextual motion
