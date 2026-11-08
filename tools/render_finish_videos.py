@@ -46,11 +46,16 @@ def phase_label(ds,group,index):
 
 def verdict(row):
     if row['strict_pass']:return prior_verdict(row)
+    if (row['zero_spill'] and row['grasp_verified'] and row['visual_grasp_confirmed']
+        and row['sustained_grasp_fraction']<.8 and not row['completed_return_release_sequence']):
+        return 'Grip / stop / return failed',f"Two-finger contact: {100*row['sustained_grasp_fraction']:.1f}% of tipping samples; 80% required. Stop and return incomplete."
     if (row['stop_reason'] in ('localization_unconfirmed','approach_unconfirmed') or not row['grasp_verified']
         or not row['visual_grasp_confirmed'] or not row['zero_spill'] or row['sustained_grasp_fraction']<.8
         or not row['completed_return_release_sequence']):return prior_verdict(row)
     if row['stop_reason'] in ('trajectory_unreachable','return_planning_failed'):
         return 'Motion planning failed','A required joint path could not be confirmed. The controller aborted the task.'
+    if row['stop_reason'] in ('fill_unconfirmed','level_unconfirmed') and row['expected_stop']=='cup_near_full':
+        return 'Full stop unconfirmed',f"Final level: {100*row['cup_surface_height_fraction']:.1f}% of rim. Fullness was not confirmed. Bottle returned; zero measured loss."
     if row['stop_reason']!=row['expected_stop']:
         return 'Wrong stop condition','The controller did not confirm the required full-cup or empty-bottle condition.'
     if row['expected_stop']=='bottle_empty' and row['source_remaining_ml']>max(.25,.01*row['source_initial_ml']):
