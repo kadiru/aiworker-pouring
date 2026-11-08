@@ -40,6 +40,9 @@ def frame(row,record,ds,group,index,t,speed,part,number,total,hold=None):
             image=image.crop(box)
         im.paste(image.resize((size,size),Image.Resampling.LANCZOS),(x,112))
     title,detail=verdict(row)
+    if row['strict_pass'] and row['expected_stop']=='bottle_empty':
+        title='Task passed'
+        detail=f"Empty threshold met: {row['source_remaining_ml']:.2f} nominal mL left. Correct stop and return; zero measured loss."
     text(d,(568,460),title,24,color,True,max_width=672)
     y=lines(d,(568,500),detail,19,672,MUTED);assert y<594,(row['name'],y)
     text(d,(568,605),phase_label(ds,group,index),20,WHITE,max_width=672)

@@ -365,3 +365,33 @@ post-processing, distinct from the dynamics; that distinction alone does
 not diagnose these recordings. Reference:
 [Omni Physics particle documentation](https://docs.omniverse.nvidia.com/kit/docs/omni_physics/107.3/dev_guide/particles/particles.html#post-processing-for-fluid-rendering).
 No fluid or rendering settings have been changed during this evaluation.
+
+## Closed round-2 task batch and declared task repair
+
+All six attempts ran once with the same checkpoint and runtime. Final totals:
+2/6 strict task passes, 6/6 zero measured loss, and 4/6 ordered complete
+returns. Dev04 passes at 91.7749% final height; Dev05 passes with 0.180792
+nominal mL remaining, below its unchanged 0.28 empty threshold. Dev00/03
+retain localization failures; Dev01/02 retain 87.8221%/88.5937% underfills.
+The four actual returns have no sampled stationary upright over-cup dwell
+and no post-release gripper-contact samples. Their upright/transfer stages
+last 3.10–3.15 seconds. Seventy-two selected native frames were inspected.
+
+Native integrity passes all 106 records, with 100 accepted stationary labels.
+All 430 scalar sidecars are SHA-verified locally. Full HDF5/trajectory backup
+is not claimed. The 109.7-second, 1280×720 development reel includes all six
+attempts, at labeled 2× speed with initial/final holds. Full decoding and 54
+native-camera comparisons pass (maximum mean error 1.358/255); twenty
+selected encoded frames and both cards were inspected. This is not
+continuous manual playback. Reports and media use round-specific filenames
+so later evidence cannot silently replace their provenance.
+
+Round 2 is archived before replacing its fitting/admission helpers. Round 3
+explicitly consumes the six old development records with the declared
+4/2 training/validation split above. The nine passed round-2 static holdouts
+are archived and remain excluded from fitting. Nine new static holdouts and
+six new development realizations were declared before fitting; all fifteen
+CPU geometry screens pass. The new development records save trajectories
+and outside-particle diagnostics; no such simulator data enters control.
+The original six reserved tests remain unstarted. The native runtime sources,
+material, physics, and stop/score thresholds are unchanged.

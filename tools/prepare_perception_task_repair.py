@@ -51,7 +51,8 @@ def main():
         scenes.append(s);checks.append(dict(name=s['name'],seed_cut=cut,particles=len(points),positions_sha256=hashlib.sha256(points.tobytes()).hexdigest()))
     tasks=[]
     for i,original in enumerate(old_tasks):
-        s=copy.deepcopy(original);s.update(name=f'PV_A_development_r1_{i:02d}',development_round=1)
+        s=copy.deepcopy(original);s.update(name=f'PV_A_development_r1_{i:02d}',development_round=1,
+            save_particle_trajectory=True,record_particle_diagnostics=True)
         offset=rng.uniform(-.003,.003,2)
         if np.linalg.norm(offset)<.002:offset=offset/np.linalg.norm(offset)*.002
         s['cup_world']=(np.array(s['cup_world'])+[*offset,0.]).tolist()

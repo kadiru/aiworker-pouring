@@ -28,6 +28,8 @@ def main():
         r=dict(name=name,split=spec['study_split'],path=str(h5),sha256=sha(h5),bytes=h5.stat().st_size,
             transitions=validation['transitions'],max_camera_state_skew_s=validation['max_camera_state_skew_s'],
             sidecars={p.name:sha(p) for p in path.parent.glob('*.json')})
+        trajectory=path.parent/'trajectory.npz'
+        if trajectory.exists():r['trajectory_sha256']=sha(trajectory)
         if spec.get('calibration_only'):
             r['label']=settled_label(samples)
             if spec.get('record_surface_diagnostics'):
