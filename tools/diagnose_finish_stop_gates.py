@@ -96,13 +96,25 @@ def main():
                 pause_count=decisions[stop]['pause_count'], max_pauses=model['thresholds']['max_pauses'],
                 next_sample_height=samples[stop]['cup_fill_fraction'],
                 final_settled_height=samples[-1]['cup_fill_fraction'])
+        tracking_abort = None
+        if stop is not None and decisions[stop]['stop_latched'] == 'source_tracking_lost':
+            indices = range(stop-7, stop+1)
+            window = [decisions[i] for i in indices]
+            assert stop >= 8 and all(d['source_present_probability'] < .05 for d in window)
+            tracking_abort = dict(command_time_s=decisions[stop]['t'],
+                eight_presence_scores=[d['source_present_probability'] for d in window],
+                lost_threshold=.05,
+                encoder_hold_count=sum(bool((d.get('empty_views') or {}).get('encoder_hold')) for d in window),
+                preceding_state_two_finger_contact_count=sum(samples[i-1]['both_fingers'] for i in indices),
+                stop_estimated_tilt_deg=decisions[stop]['estimated_tilt_from_joints'])
         tipping = [s for s in samples if abs(s['bottle_tilt_deg']) > 20.]
         cases.append(dict(name=identity['name'], recording_sha256=identity['sha256'],
             stop_reason=decisions[stop]['stop_latched'] if stop is not None else None,
+            tipping_samples=len(tipping), contact_fraction_has_tipping_observations=bool(tipping),
             final_mode=decisions[-1]['mode'], sustained_two_finger_fraction=
                 sum(s['both_fingers'] for s in tipping)/max(1, len(tipping)),
             final_source_ml=samples[-1]['bottle_ml'], final_rim_fraction=samples[-1]['cup_fill_fraction'],
-            empty_gate=empty_gate, full_gate=full_gate))
+            empty_gate=empty_gate, full_gate=full_gate, tracking_abort=tracking_abort))
     result = dict(sources_sha256=sha(args.sources), model_summary_sha256=sha(args.model),
         analysis_source_sha256=sha(Path(__file__)), checkpoint_sha256=model['checkpoint_sha256'], cases=cases,
         scope='Recorded-decision diagnosis only. Source presence below 0.7 blocks both empty-stop paths; '
@@ -110,7 +122,8 @@ def main():
               'is not proof of two-finger contact. Full-stop quantile is reconstructed from six recorded '
               'estimates; a below-target value alone blocks fullness confirmation. Stability and geometry '
               'agreement use the frozen limits. The colored-pixel mass gate is not reconstructed. No counterfactual '
-              'outcome or physical cause of lost contact is established. Full benchmark audit is separate.')
+              'outcome or physical cause of lost contact is established. With zero tipping samples the '
+              'existing score uses zero, which is not evidence of lost physical contact. Full benchmark audit is separate.')
     args.output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(cases, indent=2))
 

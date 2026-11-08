@@ -1,20 +1,46 @@
 # Settled-level repair and natural bottle withdrawal
 
-Authorized November 6, 2026 (America/Los_Angeles). **In progress; development closed November 7 at 16:20 PST.** V24 passes all eight r3 development attempts with zero measured loss. Full cases settle at 92.54–94.17% rim height; all four empty cases finish with zero source particles. All 144 selected native frames are reviewed, not continuous playback. Return upright/transfer is 3.10–3.15 seconds, upright stationary over-cup dwell is at most 0.05 seconds and there is no post-release gripper contact. Integrity passes 32 completed recordings / 24,360 transitions, with 129 complete/retained-partial scalar sidecars backed up and SHA-verified. The reviewed candidate was frozen and all thirty once-only reserved tests were queued November 7 at 16:28 PST. Weights, thresholds and runtime sources remain unchanged during evaluation; every outcome will be retained. The previous wider/swapped benchmark remains 18/30 and is not relabeled.
+Authorized November 6, 2026 (America/Los_Angeles). **All thirty fresh tests closed November 8 at 00:03 PST: 25/30 strict passes, 29/30 zero measured loss, 29/30 completed return/release sequences.** Full-target tasks pass 12/15; empty-target tasks pass 13/15. Successful full cups settle at 91.490–96.259% rim height; all thirteen successful empty-target bottles finish with zero source particles. The previous 18/30 wider/swapped benchmark remains separate and unchanged. No reserved trial was retried and no controller, threshold, physics or checkpoint changed during this evaluation.
+
+The programmed 1.2-second upright drain hold is removed. The bottle turns upright, follows a raised transfer to its original location, is placed and released, and the hand withdraws. All 28 completed post-pour returns take 3.10–3.15 seconds for upright/transfer; the separate pre-pour tracking abort uses a 4.30-second recovery. Among the 29 observed returns, maximum sampled stationary upright dwell above the cup is 0.05 seconds and there is no recorded post-release gripper contact. Case 13 never stops or returns; its missing-motion measurements are null, not zero-dwell successes. Tilted settling pauses during filling remain.
+
+Native integrity validates **62 complete development/test recordings, 48,398 transitions and 248 complete-record scalar sidecars**. One catalogued incomplete recorder abort and its scalar sidecar remain separate: 249 scalar files total are backed up and SHA-verified locally. All thirty primary scores are independently recomputed from those records. See [results](../evidence/finish-A/final-benchmark.json), [timing](../evidence/finish-A/final-outcome-timing.json), [return measurements](../evidence/finish-A/test-withdrawal.json), [recording audit](../evidence/finish-A/recording-integrity.json) and [stop-gate diagnosis](../evidence/finish-A/final-stop-gates-diagnostic.json).
+
+| Failed case | Audited observation |
+|---|---|
+| `FN30_A_test_01` | Two particles, 0.011664 nominal mL, are recorded near the worktop at 25.055 s while pouring, 0.40 s before the stop command. Empty detection and return complete. |
+| `FN30_A_test_13` | Source remains empty from 25.455 s through 60.005 s. The wrist empty score is 98.61–99.86%, but bottle presence stays 58.88–65.70%: below the 70% empty-stop requirement and above the 5% lost-source abort threshold. It never stops/returns. Two-finger contact is recorded in 42.05% of tipping samples. No measured loss. |
+| `FN30_A_test_15` | Final actual settled height is 95.6051%, but the stop estimator's six-frame lower quartile is 91.6981%, below the 92.5414% confirmation threshold. Thirteen pauses exhaust the budget; `fill_unconfirmed` is retained. Return completes with zero loss. |
+| `FN30_A_test_19` | Final actual height is 92.6322%. The stable learned estimate is 93.7726%, but it disagrees with the geometry estimate by 10.3375 percentage points, above the 10-point limit. `level_unconfirmed` is retained; return completes with zero loss. |
+| `FN30_A_test_23` | Presence scores of 2.17–2.95% trigger an early tracking abort at 4.655 s, despite encoder obstruction and bilateral contact in all eight corresponding states. No meaningful liquid transfer occurs. There are zero samples above 20° tilt: the frozen score's zero sustained-grip fraction does **not** establish physical grip loss. Recovery/release completes with zero loss. |
+
+These five outcomes remain failures. The zero-spill and reliable-stop goals are not fully achieved. All source identities used by the diagnostic match the complete recording/scalar audit. The missing-return case still exhibits a long empty-bottle hold before a stop decision, distinct from the removed programmed terminal hold.
+
+All three video exports and selected-frame reviews are complete: **three full decodes, 270 native-camera comparisons, 96 visually inspected encoded frames/cards**, maximum mean pixel error 1.024/255. This is selected-frame inspection, not continuous manual playback. All thirty complete native attempts and every failure appear at labeled 1×/2× speed, with no internal cuts, interpolation or generated camera footage. [Review summary](../evidence/finish-A/review-summary.json).
+
+| Local video (outside Git) | Duration |
+|---|---:|
+| [Tests 01–10](../evidence/finish-A/thirty-finish-tests-part-1.mp4) | 261.75 s |
+| [Tests 11–20](../evidence/finish-A/thirty-finish-tests-part-2.mp4) | 258.50 s |
+| [Tests 21–30](../evidence/finish-A/thirty-finish-tests-part-3.mp4) | 229.70 s |
+
+Final resource verification retains the frozen checkpoint, all 42 runtime files, asset, container limits and guard. The separate 4090 PID 232122 is active at 74% in the final snapshot; host available RAM is 47,537 MiB. No foreign job was signaled or reconfigured. These snapshots do not establish zero shared-host overhead or uninterrupted foreign execution.
+
+Next: repair source-presence handling and bounded uncertain-state recovery, then the level-estimate/agreement failures. Further tuning must use a separate fresh evaluation; the completed thirty outcomes remain unchanged.
 
 Across all 24 completed r0–r2 development attempts, upright stationary dwell over the cup is at most 0.05 seconds, with no post-release gripper contact. The bottle turns upright, immediately clears the cup, returns to its original position, releases and leaves the hand withdrawn. Strict task scores are 7/8, 7/8 and 4/8 respectively; zero-loss counts are 8/8, 7/8 and 4/8. All failures remain retained. R2 loses nine particles across four attempts, totaling 0.052488 nominal mL; the return itself completes in all eight.
 
 V24 refits only the settled-level predictor, using 238 training / 54 validation episodes and 7,116 / 1,476 images. The 4070 fit takes 33.1 seconds. Its 126-coefficient ridge model plus 139→32→16→1 tanh residual has 5,151 fitted parameters. Existing near-full validation MAE is 0.8997 percentage points, maximum absolute/overestimate 2.3414 points. The resulting full-stop threshold is 92.5414%. These component measurements are not fresh autonomous task results. Twenty-one of the 24 consumed development records supply eligible training views; the other three remain in the manifest with zero eligible images. Existing validation membership and image labels are retained.
 
-Training-pause labels now predict expected settled height using a monotonic map fitted from static calibration; final/static measured labels remain unchanged. Runtime uses RGB, not particle inventory. The V24 motion also shifts the lip 8 mm toward cup center between 116° and 122° tilt to address two observed late-empty losses. All 38 authored-layout geometry checks pass, but fluid success is unproven. It does not directly change the 80° settling pose where another r2 loss occurred. Physics and the natural return timing remain unchanged.
+Training-pause labels now predict expected settled height using a monotonic map fitted from static calibration; final/static measured labels remain unchanged. Runtime uses RGB, not particle inventory. The V24 motion also shifts the lip 8 mm toward cup center between 116° and 122° tilt to address two observed late-empty losses. All 38 authored-layout geometry checks pass; geometry alone is not fluid validation. The fresh dynamic results above retain the remaining two-particle loss. It does not directly change the 80° settling pose where another r2 loss occurred. Physics and the natural return timing remain unchanged.
 
-Current checkpoint: `5068af6b18583afcb3eff231110c63896e0be898f389b9aad940f9e9405179d3`. Runtime contains 42 files from `76302c480dd0cbf16ca4621c8b90b470c13cf5cc`; fitting helper source is `1ec4405eff9880f64dbb9078afbda926348b7331`. Native run `20261107T222043Z` is observed by `/tmp/aiworker-finish-development-r3/`. Only the owned container was restarted, with its GPU binding, four-core/16 GiB caps and priority guard preserved. The separate 4090 job is active in the deployment snapshot; no foreign job was signaled or reconfigured.
+Current checkpoint: `5068af6b18583afcb3eff231110c63896e0be898f389b9aad940f9e9405179d3`. Runtime contains 42 files from `76302c480dd0cbf16ca4621c8b90b470c13cf5cc`; fitting helper source is `1ec4405eff9880f64dbb9078afbda926348b7331`. Native run `20261107T222043Z` is closed; `/tmp/aiworker-finish-test/` retains its finite observer output. Only the owned container was restarted, with its GPU binding, four-core/16 GiB caps and priority guard preserved. The separate 4090 job is active in the deployment snapshot; no foreign job was signaled or reconfigured.
 
-The remaining sections preserve the method and chronological preparation history. Current evidence is in `level-refit.json`, `settled-target-supervision.json`, `runtime-source-manifest-drip-r3.json`, the deployment snapshots and the eventual reviewed r3 outcomes.
+The remaining sections record the method and a condensed development lineage; the original reports and Git history retain intermediate preparation states. Current evidence is in `final-benchmark.json`, `final-outcome-timing.json`, `test-withdrawal.json`, `runtime-comparison.json`, the fit/label manifests and the reviewed development reports.
 
 ## Current implementation and evidence
 
-The terminal motion now opts into zero stationary drain hold. It turns upright over the receiving cup, immediately follows a raised transfer to the original bottle location, then gently places, releases and retreats. Commanded return duration is 3.1 seconds instead of 4.3 seconds. The old checkpoint retains its 1.2-second hold by default. Video and measured motion must still verify this change during autonomous pours. A read-only audit of the historical thirty-test cohort measures 0.9–1.2 seconds of upright near-stationary dwell (median 1.1 seconds), with no post-release gripper recontact. The new development acceptance bound is ≤0.35 seconds under the recorded 3D-speed/tilt-speed definition, zero recontact, and a 3.1-second terminal return within one sample.
+The terminal motion now opts into zero stationary drain hold. It turns upright over the receiving cup, immediately follows a raised transfer to the original bottle location, then gently places, releases and retreats. Commanded return duration is 3.1 seconds instead of 4.3 seconds. The old checkpoint retains its 1.2-second hold by default. The completed autonomous scalar audit verifies the timing above; video review is tracked separately. A read-only audit of the historical thirty-test cohort measures 0.9–1.2 seconds of upright near-stationary dwell (median 1.1 seconds), with no post-release gripper recontact. The new development acceptance bound is ≤0.35 seconds under the recorded 3D-speed/tilt-speed definition, zero recontact, and a 3.1-second terminal return within one sample.
 
 All 38 new approach layouts and 38 continuous-return paths pass geometry screening. Return screening covers 63 poses and articulated closed-finger hull ranges; this is not dynamic, self-collision or no-spill validation. Thirty-one CPU controller/feature/calibration checks pass. Protocol 18 now uses the raised home and wide-layout path support already present in protocol 17.
 
@@ -36,9 +62,9 @@ This is a hybrid supervised system: RGB localization, a wrist empty-state CNN, c
 
 The cup crop normalizes position, scale and shear from visual localization and calibrated rim/base geometry. Candidate features include the previous 340 coefficients, color-envelope quantiles and spatial interactions, up to 709 features. Ridge regression minimizes weighted squared height error plus an L2 coefficient penalty. A validation-selected nonlinear residual is also considered: 34 or 139 inputs, tanh layers of width 32 or 64 then 16, AdamW at 0.001 for 1,200 steps per width, evaluated every 20 steps. Its loss adds weighted squared error and a residual-size penalty. A candidate is retained only if the unchanged consumed-validation near-full maximum error is below four percentage points and the derived stop target is at most 0.945. Independent task success remains 0.90.
 
-The completed wide benchmark's thirty test recordings and eight r3 development recordings are explicitly consumed. Former test swap pairs 3, 8 and 13 are validation; the other former tests and r3 are training, alongside the inherited cache. These validation outcomes are already known and are not unbiased new-performance evidence. Stable-inventory settling-pause and final views have per-frame native hashes, image indices and simulator labels. Initial FN30 development and reserved images are excluded from fitting.
+The completed wide benchmark's thirty test recordings and eight r3 development recordings are explicitly consumed. Former test swap pairs 3, 8 and 13 are validation; the other former tests and r3 are training, alongside the inherited cache. These validation outcomes are already known and are not unbiased new-performance evidence. Stable-inventory settling-pause and final views have per-frame native hashes, image indices and simulator labels. That initial V23 fit excluded all FN30 images. The selected V24 refit subsequently consumes 24 r0–r2 development records as explicit training data; the r3 acceptance round and all thirty fresh test images remain excluded.
 
-Candidate engineering parameters are slow tilt 2.5°/s (previously 4), braking 45°/s (90), trim rate 18°/s (35), coarse flow cap 10 nominal mL/s (18), coarse brake target 0.87 (0.89), and trim timeout 2.5 seconds (1.5). These are changes to validate, not newly learned motor skills. Liquid physics and autonomous initialization are unchanged.
+Candidate engineering parameters are slow tilt 2.5°/s (previously 4), braking 45°/s (90), trim rate 18°/s (35), coarse flow cap 10 nominal mL/s (18), coarse brake target 0.87 (0.89), and trim timeout 2.5 seconds (1.5). These describe the initial V23 engineering changes, not newly learned motor skills. The selected V24 uses coarse brake target 0.82, maximum 13 pauses, full threshold 0.925414 and an 8 mm late lip shift. Liquid physics and autonomous initialization are unchanged.
 
 ## Calibration and preserved failures
 
@@ -61,106 +87,37 @@ Native HDF5 recordings, coefficients, checkpoints and private assets remain outs
 
 The review pipeline audits all camera decodes/timestamps and inventory partitions, independently recomputes all thirty scalar outcomes, checks source/weight/resource identities, and renders three complete labeled reels. Development review includes eight task/wrist/overview frames and ten return-sequence frames per attempt. The withdrawal diagnostic measures upright, near-stationary dwell over the cup and post-release recontact. Selected-frame review is not continuous manual playback.
 
-## Next actions
+## Preserved development lineage
 
-Inspect the eight active autonomous development cases; freeze a reviewed candidate; run thirty fresh tests; independently score, render and inspect all videos; update results and push final evidence. No new success rate is available yet.
+| Round | Strict passes | Zero-loss attempts | Main change / retained limitation |
+|---|---:|---:|---|
+| r0 | 7/8 | 8/8 | Initial settled-level fit and direct return. One full-stop confirmation failure; one earlier recorder abort retained separately. |
+| r1 | 7/8 | 7/8 | Full-stop scalar target reduced to 0.9294295. One unconfirmed full stop with overflow. |
+| r2 | 4/8 | 4/8 | Earlier coarse brake at 0.82 and up to 13 pauses. Four loss cases totaling nine particles (0.052488 nominal mL); all eight return. |
+| r3 / V24 | 8/8 | 8/8 | Training-only settled-pause supervision, 5,151-parameter refit, 8 mm late lip shift. Reviewed before the fresh thirty-test freeze. |
 
-Reference-anchor check: all sixteen matched historical RGB anchors pass the <3 mm gate; the first 22 calibration records have maximum anchor error 0.493 mm and parent-model level MAE 3.545 percentage points. This is CPU-only calibration evidence, not a new fit or task success.
+These are development/selection results, not additional fresh-test successes. All 32 complete development trajectories remain in the native audit, with 144 selected native frames reviewed per round. The r2 cases 03/06/07 each lose two particles, and 05 loses three; case 05 also retains an unconfirmed stop. Their scalar/visual diagnoses remain under `evidence/finish-A/development-r2-*`. The late lip shift does not directly change the 80° settling pose implicated in r2 case 06, and one different late-empty loss remains in the fresh benchmark.
 
-Collection is queued in bounded batches: the simulator truncates each pending queue to 32 entries. After 38 total closed calibration records (six pilots plus the first 32-case batch), `finish_calibrate` was invoked again while idle for the final thirteen unstarted cases. Completed names are never requeued. The finite v4 handoff continues to require all 51 records.
+The initial spatial fit took 24.86 seconds on the 4070, with 217/54 train/validation episodes and 6,247/1,476 images. Its 126-coefficient ridge model plus 139→64→16→1 residual contained 10,143 parameters (checkpoint `f26ff47868da35f47c9b8a6011132b25211a0cfd9c85522a0caa1468b65647ab`). Subsequent scalar candidates are archived under native `candidates/v23-r0/`, `v23-r1/` and `v23-r2/`; local binary candidates remain ignored. The selected V24 fit and its distinct training supervision are described above. An initial V24 refit attempt failed a metadata-preservation assertion before saving/deploying a candidate. Corrected alias handling preserves historical metadata; successful `refit-r3-attempt2` remains separate from that first attempt.
 
-Spatial feature candidate: preserve the first 604 columns, then add 105 continuous spatial descriptors (8×8 red-surface grid, thirteen column-group centroids, spreads and masses, and global center/mass). Positive red margins exclude dark cup-wall pixels. The 709-feature candidate retains all former ridge choices and tests 34- versus 139-input residual networks; the four-point error gate and fresh-test goals remain unchanged. Worst-crop inspection found opposite errors for 84% and 94% fills in the same view, so a constant output offset alone cannot repair the selected r4 model.
+The original recorder interruption was infrastructure failure, not a task outcome: `FN30_A_dev_05_r0` ended at 44.755 simulated seconds during retreat due to approximately 1 microsecond of camera-clock skew. Its incomplete HDF5, 893 transitions, 5,358 decoded images and original error remain catalogued in `infrastructure-aborts.json`. The bounded repair accepts at most 100 microseconds of skew while retaining raw monotonic timestamps; a stale 1 ms view is rejected. Only that interrupted development case was repeated as `FN30_A_dev_05_retry1_r0`. None of the thirty reserved tests was retried.
 
-Passing spatial fit (r5): checkpoint `f26ff47868da35f47c9b8a6011132b25211a0cfd9c85522a0caa1468b65647ab`, runtime source `74adfd1`, 24.86 seconds on the RTX 4070. Uses 217/54 train/validation episodes and 6,247/1,476 images. Selected baseline has 126 ridge coefficients and the residual has 139 inputs with layers 64→16→1 (tanh), selected optimizer step 60, 10,143 fitted parameters total. Wider near-full validation MAE 0.834 points, maximum absolute/overestimate 2.743 points; derived full-stop target 93.243%. The retained CNN/localizer/motor models are not included in that parameter count. This passes the unchanged accuracy gate; it does not establish autonomous task performance. All sixteen near-full calibration layout frames are manually inspected. Eight development cases are now queued; thirty reserved tests remain unused.
+The read-only timing helper reproduces independently diagnosed r2 loss times and retains their original outcomes. `failure-diagnostic-sources.json` and `failed-stop-gates-diagnostic.json` preserve the earlier two-case diagnosis during evaluation; the final five-case diagnosis is now bound to the complete audit. Reporting changes did not modify the frozen controller or its pass/fail rules. In particular, a missing return has null motion measurements, and an early abort with no tipping observations is not described as proven physical grip loss.
 
-First development preview: `FN30_A_dev_00_r0` passes, with final settled rim height 96.1846%, zero measured loss, 0.05 seconds upright over-cup dwell and no post-release gripper contact. Return stage is 3.15 seconds, within one 20 Hz sample of the 3.1-second command. Complete native video is 23.05 seconds at labeled 2×; SHA `f2aa3b11e1eeb78f57d86f8580990d40d45b952da5f03e1e1a8cd4f569547670`. Full decoding and twelve native-camera comparisons pass. Four encoded stage views and ten return overview views are manually inspected; this is not continuous manual playback. The preview is development evidence only and remains excluded from reserved tests.
+## Reproducing the completed evidence
 
-Video clarity: the new renderer displays plain-language phase captions from each recorded transition (for example, Check liquid level, Small top-up, Return bottle, Withdraw hand). Four native development frames pass selected-frame layout review. The captions do not change camera pixels or simulator outcomes. The first two already-exported development previews retain their original hashes and formatting.
-
-Halfway development snapshot: 4/4 strict passes. Two full cups finish at 96.1846% and 95.8509% rim height; both empty cases have zero source particles. The owned 4070 binding, CPU/RAM limits, source/checkpoint identities and priority guard are retained. The separate 4090 process remains present and active at the snapshot. Four development cases and all thirty reserved tests are still pending.
-
-## Recorder interruption and bounded recovery
-
-On November 7, the sixth development attempt (`FN30_A_dev_05_r0`) aborted during retreat at 44.755 simulated seconds because raw camera time 44.754998999647796 differed by just over one microsecond. Its closed incomplete HDF5 retains 893 transitions; all 5,358 stored camera images decode and maximum recorded skew is 0.999235 microseconds. No successful outcome is assigned to it. Five completed cases remain valid. The partial file, exception and original model/provenance are preserved.
-
-The recorder now retains raw camera times with an explicit 100-microsecond bound, still 25 times smaller than a physics step and 500 times smaller than the control interval. Camera times must advance; stale 1 ms, 2.5 ms and 50 ms frames, nonfinite times and widened metadata bounds are rejected. Historical recordings retain their original one-microsecond validation bound. Fifteen clock/recovery/protocol checks pass.
-
-The fitted checkpoint, thresholds, robot control and fluid settings remain unchanged. Fitted-source identity is retained separately from the repaired recording runtime. Recovery will retain the original five complete results, repeat only interrupted case 05 as `FN30_A_dev_05_retry1_r0`, and run unstarted cases 06/07. The aborted attempt stays catalogued and incomplete. All thirty reserved tests remain unused and their once-only rules are unchanged. Repair runtime `2b81ff0` is deployed in run `20261107T082537Z`. The five complete recordings pass native audit (3,602 transitions), with the closed incomplete file catalogued separately. The unchanged checkpoint is being used for the declared retry and unstarted 06/07; final recovery verification is pending. Fitted source identity remains `74adfd1`, and the separately tracked runtime contains 42 files.
-
-
-Development retry diagnosis: `FN30_A_dev_05_retry1_r0` closes normally with zero measured loss and final rim height 96.0458%, but fails strict scoring with `fill_unconfirmed`. Its last-six prediction quartile is 93.0459%, below target 93.2430%; standard deviation is 0.055 percentage points and the geometry cross-check is within tolerance. A scalar-only calibration is prepared: retain the consumed-validation maximum overestimate (2.743 points), reduce the added empirical margin from 0.5 to 0.2 points, and target 92.9430%. This is development-selected calibration, not additional gradient training or an unbiased result. Five CPU integrity checks verify that unintended tensor/array changes are rejected. It is not applied yet; all current cases finish unchanged, then the entire eight-case development round must be rerun. Reserved tests remain unused.
-
-
-## Applied scalar calibration and round 1
-
-After all eight r0 cases closed, their 6,054 transitions and 33 scalar sidecars passed integrity checks. Eight task/wrist/overview sheets and eight ten-frame return strips were inspected (144 frames); the failed confirmation label is retained. Actual sampled over-cup stationary dwell is at most 0.05 seconds in all eight, with no gripper recontact after release. The old r0 checkpoint and all source/recovery/provenance files are archived under `candidates/v23-r0`.
-
-At 09:21 UTC November 7, all eight layouts were queued again as r1. New checkpoint `f9ffbce349aa5b3a0720205f28c5fc51499a5a0b72762bc5470aa41b2930bb27` changes exactly one scalar: `thresholds.full_settled_target`, from 0.9324295210838318 to 0.9294295210838318. Recursive tensor/array/scalar comparison and serialization round-trip verify all other checkpoint values are unchanged. The target is 0.90 + 0.0274295210838318 consumed-validation overestimate + 0.002 empirical margin. This is a development-selected calibration, not a new GPU fit or a guaranteed error bound. No labels, scoring criteria, motor parameters, physics or source files change.
-
-The helper initially stopped before mutation because its loopback idle check did not match the server's LAN-only bind. Using the verified `192.168.68.60:8212` address resolved that preparation issue; the failed check's log is retained. The new checkpoint, complete calibration record and before/after resource snapshots are SHA-verified locally. The eight r1 native trials must pass task/motion checks and visual review before the untouched thirty-case evaluation. Use `runtime-source-manifest-target-r1.json` for the later freeze; runtime source remains `2b81ff0`, fitted source `74adfd1`.
-
-
-Round-1 halfway: 4/4 strict passes, all zero measured loss and completed return/release. Full cases settle at 95.8102% and 95.5568%; both empty bottles have zero source particles. The 10:17 UTC snapshot verifies unchanged checkpoint/sources, owned container, caps and guard. A separate 4090 process is active; its PID changed since the prior snapshot, with no cause inferred. No foreign job was signaled or reconfigured. Four development cases and all thirty reserved tests remain pending.
-
-
-## Initial-pour failure and prepared braking repair
-
-`FN30_A_dev_05_r1` overfills before its first brake. The coarse CNN estimate plateaus near 0.83 while the actual cup rises from 79% to overflowing; the positive derivative falls near zero, so its runoff predictor also stops signaling rising flow. The unchanged initial-brake target is 0.87. First brake occurs at 17.905 seconds, after the first measured loss; the attempt ends `level_unconfirmed`, final rim measure 1.0, final outside 7.791552 nominal mL, ever-near-worktop 5.079672 nominal mL. Its failure is preserved. The cup anchor differs from the safe r0 retry by only about 0.033 mm; the recorded level-feedback plateau is the directly observed failure mechanism.
-
-`probe_finish_coarse_braking.py` exactly reconstructs each original first-brake command in fourteen closed r0/r1 attempts, using the actual filtered CNN and recorded visual derivative. At proposed target 0.82, the failed trace requests braking at 14.955 seconds (2.95 seconds earlier), where its recorded rim height is 74.4371%. All seven full-case candidate windows are below 90% and have zero loss at that recorded point; all seven empty cases remain without a coarse brake. These are first-changed-command diagnostics, not counterfactual trajectory or success claims.
-
-Prepared repair: initial-brake target 0.82, maximum pause count 13 (including the initial brake/check), unchanged full-stop target 0.9294295210838318 and 60-second limit. Earlier braking leaves more work for small bounded top-ups. `calibrate_finish_braking.py` requires all r1 cases closed/reviewed, the complete sixteen-record probe, archived prior checkpoint and exact tensor/array/scalar equality outside those two threshold fields. It will not change learned weights, runtime sources, fluid physics, return motion, scoring, or original outcomes. The repair is not yet applied; native r2 remains required before reserved evaluation.
-
-Consumed prior-wide trace cross-check: the same first-brake reconstruction exactly matches all thirty original 0.89 triggers. A proposed 0.82 trigger appears in all fifteen full goals at recorded rim heights 65.63–88.19%, with zero measured loss at those instants. It also adds a pause in historical empty case `XW30_A_test_27`, at 63.59% height with 2.44944 nominal mL still in the bottle. The current slower tilt differs from that historical trajectory, so neither successful draining nor regression can be inferred. This is a retained regression risk, not a new simulator result. See `evidence/finish-A/consumed-wide-coarse-brake-probe.json`; none of the FN30 reserved scenes was inspected or run for this diagnostic.
-
-## Applied initial-braking calibration and r2 development
-
-Round 1 is fully closed: seven strict passes and one visible overflow, all eight complete return/release sequences. Native integrity covers sixteen complete r0/r1 recordings, 11,742 transitions and 65 scalar sidecars, retaining the catalogued incomplete original r0 recording. All 144 selected r1 frames are inspected, including the failed pour and ten return frames per case. No continuous manual playback is claimed.
-
-`tools/calibrate_finish_braking.py` accepts only the reviewed r1 identities, unchanged 42 runtime sources, the declared single overflow failure, verified motion and sixteen matching scalar probes. It archives `candidates/v23-r1/`, then changes exactly `coarse_brake_target` 0.87→0.82 and `max_pauses` 10→13. Recursive comparison and serialization round-trip establish all other checkpoint values unchanged. The active full-stop target remains 0.9294295210838318. This is CPU calibration, not another weight fit. New checkpoint: `bc9dc0e2d0afd2d090ff36f283be2276a9090f5fc48d3bf8290291dfcf2ee81e`; source commit remains `2b81ff055fb1cf980ae9e422c2d0ce90907deb47`.
-
-Development r2 was explicitly queued at 11:13:55 UTC November 7. Native observer PID 2956886 writes `/tmp/aiworker-finish-development-r2/`; its scoped, finite local review command is:
+Restore external scalar/model/native recording artifacts first; Git contains source and small reports only. These commands read completed evidence without queuing tests or fitting:
 
 ```sh
-.venv/bin/python tools/prepare_finish_development_review.py --round 2 --checkpoint bc9dc0e2d0afd2d090ff36f283be2276a9090f5fc48d3bf8290291dfcf2ee81e
-```
-
-The already-running observer/review must not be duplicated. R2 outcomes remain pending. Freeze must use the new `runtime-source-manifest-braking-r2.json`, reviewed r2 sheets and r2 withdrawal evidence. The old r0/r1 manifests do not describe the active checkpoint. The thirty reserved scenes remain unused.
-
-**First r2 preview:** `FN30_A_dev_00_r2` passes with final settled rim height 93.3998%, zero measured loss and complete return/release. Its full native 22.75-second, labeled 2× preview is `evidence/finish-A/FN30_A_dev_00_r2-preview.mp4`, SHA `ff90b57e9c072b118df2c399b9eee9f41bd98a144833925ef5ed06d40c3ecf26`. Full decode and twelve native-camera comparisons pass (maximum mean pixel error 0.871/255); four selected encoded frames are inspected. This is development-only evidence, not continuous manual playback or a reserved result. Seven r2 cases remain.
-
-
-## Read-only outcome timing report
-
-`tools/analyze_finish_outcomes.py` reads byte/SHA-verified scalar sidecars and retains the existing strict scores. It pairs each control decision with its next-state sample 50 ms later, reports the first sampled cumulative near-worktop loss, the first stop command, final level/inventory, and terminal stage times. It also records the first nonairborne outside reading, which can be a transient droplet that returns. Aggregate counts do not identify individual particle trajectories or establish a physical cause.
-
-A check against r2 reproduces the independently documented first-loss times for cases 03/06/07 exactly: 25.755, 25.555 and 24.905 seconds. All occur before the terminal stop. The report preserves all four r2 failures, including case 05's first near-worktop loss at 46.055 seconds. See `evidence/finish-A/development-r2-outcome-timing.json`. This diagnostic does not change the frozen candidate or current test scores.
-
-After all thirty current tests and their audit/backup finish, run:
-
-```sh
-.venv/bin/python tools/analyze_finish_outcomes.py --report evidence/finish-A/final-benchmark.json --integrity evidence/finish-A/recording-integrity.json --output evidence/finish-A/final-outcome-timing.json
-```
-
-
-The timing report also locates the final uninterrupted zero-source stretch and its interval to the first stop command. This is diagnostic only, not a new scoring criterion; a negative interval can be valid under the declared near-empty tolerance. R3 development intervals are −0.20 to +0.50 seconds across its four empty cases. The original r3 pass counts and frozen selection are unchanged.
-
-A fresh test exposes missing terminal motion, so the withdrawal report now explicitly counts observed return/post-release samples and records absent measurements as `null`. A trajectory that never returns or releases must not be described as a zero-dwell or zero-recontact success. The reporting-only update exactly preserves every original measurement for all eight completed r3 returns; `development-r3-withdrawal-reporting-check.json` records that comparison input/output. Runtime controls and existing strict test criteria remain frozen.
-
-## Read-only diagnosis during frozen evaluation
-
-At seventeen closed tests, fourteen pass strictly and sixteen have zero measured loss. The controller remains frozen. Two retained failures are diagnosed from SHA-verified scalar copies in `failure-diagnostic-sources.json`; the complete benchmark/recording audit remains pending.
-
-- Case 13 stays empty from 25.455 s to its 60.005 s endpoint without stopping. All 691 subsequent commands have a wrist empty score above 98.6%, but fused bottle presence remains 58.9–65.7%. Presence must be at least 70% for either empty-stop path; the separate lost-source abort requires below 5%. This interval therefore blocks both terminal actions. Encoder obstruction remains true, but the physical two-finger score is only 42.05% of tipping samples. Neither encoder obstruction nor the visual empty score establishes secure grasp; the physical cause is not proven.
-- Case 15 exhausts thirteen pauses with a six-estimate lower quartile of 91.6981%, below the 92.5414% fullness threshold. It returns safely with `fill_unconfirmed` and final settled height 95.6051%. The physical fill does not turn the unconfirmed stop into a strict pass.
-
-Reproduce this reporting-only diagnostic with:
-
-```sh
+.venv/bin/python tools/summarize_finish_benchmark.py
+.venv/bin/python tools/analyze_finish_outcomes.py \
+  --report evidence/finish-A/final-benchmark.json \
+  --integrity evidence/finish-A/recording-integrity.json \
+  --output /tmp/aiworker-finish-timing-check.json
 .venv/bin/python tools/diagnose_finish_stop_gates.py \
-  --sources evidence/finish-A/failure-diagnostic-sources.json \
+  --sources evidence/finish-A/failure-diagnostic-sources-final.json \
   --model evidence/finish-A/model-summary.json \
-  --output /tmp/aiworker-finish-stop-gates-check.json
+  --output /tmp/aiworker-finish-final-stop-gates-check.json
 ```
 
-This command verifies scalar bytes/hashes and the frozen controller source hashes. It does not run inference, change thresholds, retry tests or predict a counterfactual outcome. Failure video labels preserve these distinctions; two selected native final-frame previews have been inspected.
+Use a new output filename if a diagnostic already exists. Native audit inputs, video mappings and reporting-helper hashes are bound in `review-summary.json`. Video manifests preserve every native-to-output frame mapping. The original full-scale data remain on Ubuntu; local scalar copies and the existing lossless historical archives are retained.
