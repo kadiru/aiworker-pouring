@@ -88,6 +88,9 @@ def main():
     print(json.dumps(dict(calibration=len(calibration),contained=sum(r['stable_contained'] for r in calibration),
         seed_calibration=len(seed_calibration),seed_contained=sum(r['stable_contained'] for r in seed_calibration),
         development=len(development),passes=sum(r['strict_pass'] for r in development),pending=pending,unstarted=report['unstarted'])))
+    if len(seed_calibration)==9 and not (ROOT/'low-fill-temporal-perception-probe.json').exists():
+        from probe_size_perception import main as probe
+        probe()
 
 
 if __name__=='__main__':main()

@@ -33,6 +33,18 @@ collision settings remain unchanged. It records sparse outside-particle
 positions/origins for diagnosis. This tests a better initialization; it does
 not establish leak-free dynamic pouring or explain the original loss.
 
+The revised nine pilots all pass low-fill containment and recording checks.
+A frozen-weight CPU perception probe uses image-localized cup XY and known
+declared dimensions, with fixture positions used only for scoring. With the
+actual temporal confirmation rule, **4/9 cups confirm and 5/9 abstain**.
+Among the four confirmations, maximum localization error is 4.463 mm and
+settled-level mean absolute error is 4.982 percentage points (maximum 10.742
+points). These are low-fill views at one consumed layout, not near-full or
+autonomous success rates. The simpler single-frame probe is retained
+separately; its larger errors do not describe the controller's temporal gate.
+No weights were fitted by either probe. Cup-size perception needs supervised
+calibration before resized autonomous trials.
+
 Camera crop normalization accepts declared cup geometry. These dimensions
 are known fixture configuration, not camera-inferred size. Resized autonomous
 episodes are rejected unless a checkpoint carries the matching declared
