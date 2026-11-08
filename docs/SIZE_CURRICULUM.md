@@ -45,6 +45,15 @@ separately; its larger errors do not describe the controller's temporal gate.
 No weights were fitted by either probe. Cup-size perception needs supervised
 calibration before resized autonomous trials.
 
+Recorded camera intrinsics and extrinsics match the fixed model calibration
+in all nine settled-seed pilots. A separate frozen-detector diagnostic finds
+that all five rejected cups fail to reach the unchanged 0.46803 anchor-score
+threshold anywhere in the two-second confirmation window. Two also jump
+between widely separated image positions. This describes the rejection;
+it does not prove the underlying visual cause. New size-specific localization
+examples are needed; weakening the confidence gate is not validated by these
+observations. See `localization-diagnostics.json`.
+
 Camera crop normalization accepts declared cup geometry. These dimensions
 are known fixture configuration, not camera-inferred size. Resized autonomous
 episodes are rejected unless a checkpoint carries the matching declared
@@ -79,6 +88,15 @@ These test the two source failures, two unresolved full-stop failures, and
 one successful full/empty control each. They are deliberately **not fresh
 held-out tests**. Every outcome remains in `stage-results.json`. No failure
 is relabeled as success because a safety return finishes.
+
+The first three completed regressions retain one task pass and two failures,
+with three completed return/release sequences. Case 23 passes at a final
+94.2206% rim height with zero measured loss. Case 13 returns after uncertain
+source evidence, but loses two particles before the stop decision. Case 15
+still stops `fill_unconfirmed` after thirteen pauses: its six-frame prediction
+quartile is 91.4294%, below the 92.5414% target, while final measured level is
+96.5172%. It returns with zero measured loss. These are provisional outcomes
+within the ongoing six-case block; no weights or controls change mid-block.
 
 ## Acceptance and next stages
 

@@ -46,6 +46,13 @@ def main():
             sidecars={p.name:sha(p) for p in folder.glob('*.json')}))
         with h5py.File(h5) as f:
             d=f['data/demo_0'];rgb=decode(d['next_obs/task_image'][-1],'jpeg95')
+            k_error=float(np.max(abs(f['calibration/task/intrinsics'][:]-np.asarray(saved['calibration']['K']))))
+            poses=np.concatenate([d[g+'/task_world_T_camera'][:] for g in ('obs','next_obs')])
+            t_error=float(np.max(abs(poses-np.asarray(saved['calibration']['T']))))
+            camera_motion=float(np.max(abs(poses-poses[0])))
+            assert k_error<1e-3 and t_error<1e-6 and camera_motion<1e-9
+            integrity[-1]['fixed_task_camera_check']=dict(intrinsics_max_abs_error=k_error,
+                extrinsics_max_abs_error=t_error,camera_pose_change=camera_motion)
             Image.fromarray(rgb).save(out/(name+'.jpg'))
             if spec.get('calibration_only'):
                 tail=[r for r in samples if r['t']>=last['t']-.5]
@@ -64,6 +71,7 @@ def main():
                 (seed_calibration if seeded else calibration).append(record)
                 images.setdefault('seed' if seeded else 'grid',[]).append((record,rgb))
             else:
+                assert m['policy']['checkpoint_sha256']==candidate['checkpoint_sha256']
                 r=completed_row(folder,m['policy']['checkpoint_sha256'])
                 r.update(strict_pass=strict_success(r),failure_reasons=reasons(r),former_test_case=spec['former_test_case'])
                 development.append(r)
