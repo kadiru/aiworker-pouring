@@ -13,12 +13,18 @@ def check():
     return h
 def main():
     global OUT
-    parser=argparse.ArgumentParser();parser.add_argument('--resume',action='store_true');parser.add_argument('--part',choices=('collect','level_supplement'),default='collect');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--resume',action='store_true');parser.add_argument('--part',choices=('collect','level_supplement'),default='collect');parser.add_argument('--output',type=Path);parser.add_argument('--geometry');args=parser.parse_args()
     resume=args.resume
     if args.part=='level_supplement':OUT=Path('/tmp/aiworker-perception-level-supplement')
+    if args.output is not None:
+        assert args.output.parent==Path('/tmp') and args.output.name.startswith('aiworker-perception-')
+        OUT=args.output
+    geometry=args.geometry or ('geometry-preflight.json' if args.part=='collect' else 'level-supplement-geometry.json')
+    assert Path(geometry).name==geometry and geometry.endswith('.json')
     OUT.mkdir(exist_ok=resume);plan=read(ROOT/'plan.json');candidate=read(ROOT/'candidate.json')
     plan_sha=hashlib.sha256((ROOT/'plan.json').read_bytes()).hexdigest();assert plan_sha==candidate['plan_sha256']
-    names={s['name'] for s in plan[args.part]};assert len(names)==(47 if args.part=='collect' else 12)
+    names={s['name'] for s in plan[args.part]};assert names and len(names)==len(plan[args.part])
+    assert all(s['study_split']=='train' for s in plan.get('level_supplement',[]))
     review=read(ROOT/'camera-review.json');assert review['passed'] and review['gripper_pilot_passed']
     snapshot='runtime-resume-'+str(time.time_ns())+'.json' if resume else 'runtime-before.json'
     if resume:assert (OUT/'runtime-before.json').exists()
@@ -26,7 +32,8 @@ def main():
     deadline=time.monotonic()+10800
     while True:
         assert time.monotonic()<deadline
-        h=check();g=read(ROOT/('geometry-preflight.json' if args.part=='collect' else 'level-supplement-geometry.json'));passed={r['name'] for r in g['cases'] if r['passed']}
+        h=check();g=read(ROOT/geometry);passed={r['name'] for r in g['cases'] if r['passed']}
+        if args.geometry:assert g['plan_sha256']==plan_sha
         failed=[r for r in g['cases'] if r['name'] in names and not r['passed']];assert not failed,failed
         if names.issubset(passed) and (resume or (not h['queue'] and not h.get('recording',{}).get('active',False))):break
         print(json.dumps(dict(stage='waiting_geometry',passed_collection=len(passed&names),total=len(names),utc=datetime.datetime.now(datetime.timezone.utc).isoformat())),flush=True)

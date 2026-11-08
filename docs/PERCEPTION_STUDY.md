@@ -395,3 +395,23 @@ CPU geometry screens pass. The new development records save trajectories
 and outside-particle diagnostics; no such simulator data enters control.
 The original six reserved tests remain unstarted. The native runtime sources,
 material, physics, and stop/score thresholds are unchanged.
+
+The first round-3 locator fit is rejected: 240 epochs / 13,440 updates,
+893 training and 302 validation images from 89/30 episodes; 288.916 seconds
+fitting on the guarded RTX 4070. Its best baseline maximum is 3.2085 mm
+(limit <3 mm), on stationary case `PV_A_validation_04_0`. Consumed task
+validation cases 02/03 reach maximum errors of 1.077/1.333 mm, but that
+improvement does not waive the stationary failure. All-size validation
+maximum is 81.5315 mm; resized autonomy remains gated. Failed weights,
+reports, data manifest, plan and fitting/admission sources are preserved in
+`rounds/task-r3-locator-attempt1`; active `best.pt` remains round 2.
+
+Plan version 11 adds eight training-only fixtures before the next fit: six
+intermediate fills at jittered existing training layouts, plus two low-fill
+initial views derived from the consumed training layouts. All validation,
+fresh holdout/development, and reserved identities are unchanged. The six
+intermediate cases use subsets of the same settled seed; the two initial
+views use the autonomous initial grid. Both require native stable-label and
+containment checks. No geometry, fluid, rendering or acceptance limits are
+relaxed. Declaration: `task-supplement-preparation.json`; plan SHA
+`d6c98cb1bcac547ce6a611237bbb6c4b358bf646aea93bf558cd2302d28c8ed2`.
