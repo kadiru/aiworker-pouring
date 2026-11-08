@@ -72,6 +72,14 @@ class Actor:
             self.empty_detector=load_empty(self.saved)
         self.cup_model=CupEstimator().cuda().eval();self.cup_model.load_state_dict(self.saved['cup_model'])
         self.cal=self.saved['calibration'];self.profile=dict(self.saved['primitive']);self.threshold=self.saved['thresholds']
+        self.cup_cal=self.saved.get('cup_localization_calibration',self.cal)
+        self.level_cal=self.saved.get('cup_detail_calibration',self.cal)
+        self.cup_localization_image=None
+        self.presence_detector=None
+        if 'wrist_presence_model' in self.saved:
+            from pour_wide_empty import EmptyWrist
+            self.presence_detector=EmptyWrist().cuda().eval()
+            self.presence_detector.load_state_dict(self.saved['wrist_presence_model'])
         self.steps=0;self.clamps=0;self.diagnostics=[];self.history=[];self.start=None;self.fk=None;self.arm_limits=None
         self.stop_latched=None;self.terminal=None;self.done_votes=0;self.abort_time=None
         self.grasp_stage='initialize';self.stage_start=None;self.attempt=0;self.confirm_votes=0;self.grasp_confirmed=False
@@ -97,7 +105,8 @@ class Actor:
             self.attempt+=1;self.confirm_votes=0;self.visual_votes=[];self.physical_votes=0
             self.localization_start=t;self.home=q[:7].copy()
             self.localization_history={'source':[],'cup':[]}
-        neck,self.source_score=locate(task,self.saved['source_bank']);rim,self.cup_score=locate(task,self.saved['cup_bank'])
+        neck,self.source_score=locate(task,self.saved['source_bank'])
+        rim,self.cup_score=locate(task if self.cup_localization_image is None else self.cup_localization_image,self.saved['cup_bank'])
         config=self.saved.get('localization_consensus')
         if config:
             from pour_temporal_localization import consensus
@@ -115,7 +124,7 @@ class Actor:
         elif self.source_score<self.threshold['source_localization_score'] or self.cup_score<self.threshold['cup_localization_score']:
             self.abort_time=t;self.stop_latched='localization_unconfirmed';self.home=q[:7].copy();return
         base=bottle_base_from_neck(neck,self.cal);self.source_xy=base[:2]
-        self.cup_xy=plane_point(rim,self.cal['table_z']+self.cal.get('cup_geometry',{}).get('rim_z_m',.038),self.cal)[:2]
+        self.cup_xy=plane_point(rim,self.cup_cal['table_z']+self.cup_cal.get('cup_geometry',{}).get('rim_z_m',.038),self.cup_cal)[:2]
         self.initial_neck=neck;self.expected_lift_neck=project(base+[0,0,.135+.044],self.cal)
         self.home=q[:7].copy()
         # The same known hardware geometry/IK branch as the demonstration planner.
@@ -229,6 +238,14 @@ class Actor:
         if self.start is None:self.start=t;Hardware.hardware(self,robot)
         age=t-self.start;q=observation['joint_pos'];v=observation['joint_vel'];self.history.append((age,q[:7].copy()))
         task=decode(observation['task_encoded'],'jpeg95');wrist=decode(observation['wrist_encoded'],'jpeg95')
+        level_image=task
+        if 'cup_detail_calibration' in self.saved:
+            from PIL import Image
+            level_image=decode(observation['cup_detail_encoded'],'jpeg95')
+            width,height=self.level_cal['resolution_wh']
+            assert level_image.shape==(height,width,3)
+            assert np.allclose(observation['cup_detail_world_T_camera'],self.level_cal['T'],atol=1e-6,rtol=0)
+            self.cup_localization_image=np.asarray(Image.fromarray(level_image).resize((384,384),Image.Resampling.BILINEAR))
         geo=cnn=flow=empty=present=tilt=0.;mass=0.;settled_prediction=None;empty_views=None
         if not self.grasp_confirmed and self.terminal is None:
             targets,phase=self.grasp_action(task,q,t,age)
@@ -236,7 +253,7 @@ class Actor:
         else:
             if not self.outbound or self.pour_phase>self.outbound[-1][0]+.3:
                 self.outbound.append((self.pour_phase,q[:7].copy()))
-            normalized=cup_crop(task,self.cup_xy,self.cal);a=torch.as_tensor(normalized,device='cuda')[None]
+            normalized=cup_crop(level_image,self.cup_xy,self.level_cal);a=torch.as_tensor(normalized,device='cuda')[None]
             cnn=float(self.cup_model(a)[0])+self.saved['cup_bias'];features,_,n=surface_features(a);mass=float(n[0])
             geom=self.saved['surface_geometry'];coef=torch.as_tensor(geom['coef'],device='cuda')
             geo=float(features[0,:geom['dimensions']]@coef)+geom['bias'] if mass>1. else 0.
@@ -271,6 +288,15 @@ class Actor:
                 image=wrist_crop(wrist,self.saved['wide_empty_roi'])
                 empty=float(self.empty_detector(torch.as_tensor(image,device='cuda')[None]).sigmoid()[0])
                 empty_views=dict(empty_views or {},wrist_crop_empty=empty)
+            if self.presence_detector is not None:
+                from pour_wide_empty import wrist_crop
+                image=wrist_crop(wrist,self.saved['wrist_presence_roi'])
+                visible=float(self.presence_detector(torch.as_tensor(image,device='cuda')[None]).sigmoid()[0])
+                held=held_gripper(q,self.saved['pour_primitive']['grasp_closure']['min_deficit_rad'])
+                # Presence is independent of liquid remaining. Require the
+                # previously verified grasp and current encoder obstruction.
+                present=visible if held else 0.
+                empty_views=dict(empty_views or {},wrist_present=visible,encoder_hold=held)
             tilt=float(np.degrees(np.arccos(np.clip(up[2],-1,1))))
             is_empty=empty>=self.threshold['empty_probability'] and present>=.7 and tilt>=95 and flow*72.8<3.
             self.empty_votes=self.empty_votes+1 if is_empty else 0;self.lost_votes=self.lost_votes+1 if present<.05 else 0

@@ -1,0 +1,46 @@
+{
+  "method": "Supervised binary cross entropy, separate wrist CNN initialized from the existing empty-bottle encoder; AdamW, episode/class weighting, image augmentation.",
+  "device": "NVIDIA GeForce RTX 4070",
+  "fit_seconds": 11.03515778700239,
+  "total_seconds": 18.88126895602909,
+  "learned_parameters": 48001,
+  "epochs": 80,
+  "optimizer_steps": 1200,
+  "counts": {
+    "train": {
+      "episodes": 26,
+      "images": 1895,
+      "positive": 1866,
+      "negative": 29
+    },
+    "validation": {
+      "episodes": 10,
+      "images": 659,
+      "positive": 631,
+      "negative": 28
+    }
+  },
+  "passed": true,
+  "selected": {
+    "epoch": 40,
+    "bce": 0.0002042331179836765,
+    "false_positive": 0,
+    "missed_positive": 0,
+    "held_tilt_min_probability": 0.9997791647911072,
+    "empty_tilt_min_probability": 0.9997791647911072,
+    "positive_recall": 1.0
+  },
+  "roi": [
+    170,
+    140,
+    246,
+    248
+  ],
+  "labels": "Offline projected bottle envelope: >=80% within fixed wrist ROI positive, zero overlap negative, ambiguous excluded. This labels projected bottle presence, not guaranteed optical visibility; live control requires previously verified grasp and measured finger obstruction.",
+  "gate": "Validation: zero false positives at p>=0.7, every eligible tilted positive >=0.7, total positive recall >=99%. No reserved test frames.",
+  "active_checkpoint_unchanged": true,
+  "source_sha256": "d257f2c764dfbf6c2338751e1e9175506147a9316ff957bd51bc64c45917825e",
+  "checkpoint_sha256": "f61fe036112778ea16499778b3091731a00bbda6860b5a31d811f9be6138b2f0",
+  "native_report_sha256": "f0282414b4009a51756b7249dfa2ddc00f1d379040f56dd5beade90daec64719",
+  "scope": "Component validation only; no autonomous outcome from this fit. Negative validation examples are 28 frames from two authored native empty-hand episodes."
+}

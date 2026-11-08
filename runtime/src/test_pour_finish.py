@@ -48,10 +48,14 @@ class FinishTests(unittest.TestCase):
         from types import SimpleNamespace
         robot=object.__new__(RobotPour);robot.spec=dict(calibration_only=True,max_seconds=2.5)
         robot.approach=np.ones((2,7));robot.drives=[SimpleNamespace(Set=lambda value:None) for _ in range(11)]
+        robot.calibration_command=np.r_[np.ones(7),np.zeros(4)]
         robot.stop_time=.1
         for t in (.1,1.,2.5,3.):
             robot.drive(t);np.testing.assert_allclose(robot.command,np.r_[np.ones(7),np.zeros(4)])
         self.assertFalse(robot.complete(2.4));self.assertTrue(robot.complete(2.5))
+        robot.calibration_command=np.linspace(-20,35,11)
+        robot.drive(4.)
+        np.testing.assert_allclose(robot.command,robot.calibration_command)
 
     def test_calibration_pack_stays_inside_tapered_cup(self):
         from pour_finish_calibration import cup_points

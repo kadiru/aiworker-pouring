@@ -26,6 +26,7 @@ class PourRecording:
         self.stage, self.folder, self.sim = stage, folder, sim
         self.robot, self.preview = robot, preview
         self.cameras = {}
+        self.camera_sizes = {}
         self.wrist_mount = None
         self.image_encoding=spec.get('image_encoding','raw')
         self.last = None
@@ -42,9 +43,17 @@ class PourRecording:
             # Preserve the calibrated task/wrist lenses and poses verbatim.
             definitions['overview'] = ('/World/RecordingOverviewCamera',
                 [1.0,-.73,1.65], [.49,-.22,1.12], [0,0,1], .024)
+        if spec.get('record_cup_detail'):
+            detail_resolution=spec.get('cup_detail_resolution',768)
+            detail_focal=spec.get('cup_detail_focal_m',.045)
+            assert detail_resolution in (768,1024) and detail_focal in (.030,.045)
+            definitions['cup_detail'] = ('/World/CupDetailCamera',
+                [.85,-.55,1.35], [.495,-.225,1.060], [0,0,1], detail_focal)
         for name, (path, eye, target, up, focal) in definitions.items():
+            size = (detail_resolution,detail_resolution) if name == 'cup_detail' else CAMERA_SIZE
+            self.camera_sizes[name] = size
             camera = Camera(prim_path=path, name='pour_'+name, frequency=-1,
-                            resolution=CAMERA_SIZE, annotator_device='cpu')
+                            resolution=size, annotator_device='cpu')
             matrix = Gf.Matrix4d().SetLookAt(Gf.Vec3d(*eye), Gf.Vec3d(*target), Gf.Vec3d(*up)).GetInverse()
             if name == 'wrist':
                 self.wrist_mount = matrix
@@ -77,7 +86,7 @@ class PourRecording:
                 if self.image_encoding=='jpeg95':
                     self.create(group+'/'+name+'_image', (), h5py.vlen_dtype(np.uint8))
                 else:
-                    self.create(group+'/'+name+'_image', CAMERA_SIZE+(3,), np.uint8)
+                    self.create(group+'/'+name+'_image', self.camera_sizes[name]+(3,), np.uint8)
                 self.create(group+'/'+name+'_time', (), np.float64)
                 self.create(group+'/'+name+'_reference', (2,), np.int64)
                 self.create(group+'/'+name+'_world_T_camera', (4,4), np.float64)
@@ -122,6 +131,10 @@ class PourRecording:
             self.file.attrs['camera_rig'] = 'A_task_wide_wrist_v5' + ('_with_spectator_v1' if spec.get('record_overview') else '')
             self.file.attrs['task_camera_focal_m'] = spec['task_camera_focal_m']
         self.file.attrs['camera_visual_review'] = 'pending'
+        if spec.get('record_cup_detail'):
+            self.file.attrs['camera_rig'] = 'A_task_wrist_cup_detail_v6'
+            self.file.attrs['policy_camera_names'] = json.dumps(['task','wrist','cup_detail'])
+            self.file.attrs['cup_detail_resolution_wh'] = self.camera_sizes['cup_detail']
         self.file.attrs['joint_names'] = json.dumps(NAMES)
         self.file.attrs['control_dt'] = DT
         self.file.attrs['action_semantics'] = 'Absolute joint position targets in radians, held for the following 0.05 simulation seconds'
@@ -132,6 +145,9 @@ class PourRecording:
         self.file.attrs['camera_pose_convention'] = 'world_T_camera in USD camera axes (+Y up, -Z forward), metres'
         self.file.attrs['variant'] = 'A'
         self.file.attrs['task_scope']='approach_lift_prefix' if spec.get('corrective_prefix') else 'full_pour'
+        if spec.get('calibration_only'):
+            self.file.attrs['task_scope']='stationary_perception_calibration'
+            self.file.attrs['evidence_kind']='stationary_perception_calibration'
         self.file.attrs['spec'] = json.dumps(spec)
         self.file['data'].attrs['env_args'] = json.dumps({
             'env_name':'AIWorkerPourNative-v1', 'type':2,
@@ -140,7 +156,7 @@ class PourRecording:
         for name, camera in self.cameras.items():
             c = calibration.create_group(name)
             c.create_dataset('intrinsics', data=np.asarray(camera.get_intrinsics_matrix()))
-            c.attrs['resolution_wh'] = CAMERA_SIZE
+            c.attrs['resolution_wh'] = self.camera_sizes[name]
             c.attrs['prim_path'] = camera.prim_path
             c.attrs['distortion'] = 'none, pinhole'
         self.file.flush()
@@ -162,7 +178,7 @@ class PourRecording:
         # Extra render passes finish GPU readback at this fixed physics state.
         for attempt in range(10):
             frames = {name:camera.get_current_frame() for name,camera in self.cameras.items()}
-            ready = all(frame.get('rgb') is not None and np.asarray(frame['rgb']).shape[:2]==CAMERA_SIZE
+            ready = all(frame.get('rgb') is not None and np.asarray(frame['rgb']).shape[:2]==self.camera_sizes[name]
                         and camera_time_is_current(float(frame.get('rendering_time', -1)),t)
                         and (self.last is None or float(frame['rendering_time'])>self.last[name+'_time'])
                         for name,frame in frames.items())

@@ -124,13 +124,13 @@ class RobotPour(Pour):
             count=round(spec['cup_initial_ml']/(spacing**3*1e6))
             cup_points=np.array([[*cross[i%len(cross)],.004+2*spacing+(i//len(cross))*spacing]
                                  for i in range(count)],dtype=np.float32)
-            if 'cup_height_scale' in spec or 'cup_diameter_scale' in spec:
-                from pour_vessel_geometry import initial_cup_points
-                cup_points=initial_cup_points(spec)
-            if spec.get('calibration_version') in (1,2,3):
+            if spec.get('calibration_version') in (1,2,3,4):
                 from pour_finish_calibration import cup_points as calibration_points
                 cup_points=calibration_points(spec)
                 assert abs(len(cup_points)*spacing**3*1e6-spec['cup_initial_ml'])<1e-6
+            elif 'cup_height_scale' in spec or 'cup_diameter_scale' in spec:
+                from pour_vessel_geometry import initial_cup_points
+                cup_points=initial_cup_points(spec)
             self.points=np.concatenate([self.points,(cup_points @ FRAME.T+self.cup_world).astype(np.float32)])
 
         cup=UsdGeom.Xformable(stage.GetPrimAtPath('/World/Cup'))
@@ -155,6 +155,27 @@ class RobotPour(Pour):
                 phys.CreateContactOffsetAttr(.001)
                 phys.CreateRestOffsetAttr(0.)
         self.approach,self.lift_path,self.tilt,self.path_planner=build_path(stage,spec,include_planner=True)
+        self.calibration_command=np.r_[self.approach[0],np.zeros(4)]
+        if 'calibration_arm_angle_deg' in spec:
+            assert spec.get('calibration_only') and not spec.get('policy_evaluation')
+            assert 'calibration_hold_angle_deg' not in spec
+            angle=float(spec['calibration_arm_angle_deg']);assert 0<=angle<=85
+            self.calibration_command=np.r_[self.path_planner.solve(angle,1.),np.zeros(4)]
+        if 'calibration_hold_angle_deg' in spec:
+            assert spec.get('calibration_only') and not spec.get('policy_evaluation')
+            angle=float(spec['calibration_hold_angle_deg'])
+            assert 0<=angle<=85
+            from pour_wide_geometry import calibrated_pose
+            base,rotation=calibrated_pose(angle,1.,self.start_xy,spec.get('mouth_z',.054))
+            rotation=FRAME @ rotation @ FRAME.T
+            old=self.cup_world+FRAME @ [*self.start_xy,.0002]
+            origin=self.cup_world+FRAME @ base
+            self.points[:self.initial_bottle_count]=(self.points[:self.initial_bottle_count]-old) @ rotation.T+origin
+            self.position.Set(Gf.Vec3d(*origin))
+            quat=Rotation.from_matrix(rotation).as_quat()
+            self.orientation.Set(Gf.Quatf(float(quat[3]),Gf.Vec3f(*quat[:3])))
+            UsdPhysics.RigidBodyAPI(self.bottle_prim).GetKinematicEnabledAttr().Set(True)
+            self.calibration_command=np.r_[self.path_planner.solve(angle,1.),np.full(4,45.)]
         self.centered_return=None
         self.scene_evidence = dict(
             bottle_mass_kg=.18, bottle_gravity_enabled=True, bottle_kinematic=False,
@@ -166,6 +187,11 @@ class RobotPour(Pour):
             dof_names=['arm_r_joint'+str(i) for i in range(1,8)]+
                       ['gripper_r_joint'+str(i) for i in range(1,5)],
             cup_frame_world=self.cup_world.tolist(), cup_frame_rotation=FRAME.tolist())
+        if 'calibration_hold_angle_deg' in spec:
+            self.scene_evidence.update(bottle_kinematic=True,
+                calibration_pose_scope='Authored stationary occlusion fixture; never autonomous grasp evidence')
+        elif 'calibration_arm_angle_deg' in spec:
+            self.scene_evidence['calibration_pose_scope']='Authored empty-hand pose with dynamic bottle on table; not an autonomous grasp attempt'
 
         self.drives=[]
         self.states=[]
@@ -174,7 +200,7 @@ class RobotPour(Pour):
             name=('arm_r_joint'+str(i+1)) if arm else ('gripper_r_joint'+str(i-6))
             prim=stage.GetPrimAtPath(ROOT+'/joints/'+name)
             drive=UsdPhysics.DriveAPI(prim,'angular')
-            initial=float(self.approach[0,i]) if arm else 0.
+            initial=float(self.calibration_command[i])
             prim.GetAttribute('state:angular:physics:position').Set(initial)
             prim.GetAttribute('state:angular:physics:velocity').Set(0.)
             drive.CreateStiffnessAttr((600 if i<6 else 200)*math.pi/180 if arm else .50)
@@ -202,7 +228,7 @@ class RobotPour(Pour):
 
     def drive(self,t):
         if self.spec.get('calibration_only'):
-            self.command=np.r_[self.approach[0],np.zeros(4)]
+            self.command=self.calibration_command.copy()
             self.phase='Stationary liquid-level calibration'
             for drive,target in zip(self.drives,self.command):drive.Set(float(target))
             return
@@ -307,6 +333,13 @@ class RobotPour(Pour):
             row['diagnostic_outside_particles']=[dict(index=int(i),origin='bottle' if i<self.initial_bottle_count else 'cup',
                 xyz_cup_frame_m=local[i].tolist(),velocity_m_s=(v[i]@FRAME).tolist()) for i in ids[:32]]
             row['diagnostic_outside_count']=len(ids)
+        if self.spec.get('record_surface_diagnostics'):
+            from bottle_pour import vessel_mask,BOTTLE
+            from pour_perception_geometry import upper_surface
+            mask=vessel_mask(local,self.cup_profile)&~vessel_mask((local-self.base)@self.rotation,BOTTLE)
+            surface=upper_surface(local[mask],self.cup_profile,self.spec['spacing'])
+            row['surface_column_diagnostic']=surface
+            row['cup_column_height_fraction']=surface['height_fraction']
         if self.ever_table_particles is None: self.ever_table_particles=np.zeros(len(p),dtype=bool)
         self.ever_table_particles |= (local[:,2]<.0035)
         row['ever_table_ml']=float(self.ever_table_particles.sum()*self.spec['spacing']**3*1e6)

@@ -43,6 +43,9 @@ allowed_commands.update(('wide_pilot', 'wide_repair', 'wide_collect', 'wide_trai
 allowed_commands.update(('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'))
 allowed_commands.update(('size_calibration','size_recovery_development'))
 allowed_commands.add('size_seed_calibration')
+allowed_commands.update(('perception_pilot','perception_collect','perception_development','perception_test'))
+allowed_commands.add('perception_geometry')
+allowed_commands.update(('perception_camera_pilot','perception_holdout'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -331,7 +334,8 @@ def setup(spec):
         from pour_recording import PourRecording
         recording = PourRecording(stage, folder, spec, sim, bottle, preview)
         state['recording'] = dict(active=True, path=str(folder/'episode.partial.hdf5'),
-                                  cameras=list(recording.cameras), resolution=[384,384], control_hz=20, frames=0)
+                                  cameras=list(recording.cameras), resolution=[384,384],
+                                  camera_resolutions={k:list(v) for k,v in recording.camera_sizes.items()}, control_hz=20, frames=0)
     actor = None
     if spec.get('policy_evaluation'):
         if spec.get('policy_family')=='visual_guard_hierarchy':
@@ -534,6 +538,7 @@ def finish(trial):
 
         state['recording'] = dict(active=False, path=str(recording_path),
                                   cameras=recording_cameras, resolution=[384,384], control_hz=20,
+                                  camera_resolutions={k:list(v) for k,v in trial['recording'].camera_sizes.items()},
                                   frames=trial['recording'].count)
     metrics['wall_seconds']=round(time.monotonic()-trial['wall'],2)
     result=dict(spec=trial['spec'],metrics=metrics,path=str(trial['folder']))
@@ -638,7 +643,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('size_calibration','size_seed_calibration','size_recovery_development'):
+                    if cmd in ('perception_pilot','perception_collect','perception_geometry','perception_camera_pilot','perception_holdout','perception_development','perception_test'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before perception-study work';continue
+                        from pour_perception_study import pending as perception_pending
+                        pending.extend(perception_pending(cmd.removeprefix('perception_')))
+                    elif cmd in ('size_calibration','size_seed_calibration','size_recovery_development'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before size-curriculum work';continue
                         from pour_size_study import pending as size_pending

@@ -41,14 +41,16 @@ def validate(path):
         cameras = {}
         max_skew = 0.
         camera_tolerance = recording_tolerance(file.attrs)
-        for name in ('task','wrist'):
+        for name in ('task','wrist') + (('cup_detail',) if 'cup_detail' in file['calibration'] else ()):
+            size=tuple(int(v) for v in file['calibration/'+name].attrs.get('resolution_wh',(384,384)))
+            assert size in ((768,768),(1024,1024)) if name=='cup_detail' else size==(384,384)
             first, last = [], []
             for group, timestamps in [('obs',starts),('next_obs',ends)]:
                 image = demo[group+'/'+name+'_image']
                 if codec=='jpeg95':
                     assert image.shape==(count,), 'Malformed JPEG frame dataset'
                 else:
-                    assert image.shape == (count,384,384,3), 'Missing or malformed camera images'
+                    assert image.shape == (count,size[1],size[0],3), 'Missing or malformed camera images'
                     assert image.dtype == np.uint8, 'Images should be raw uint8 RGB'
                 camera_time = demo[group+'/'+name+'_time'][:]
                 skew = float(np.max(abs(camera_time-timestamps)))
@@ -62,6 +64,7 @@ def validate(path):
                 assert demo[group+'/joint_pos'].shape == (count,11)
                 assert np.allclose(demo[group+'/'+name+'_world_T_camera'][:,3,:],[0,0,0,1])
                 for i in (0,count//2,count-1):
+                    assert decode(image[i],codec).shape == (size[1],size[0],3)
                     assert float(decode(image[i],codec).std()) > 5., 'Camera appears blank'
                 if group=='obs': first=decode(image[0],codec)
                 else: last=decode(image[-1],codec)
@@ -69,7 +72,7 @@ def validate(path):
                 assert np.array_equal(demo['obs/'+name+'_image'][i],demo['next_obs/'+name+'_image'][i-1]), 'Image transition continuity failed'
             change=float(np.mean(abs(first.astype(float)-last.astype(float))))
             assert change>.02, 'Camera did not observe any episode motion'
-            cameras[name] = dict(resolution=[384,384],rgb_dtype='uint8',encoding=codec,
+            cameras[name] = dict(resolution=list(size),rgb_dtype='uint8',encoding=codec,
                                  first_last_mean_pixel_change=change,
                                  intrinsics=file['calibration/'+name+'/intrinsics'][:].tolist())
         assert np.allclose(demo['obs/task_time'][:],demo['obs/wrist_time'][:],atol=1e-7,rtol=0)
@@ -90,7 +93,7 @@ def validate(path):
                     duration_sim_s=float(ends[-1]-starts[0]),max_camera_state_skew_s=max_skew,
                     camera_timestamp_tolerance_s=camera_tolerance,
                     physical_success=bool(file.attrs['physical_success']),
-                    training_eligible=not prefix and bool(file.attrs['physical_success']) and reviewed and
+                    training_eligible=not prefix and file.attrs.get('task_scope')!='stationary_perception_calibration' and bool(file.attrs['physical_success']) and reviewed and
                         file.attrs['evidence_kind'] in ('scripted_reference','noisy_expert_reference'),camera=cameras,
                     task_scope=file.attrs.get('task_scope','full_pour'),
                     corrective_training_eligible=bool(prefix and reviewed and metrics.get('prefix_success') and
