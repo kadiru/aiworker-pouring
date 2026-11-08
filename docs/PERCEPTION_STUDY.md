@@ -503,3 +503,18 @@ same owned container, retaining the 4070 binding, four-core quota, CPU set,
 reconfigured. All deployed source hashes match the candidate. The nine
 predeclared fresh perception cases start in run `20261108T232827Z`; no new
 autonomous success is yet claimed.
+
+The nine fresh round-3 static scenes all pass. Maximum cup localization is
+1.2585 mm; level MAE 1.182 points; near-full maximum absolute error 1.610
+points and maximum overestimate 0.730 points. Independent color maximum
+error is 3.273 points. Measured labels span 7.06%–95.09% rim height; 84
+near-full frames are scored. All nine final native three-camera composites
+were inspected. The audit now covers 123 recordings (117 stationary plus
+six prior autonomous), with 498 scalar sidecars SHA-verified locally.
+Raw HDF5 and trajectories remain on Ubuntu.
+
+The six predeclared `PV_A_development_r1_00..05` attempts have started in
+run `20261108T232827Z`, observed by `/tmp/aiworker-perception-development-r3`.
+The model, sources and criteria remain fixed throughout this batch. Only
+six strict passes, six ordered returns and actual camera review permit
+the original six reserved tests; cup/bottle size variation remains gated.
