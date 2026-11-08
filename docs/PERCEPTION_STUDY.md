@@ -181,6 +181,47 @@ checks are now running with this candidate fixed. Current data contains 82 compl
 native records; all 328 scalar sidecars are SHA-verified locally. This is not
 a full local backup of raw HDF5 images or particle trajectories.
 
+## Round-1 independent result and level-only round 2
+
+All nine new recordings pass integrity/stability checks and confirm a cup.
+Maximum localization is 0.949 mm, level MAE 1.124 points, and color maximum
+error 4.529 points. The batch still fails: near-full cases 04 and 08 overestimate
+by up to 2.965 / 3.718 points, exceeding the unchanged 2.5-point limit; case
+08 also exceeds the 3.5-point absolute limit. All outcomes remain in
+`baseline-holdout-r1.json`; its source candidate and exact artifacts are
+protected in native `rounds/baseline-r1`.
+
+A CPU diagnostic on final frames shows that exact fixture centering still
+produces 2.842 / 3.669-point overestimates in those cases. Axis-aligned ±1 mm
+crop offsets span only 0.550 / 0.577 points there. The main near-full bias
+therefore persists without localization error. True-centered crops are
+diagnostic only, never policy inputs or fitting crops.
+
+Round 2 retains the detector weights and rejection threshold unchanged.
+The nine failed records are explicitly admitted as additional level-training
+examples; their original splits and scores are preserved. Nine fresh scenes
+with different seed cuts and position offsets were declared before fitting,
+under plan SHA
+`3fe83116ac7ed49b5405d1133c18c37e01e07534430f36b61389aa994a410ac4`.
+Six autonomous development and six reserved tests remain gated/unstarted.
+There are 91 audited native records and 364 SHA-verified local scalar
+sidecars. Both nine-scene final-frame contact sheets were inspected; that
+does not constitute continuous playback or autonomous task validation.
+
+The level-only round-2 fit passes component validation: 1.405-point MAE,
+1.114-point near-full maximum absolute error and 0.681-point maximum
+overestimate. All 176 admitted near-full training frames also pass the
+same maximum limits, with a 2.490-point worst error. Training used
+1,236/379 images, 240 epochs / 4,800 updates, selected epoch 104; total
+preparation/fit time 44.674 seconds on the guarded 4070. The separate
+27-feature color/view-position RBF check uses 37 baseline prototypes /
+38 fitted coefficients and passes at 4.342-point maximum validation error.
+The checkpoint is
+`7a17cfe0f8d44826769f2ad915873be4dff3943485aadca71657e24deb1832d8`.
+Its local backup is verified, runtime sources are unchanged from the
+passing CPU checks, and no simulator restart was needed. All nine new
+geometry/frustum checks pass; independent evaluation is now running.
+
 ## Prepared learning and evaluation
 
 The method is supervised perception plus the existing contextual motion

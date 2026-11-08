@@ -1,5 +1,5 @@
 """Archive a failed independent round, explicitly admit it, declare fresh checks."""
-import copy,hashlib,json,shutil,sys,urllib.request
+import argparse,copy,hashlib,json,shutil,sys,urllib.request
 from pathlib import Path
 import numpy as np
 ROOT=Path('/workspace/learning/A-perception-20261108-v1')
@@ -11,6 +11,7 @@ from bottle_pour import vessel_mask
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--expected-current-round',type=int,choices=(0,1),default=0);args=parser.parse_args()
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10));assert not h['queue'] and not h['recording']['active'] and not h.get('error')
     assert not (ROOT/'final-selection.json').exists()
     manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');report=read(ROOT/'perception-holdout.json');audit=read(ROOT/'recording-audit.json')
@@ -24,9 +25,10 @@ def main():
     assert {s['name'] for k in ('development','test') for s in plan[k]}.isdisjoint(started)
     assert all(r['measured_label']['accepted'] for r in report['cases'])
     previous_round=plan.get('perception_round',0);new_round=previous_round+1
-    assert new_round==1,'Declare any subsequent round separately'
-    rng=np.random.default_rng(26110801);cal=read(ROOT/'camera-frustum-preflight.json')['calibration'];scenes=[];checks=[]
-    for i,(original,cut) in enumerate(zip(old,(.12,.45,.75,.91,.98,.85,.12,1.,.96))):
+    assert previous_round==args.expected_current_round,'Unexpected study round; do not silently consume another evaluation'
+    cuts={1:(.12,.45,.75,.91,.98,.85,.12,1.,.96),2:(.13,.50,.77,.94,.99,.88,.15,1.,.97)}[new_round]
+    rng=np.random.default_rng(26110800+new_round);cal=read(ROOT/'camera-frustum-preflight.json')['calibration'];scenes=[];checks=[]
+    for i,(original,cut) in enumerate(zip(old,cuts)):
         s=copy.deepcopy(original);s['name']=f'PV_A_baseline_perception_r{new_round}_{i:02d}'
         offset=rng.uniform(-.004,.004,2)
         if np.linalg.norm(offset)<.003:offset=offset/np.linalg.norm(offset)*.003
@@ -55,7 +57,7 @@ def main():
     (ROOT/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')
     manifest['protected_parent_files'].update({str(p):sha(p) for p in archive.rglob('*') if p.is_file()})
     manifest.update(trained=False,component_gates_passed=False,plan_sha256=sha(ROOT/'plan.json'),perception_round=new_round,
-        scope='Repair initialized from trained rejected round-0 weights; current-round component acceptance pending. Prior independent failures remain frozen in rounds/baseline-r0.')
+        scope=f'Repair initialized from trained rejected round-{previous_round} weights; current-round component acceptance pending. Prior independent failures remain frozen in rounds/.')
     (ROOT/'candidate.json').write_text(json.dumps(manifest,indent=2)+'\n')
     for n in ('component-selection.json','perception-holdout.json','baseline-holdout-geometry.json','cup-component.json','cup-component.pt',
               'cup-level-validation.json','cup-localization-validation.json','cup-level-attempt.pt','cup-level-predictions.json',

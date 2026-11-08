@@ -6,12 +6,15 @@ ROOT=Path('/workspace/learning/A-perception-20261108-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--part',choices=('collect','level_supplement'),default='collect');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--part',choices=('collect','level_supplement','consumed_perception_training','perception_holdout'),default='collect');args=parser.parse_args()
     audit=read(ROOT/'recording-audit.json');plan=read(ROOT/'plan.json');specs={s['name']:s for s in plan[args.part]}
     records=[r for r in audit['records'] if r['name'] in specs]
     assert len(records)==len(specs) and not audit['started_incomplete']
     records.sort(key=lambda r:(specs[r['name']]['cup_height_scale'],specs[r['name']]['cup_diameter_scale'],r['split'],r['label']['target']))
-    folder=ROOT/('collection-review' if args.part=='collect' else 'level-supplement-review');folder.mkdir(exist_ok=False);pages=[]
+    name={'collect':'collection-review','level_supplement':'level-supplement-review',
+        'consumed_perception_training':'consumed-perception-review',
+        'perception_holdout':f'perception-holdout-r{plan.get("perception_round",0)}-review'}[args.part]
+    folder=ROOT/name;folder.mkdir(exist_ok=False);pages=[]
     font_path=Path('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
     font=ImageFont.truetype(str(font_path),13) if font_path.exists() else ImageFont.load_default()
     for page in range(math.ceil(len(records)/12)):
