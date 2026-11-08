@@ -471,3 +471,25 @@ input manifests and failure reason are archived in
 `rounds/task-r3-readout-attempt1`; the original fit log is retained locally.
 The same seeded, bounded algorithm is rerun with diagnostics saved even
 when the numerical check fails. No candidate has been activated.
+
+The diagnostic confirms a 0.0720-point CPU/GPU difference, caused by
+floating cumulative quantiles choosing adjacent rows at an exact boundary.
+A continuous-feature ablation resolves numerical parity but misses the
+2.5-point overestimate limit at 2.600 points; it remains rejected. Plan
+version 15 instead recovers integer counts from the 38-pixel binary-mask
+histogram and computes quantiles with exact integer comparisons. Feature
+count remains 709; legacy identity readouts are unchanged. Sixteen native
+regressions pass, including exact-boundary CPU/GPU agreement, natural
+return and legacy-readout compatibility. An initial missing test-module
+error is preserved separately and corrected before the complete run.
+
+The resulting readout passes: 5,026 fitted parameters, 139 inputs, fixed
+32/16 tanh layers, selected update 980 of 1,200; 1,411/424 training/validation
+images from 94/26 episodes, including 87/45 pre-stop actual-pour images.
+Validation MAE is 1.392 points, near-full maximum error 2.592 points, maximum
+overestimate 1.880 points, and actual-pour MAE 1.062 points. The independent
+color maximum is 4.193 points. Maximum CPU/GPU prediction difference is
+0.00296 points; float32/float64 difference is below 0.000005 points. Total
+preparation/fitting takes 30.036 seconds on the guarded 4070. Raw CNN errors
+remain reported; the final runtime readout is the accepted estimator.
+Fresh-scene and autonomous evaluations are still required.

@@ -1,0 +1,26 @@
+{
+  "plan_sha256": "25f098f426869d41805e788a63c16e724693a81b150feb88137642316bf245f4",
+  "archive": "/workspace/learning/A-perception-20261108-v1/rounds/task-r3-readout-attempt2",
+  "helper_sha256": "d54a03bfaa363c336a5bb686b7c8219182589cf2908b0fe7523fe4d24aac9637",
+  "settings": {
+    "ridge": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "ridge_features": [
+      "first60",
+      "first7_plus_spatial_shape"
+    ],
+    "residual_features": "first60_plus_continuous_spatial_shape",
+    "residual_widths": [
+      32,
+      16
+    ],
+    "residual_steps": 1200,
+    "task_weight": 16.0,
+    "seed": 26110833
+  },
+  "scope": "Remove hard quantile-bin features from the residual network. Preserve existing continuous RGB/CNN/position features, fixed widths/updates, train/validation splits and all accuracy/numerical limits. Maximum CPU/GPU feature discrepancy in removed quantile channels includes a one-row 1/95 jump."
+}

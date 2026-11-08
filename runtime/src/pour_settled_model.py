@@ -4,6 +4,19 @@ import torch
 from pour_guard_vision import surface_features
 
 
+def stable_color_quantiles(hist):
+    """Nearest-rank red-row quantiles with exact integer count comparisons.
+
+    surface_features averages a binary mask across columns 35:73 (38 pixels).
+    Recover those integer counts so a cumulative sum exactly on a quantile
+    boundary cannot choose different rows on CPU and GPU.
+    """
+    counts=(hist*38).round().to(torch.int64)
+    cumulative=counts.cumsum(1);total=counts.sum(1,keepdim=True)
+    percent=torch.tensor([2,5,10,25,50,75,90,95,98],device=hist.device,dtype=torch.int64)
+    return (cumulative[:,:,None]*100>=total[:,:,None]*percent).to(torch.int64).argmax(1).to(hist.dtype)/95.
+
+
 def features(image, cnn, cup_xy):
     f, hist, mass = surface_features(image)
     xy = torch.as_tensor(cup_xy, device=image.device, dtype=f.dtype)
@@ -31,9 +44,7 @@ def features(image, cnn, cup_xy):
     soft = red[:, 14:84, 35:73].mean(2)
     existing = torch.cat((legacy, fine, soft, fine * view[:, :1], fine * view[:, 1:]), 1)
     # Color-envelope quantiles retain a compact level signal across cup views.
-    cumulative = hist.cumsum(1) / hist.sum(1, keepdim=True).clamp(min=1e-6)
-    qs = torch.tensor([.02,.05,.1,.25,.5,.75,.9,.95,.98],device=image.device)
-    quantiles = (cumulative[:,:,None] >= qs).float().argmax(1).float() / 95.
+    quantiles = stable_color_quantiles(hist)
     quadratic = torch.cat((view[:,:1].square(),view[:,:1]*view[:,1:],view[:,1:].square()),1)
     envelope = torch.cat((quantiles,quantiles*view[:,:1],quantiles*view[:,1:]),1)
     perspective = torch.cat([torch.cat((quantiles,fine),1)*quadratic[:,i:i+1] for i in range(3)],1)

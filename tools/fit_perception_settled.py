@@ -69,6 +69,7 @@ def main():
             consider(fitted,dict(kind='ridge',inputs=len(columns),ridge=ridge))
     # One fixed residual network on the CNN prediction, selected only by the
     # declared development validation gates; no hand-chosen output bias.
+    assert settings['residual_features']=='first7_plus_exact_count_quantiles_and_spatial_shape'
     columns=list(range(7))+list(range(340,367))+list(range(604,x.shape[1]))
     xx=x[:,columns].float();mean=xx.mean(0);scale=xx.std(0).clamp(min=.001);xx=(xx-mean)/scale
     net=torch.nn.Sequential(torch.nn.Linear(len(columns),32),torch.nn.Tanh(),torch.nn.Linear(32,16),torch.nn.Tanh(),torch.nn.Linear(16,1)).cuda()
