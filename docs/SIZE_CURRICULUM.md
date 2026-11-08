@@ -217,3 +217,28 @@ scores, the selected-frame review and final idle/resource snapshots. It
 refuses incomplete stages. Model weights, recordings and images are excluded
 from Git; the recovery candidate is backed up locally as
 `evidence/size-A/best.pt` (SHA recorded in `stage-summary.json`).
+
+## Bottle-size source inventory — November 8 follow-up
+
+The current bottle is 135 mm tall, with a 54.8 mm outer body diameter,
+18 mm inner mouth diameter and a 48 mm grasp height. Authored body mass is
+180 g. The image-to-world source projection assumes the 135 mm neck height;
+visual lift confirmation and grasp IK also use fixed heights. Bottle masks,
+particle initialization and mouth/grasp frames share fixed constants today.
+These couplings must become geometry-derived together before scaling.
+
+`evidence/size-A/bottle-geometry-inventory.json` records source hashes and
+nine **unspawned, unvalidated proposals** crossing usable bottle height and
+body diameter at 0.95/1.0/1.05. Wall/base thickness and mouth diameter remain
+fixed in these calculations. Outer body diameter would span 52.3–57.3 mm,
+lip height 128.45–141.55 mm and grasp height 45.8–50.2 mm. These are calculated
+geometry ranges, not measured gripper clearance or successful grasps.
+No bottle-size runtime change or GPU experiment was performed for this inventory.
+
+Grasp-aperture/contact validation, a declared mass policy and native inertia
+inspection, reach/return clearance, source tracking and empty-detection
+coverage remain prerequisites. Keep mouth variation separate initially:
+the current 18 mm mouth spans only ten 1.8 mm particle spacings, so changing
+its width also changes the fluid-resolution ratio. The current baseline
+perception evaluation and later cup-size perception acceptance come first;
+this inventory does not authorize resized autonomous cases to bypass them.
