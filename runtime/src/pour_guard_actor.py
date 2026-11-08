@@ -86,6 +86,10 @@ class Actor:
         self.trim_cap=95.
         self.localization_start=None;self.localization_history={"source":[],"cup":[]};self.localization_check=None
         self.approach_check=None;self.abort_path=None
+        self.source_watchdog=None
+        if self.saved.get('source_watchdog'):
+            from pour_source_watchdog import SourceWatchdog
+            self.source_watchdog=SourceWatchdog(self.saved['source_watchdog'])
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
@@ -111,7 +115,7 @@ class Actor:
         elif self.source_score<self.threshold['source_localization_score'] or self.cup_score<self.threshold['cup_localization_score']:
             self.abort_time=t;self.stop_latched='localization_unconfirmed';self.home=q[:7].copy();return
         base=bottle_base_from_neck(neck,self.cal);self.source_xy=base[:2]
-        self.cup_xy=plane_point(rim,self.cal['table_z']+.038,self.cal)[:2]
+        self.cup_xy=plane_point(rim,self.cal['table_z']+self.cal.get('cup_geometry',{}).get('rim_z_m',.038),self.cal)[:2]
         self.initial_neck=neck;self.expected_lift_neck=project(base+[0,0,.135+.044],self.cal)
         self.home=q[:7].copy()
         # The same known hardware geometry/IK branch as the demonstration planner.
@@ -278,8 +282,15 @@ class Actor:
                 slow=slow_empty_evidence(self.threshold,self.pour_phase,cap,tilt,None if self.cap_start is None else t-self.cap_start,
                     held_gripper(q,gap),present,empty,flow*72.8)
             self.slow_empty_votes=self.slow_empty_votes+1 if slow else 0
+            recovery=None
+            if self.source_watchdog is not None and self.stop_latched is None:
+                recovery=self.source_watchdog.update(t,
+                    held=held_gripper(q,self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']),
+                    present=present,empty=empty,tilt=tilt,phase=self.pour_phase,cap=cap,flow_ml_s=flow*72.8)
             if self.stop_latched is None:
                 if self.empty_votes>=12 or (slow and self.slow_empty_votes>=self.threshold['slow_empty_votes']):self.latch('bottle_empty',t,robot)
+                elif self.source_watchdog is not None:
+                    if recovery:self.latch(recovery,t,robot)
                 elif self.lost_votes>=8:self.latch('source_tracking_lost',t,robot)
             if self.terminal is not None:targets,phase=self.terminal.act(t)
             else:
@@ -370,6 +381,7 @@ class Actor:
             visual_grasp_confirmed=self.grasp_confirmed,confirmation_votes=self.confirm_votes,source_xy=None if self.source_xy is None else self.source_xy.tolist(),
             grasp_check=self.grasp_check,localization_consensus=self.localization_check,
             approach_tracking=self.approach_check,
+            source_watchdog=None if self.source_watchdog is None else self.source_watchdog.diagnostic,
             return_planning_error=getattr(self,'return_planning_error',None),
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
             settled_prediction=settled_prediction,empty_views=empty_views,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),

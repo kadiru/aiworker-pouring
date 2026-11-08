@@ -41,6 +41,7 @@ allowed_commands.add('layout_variety_test')
 allowed_commands.add('layout_variety_extra')
 allowed_commands.update(('wide_pilot', 'wide_repair', 'wide_collect', 'wide_train', 'wide_development', 'wide_test'))
 allowed_commands.update(('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'))
+allowed_commands.update(('size_calibration','size_recovery_development'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -339,6 +340,11 @@ def setup(spec):
         else:
             from pour_learning import Actor
         actor=Actor(spec['checkpoint'])
+        if 'cup_height_scale' in spec or 'cup_diameter_scale' in spec:
+            from pour_vessel_geometry import cup_geometry
+            declared=cup_geometry(spec)
+            assert actor.saved['calibration'].get('cup_geometry')==declared, 'Checkpoint does not support this declared cup geometry'
+            assert actor.saved.get('size_curriculum_native_accepted'), 'Size-aware autonomous pouring requires calibration and clearance acceptance first'
     replay = None
     if spec.get('replay_episode'):
         import sys
@@ -631,7 +637,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'):
+                    if cmd in ('size_calibration','size_recovery_development'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before size-curriculum work';continue
+                        from pour_size_study import pending as size_pending
+                        pending.extend(size_pending('calibration' if cmd=='size_calibration' else 'recovery_development'))
+                    elif cmd in ('finish_train','finish_calibrate','finish_calibration_pilot','finish_development','finish_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before finish-study work';continue
                         if cmd=='finish_train':

@@ -30,10 +30,10 @@ def bottle_spec(base, small):
 
 
 def stop_signal(cup_ml, left_ml, height, inbound_ml, flow_ml_s, initial_ml,
-                target_fraction=.87, return_flow_seconds=RETURN_FLOW_SECONDS):
+                target_fraction=.87, return_flow_seconds=RETURN_FLOW_SECONDS, brim_ml=BRIM_NOMINAL_ML):
     runoff = min(left_ml, max(0., flow_ml_s)*return_flow_seconds)
     predicted = cup_ml + inbound_ml + runoff
-    if cup_ml >= .55*BRIM_NOMINAL_ML and height >= .55 and predicted >= target_fraction*BRIM_NOMINAL_ML:
+    if cup_ml >= .55*brim_ml and height >= .55 and predicted >= target_fraction*brim_ml:
         return 'cup_near_full', predicted
     if left_ml <= max(.12, .005*initial_ml):
         return 'bottle_empty', predicted
@@ -157,9 +157,12 @@ def _vessel(stage, path, profile, material, moving):
 
 class Pour:
     def __init__(self, stage, spec, bottle_glass, cup_glass):
+        from pour_vessel_geometry import cup_profile, cup_geometry
         self.spec = spec
+        self.cup_profile = cup_profile(spec)
+        self.cup_geometry = cup_geometry(spec)
         self.position, self.orientation = _vessel(stage,'/World/Bottle',BOTTLE,bottle_glass,True)
-        _vessel(stage,'/World/Cup',CUP,cup_glass,False)
+        _vessel(stage,'/World/Cup',self.cup_profile,cup_glass,False)
         self.angle = 0.
         self.base, self.rotation = pose(0.,0.)
         self.stop_time = None
@@ -198,7 +201,8 @@ class Pour:
             raise RuntimeError('Finite particle inventory lost during bottle pour')
         local = (p-self.base) @ self.rotation
         source = vessel_mask(local,BOTTLE)
-        cup = vessel_mask(p,CUP) & ~source
+        profile = self.cup_profile
+        cup = vessel_mask(p,profile) & ~source
         outside = ~(source | cup)
         airborne = outside & (p[:,2]>.0035) & (np.linalg.norm(v,axis=1)>.04)
         spilled = outside & ~airborne
@@ -209,8 +213,8 @@ class Pour:
             tops = [np.quantile(xyz[(sector>=i)&(sector<i+1),2],.97) for i in range(8)
                     if np.count_nonzero((sector>=i)&(sector<i+1))>=5]
             if len(tops)>=6:
-                height = float(np.clip((np.median(tops)+self.spec['spacing']/2-CUP[0][0]) /
-                                       (CUP[-1][0]-CUP[0][0]),0.,1.))
+                height = float(np.clip((np.median(tops)+self.spec['spacing']/2-profile[0][0]) /
+                                       (profile[-1][0]-profile[0][0]),0.,1.))
         ml = self.spec['spacing']**3*1e6
         left = int(source.sum())
         cup_ml = float(cup.sum()*ml)
@@ -218,10 +222,11 @@ class Pour:
         self.source_history.append((t,source_ml))
         old_t, old_ml = self.source_history[0]
         flow_ml_s = max(0.,(old_ml-source_ml)/max(t-old_t,1e-6))
-        inbound = airborne & (p[:,2]>=CUP[-1][0]) & (v[:,2]<0.) & (np.hypot(p[:,0],p[:,1])<1.25*CUP[-1][1])
+        inbound = airborne & (p[:,2]>=profile[-1][0]) & (v[:,2]<0.) & (np.hypot(p[:,0],p[:,1])<1.25*profile[-1][1])
         reason,predicted = stop_signal(cup_ml,source_ml,height,inbound.sum()*ml,flow_ml_s,len(p)*ml,
                                      self.spec.get('target_fraction',.87),
-                                     self.spec.get('return_flow_seconds',RETURN_FLOW_SECONDS))
+                                     self.spec.get('return_flow_seconds',RETURN_FLOW_SECONDS),
+                                     self.cup_geometry['legacy_brim_nominal_ml'])
         if t<=1.15:
             reason=None
         self.confirmed = self.confirmed+1 if reason and reason==self.last_signal else int(reason is not None)
@@ -238,8 +243,8 @@ class Pour:
                     bottle_pose_xyz=self.base.tolist(),bottle_quat_xyzw=[0.,math.sin(math.radians(self.angle)/2),0.,math.cos(math.radians(self.angle)/2)],
                     bottle_tilt_deg=self.angle,stop_command=self.stop_time is not None,
                     stop_reason=self.reason,stop_time=self.stop_time,phase=self.phase,
-                    initial_ml=len(p)*ml,capacity_geometric_ml=CAPACITY_ML,
-                    cup_inventory_fraction=cup_ml/BRIM_NOMINAL_ML,
+                    initial_ml=len(p)*ml,capacity_geometric_ml=self.cup_geometry['capacity_geometric_ml'],
+                    cup_inventory_fraction=cup_ml/self.cup_geometry['legacy_brim_nominal_ml'],
                     source_outflow_ml_s=flow_ml_s, predicted_cup_ml=float(predicted),
                     outside_peak_z_m=float(p[outside,2].max()) if outside.any() else None)
 

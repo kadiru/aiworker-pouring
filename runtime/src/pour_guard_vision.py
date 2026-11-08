@@ -22,10 +22,13 @@ def bottle_base_from_neck(uv,cal):
 
 
 def cup_crop(rgb,xy,cal):
+    geometry=cal.get('cup_geometry',{})
+    rim_z=geometry.get('rim_z_m',.038);bottom_z=geometry.get('bottom_z_m',.004)
+    rim_radius=geometry.get('rim_radius_m',.024)
     center=np.r_[xy,cal['table_z']]
-    rim=project(center+[0,0,.038],cal);base=project(center+[0,0,.004],cal)
+    rim=project(center+[0,0,rim_z],cal);base=project(center+[0,0,bottom_z],cal)
     right=np.asarray(cal['T'])[:3,0]
-    radius=abs(project(center+[0,0,.038]+right*.024,cal)[0]-rim[0])
+    radius=abs(project(center+[0,0,rim_z]+right*rim_radius,cal)[0]-rim[0])
     sx=radius/32.;shear=(base[0]-rim[0])/40.;sy=(base[1]-rim[1])/40.
     affine=(sx,shear,rim[0]-48*sx-24*shear,0.,sy,rim[1]-24*sy)
     a=np.asarray(Image.fromarray(rgb).transform((96,96),Image.Transform.AFFINE,affine,Image.Resampling.BILINEAR)).copy()

@@ -123,6 +123,9 @@ class RobotPour(Pour):
             count=round(spec['cup_initial_ml']/(spacing**3*1e6))
             cup_points=np.array([[*cross[i%len(cross)],.004+2*spacing+(i//len(cross))*spacing]
                                  for i in range(count)],dtype=np.float32)
+            if 'cup_height_scale' in spec or 'cup_diameter_scale' in spec:
+                from pour_vessel_geometry import initial_cup_points
+                cup_points=initial_cup_points(spec)
             if spec.get('calibration_version') in (1,2):
                 from pour_finish_calibration import cup_points as calibration_points
                 cup_points=calibration_points(spec)

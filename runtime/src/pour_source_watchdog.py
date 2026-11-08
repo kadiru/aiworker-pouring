@@ -1,0 +1,46 @@
+"""Bounded uncertainty recovery using RGB probabilities and joint evidence only.
+
+Abstention is a failed task, never a substitute success label. This supervisor
+does not change the trained empty detector or its success thresholds.
+"""
+import math
+
+
+class SourceWatchdog:
+    def __init__(self, config):
+        self.config = dict(config)
+        self.first = self.lost_since = self.uncertain_since = self.cap_since = None
+        self.diagnostic = {}
+
+    def update(self, t, *, held, present, empty, tilt, phase, cap, flow_ml_s):
+        c = self.config
+        if self.first is None:
+            self.first = t
+        finite = all(math.isfinite(float(v)) for v in (t,present,empty,tilt,phase,cap,flow_ml_s))
+        # Early tilted appearances lie outside the old presence detector's
+        # reliable range. The separately verified grasp + encoder obstruction
+        # carries this short phase; it never licenses an empty success.
+        visual_eligible = finite and tilt >= c['presence_min_tilt_deg']
+        lost = not held or not finite or (visual_eligible and present < .05)
+        ambiguous_empty = finite and held and tilt >= 95 and present < .7 and empty >= .97 and flow_ml_s < 1.
+        at_cap = finite and phase >= cap-.25 and tilt >= cap-3.
+        for field, active in (('lost_since',lost),('uncertain_since',ambiguous_empty),('cap_since',at_cap)):
+            previous = getattr(self, field)
+            setattr(self, field, (t if previous is None else previous) if active else None)
+        age = lambda start: None if start is None else max(0.,t-start)
+        self.diagnostic = dict(visual_presence_eligible=visual_eligible, encoder_hold=bool(held),
+            lost_age_s=age(self.lost_since), ambiguous_empty_age_s=age(self.uncertain_since),
+            cap_age_s=age(self.cap_since), active_age_s=age(self.first))
+        if self.lost_since is not None and t-self.lost_since >= c['lost_seconds']-1e-7:
+            return 'source_tracking_lost'
+        if self.uncertain_since is not None and t-self.uncertain_since >= c['ambiguous_empty_seconds']-1e-7:
+            return 'source_state_unconfirmed'
+        if self.cap_since is not None and t-self.cap_since >= c['cap_timeout_seconds']-1e-7:
+            return 'pour_progress_unconfirmed'
+        if t-self.first >= c['active_timeout_seconds']-1e-7:
+            return 'pour_progress_unconfirmed'
+        return None
+
+
+DEFAULT = dict(presence_min_tilt_deg=75.,lost_seconds=.35,
+    ambiguous_empty_seconds=1.2,cap_timeout_seconds=8.,active_timeout_seconds=48.)

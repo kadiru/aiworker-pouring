@@ -16,11 +16,15 @@ def out(*args):
 
 
 def main():
+    global STUDY
     p=argparse.ArgumentParser()
     p.add_argument('--expected-container', required=True)
     p.add_argument('--phase', required=True)
+    p.add_argument('--study-name', default='A-finish-20261106-v1',
+        choices=('A-finish-20261106-v1','A-size-20261108-v1'))
     p.add_argument('files', nargs='+')
     a=p.parse_args()
+    STUDY=ROOT/'learning'/a.study_name
     info=json.loads(out('docker','inspect',a.expected_container))[0]
     assert info['Id']==a.expected_container and info['Name']=='/aiworker_pouring_4070'
     assert info['Config']['Labels']['owner']=='aiworker-pouring'
@@ -35,13 +39,13 @@ def main():
     gpu=out('nvidia-smi','--query-compute-apps=gpu_uuid,pid','--format=csv,noheader')
     assert all(int(r.split(',')[1]) in own for r in gpu.splitlines() if r.startswith(GPU))
     assert all('/' not in n and n.endswith('.py') for n in a.files)
-    payload=dict(phase=a.phase,files=a.files,container=info['Id'],
+    payload=dict(phase=a.phase,study_name=a.study_name,files=a.files,container=info['Id'],
         limits={k:caps[k] for k in ('DeviceRequests','NanoCpus','CpusetCpus','CpuShares','Memory','MemorySwap')},
         health={k:h.get(k) for k in ('run','phase','queue','recording','error')}, gpu_processes=gpu)
     code="""
 import ast,datetime,hashlib,json,shutil,sys
 from pathlib import Path
-p=json.load(sys.stdin);root=Path('/workspace');study=root/'learning/A-finish-20261106-v1'
+p=json.load(sys.stdin);root=Path('/workspace');study=root/'learning'/p['study_name']
 archive=study/('before-'+p['phase']);archive.mkdir(exist_ok=False)
 for name in p['files']:ast.parse((study/'staged'/name).read_text())
 sources={}
