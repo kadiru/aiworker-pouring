@@ -141,3 +141,8 @@ After all thirty current tests and their audit/backup finish, run:
 ```sh
 .venv/bin/python tools/analyze_finish_outcomes.py --report evidence/finish-A/final-benchmark.json --integrity evidence/finish-A/recording-integrity.json --output evidence/finish-A/final-outcome-timing.json
 ```
+
+
+The timing report also locates the final uninterrupted zero-source stretch and its interval to the first stop command. This is diagnostic only, not a new scoring criterion; a negative interval can be valid under the declared near-empty tolerance. R3 development intervals are −0.20 to +0.50 seconds across its four empty cases. The original r3 pass counts and frozen selection are unchanged.
+
+A fresh test exposes missing terminal motion, so the withdrawal report now explicitly counts observed return/post-release samples and records absent measurements as `null`. A trajectory that never returns or releases must not be described as a zero-dwell or zero-recontact success. The reporting-only update exactly preserves every original measurement for all eight completed r3 returns; `development-r3-withdrawal-reporting-check.json` records that comparison input/output. Runtime controls and existing strict test criteria remain frozen.

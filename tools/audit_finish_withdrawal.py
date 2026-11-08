@@ -38,12 +38,15 @@ def main():
             if i:speeds.append(float(np.linalg.norm(np.array(samples[i]['bottle_pose_xyz'])-samples[i-1]['bottle_pose_xyz'])/(samples[i]['t']-samples[i-1]['t'])))
         modes=('Returning upright','Setting bottle down','Releasing bottle','Retreating','Holding completed pose')
         starts={mode:next((s['t'] for s,d in zip(samples,decisions) if d['mode']==mode),None) for mode in modes}
+        ordered=all(t is not None for t in starts.values()) and all(starts[x]<starts[y] for x,y in zip(modes,modes[1:]))
         result.append(dict(name=r['name'],source_sha256=r['sha256'],stop_recorded=stop is not None,stage_starts_s=starts,
-            longest_sampled_upright_near_stationary_over_cup_s=longest,post_release_gripper_contact_frames=len(contacts),contacts=contacts,
+            terminal_sequence_recorded=ordered,return_sample_count=len(returning),post_release_sample_count=len(released),
+            longest_sampled_upright_near_stationary_over_cup_s=longest if returning else None,
+            post_release_gripper_contact_frames=len(contacts) if released else None,contacts=contacts,
             maximum_post_release_bottle_speed_m_s=max(speeds,default=None),final_tilt_deg=samples[-1]['bottle_tilt_deg'],
             final_base_height_m=samples[-1]['bottle_base_height_m'],final_outside_ml=samples[-1]['spilled_ml']+samples[-1]['airborne_ml']))
-    out=dict(cases=result,source_manifest_sha256=sha(a.manifest),historical_baseline=a.baseline_wide,
+    out=dict(cases=result,source_manifest_sha256=sha(a.manifest),historical_baseline=a.baseline_wide,analysis_source_sha256=sha(Path(__file__)),
         definition='Over-cup dwell: bottle center within 6 cm horizontally of cup, tilt below 8 degrees, sampled 3D speed below 3 mm/s and tilt speed below 5 deg/s during the terminal return. Diagnostic only; strict task score is unchanged.',
-        scope='20 Hz simulator logs, not a claim about unsampled contact, naturalness or physical hardware.')
-    a.output.write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(dict(cases=len(result),maximum_dwell_s=max(r['longest_sampled_upright_near_stationary_over_cup_s'] for r in result),contact_cases=[r['name'] for r in result if r['contacts']]),indent=2))
+        scope='20 Hz simulator logs, not a claim about unsampled contact, naturalness or physical hardware. Missing return or post-release observations have null measurements, not zero-dwell or zero-contact successes.')
+    a.output.write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(dict(cases=len(result),maximum_dwell_s=max((r['longest_sampled_upright_near_stationary_over_cup_s'] for r in result if r['return_sample_count']),default=None),contact_cases=[r['name'] for r in result if r['contacts']],missing_terminal_sequences=[r['name'] for r in result if not r['terminal_sequence_recorded']]),indent=2))
 if __name__=='__main__':main()

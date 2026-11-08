@@ -88,6 +88,12 @@ def main():
                               if d['stop_latched'] and d['mode'] == stage), None)
                   for stage in stages}
         final = samples[-1]
+        # Use the final uninterrupted zero-inventory stretch, so a transient
+        # empty reading followed by liquid returning to the bottle is excluded.
+        empty_start = (1 + max((i for i, s in enumerate(samples) if s['bottle_ml'] > 0),
+                               default=-1)) if final['bottle_ml'] == 0 else None
+        empty_to_stop = (stop_time - samples[empty_start]['t']
+                         if stop_time is not None and empty_start is not None else None)
         assert row['cup_surface_height_fraction'] == final['cup_fill_fraction']
         assert row['source_remaining_ml'] == final['bottle_ml']
         assert row['final_outside_ml'] == final['spilled_ml'] + final['airborne_ml']
@@ -101,6 +107,8 @@ def main():
                           ever_near_worktop_ml=row['ever_below_worktop_ml'],
                           first_stop=event(stop), first_near_worktop_loss=event(table),
                           first_nonairborne_outside_reading=event(outside),
+                          final_zero_source_stretch_start=event(empty_start),
+                          zero_source_to_first_stop_command_s=empty_to_stop,
                           terminal_stage_command_times_s=starts,
                           source_recording_sha256=identity['sha256'], sidecar_sha256=hashes))
     failures = [r for r in cases if not r['strict_pass']]
@@ -115,6 +123,9 @@ def main():
                         'is the first sampled positive cumulative count, not a continuous contact time. '
                         'The first outside reading may be a transient droplet that returns. No individual '
                         'particle trajectories are recorded, so timing alone does not establish causation. '
+                        'Zero-source delay starts at the final uninterrupted sampled zero-inventory stretch; '
+                        'it is a diagnostic, not a new pass/fail rule. Negative values mean the stop command '
+                        'preceded complete emptying, which may satisfy the declared near-empty tolerance. '
                         'Volumes are nominal particle-count mL, not calibrated physical volume.')
     args.output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({k: result[k] for k in ('attempts', 'strict_passes', 'zero_measured_loss',
