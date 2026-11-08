@@ -81,11 +81,18 @@ def main():
             assert len(window) == 6 and all(d['fill_mode'] == 'settle' and
                 d['pause_count'] == decisions[stop]['pause_count'] for d in window)
             levels = [d['settled_prediction'] for d in window]
+            level = float(np.quantile(levels, .25))
+            deviation = float(np.std(levels))
+            geometry = float(np.median([d['surface_geometry_fraction'] for d in window]))
             full_gate = dict(command_time_s=decisions[stop]['t'], six_level_predictions=levels,
-                q25_level=float(np.quantile(levels, .25)), std=float(np.std(levels)),
-                median_geometry=float(np.median([d['surface_geometry_fraction'] for d in window])),
+                q25_level=level, std=deviation, median_geometry=geometry,
                 required_level=model['thresholds']['full_settled_target'],
-                below_required_level=bool(np.quantile(levels, .25) < model['thresholds']['full_settled_target']),
+                below_required_level=level < model['thresholds']['full_settled_target'],
+                stability_limit=model['thresholds']['settled_stability_std'],
+                stable=deviation < model['thresholds']['settled_stability_std'],
+                geometry_disagreement=abs(geometry-level),
+                geometry_tolerance=model['thresholds']['settled_geometry_tolerance'],
+                geometry_agrees=abs(geometry-level) < model['thresholds']['settled_geometry_tolerance'],
                 pause_count=decisions[stop]['pause_count'], max_pauses=model['thresholds']['max_pauses'],
                 next_sample_height=samples[stop]['cup_fill_fraction'],
                 final_settled_height=samples[-1]['cup_fill_fraction'])
@@ -101,7 +108,8 @@ def main():
         scope='Recorded-decision diagnosis only. Source presence below 0.7 blocks both empty-stop paths; '
               'presence below 0.05 is required for the separate lost-source abort. Encoder obstruction '
               'is not proof of two-finger contact. Full-stop quantile is reconstructed from six recorded '
-              'estimates; a below-target value alone blocks fullness confirmation. No counterfactual '
+              'estimates; a below-target value alone blocks fullness confirmation. Stability and geometry '
+              'agreement use the frozen limits. The colored-pixel mass gate is not reconstructed. No counterfactual '
               'outcome or physical cause of lost contact is established. Full benchmark audit is separate.')
     args.output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(cases, indent=2))

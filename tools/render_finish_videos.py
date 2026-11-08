@@ -49,6 +49,10 @@ def verdict(row):
     if (row['zero_spill'] and row['grasp_verified'] and row['visual_grasp_confirmed']
         and row['sustained_grasp_fraction']<.8 and not row['completed_return_release_sequence']):
         return 'Grip / stop / return failed',f"Two-finger contact: {100*row['sustained_grasp_fraction']:.1f}% of tipping samples; 80% required. Stop and return incomplete."
+    if row['zero_spill'] and row['stop_reason']=='source_tracking_lost':
+        detail=('Too little liquid reached the cup.' if row['delivered_to_cup_ml']<1.
+                else 'The required full/empty stop was not completed.')
+        return 'Bottle tracking lost','Bottle presence fell below the confidence limit. '+detail
     if (row['stop_reason'] in ('localization_unconfirmed','approach_unconfirmed') or not row['grasp_verified']
         or not row['visual_grasp_confirmed'] or not row['zero_spill'] or row['sustained_grasp_fraction']<.8
         or not row['completed_return_release_sequence']):return prior_verdict(row)
