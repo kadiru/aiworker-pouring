@@ -15,6 +15,7 @@ from pour_guard_vision import locate,plane_point,cup_crop,surface_features,color
 from pour_perception_geometry import settled_label
 from pour_perception_study import check_freeze
 from pour_temporal_localization import consensus
+from pour_settled_model import features as settled_features,predict as settled_predict
 ROOT=Path('/workspace/learning/A-perception-20261108-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -56,7 +57,10 @@ def main():
                     crop=torch.from_numpy(cup_crop(rgb,xy,detail))[None]
                     cnn=float((model(crop)[0]+saved['cup_bias']).clamp(0,1));features,_,mass=surface_features(crop)
                     geometry=saved['surface_geometry'];geo=float(color_geometry_readout(crop,geometry,xy)[0]) if mass[0]>1 else 0.
-                    estimates.append(dict(index=int(i),cnn=cnn,geometry=geo,error=cnn-label['target'],geometry_error=geo-label['target']))
+                    level=cnn
+                    if 'settled_regressor' in saved:
+                        level=float(settled_predict(settled_features(crop,crop.new_tensor([cnn],dtype=torch.float32),xy),saved['settled_regressor'])[0])
+                    estimates.append(dict(index=int(i),cnn=cnn,level=level,geometry=geo,error=level-label['target'],cnn_error=cnn-label['target'],geometry_error=geo-label['target']))
         results.append(dict(name=name,source_sha256=record['sha256'],height_scale=spec['cup_height_scale'],diameter_scale=spec['cup_diameter_scale'],
             measured_label=label,temporal_confirmation=accepted,frames_considered=len(history),localization_error_mm=localization_error,
             localized_xy=None if xy is None else xy.tolist(),estimates=estimates))
@@ -77,7 +81,8 @@ def main():
         and metrics['near_full_frames']>=20 and metrics['max_target']>=.94 and metrics['min_target']<=.15
         and metrics['near_full_max_abs']<gate['level_validation_near_max_error']
         and metrics['near_full_max_overestimate']<gate['level_validation_near_overestimate'])
-    report=dict(passed=passed,metrics=metrics,cases=results,checkpoint_sha256=manifest['checkpoint_sha256'],plan_sha256=manifest['plan_sha256'],
+    metrics['raw_cnn_max_abs']=max((abs(e['cnn_error']) for r in results for e in r['estimates']),default=None)
+    report=dict(passed=passed,metrics=metrics,cases=results,level_prediction_kind=plan.get('level_prediction_kind','cnn'),checkpoint_sha256=manifest['checkpoint_sha256'],plan_sha256=manifest['plan_sha256'],
         component_selection_sha256=sha(ROOT/'component-selection.json'),audit_sha256=sha(ROOT/'recording-audit.json'),helper_sha256=sha(Path(__file__)),
         scope='Nine once-only static native original-cup holdouts with small position jitters. Known original size, image-localized position. Low and near-full measured coverage required. Resized autonomy remains gated. No autonomous grasp/pour claim and no fitting or threshold selection.')
     output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(dict(passed=passed,metrics=metrics)))

@@ -425,3 +425,49 @@ attempts; all 462 scalar sidecars are SHA-verified locally. Original raw
 HDF5/trajectory files remain on Ubuntu. The second 240-epoch locator fit
 starts from the same preserved round-2 weights, using the augmented training
 set and unchanged validation cases/gates.
+
+The supplemented locator passes baseline component gates at selected epoch
+100: validation/training maxima 2.3901/2.7317 mm. The bounded run used
+997/302 images from 97/30 episodes, 240 epochs / 15,120 updates and 313.453
+seconds fitting. Some later checkpoints regress sharply; only eligible
+weights are retained. All-size validation maximum is 81.8389 mm, and
+resized autonomy remains gated. Fresh-scene evaluation is still required.
+
+The first actual-pour level fit fails and is preserved in
+`rounds/task-r3-level-attempt1`. The offline frame selector incorrectly
+admitted stable post-stop return images, including fully occluded liquid.
+The independent color readout returned zero in those frames; selected native
+dev02 images 650/686 confirm visible pre-stop liquid versus bottle occlusion
+during return. No recorded task outcome changes. Plan version 12 declares
+pre-stop settling supervision only, keeping the same episode splits and
+acceptance limits. This retains 48/39 training frames from dev01/04 and
+45 validation frames from dev02 (21 near full). Empty-stop dev05 supplies
+no such level frames. All 56 local checks pass, including explicit rejection
+of post-stop images despite stable particle labels. The corrected level
+fit is a development repair, not an independent evaluation.
+
+The pre-stop raw-CNN refit also fails its near-full gates. Its independent
+color check now passes at 4.193 points maximum; the occluded-frame admission
+bug is fixed, but model generalization remains inadequate. This second failed
+fit and all its original sources are preserved in `rounds/task-r3-level-attempt2`.
+
+Plan version 13 declares a learned final stop-level readout on the frozen
+second-attempt CNN: two predefined feature sets with four ridge penalties,
+and one 32/16 tanh residual network trained for 1,200 updates. Inputs are
+RGB-derived surface features, the CNN estimate and image-localized cup XY.
+Episode-balanced weighted squared error trains on the same admitted data;
+validation selects only candidates satisfying the unchanged level limits,
+including separate actual-pour and training near-full checks. No hand-set
+output bias or new runtime source is introduced. The existing runtime
+`pour_settled_model.predict` decodes the learned readout. Independent static
+evaluation now explicitly scores that same final estimate and retains raw
+CNN error separately. CPU/GPU and float32/float64 prediction agreement are
+checked before accepting the component. All original fresh holdout, development
+and reserved specifications remain unchanged and unstarted.
+
+The first readout run reaches eligible validation metrics but stops at the
+CPU/GPU precision assertion before emitting final weights. Its source,
+input manifests and failure reason are archived in
+`rounds/task-r3-readout-attempt1`; the original fit log is retained locally.
+The same seeded, bounded algorithm is rerun with diagnostics saved even
+when the numerical check fails. No candidate has been activated.

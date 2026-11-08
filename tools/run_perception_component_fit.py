@@ -7,7 +7,7 @@ ROOT=w.HOST_ROOT/'learning/A-perception-20261108-v1'
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--component',choices=('locator','correction','cup'),required=True);p.add_argument('--round',required=True);p.add_argument('--refine-from');p.add_argument('--cnn-from');p.add_argument('--member',type=int,choices=(0,1));a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--component',choices=('locator','correction','cup','settled'),required=True);p.add_argument('--round',required=True);p.add_argument('--refine-from');p.add_argument('--cnn-from');p.add_argument('--member',type=int,choices=(0,1));a=p.parse_args()
     assert a.round.replace('-','').isalnum()
     out=Path('/tmp')/('aiworker-perception-'+a.component+'-'+a.round);out.mkdir(exist_ok=False)
     manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');audit=read(ROOT/'recording-audit.json')
@@ -23,9 +23,9 @@ def main():
     witness=w.isolation();h=w.health();assert not h['queue'] and not h.get('recording',{}).get('active',False) and not h.get('error')
     own={int(x.strip()) for x in subprocess.check_output(['docker','top',w.CID,'-eo','pid'],text=True).splitlines()[1:]}
     assert all(int(r.split(',')[1]) in own for r in witness['gpu_processes'].splitlines() if r.startswith(w.GPU))
-    report={'locator':'cup-neural-localization.json','correction':'cup-locator-correction.json','cup':'cup-component.json'}[a.component]
+    report={'locator':'cup-neural-localization.json','correction':'cup-locator-correction.json','cup':'cup-component.json','settled':'cup-component.json'}[a.component]
     assert not (ROOT/report).exists(),'Archive previous reports before starting a new fit'
-    helper={'locator':'fit_perception_locator.py','correction':'fit_perception_locator_correction.py','cup':'fit_perception_cup.py'}[a.component]
+    helper={'locator':'fit_perception_locator.py','correction':'fit_perception_locator_correction.py','cup':'fit_perception_cup.py','settled':'fit_perception_settled.py'}[a.component]
     extra=[]
     if a.refine_from:
         assert a.component=='locator'

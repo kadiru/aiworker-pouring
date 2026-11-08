@@ -31,4 +31,14 @@ class TaskLabels(unittest.TestCase):
         rows,decisions=self.data();decisions[12]['t']+=.05
         with self.assertRaises(AssertionError):task_level_frames(rows,decisions)
 
+    def test_post_stop_return_is_excluded_even_with_stable_height(self):
+        rows,decisions=self.data()
+        for d in decisions[20:]:d['stop_latched']='cup_near_full'
+        frames=task_level_frames(rows,decisions)
+        self.assertTrue(frames)
+        self.assertTrue(all(f['index']<20 for f in frames))
+        # An empty stop has no level decision to supervise on the way home.
+        for d in decisions:d.update(fill_mode='coarse',stop_latched='bottle_empty')
+        self.assertEqual(task_level_frames(rows,decisions),[])
+
 if __name__=='__main__':unittest.main()

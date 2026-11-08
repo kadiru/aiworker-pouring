@@ -9,7 +9,10 @@ def task_level_frames(samples, decisions, stride=2):
         d=decisions[i]
         if not d.get('visual_grasp_confirmed') or d['cup_xy'] is None:
             continue
-        if d['fill_mode']!='settle' and not d.get('stop_latched'):
+        # Level decisions happen during settling before a stop is latched.
+        # During the subsequent return the bottle can fully occlude the cup;
+        # stable particle height alone does not make that image informative.
+        if d['fill_mode']!='settle' or d.get('stop_latched'):
             continue
         # obs[i] precedes action i and matches samples[i-1], not samples[i].
         assert abs(d['t']-samples[i-1]['t'])<.0002
@@ -21,5 +24,5 @@ def task_level_frames(samples, decisions, stride=2):
             continue
         frames.append(dict(group='obs',index=i,target=label['target'],label=label,
             prototype=f'pause{d["pause_count"]}/level{round(label["target"]/.02)}',
-            label_source='measured_causal_half_second_stable_median'))
+            label_source='measured_causal_half_second_stable_median_before_stop'))
     return frames

@@ -30,7 +30,7 @@ def main():
     saved['localization_consensus']['cup']=c['localization']['consensus']
     saved['thresholds']['full_settled_target']=read(ROOT/'plan.json')['component_gates']['stop_target_surface_fraction']
     saved.update(model_version=f'visual_perception_v26_r{round_number}',
-        method='Supervised cup-level CNN (weighted squared error), wrist bottle-presence CNN (binary cross entropy), and RGB center-heatmap localization (focal heatmap plus smooth-L1 offset loss); retained empty CNN and contextual motion BC/IK; programmed grasp/stop/return. No reinforcement learning.',
+        method='Supervised cup-level CNN and optional learned stop-level readout (weighted squared error), wrist bottle-presence CNN (binary cross entropy), and RGB center-heatmap localization (focal heatmap plus smooth-L1 offset loss); retained empty CNN and contextual motion BC/IK; programmed grasp/stop/return. No reinforcement learning.',
         inputs='Task RGB, wrist RGB, cup-detail RGB, measured joints/velocities, fixed camera/robot calibration, own history; no runtime simulator object/particle state.',
         perception_components=dict(cup_sha256=cup['checkpoint_sha256'],presence_sha256=presence['checkpoint_sha256']))
     for name in ('pour_guard_actor.py','pour_perception_study.py','pour_guard_vision.py','pour_cup_locator.py'):manifest['runtime_sources'][name]=sha(ROOT/'staged'/name)

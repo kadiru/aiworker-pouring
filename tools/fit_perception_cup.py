@@ -124,7 +124,7 @@ def localize(seq,detail,gate):
         resized_autonomy_authorized=False,selection_sha256=sha(ROOT/'scope-selection.json'),
         method='Supervised RGB center heatmap plus subpixel offsets and unchanged eight-vote temporal confirmation. Original vessel dimensions only; resized autonomy remains gated.')
 
-def fit_level(seq,cal,gate,parent,fixed_cnn=None):
+def collect_level_data(seq,cal,parent):
     data={s:dict(image=[],target=[],name=[],domain=[],xy=[],prototype=[]) for s in ('train','validation')}
     for e in seq:
         label=e['entry'].get('label');s=e['spec']
@@ -171,6 +171,10 @@ def fit_level(seq,cal,gate,parent,fixed_cnn=None):
         assert len({n for n,d in zip(a['name'],a['domain']) if d=='native_detail'})>=(20 if s=='train' else 14),f'Insufficient stable episodes in {s}'
         a['x']=torch.from_numpy(np.stack(a.pop('image'))).cuda();a['y']=torch.tensor(a['target'],device='cuda')
         a['xy']=torch.tensor(np.asarray(a['xy']),device='cuda',dtype=torch.float32)
+    return data
+
+def fit_level(seq,cal,gate,parent,fixed_cnn=None):
+    data=collect_level_data(seq,cal,parent)
     tr,va=data['train'],data['validation'];all_native=torch.tensor([d!='historical_task_replay' for d in va['domain']],device='cuda')
     baseline_names={e['spec']['name'] for e in seq if e['spec'].get('cup_height_scale',1.)==e['spec'].get('cup_diameter_scale',1.)==1.}
     native=all_native & torch.tensor([n in baseline_names for n in va['name']],device='cuda');replay_mask=~all_native
@@ -273,11 +277,11 @@ def fit_level(seq,cal,gate,parent,fixed_cnn=None):
         actual_pour_validation=dict(episodes=len({n for n,m in zip(va['name'],task_mask.tolist()) if m}),images=int(task_mask.sum()),near_full_images=int(task_near.sum()),scope='Explicitly consumed development validation; not an independent test result.'),
         counts={s:dict(episodes=len(set(a['name'])),images=len(a['y']),min_target=float(a['y'].min()),max_target=float(a['y'].max()),
             domains={d:dict(images=sum(v==d for v in a['domain']),episodes=len({n for n,v in zip(a['name'],a['domain']) if v==d})) for d in set(a['domain'])}) for s,a in data.items()},
-        historical_replay_baseline_mae=replay_baseline_mae,replay_scope='Original lower-resolution task views from 24/8 train/validation references. New-record weight 4, replay weight 1. Dynamic appearances retained; no reserved tests or generated detail pixels.',
+        historical_replay_baseline_mae=replay_baseline_mae,replay_scope='Original lower-resolution task views from 24/8 train/validation references. Stationary weight 4, consumed pre-stop task weight 6, replay weight 1. Dynamic appearances retained; no reserved tests or generated detail pixels.',
         candidates=history,learned_parameters=sum(p.numel() for p in model.parameters())+color_parameters,epochs=epochs,optimizer_steps=steps,cnn_weights_retained=fixed_cnn is not None,
         newly_fitted_parameters=(0 if geometry.get('retained_from_parent') else color_parameters)+(0 if fixed_cnn is not None else sum(p.numel() for p in model.parameters())),
         method='Supervised RGB cup-level regression, with optional reuse of an already accepted CNN. Independent explicit-color ridge or RBF kernel regression; optional image-localized XY handles viewing angle. Kernel candidates use one prototype per training episode, fixed unit bandwidth and .01 ridge. No level-CNN features or runtime ground truth. Episode-disjoint validation selects candidates; no reserved test images.',
-        target_source='Measured final-second surface median for stationary native recordings; consumed actual task observations use a causal stable half-second window with constant inventory and <=1 point instantaneous deviation. No future-final labels on earlier frames. Image-localized crops, declared cup dimensions; >=3 mm baseline localization error rejects the component. No truth-centered fitting crops or inventory-derived target lookup.',
+        target_source='Measured final-second surface median for stationary native recordings; consumed actual task observations use pre-stop settling only, with a causal stable half-second window, constant inventory and <=1 point instantaneous deviation. Post-stop return images are excluded even if height is stable because the bottle can occlude the cup. No future-final labels on earlier frames. Image-localized crops, declared cup dimensions; >=3 mm baseline localization error rejects the component. No truth-centered fitting crops or inventory-derived target lookup.',
         task_label_helper_sha256=sha(ROOT/'perception_task_labels.py'))
     attempt=best or best_attempt
     torch.save(dict(cup_model=attempt['state'],geometry=geometry,selected=attempt['row'],accepted=passed),ROOT/'cup-level-attempt.pt')
