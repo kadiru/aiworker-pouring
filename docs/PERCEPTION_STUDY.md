@@ -609,3 +609,14 @@ ssh kfuUbuntu 'python3 /tmp/watch_perception_cases.py --part test --output /tmp/
 
 These are one-shot commands, not rerun instructions for already started IDs.
 The delivery helper cannot fit, queue, restart, freeze or mark manual review.
+
+
+The first two reserved attempts close at 1/2 strict passes. Test00 has correct
+empty-stop and return but loses two particles (0.011664 nominal mL). The
+closed sidecars show first table loss at 24.405 s while still pouring,
+0.4 s before the 24.805 s stop command; the return cannot initiate that
+loss. Particle trajectories were not recorded for these reserved cases,
+so this is timing evidence, not a diagnosed escape mechanism. Test01
+empties completely and returns with zero final-outside/ever-near-table loss.
+The remaining four continue unchanged. A read-only resource/source witness
+after two tests re-verifies the 4070 binding, limits, guard and frozen hashes.
