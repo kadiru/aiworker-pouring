@@ -565,3 +565,47 @@ crop shift spans 93.703%–100%, showing sensitivity despite the actual
 accurate localization. Two selected native stop/final views were inspected;
 whole-batch motion/video review remains pending. No candidate, threshold or
 test score changes result from this diagnostic.
+
+
+## Round-3 development complete; reserved evaluation frozen
+
+All six new development attempts pass the unchanged strict criteria. Full
+cases 01/02/03/04 finish at 97.9536%, 94.7192%, 92.6018% and 93.9656% rim
+height; both empty cases have zero source particles. All six have zero final
+outside and ever-near-table loss, verified grasp and ordered return/release.
+Post-release gripper contact is zero. Uprighting/transfer lasts 3.10–3.15 s;
+the maximum sampled stationary upright pause over the cup is 0.05 s.
+
+All 72 selected native frames were inspected; they show set-down, release
+and hand withdrawal. The complete 149.5-second development video includes
+all six attempts at labeled 2×, with no internal cuts. Full decoding and
+54 native-camera comparisons pass (maximum mean pixel error 1.354/255).
+Opening/closing cards and 18 encoded scene frames were inspected using
+three contact sheets. These are selected-frame checks, not continuous
+manual playback. Separate manual manifests preserve the original generated
+pending-review reports and their hash bindings.
+
+The audit covers 129 complete records (117 stationary, 12 autonomous);
+528 scalar sidecars are SHA-verified locally. All six particle-motion
+recomputations pass. Sparse 0.25-second trajectories can end before a final
+height change, so their largest observed drop is not necessarily the largest
+scalar step. The late-settling mechanism remains unresolved; no solver,
+fluid, material, rendering, threshold or success-score change was made.
+
+The reviewed checkpoint `595aeb7e478b165aa3c50aea4eba35358f3b7486e579838f0684417d9abdb7a7`,
+plan and runtime sources are frozen. `final-selection-r3.json` records all
+required evidence and verifies the six original reserved IDs were unstarted.
+They now run once under `/tmp/aiworker-perception-test-r3`. No retries,
+fitting or candidate edits are permitted during evaluation. Baseline sizes
+only; size-generalization remains unproven and resized autonomy gated.
+
+Commands used after the actual native-frame review:
+
+```sh
+ssh kfuUbuntu 'docker exec aiworker_pouring_4070 /isaac-sim/python.sh /workspace/learning/A-perception-20261108-v1/freeze_perception_candidate.py --review /workspace/learning/A-perception-20261108-v1/development-manual-review.json'
+ssh kfuUbuntu 'python3 /tmp/watch_perception_cases.py --part test --output /tmp/aiworker-perception-test-r3'
+.venv/bin/python tools/prepare_perception_delivery.py --part test --round 3 --checkpoint 595aeb7e478b165aa3c50aea4eba35358f3b7486e579838f0684417d9abdb7a7
+```
+
+These are one-shot commands, not rerun instructions for already started IDs.
+The delivery helper cannot fit, queue, restart, freeze or mark manual review.
