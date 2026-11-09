@@ -46,7 +46,7 @@ allowed_commands.add('size_seed_calibration')
 allowed_commands.update(('perception_pilot','perception_collect','perception_development','perception_test'))
 allowed_commands.add('perception_geometry')
 allowed_commands.update(('perception_camera_pilot','perception_holdout'))
-allowed_commands.update(('side_diagnostic','side_impact','side_impact_followup','side_development','side_test'))
+allowed_commands.update(('side_diagnostic','side_impact','side_impact_followup','side_support','side_development','side_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -655,7 +655,7 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('side_diagnostic','side_impact','side_impact_followup','side_development','side_test'):
+                    if cmd in ('side_diagnostic','side_impact','side_impact_followup','side_support','side_development','side_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before side-return study';continue
                         from pour_side_study import pending as side_pending

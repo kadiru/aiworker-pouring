@@ -44,6 +44,8 @@ def frame(row,record,ds,group,index,t,speed,part,number,total,hold=None):
     if not row['strict_pass'] and row['zero_spill'] and row['stop_reason']==row['expected_stop']:
         if 'side_return_unconfirmed' in row['failure_reasons']:
             title='Side return failed';detail='The bottle did not meet the continuous sideways uprighting and placement checks.'
+            if row['side_return'].get('final_placement_error_m',0)>.015:
+                title='Placement outside tolerance';detail=f"Final bottle position: {1000*row['side_return']['final_placement_error_m']:.0f} mm from its planned spot; limit 15 mm."
         elif 'insufficient_stopping_margin' in row['failure_reasons']:
             title='Stopping margin too small';detail=f"Peak sampled level: {100*row['side_return']['peak_surface_height_fraction']:.1f}% of rim; limit 98%."
 

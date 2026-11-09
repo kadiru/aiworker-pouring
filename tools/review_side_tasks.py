@@ -13,7 +13,8 @@ def main():
     outcomes=read(ROOT/(a.part+'-outcomes.json'));assert outcomes['status']=='complete'
     candidate=read(ROOT/'candidate.json');assert outcomes['checkpoint_sha256']==candidate['checkpoint_sha256']
     audit=read(ROOT/'recording-audit.json');assert not audit['started_incomplete']
-    indexed={r['name']:r for r in audit['records']};out=ROOT/(a.part+'-review');out.mkdir(exist_ok=False);records=[]
+    indexed={r['name']:r for r in audit['records']};round_suffix='' if candidate['candidate_round']==0 else f"-r{candidate['candidate_round']}"
+    out=ROOT/(a.part+'-review'+round_suffix);out.mkdir(exist_ok=False);records=[]
     font_path=Path('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
     font=ImageFont.truetype(str(font_path),14) if font_path.exists() else ImageFont.load_default()
     for result in outcomes['cases']:

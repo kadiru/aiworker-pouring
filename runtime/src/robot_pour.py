@@ -110,6 +110,13 @@ class RobotPour(Pour):
         self.ever_table_particles=None
         self.bottle_prim=stage.GetPrimAtPath('/World/Bottle')
         UsdPhysics.RigidBodyAPI(self.bottle_prim).GetKinematicEnabledAttr().Set(False)
+        from pour_rigid_support import apply as apply_support_friction
+        support_contact=apply_support_friction(stage,spec)
+        if 'calibration_bottle_velocity_m_s' in spec:
+            assert spec.get('calibration_only') and not spec.get('policy_evaluation')
+            velocity=np.asarray(spec['calibration_bottle_velocity_m_s'],dtype=float)
+            assert velocity.shape==(3,) and np.isfinite(velocity).all() and np.linalg.norm(velocity)<=.05
+            UsdPhysics.RigidBodyAPI(self.bottle_prim).CreateVelocityAttr(Gf.Vec3f(*velocity))
         # Only initial fixture placement writes the bottle transform.
         self.position.Set(Gf.Vec3d(*(self.cup_world + FRAME @ [*self.start_xy,.0002])))
         self.points[:,:2] += self.start_xy - [START_X,0.]
@@ -187,6 +194,7 @@ class RobotPour(Pour):
             dof_names=['arm_r_joint'+str(i) for i in range(1,8)]+
                       ['gripper_r_joint'+str(i) for i in range(1,5)],
             cup_frame_world=self.cup_world.tolist(), cup_frame_rotation=FRAME.tolist())
+        if support_contact is not None:self.scene_evidence['bottle_support_contact']=support_contact
         if 'calibration_hold_angle_deg' in spec:
             self.scene_evidence.update(bottle_kinematic=True,
                 calibration_pose_scope='Authored stationary occlusion fixture; never autonomous grasp evidence')

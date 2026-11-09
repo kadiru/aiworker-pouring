@@ -15,6 +15,7 @@ def main():
     assert all(sha(Path(p))==d for p,d in m['protected_parent_files'].items())
     plan=read(ROOT/'plan.json');development=read(ROOT/'development-outcomes.json')
     audit=read(ROOT/'recording-audit.json');review=read(ROOT/'development-manual-review.json')
+    assert read(ROOT/'support-outcomes.json')['passed']
     assert not audit['started_incomplete'] and development['status']=='complete'
     expected={s['name'] for s in plan['development']};assert len(expected)==6
     assert {r['name'] for r in development['cases']}==expected
@@ -33,7 +34,7 @@ def main():
     started={read(p)['name'] for p in Path('/workspace/outputs/fountain').glob('*/*SR_A_*/parameters.json')}
     assert reserved.isdisjoint(started)
     archive=ROOT/'frozen-candidate';archive.mkdir();(archive/'src').mkdir()
-    evidence=('development-outcomes.json','development-manual-review.json','recording-audit.json','impact-outcomes.json','impact_followup-outcomes.json')
+    evidence=('development-outcomes.json','development-manual-review.json','recording-audit.json','impact-outcomes.json','impact_followup-outcomes.json','support-outcomes.json')
     for n in ('best.pt','candidate.json','plan.json',*evidence):shutil.copy2(ROOT/n,archive/n)
     for n in m['runtime_sources']:shutil.copy2(Path('/workspace/src')/n,archive/'src'/n)
     selection=dict(frozen_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),

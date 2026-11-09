@@ -18,13 +18,13 @@ def capture(manifest):
     return dict(witness,checkpoint_sha256=manifest['checkpoint_sha256'],plan_sha256=manifest['plan_sha256'],runtime_sources=manifest['runtime_sources'])
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--part',choices=('diagnostic','impact','impact_followup','development','test'),required=True)
+    parser=argparse.ArgumentParser();parser.add_argument('--part',choices=('diagnostic','impact','impact_followup','support','development','test'),required=True)
     parser.add_argument('--output',type=Path,required=True);a=parser.parse_args();assert not a.output.exists()
     manifest=read(ROOT/'candidate.json');selection=read(ROOT/'final-selection.json') if a.part=='test' else manifest
     assert manifest['component_gates_passed']
     for key in ('checkpoint_sha256','plan_sha256','runtime_sources'):assert selection[key]==manifest[key]
     plan=read(ROOT/'plan.json');expected={s['name']:s for s in plan[a.part]}
-    assert len(expected)==dict(diagnostic=4,impact=12,impact_followup=2,development=6,test=30)[a.part]
+    assert len(expected)==dict(diagnostic=4,impact=12,impact_followup=2,support=2,development=6,test=30)[a.part]
     outputs=w.HOST_ROOT/'outputs/fountain'
     existing={read(p)['name'] for p in outputs.glob('*/*SR_A_*/parameters.json')}
     assert not expected.keys()&existing,'Never retry or silently resume a started split'
@@ -39,8 +39,8 @@ def main():
             spec=read(p.parent/'parameters.json');name=spec['name']
             if name not in expected or name in seen:continue
             assert all(spec[k]==v for k,v in expected[name].items())
-            if a.part.startswith('impact'):
-                m=read(p);row=dict(name=name,status='complete',path=str(p.parent),strict_pass=bool(m['zero_spill']),failure_reasons=[] if m['zero_spill'] else ['measured_spill'],scope='Fluid-impact fixture only; not an autonomous task')
+            if a.part.startswith('impact') or a.part=='support':
+                m=read(p);row=dict(name=name,status='complete',path=str(p.parent),strict_pass=bool(m['zero_spill']),failure_reasons=[] if m['zero_spill'] else ['measured_spill'],scope='Containment in non-autonomous calibration only; task/support outcomes are scored separately')
             else:
                 row=completed_row(p.parent,manifest['checkpoint_sha256'])
                 row.update(strict_pass=strict_success(row),failure_reasons=reasons(row))

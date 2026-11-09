@@ -16,6 +16,7 @@ def pending(part):
     assert all(sha(Path('/workspace/src')/n) == d for n,d in manifest['runtime_sources'].items())
     assert all(sha(Path(n)) == d for n,d in manifest['protected_parent_files'].items())
     plan = read(ROOT/'plan.json')
+    if part == 'development':assert manifest['stage']=='development_candidate', 'Complete candidate checks before development'
     if (ROOT/'final-selection.json').exists():
         assert part == 'test', 'Reserved evaluation is frozen'
     if part == 'test':

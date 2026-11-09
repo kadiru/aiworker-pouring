@@ -17,7 +17,7 @@ def main():
     plan=read(ROOT/'plan.json');candidate=read(ROOT/'candidate.json')
     saved=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     assert all(sha(Path(p))==v for p,v in candidate['protected_parent_files'].items())
-    expected={s['name']:s for part in ('diagnostic','impact','impact_followup','development','test') for s in plan.get(part,[])}
+    expected={s['name']:s for part in ('diagnostic','impact','impact_followup','support','development_history','development','test') for s in plan.get(part,[])}
     result=[];seen=set();out=ROOT/'review';out.mkdir(exist_ok=True)
     for path in sorted(Path('/workspace/outputs/fountain').glob('*/*SR_A_*/parameters.json')):
         spec=read(path);name=spec['name'];assert name in expected and name not in seen
