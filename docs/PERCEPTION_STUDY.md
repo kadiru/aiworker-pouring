@@ -620,3 +620,20 @@ so this is timing evidence, not a diagnosed escape mechanism. Test01
 empties completely and returns with zero final-outside/ever-near-table loss.
 The remaining four continue unchanged. A read-only resource/source witness
 after two tests re-verifies the 4070 binding, limits, guard and frozen hashes.
+
+
+The next two full-stop tests (02/03) pass at 96.1034% / 96.8963% final rim
+height, with zero measured loss and complete returns. Their live levels
+approach the brim before stopping; the final pass does not remove that
+limited-headroom concern. Test04 then repeats a two-particle loss before
+its empty-stop command, despite emptying and returning correctly. Test05
+is the last remaining attempt; no candidate edits or retries occurred.
+
+A local read-only event helper verifies sidecar hashes and the one-control-
+period (0.05 s) offset between each decision and its next-state sample.
+An initial equal-timestamp assumption was rejected before output; the
+corrected check passes all six development records. It records first loss,
+stop time, instantaneous/terminal heights and constant-inventory terminal
+height changes. Near-table loss is position-based scoring, not a measured
+contact force. It makes no causal claim and never replaces task scoring.
+The same helper will analyze the reserved batch only after its audit/backup.
