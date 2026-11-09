@@ -1,0 +1,150 @@
+{
+  "part": "impact_followup",
+  "cases": [
+    {
+      "name": "SR_A_impact_followup_00_cohesion16",
+      "zero_measured_loss": true,
+      "spill": {
+        "final_outside_ml": 0.0,
+        "ever_table_ml": 0.0,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "tracked_drops": [
+        {
+          "original_id": 114,
+          "seed_index": 114,
+          "contained_final": true,
+          "ever_near_table": false,
+          "max_sampled_upward_speed_m_s": 0.022789426147937775,
+          "max_sampled_height_m": 0.02962203979492184
+        },
+        {
+          "original_id": 1437,
+          "seed_index": 1400,
+          "contained_final": true,
+          "ever_near_table": false,
+          "max_sampled_upward_speed_m_s": 0.030156731605529785,
+          "max_sampled_height_m": 0.029627404212951625
+        }
+      ],
+      "first_recorded_time_s": 0.10499999877065425,
+      "first_level": 0.6908793491475711,
+      "final_level": 0.6781795978546131,
+      "max_level": 0.6926056924988231,
+      "sleep_transitions": [
+        {
+          "t": 0.105,
+          "state": {
+            "/World/Robot/ffw_bg2_follower/root_joint": false,
+            "/World/Bottle": false
+          },
+          "level": 0.6908793491475711
+        },
+        {
+          "t": 0.405,
+          "state": {
+            "/World/Robot/ffw_bg2_follower/root_joint": false,
+            "/World/Bottle": true
+          },
+          "level": 0.6921039090437037
+        },
+        {
+          "t": 1.555,
+          "state": {
+            "/World/Robot/ffw_bg2_follower/root_joint": true,
+            "/World/Bottle": true
+          },
+          "level": 0.6777843839981966
+        }
+      ],
+      "source_sha256": "df9de2d5a16f5c170f907deae25f8ce1773e27099d4e82e6ab85251db0aa6d55",
+      "trajectory_sha256": "18ac2665d84a468bbe87d8b231d0138b62ad898f9438cf941b8f3871a4e6710f",
+      "controls": {
+        "viscosity": 0.0,
+        "cohesion": 0.01,
+        "surface_tension": 0.0,
+        "friction": 0.0,
+        "iterations": 16,
+        "max_depenetration_velocity": 1.0,
+        "cfl_coefficient": 1.0
+      }
+    },
+    {
+      "name": "SR_A_impact_followup_01_cohesion32",
+      "zero_measured_loss": true,
+      "spill": {
+        "final_outside_ml": 0.0,
+        "ever_table_ml": 0.0,
+        "particle_quantum_ml": 0.0058319999999999995
+      },
+      "tracked_drops": [
+        {
+          "original_id": 114,
+          "seed_index": 114,
+          "contained_final": true,
+          "ever_near_table": false,
+          "max_sampled_upward_speed_m_s": 0.016320766881108284,
+          "max_sampled_height_m": 0.02962203979492184
+        },
+        {
+          "original_id": 1437,
+          "seed_index": 1400,
+          "contained_final": true,
+          "ever_near_table": false,
+          "max_sampled_upward_speed_m_s": 0.017116839066147804,
+          "max_sampled_height_m": 0.029627404212951625
+        }
+      ],
+      "first_recorded_time_s": 0.10499999877065425,
+      "first_level": 0.6908793491475711,
+      "final_level": 0.690506679871502,
+      "max_level": 0.6926056924988231,
+      "sleep_transitions": [
+        {
+          "t": 0.105,
+          "state": {
+            "/World/Robot/ffw_bg2_follower/root_joint": false,
+            "/World/Bottle": false
+          },
+          "level": 0.6908793491475711
+        },
+        {
+          "t": 0.405,
+          "state": {
+            "/World/Robot/ffw_bg2_follower/root_joint": false,
+            "/World/Bottle": true
+          },
+          "level": 0.6921039090437037
+        },
+        {
+          "t": 1.555,
+          "state": {
+            "/World/Robot/ffw_bg2_follower/root_joint": true,
+            "/World/Bottle": true
+          },
+          "level": 0.691524236342485
+        }
+      ],
+      "source_sha256": "767fa54ab4e45495239426208834442e86362d5fc986c1d5f28b860513cd5e8a",
+      "trajectory_sha256": "793c2a2dd640e0960af34e6f0577b08ae5975bc77e3789704cd577ee1fd01418",
+      "controls": {
+        "viscosity": 0.0,
+        "cohesion": 0.01,
+        "surface_tension": 0.0,
+        "friction": 0.0,
+        "iterations": 32,
+        "max_depenetration_velocity": 1.0,
+        "cfl_coefficient": 1.0
+      }
+    }
+  ],
+  "baseline_reproduces_loss": false,
+  "contained_variants": [
+    "SR_A_impact_followup_00_cohesion16",
+    "SR_A_impact_followup_01_cohesion32"
+  ],
+  "scope": "Non-autonomous cold-start fluid impact. All recorded particles outside the bottle, including both tracked drops; remaining source liquid and moving bottle are omitted. Camera initialization advances 0.05 seconds before transition recording; first_recorded_time_s reports the first saved particle sample. Differences support only this controlled fixture. A zero-loss baseline cannot establish a repair. No force/impulse or continuous peak measurement.",
+  "audit_sha256": "bc5e8e8c2d89d554dc91b603bdb221d7384b611adec6a3c389183389f57804fe",
+  "seed_sha256": "91f38b23442f3ce857667477446e489f3128dc805785f2d1897840e4c66c955b",
+  "helper_sha256": "600f39c3aa94ef336aee9e90a6cb7acdde963836606ef433bcee0515e30f34df"
+}

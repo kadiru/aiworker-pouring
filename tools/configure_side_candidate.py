@@ -20,13 +20,16 @@ h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10
 m=read(ROOT/'candidate.json');assert sha(ROOT/'best.pt')==m['checkpoint_sha256'] and sha(ROOT/'plan.json')==m['plan_sha256']
 assert all(sha(Path('/workspace/src')/n)==d for n,d in m['runtime_sources'].items())
 plan=read(ROOT/'plan.json');report=read(ROOT/'impact-outcomes.json');assert len(report['cases'])==12
-selection=next(r for r in report['cases'] if r['name']==a.variant);assert selection['zero_measured_loss']
+followup=read(ROOT/'impact_followup-outcomes.json') if (ROOT/'impact_followup-outcomes.json').exists() else {'cases':[]}
+assert len(followup['cases']) in (0,2)
+selection=next(r for r in report['cases']+followup['cases'] if r['name']==a.variant);assert selection['zero_measured_loss']
 assert report['baseline_reproduces_loss'],'A non-reproducing microbenchmark cannot authorize an asserted repair'
-chosen=next(s for s in plan['impact'] if s['name']==a.variant)
+chosen=next(s for s in plan['impact']+plan.get('impact_followup',[]) if s['name']==a.variant)
 started={read(p)['name'] for p in Path('/workspace/outputs/fountain').glob('*/*SR_A_*/parameters.json')}
 assert not started&{s['name'] for s in plan['development']+plan['test']}
 archive=ROOT/f'rounds/before-candidate-r{a.round}';archive.mkdir(parents=True,exist_ok=False)
 for n in ('best.pt','candidate.json','plan.json','impact-outcomes.json','recording-audit.json'):shutil.copy2(ROOT/n,archive/n)
+if followup['cases']:shutil.copy2(ROOT/'impact_followup-outcomes.json',archive/'impact_followup-outcomes.json')
 saved=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
 unchanged={k:digest(v) for k,v in saved.items() if k not in ('thresholds','side_return','side_return_version')}
 old_thresholds=copy.deepcopy(saved['thresholds']);old_target=saved['thresholds']['full_settled_target'];saved['thresholds']=dict(saved['thresholds'],full_settled_target=a.full_target)
@@ -49,5 +52,5 @@ m.update(checkpoint_sha256=sha(ROOT/'best.pt'),plan_sha256=sha(ROOT/'plan.json')
 write(ROOT/'candidate.json',m)
 record=dict(candidate=m,old_target=old_target,new_target=a.full_target,side_return=saved['side_return'],
     unchanged_component_digests=unchanged,impact_outcomes_sha256=sha(ROOT/'impact-outcomes.json'),chosen_impact_result=selection,
-    helper_sha256=sha(Path(__file__)),scope=m['method'])
+    followup_outcomes_sha256=sha(ROOT/'impact_followup-outcomes.json') if followup['cases'] else None,helper_sha256=sha(Path(__file__)),scope=m['method'])
 write(ROOT/f'candidate-selection-r{a.round}.json',record);print(json.dumps(dict(checkpoint_sha256=m['checkpoint_sha256'],physics=physics,full_target=a.full_target)))
