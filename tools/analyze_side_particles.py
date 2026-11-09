@@ -1,4 +1,4 @@
-"""Trace final/near-table lost particles in consumed diagnostics, scoring only."""
+"""Trace lost particles in closed records; read-only scoring, never fitting."""
 import argparse,hashlib,json,sys
 from pathlib import Path
 sys.path[:0]=['/workspace/src','/workspace']
@@ -9,8 +9,15 @@ from robot_pour import FRAME
 ROOT=Path('/workspace/learning/A-side-return-20261108-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-a=argparse.ArgumentParser();a.add_argument('--part',default='diagnostic');a.add_argument('--output',type=Path,required=True);a=a.parse_args();assert not a.output.exists()
+a=argparse.ArgumentParser();a.add_argument('--part',default='diagnostic');a.add_argument('--name');a.add_argument('--output',type=Path,required=True);a=a.parse_args();assert not a.output.exists()
 expected={s['name'] for s in read(ROOT/'plan.json')[a.part]};rows=[]
+if a.name:
+    assert a.name in expected;expected={a.name}
+if a.part=='test':
+    assert a.name,'Reserved inspection requires one explicitly closed case'
+    frozen=read(ROOT/'final-selection.json')
+    assert sha(ROOT/'plan.json')==frozen['plan_sha256'] and sha(ROOT/'best.pt')==frozen['checkpoint_sha256']
+    assert all(sha(Path('/workspace/src')/n)==d for n,d in frozen['runtime_sources'].items())
 for p in sorted(Path('/workspace/outputs/fountain').glob('*/*SR_A_*/metrics.json')):
     spec=read(p.parent/'parameters.json')
     if spec['name'] not in expected:continue
