@@ -21,7 +21,7 @@ def main():
     p.add_argument('--expected-container', required=True)
     p.add_argument('--phase', required=True)
     p.add_argument('--study-name', default='A-finish-20261106-v1',
-        choices=('A-finish-20261106-v1','A-size-20261108-v1','A-perception-20261108-v1'))
+        choices=('A-finish-20261106-v1','A-size-20261108-v1','A-perception-20261108-v1','A-side-return-20261108-v1'))
     p.add_argument('files', nargs='+')
     a=p.parse_args()
     STUDY=ROOT/'learning'/a.study_name

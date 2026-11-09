@@ -222,7 +222,15 @@ class Actor:
             profile=early_return_profile(profile,self.saved['early_return_seconds'])
         self.terminal=TerminalPrimitive(self.history,t,profile)
         self.terminal.return_path=monotone_return_path(self.outbound,self.pour_phase,self.history[-1][1],self.qlift)
-        if self.saved.get('centered_return') and self.pour_phase>=70.:
+        if self.saved.get('side_return'):
+            from pour_side_return import SideTerminal
+            try:
+                self.terminal=SideTerminal(self.history,t,profile,self.fk,self.cup_xy,
+                    self.cal['table_z'],self.saved['side_return'])
+            except ValueError as error:
+                self.return_planning_error=str(error)
+                self.stop_latched=robot.reason='return_planning_failed'
+        elif self.saved.get('centered_return') and self.pour_phase>=70.:
             from pour_wide_motion import CenteredTerminal
             try:
                 self.terminal=CenteredTerminal(self.history,t,profile,self.fk,self.pour_phase,
@@ -410,6 +418,7 @@ class Actor:
             approach_tracking=self.approach_check,
             source_watchdog=None if self.source_watchdog is None else self.source_watchdog.diagnostic,
             return_planning_error=getattr(self,'return_planning_error',None),
+            side_return_plan=getattr(self.terminal,'diagnostic',None),
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
             cup_level_camera='cup_detail' if 'cup_detail_calibration' in self.saved else 'task',
             source_presence_model='wrist_presence_cnn' if self.presence_detector is not None else 'legacy_source_fusion',

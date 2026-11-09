@@ -46,6 +46,7 @@ allowed_commands.add('size_seed_calibration')
 allowed_commands.update(('perception_pilot','perception_collect','perception_development','perception_test'))
 allowed_commands.add('perception_geometry')
 allowed_commands.update(('perception_camera_pilot','perception_holdout'))
+allowed_commands.update(('side_diagnostic','side_development','side_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -643,7 +644,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('perception_pilot','perception_collect','perception_geometry','perception_camera_pilot','perception_holdout','perception_development','perception_test'):
+                    if cmd in ('side_diagnostic','side_development','side_test'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before side-return study';continue
+                        from pour_side_study import pending as side_pending
+                        pending.extend(side_pending(cmd.removeprefix('side_')))
+                    elif cmd in ('perception_pilot','perception_collect','perception_geometry','perception_camera_pilot','perception_holdout','perception_development','perception_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before perception-study work';continue
                         from pour_perception_study import pending as perception_pending
@@ -965,7 +971,11 @@ try:
                                           teacher_action=transition_teacher_action)
                 state['recording']['frames'] = trial['recording'].count
             trial['samples'].append(row)
-            if spec.get('save_particle_trajectory',True) and trial['frame']%5==0: trial['trajectory'].append((trial['t'],p,v))
+            trajectory_stride=spec.get('trajectory_stride',5)
+            assert isinstance(trajectory_stride,int) and 1<=trajectory_stride<=20
+            if (spec.get('save_particle_trajectory',True) and trial['frame']%trajectory_stride==0
+                    and trial['t']>=spec.get('trajectory_start_s',0.)):
+                trial['trajectory'].append((trial['t'],p.copy(),v.copy()))
             state.update(phase=phase,sim_time=round(trial['t'],2),metrics=row,
                          progress=min(1.,trial['t']/(spec['flow_seconds']+spec['settle_seconds'])))
             preview.capture()
