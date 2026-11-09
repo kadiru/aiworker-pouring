@@ -1,0 +1,89 @@
+{
+  "round": "r8",
+  "plan_sha256": "e8a89896054825ac3a5e3808bcde68836b016a92401f07d6048c611fed4f54d4",
+  "parent_checkpoint_sha256": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+  "audit_sha256": "d2fea71ab360b01569e84b41846b7d5233a592785a1b937932f17ecd091b5c6a",
+  "manual_review_sha256": "37c7fcfb8d93cb324bece0f352ab1c97bd2f8872396be32c8893853305567bab",
+  "frozen_locator": {
+    "cup-neural-localization.pt": "a19e1ff32746e6541ecfad3e8b6e1ab88ab04a3d41a78c5fa274c98ea1717570",
+    "cup-neural-localization.json": "ab7372dc012b4d78a54505ac336941c80db99639f3bbc66e70de94ad6e0922d4",
+    "scope-selection.json": "f833b9e61e0aa5d76a0ab25b6b5c27f014bccae28cb6a758443d4584a85dc4a7",
+    "scale_rim_refiner.py": "8569afe13cdab2701b83d87089b9387772721f2ca64059ede37e7a4ad72afed3"
+  },
+  "feature_sets": [
+    "physical_surface"
+  ],
+  "ridge_penalties": [
+    0.001,
+    0.01,
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "kernel_length_scales": [
+    0.5,
+    1.0,
+    2.0,
+    4.0
+  ],
+  "kernel_ridge_penalties": [
+    0.0001,
+    0.001,
+    0.01,
+    0.1
+  ],
+  "training": "Episode-mean features/targets, 90 equally weighted training episodes; CUDA float64 ridge and RBF kernel ridge. Whole-episode validation. No held-out images.",
+  "selection": "Only candidates passing every original per-size train/validation gate; minimize worst per-size validation MAE + 0.3*near-full max error, then overall validation MAE.",
+  "rationale": "Old 96-pixel crops use 40 pixels over usable cup height. Measure 192-pixel color envelopes, convert to heights using image-localized cup geometry/camera projection, then supervise remaining refraction/rendering bias.",
+  "required": [
+    "unchanged all-size localization",
+    "unchanged per-size level gates",
+    "CPU/GPU parity below 1e-4",
+    "exact inference-feature path"
+  ],
+  "unchanged": [
+    "108 episodes and splits",
+    "all original thresholds",
+    "nine unused reserved scenes",
+    "active controller and runtime sources"
+  ],
+  "scope": "Known-size stationary cup perception; dimensions are fixture inputs, not visually estimated.",
+  "runtime_before": {
+    "utc": "2026-11-09T22:23:01.115891+00:00",
+    "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+    "limits": {
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "NanoCpus": 4000000000,
+      "CpusetCpus": "16-23",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "MemorySwap": 17179869184
+    },
+    "gpu_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 4172782, 6128 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 3750988, 4751 MiB",
+    "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+  },
+  "crop_resolution": 192,
+  "usable_height_pixels": 80,
+  "surface_quantiles_percent": [
+    2,
+    5,
+    10
+  ],
+  "surface_columns": 13,
+  "projected_height_samples": 101
+}

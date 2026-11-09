@@ -18,7 +18,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--component',choices=('locator','level'),default='locator')
-    parser.add_argument('--round',choices=('r0','r1','r2','r3','r4','r5','r6'),default='r0');parser.add_argument('--refine-from')
+    parser.add_argument('--round',choices=('r0','r1','r2','r3','r4','r5','r6','r7','r8','r9','r10'),default='r0');parser.add_argument('--refine-from')
     parser.add_argument('--resolution',type=int,choices=(384,768),default=384)
     parser.add_argument('--augmentation',choices=('integer','continuous'),default='continuous');args=parser.parse_args()
     assert args.component=='locator' or args.resolution==384
@@ -27,6 +27,9 @@ def main():
         initialization=(ROOT/args.refine_from).resolve()
         assert initialization.is_relative_to(ROOT) and initialization.suffix=='.pt' and initialization.is_file()
     helper='fit_scale_locator.py' if args.component=='locator' else 'fit_scale_level.py'
+    if args.round in ('r7','r8','r9','r10'):
+        assert args.component=='level' and args.refine_from is None
+        helper='fit_scale_level_cnn.py' if args.round in ('r9','r10') else 'fit_scale_level_readout.py'
     if args.component=='locator' and args.round in ('r4','r5','r6'):
         helper='fit_scale_rim_calibration.py' if args.round=='r6' else 'fit_scale_rim_refiner.py'
         assert args.refine_from is None and args.resolution==384
@@ -40,6 +43,11 @@ def main():
         protocol=read(ROOT/f'locator-refit-{args.round}-plan.json')
         assert protocol['plan_sha256']==manifest['plan_sha256']
         assert protocol['audit_sha256']==sha(audit_path) and protocol['review_sha256']==sha(review_path)
+    if args.round in ('r7','r8','r9','r10'):
+        protocol=read(ROOT/f'level-refit-{args.round}-plan.json')
+        assert protocol['plan_sha256']==manifest['plan_sha256']
+        assert protocol['audit_sha256']==sha(audit_path) and protocol['manual_review_sha256']==sha(review_path)
+        assert all(sha(ROOT/n)==v for n,v in protocol['frozen_locator'].items())
     assert not manifest['trained'] and not (ROOT/'component-selection.json').exists()
     assert audit['complete']
     records=admit(plan,manifest,audit)
@@ -63,6 +71,9 @@ def main():
         sources['scale_rim_refiner.py']=sha(ROOT/'scale_rim_refiner.py')
         sources['scale_rim_augmentation.py']=sha(ROOT/'scale_rim_augmentation.py')
         sources['fit_scale_rim_refiner.py']=sha(ROOT/'fit_scale_rim_refiner.py')
+    if args.round in ('r7','r8','r9','r10'):
+        sources.update({n:sha(ROOT/n) for n in ('scale_level_readout.py','scale_surface_geometry.py','fit_scale_level.py','scale_rim_refiner.py')})
+    if args.round in ('r9','r10'):sources.update({n:sha(ROOT/n) for n in ('scale_level_cnn.py','scale_rim_augmentation.py')})
     (output/'runtime-before.json').write_text(json.dumps(dict(witness,sources=sources,admitted_episodes=len(records)),indent=2)+'\n')
     with (output/'fit.log').open('x') as log:
         command=['docker','exec','-e','PYTHONDONTWRITEBYTECODE=1',w.CID,'nice','-n','10',
@@ -72,6 +83,8 @@ def main():
             if args.round in ('r4','r5'):command+=['--round',args.round]
             elif args.round=='r6':pass
             else:command+=['--resolution',str(args.resolution),'--augmentation',args.augmentation]
+        if args.component=='level' and args.round in ('r7','r8'):command+=['--round',args.round]
+        if args.round in ('r9','r10'):command+=['--round',args.round]
         result=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT)
     (output/'runtime-after.json').write_text(json.dumps(w.isolation(),indent=2)+'\n')
     assert sha(ROOT/'best.pt')==manifest['checkpoint_sha256'] and sha(ROOT/'plan.json')==manifest['plan_sha256']

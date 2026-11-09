@@ -1,0 +1,78 @@
+{
+  "stage": "independent_static_evaluation_complete",
+  "phases": [
+    {
+      "stage": "level",
+      "exit_code": 0,
+      "log_sha256": "cf294b7bae212da37d394a6ab82b64541cee4505a80fe538bd5cf9f2c089eda4"
+    },
+    {
+      "stage": "select",
+      "exit_code": 0,
+      "log_sha256": "0ef42a1738ba11307b41a3241d3c89c7db86964ac5fc68bc0a58bdff7031062f"
+    },
+    {
+      "stage": "holdout_collection",
+      "exit_code": 0,
+      "log_sha256": "08b141473fa4bddb4e3de18a11b28ed1a71266144e5355e4f278618e2dcd3a28"
+    },
+    {
+      "stage": "holdout_audit",
+      "exit_code": 0,
+      "log_sha256": "88c44f248f89f037d915abba6934d0ab07b532e6743f15b392045c675998f368"
+    },
+    {
+      "stage": "holdout_score",
+      "exit_code": 0,
+      "log_sha256": "9b8c43298336ec97b450f6d80fa2d6891d9d9b82fe3fe229386d80d73ca91ebb"
+    }
+  ],
+  "plan_sha256": "4efcc93638e4abc10a6222712470f395aa71a5812e117373d6a1693c6364bf47",
+  "checkpoint_sha256": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+  "reports": {
+    "cup-neural-localization.json": "2384595a66f1e00c633ea72aa9652122b50b22e42353501e01de87d61f34b197",
+    "static-level-fit.json": "eb5084e3fa58e67cf01773f1e6a4c6dc7dff6de94d198db2891d9330af32f4d5",
+    "level-localization-check.json": "0bea0e9f4bb38304d911a368d24f8009eb08653e924e1d3ff7554dc5d0e14296",
+    "component-selection.json": "7f0b95077f91012b4f4d96b43ec5051a62cb8af528c7ef7360e20673f8e4bdd7",
+    "holdout-r0-audit.json": "15029d69bf84d57d776d67223b96c91a583c045f104cf3348204c4e5e53d6902",
+    "static-holdout-evaluation.json": "646694eb7fc65b3229b58c3fed7ad546c1040fffd46b57bbb3fcbb0f52856ad5"
+  },
+  "reserved_scenes_started": 9,
+  "active_controller_unchanged": true,
+  "autonomous_size_accepted": false,
+  "queue_empty": true,
+  "recording_inactive": true,
+  "runtime": {
+    "utc": "2026-11-09T23:27:01.153219+00:00",
+    "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+    "limits": {
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "NanoCpus": 4000000000,
+      "CpusetCpus": "16-23",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "MemorySwap": 17179869184
+    },
+    "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 3750988, 4841 MiB",
+    "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+  },
+  "helper_sha256": "b215a1cb8b9234d39bd8327891ccecd9394010766f90bd653bac1b58a80196fa",
+  "locator_passed": true,
+  "level_passed": true,
+  "independent_static_passed": true,
+  "scope": "Static known-size supervised perception only; no autonomous pouring task result."
+}

@@ -20,7 +20,7 @@ def read(p):return json.loads(p.read_text())
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--part',choices=('collect','holdout'),required=True)
-    parser.add_argument('--round',choices=('r0','r1'),default='r0');parser.add_argument('--plan',default='plan-collection-r0.json')
+    parser.add_argument('--round',choices=('r0','r1','r2'),default='r0');parser.add_argument('--plan',default='plan-collection-r0.json')
     parser.add_argument('--new-only',action='store_true');a=parser.parse_args()
     assert Path(a.plan).name==a.plan
     audit_path=ROOT/f'{a.part}-{a.round}-audit.json';audit=read(audit_path);plan_path=ROOT/a.plan;plan=read(plan_path)
@@ -34,17 +34,20 @@ def main():
     rows=sorted(audit['records'],key=lambda r:(specs[r['name']]['cup_height_scale'],specs[r['name']]['cup_diameter_scale'],r['name']))
     carried={}
     if a.new_only:
-        assert a.part=='collect' and a.round=='r1'
+        assert a.part=='collect' and a.round in ('r1','r2')
         names=set(plan['collection_rounds'][a.round])
-        old=read(ROOT/'collect-r0-manual-review.json');old_audit=read(ROOT/'collect-r0-audit.json')
-        assert old['accepted'] and old['audit_sha256']==sha(ROOT/'collect-r0-audit.json')
+        previous='r0' if a.round=='r1' else 'r1'
+        old_review_path=ROOT/f'collect-{previous}-manual-review.json';old_audit_path=ROOT/f'collect-{previous}-audit.json'
+        old=read(old_review_path);old_audit=read(old_audit_path)
+        assert old['accepted'] and old['audit_sha256']==sha(old_audit_path)
         old_records={r['name']:r for r in old_audit['records']}
         for r in rows:
             if r['name'] not in names:
                 assert old_records[r['name']]['sha256']==r['sha256']
-                carried[r['name']]=dict(source_recording_sha256=r['sha256'],previous_manual_review_sha256=sha(ROOT/'collect-r0-manual-review.json'))
+                carried[r['name']]=dict(source_recording_sha256=r['sha256'],previous_manual_review_sha256=sha(old_review_path))
         rows=[r for r in rows if r['name'] in names]
-        assert len(rows)==54 and len(carried)==54
+        expected=(54,54) if a.round=='r1' else (36,108)
+        assert (len(rows),len(carried))==expected
     reviewed={};sheets=[]
     for start in range(0,len(rows),6):
         canvas=Image.new('RGB',(1536,1164),'white');draw=ImageDraw.Draw(canvas)

@@ -30,7 +30,7 @@ def write(name,data):(ROOT/name).write_text(json.dumps(data,indent=2)+'\n')
 
 
 @torch.no_grad()
-def collect():
+def collect(surface=False):
     plan=read(ROOT/'plan.json');m=read(ROOT/'candidate.json');audit_path,review_path=collection_paths(ROOT,m)
     audit=read(audit_path);review=read(review_path);selection=read(ROOT/'scope-selection.json')
     assert review['accepted'] and review['audit_sha256']==sha(audit_path)
@@ -45,6 +45,9 @@ def collect():
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     model=CupEstimator().cuda().eval();model.load_state_dict(parent['cup_model'])
     data={s:dict(images=[],target=[],xy=[],meta=[]) for s in ('train','validation')};windows=[]
+    if surface:
+        from scale_surface_geometry import surface_crop,surface_lookup
+        for a in data.values():a.update(surface_images=[],surface_lookup=[])
     for spec,r,split in admit(plan,m,audit):
         path=Path(r['path']);assert sha(path)==r['sha256']
         with h5py.File(path) as f:
@@ -67,8 +70,13 @@ def collect():
                 write('level-localization-check.json',dict(passed=False,windows=windows))
                 raise ValueError('All-size temporal localization must pass before level fitting')
             a=data[split];times=d['next_time'][:]
+            if surface:lookup=surface_lookup(xy,detail,spec['declared_cup_geometry'])
             for index in np.flatnonzero(times>=times[-1]-1.-1e-7)[::2]:
-                a['images'].append(cup_crop(decode(d['next_obs/cup_detail_image'][int(index)],'jpeg95'),xy,detail))
+                rgb=decode(d['next_obs/cup_detail_image'][int(index)],'jpeg95')
+                a['images'].append(cup_crop(rgb,xy,detail))
+                if surface:
+                    a['surface_images'].append(surface_crop(rgb,xy,detail,spec['declared_cup_geometry']))
+                    a['surface_lookup'].append(lookup)
                 a['target'].append(r['label']['target']);a['xy'].append(xy)
                 a['meta'].append(dict(name=spec['name'],cup_height_scale=spec['cup_height_scale'],
                     cup_diameter_scale=spec['cup_diameter_scale'],index=int(index),source_sha256=r['sha256']))
@@ -76,6 +84,9 @@ def collect():
         scope='Actual image localization and temporal confirmation on every declared fitting episode.'))
     for a in data.values():
         a['x']=torch.tensor(np.stack(a.pop('images')),device='cuda')
+        if surface:
+            a['surface_x']=torch.tensor(np.stack(a.pop('surface_images')),device='cuda')
+            a['surface_lookup']=torch.tensor(np.stack(a['surface_lookup']),device='cuda',dtype=torch.float64)
         a['xy']=torch.tensor(np.asarray(a['xy']),device='cuda',dtype=torch.float32)
         a['y']=torch.tensor(a['target'],device='cuda',dtype=torch.float32)
         a['weights']=torch.tensor(balanced_frame_weights(a['meta']),device='cuda')

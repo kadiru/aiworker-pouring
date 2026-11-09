@@ -1,6 +1,6 @@
 # Native-resolution rim localization
 
-Completed November 9, 2026, on the guarded RTX 4070. **Localization passes its development checks; level estimation fails, and all nine reserved static tests remain unused.** The original robot controller and runtime sources are unchanged. This is a static, known-size perception result, not a resized autonomous-pouring result.
+Historical r4–r6 stage, completed November 9, 2026, on the guarded RTX 4070. **At this stage's closure, localization passed its development checks; level estimation failed and all nine reserved static tests remained unused.** The original robot controller and runtime sources were unchanged. This is a static, known-size perception result, not a resized autonomous-pouring result. The subsequent accepted size-aware level fit and expanded-data rim revalidation are documented in [Liquid level across cup sizes](LEVEL_SIZE_STUDY.md).
 
 ## Data and inference
 

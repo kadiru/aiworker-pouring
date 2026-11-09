@@ -36,6 +36,9 @@ def main():
     assert level['parent_checkpoint_sha256']==m['checkpoint_sha256']
     assert level['checkpoint_sha256']==sha(ROOT/'static-level-candidate.pt')
     assert loc['module_sha256']==level['localization_module_sha256']==sha(ROOT/'scale_rim_refiner.py')
+    assert level['level_module_sha256']==sha(ROOT/'scale_level_readout.py')
+    assert level['surface_module_sha256']==sha(ROOT/'scale_surface_geometry.py')
+    if 'cnn_module_sha256' in level:assert level['cnn_module_sha256']==sha(ROOT/'scale_level_cnn.py')
     selected=ROOT/'selected-static';selected.mkdir()
     files={}
     for name in ('cup-neural-localization.pt','static-level-candidate.pt','cup-neural-localization.json',
@@ -45,6 +48,9 @@ def main():
         all_size_component_gates_passed=True,components=files,holdout_names=[s['name'] for s in plan['holdout']],
         evaluation_helper_sha256=sha(ROOT/'evaluate_scale_static_holdout.py'),evaluation_observation_frames=12,
         localization_module_sha256=sha(ROOT/'scale_rim_refiner.py'),
+        level_module_sha256=sha(ROOT/'scale_level_readout.py'),
+        surface_module_sha256=sha(ROOT/'scale_surface_geometry.py'),
+        cnn_module_sha256=level.get('cnn_module_sha256'),
         primary_model='selected_static_candidate',comparison_model='frozen_parent_no_selection',
         model_activated=False,autonomous_use_accepted=False,helper_sha256=sha(Path(__file__)),
         scope='Static known-size cup localization and level estimation in the measured collection range only. Freeze before nine unused near-full static holdouts; parent robot checkpoint remains unchanged. Independent color, >=94% fill, held-bottle, dynamic and task gates are not accepted.')

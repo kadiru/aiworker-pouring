@@ -2,7 +2,7 @@
 
 Started November 9, 2026, after the user accepted two lost particles and provisionally allowed up to five per task. The completed parent stays frozen at **28/30 strict zero-loss passes**, or **30/30 under the later practical tolerance**. This is a separate study, `/workspace/learning/A-scale-20261109-v1`, prefix `SC_A_`. No resized autonomous pour has run and the parent robot checkpoint remains active.
 
-Latest result: native-resolution rim refinement and train-only calibration now pass localization (**2.9033 mm validation maximum, 2.9766 mm training maximum**). The subsequent level fit fails its per-size error gate, so **none of the nine reserved tests ran**. The active robot remains unchanged. See [Rim localization continuation](RIM_LOCALIZATION.md).
+Latest result: size-aware supervised level estimation now passes every declared development gate, followed by **9/9 once-only reserved static perception tests**. Added 36 training-only intermediate-fill scenes; split is 126 train / 18 validation. Worst-size validation MAE is **1.3329 percentage points**; reserved mean/max errors are **0.6578 / 1.4194 points**. The active robot remains unchanged; independent color, >=94%-fill and dynamic/task checks still gate resized autonomy. See [Liquid level across cup sizes](LEVEL_SIZE_STUDY.md).
 
 ## Scope and acceptance
 

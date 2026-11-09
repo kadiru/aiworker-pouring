@@ -1,0 +1,76 @@
+{
+  "round": "r10",
+  "plan_sha256": "4efcc93638e4abc10a6222712470f395aa71a5812e117373d6a1693c6364bf47",
+  "parent_checkpoint_sha256": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+  "audit_sha256": "fe2b27fed31f97537c36b2ea358397924de9d98f149dce480d1191871146d47d",
+  "manual_review_sha256": "5ebbd28d37ededf2880defc099649005c72eb3c774cea3b6de9f7ad477c0ab70",
+  "frozen_locator": {
+    "cup-neural-localization.pt": "a19e1ff32746e6541ecfad3e8b6e1ab88ab04a3d41a78c5fa274c98ea1717570",
+    "cup-neural-localization.json": "2384595a66f1e00c633ea72aa9652122b50b22e42353501e01de87d61f34b197",
+    "scope-selection.json": "ff51f752580435ee1db70382bf21fc04146df5875afb131a40fa7e2fe232f373",
+    "scale_rim_refiner.py": "8569afe13cdab2701b83d87089b9387772721f2ca64059ede37e7a4ad72afed3"
+  },
+  "epochs": 240,
+  "batch_size": 64,
+  "learning_rate": 5e-05,
+  "weight_decay": 0.0001,
+  "seed": 26110999,
+  "augmentation": {
+    "translation_pixels": 1.5,
+    "scale_min": 0.98,
+    "scale_max": 1.02,
+    "rotation_degrees": 1.5,
+    "brightness_min": 0.95,
+    "brightness_max": 1.05
+  },
+  "training": "Continue supervised fine-tuning of all CupEstimator and context-correction weights from the archived rejected r9 checkpoint; AdamW, equal episode/size sampling, MSE. Image augmentation leaves the physical level label unchanged.",
+  "context": "Declared height, diameter, diameter/height, and image-localized XY; corrections depend also on the CNN level.",
+  "rationale": "Same CNN method, initialized from rejected r9 best attempt, now with all four training layouts per size at an additional 0.35 seed cut. Original validation and reserved fixtures unchanged.",
+  "unchanged": [
+    "Original 108 episodes and splits",
+    "all original thresholds",
+    "nine unused reserved scenes",
+    "active controller and runtime sources"
+  ],
+  "required": [
+    "unchanged all-size localization",
+    "unchanged per-size level gates",
+    "CPU/GPU parity below 1e-4",
+    "exact inference-feature path"
+  ],
+  "selection": "Only candidates passing every original per-size train/validation gate; minimize worst per-size validation MAE + 0.3*near-full max error; retain the earlier epoch on an exact tie.",
+  "scope": "Known-size stationary cup perception; dimensions are fixture inputs, not visually estimated.",
+  "runtime_before": {
+    "utc": "2026-11-09T22:29:05.558304+00:00",
+    "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+    "limits": {
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "NanoCpus": 4000000000,
+      "CpusetCpus": "16-23",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "MemorySwap": 17179869184
+    },
+    "gpu_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 4172782, 6128 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 3750988, 4751 MiB",
+    "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+  },
+  "fine_initialization": "collection-r1/static-level-candidate.pt",
+  "fine_initialization_sha256": "0c064d9244951ebd78db2af9868ed15f092b192200479f9bba65e4229004d396",
+  "training_episodes": 126,
+  "validation_episodes": 18,
+  "expected_updates": 5280
+}

@@ -14,6 +14,8 @@ from pour_guard_vision import locate,plane_point,cup_crop,color_geometry_readout
 from pour_temporal_localization import consensus
 from pour_settled_model import features,predict
 from scale_rim_refiner import locate_static
+from scale_level_readout import predict_static_level,predict_surface_readout
+from scale_surface_geometry import surface_crop,surface_lookup
 ROOT=Path('/workspace/learning/A-scale-20261109-v1')
 
 
@@ -38,7 +40,10 @@ def main():
     loc=torch.load(selection['components']['cup-neural-localization.pt']['path'],map_location='cpu',weights_only=False)
     resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768],[1024,1024])
     assert selection['localization_module_sha256']==sha(ROOT/'scale_rim_refiner.py')
+    assert selection['level_module_sha256']==sha(ROOT/'scale_level_readout.py')
+    assert selection['surface_module_sha256']==sha(ROOT/'scale_surface_geometry.py')
     level=torch.load(selection['components']['static-level-candidate.pt']['path'],map_location='cpu',weights_only=False)
+    if 'size_cnn_state' in level:assert selection['cnn_module_sha256']==sha(ROOT/'scale_level_cnn.py')
     assert level['accepted'];torch.set_num_threads(2);model=CupEstimator().eval();model.load_state_dict(level['cup_model'])
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     parent_model=CupEstimator().eval();parent_model.load_state_dict(parent['cup_model'])
@@ -75,7 +80,11 @@ def main():
                     image=decode(d['next_obs/cup_detail_image'][int(index)],'jpeg95')
                     x=torch.from_numpy(cup_crop(image,xy,cal))[None]
                     cnn=(model(x)+level['cup_bias']).clamp(0,1)
-                    estimate=float(predict(features(x,cnn,xy),level['settled_regressor'])[0])
+                    if level.get('size_level_readout',{}).get('features')=='physical_surface':
+                        sx=torch.from_numpy(surface_crop(image,xy,cal,s['declared_cup_geometry']))[None]
+                        lookup=surface_lookup(xy,cal,s['declared_cup_geometry'])[None]
+                        estimate=float(predict_surface_readout(sx,lookup,s['declared_cup_geometry'],xy,level)[0])
+                    else:estimate=float(predict_static_level(x,cnn,xy,s['declared_cup_geometry'],level)[0])
                     color=float(color_geometry_readout(x,level['surface_geometry'],xy)[0])
                     estimates.append(dict(index=int(index),level=estimate,error=estimate-r['label']['target'],
                         raw_cnn=float(cnn[0]),independent_color=color,color_error=color-r['label']['target']))
