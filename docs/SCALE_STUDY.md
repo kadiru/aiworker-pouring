@@ -25,3 +25,28 @@ Observed infrastructure interruption: `docker.service` restarted on the shared U
 The three r1 pilots are now closed and accepted for seed preparation: final-second median heights 91.1275%, 90.6085% and 90.5762%, zero final-outside and ever-table loss, valid native recordings. Actual review covers three final four-camera composites and twelve selected encoded frames. The complete three-clip reel is 20.85 seconds at labeled 2x, with one-second final holds; decoding and twelve native-source comparisons pass (maximum mean pixel error 0.6682/255). It clearly labels authored calibration, not robot task performance. Round2 declares the six remaining shape combinations; no model fitting is queued automatically.
 
 The retained model was also probed on CPU with explicitly retargeted known cup geometry, image-localized crops and no weight updates. All three cups confirm, but worst localization is4.3539mm and level MAE2.2861percentage points, failing the unchanged3mm/2point component limits. This diagnostic consumes these calibration views as development evidence; it is not an independent held-out performance estimate. Small/large localization errors are4.3539/4.1278mm and baseline0.5892mm. Future training must address this size dependence and obtain additional high-fill coverage if needed above the currently measured90.6–91.1% range.
+
+
+Current stage: all nine gradual-fill pilots are physically accepted. The six r2 medians are 90.5578%, 90.9142%, 90.6588%, 90.3845%, 90.4698%, and 90.5750%; all have zero measured loss and 21 stable final samples. All six final composites and 24 selected encoded frames are reviewed; the 38.2-second reel passes full decoding and 24 source comparisons. The original model confirms five of these six cups, with 5.6327 mm maximum localization error. Combined with r1 this is 8/9 confirmations, not a new task benchmark.
+
+Plan v4 declares 54 static recordings before fitting: four training and two validation episodes per size, four training/two validation layouts drawn from established normal/swapped families, and size-rotated fill cuts to reduce position/level correlation. Nine unused holdouts have small fixed position jitters. All 63 CPU geometry screens pass. Collection is running; its final labels and camera review remain required. A 2.5-second stationary episode supplies a final-second measured label; a seed cut is not itself a ground-truth level.
+
+The locator candidate fine-tunes the retained CNN with focal heatmap loss plus twice smooth-L1 offsets, AdamW for 240 epochs. Integer translation and brightness augmentation are applied to training images. Sampling gives each size 1/9 probability and each episode equal probability within a size. Selection uses the maximum error across all sizes in both whole-episode splits, plus the declared synthetic-absence confidence margin. It never falls back to baseline-only selection. Synthetic absent masks do not replace real missing-cup validation.
+
+The prepared level candidate freezes the retained CNN and fits a separate 139-input, 32/16-tanh residual readout for 1,200 AdamW steps: equal-size/episode weighted squared level error plus 0.02 times squared correction. It uses actual image-localized crops and declared dimensions; simulator poses and measured particle surfaces provide offline labels only. Selection requires each size to pass the unchanged 2-point MAE, 3.5-point near-full maximum error and 2.5-point overestimate limits, plus CPU/GPU parity. The retained independent color estimator is separately diagnosed, not silently accepted. Neither fitter activates a model or launches pours. These preparations are not yet measured fitting results.
+
+Current data reach roughly 91%, below the >=94% coverage required for later stop validation, and do not include a held bottle. Any static success is restricted to its measured level/pose domain. Autonomous size acceptance additionally requires higher-fill and occluded/dynamic perception, independent color agreement, all-size path clearance and fresh task tests. Bottle-size dynamics remain a separate later gate.
+
+Scoped native commands (run only after their predecessor and manual-review gate; helpers use exclusive outputs and must not be blindly retried):
+
+```sh
+# Host, current finite collection/closure observer:
+python3 /tmp/aiworker-scale-stage-transfer/watch_scale_stage.py --part collect --round r0
+# Owned container, CPU recording audit after closure:
+/isaac-sim/python.sh /workspace/learning/A-scale-20261109-v1/check_scale_stage.py --part collect --round r0
+# Host, only after the bound collection camera review is accepted:
+python3 /home/kadir/aiworker-pouring-4070/learning/A-scale-20261109-v1/run_scale_locator_fit.py --component locator
+python3 /home/kadir/aiworker-pouring-4070/learning/A-scale-20261109-v1/run_scale_locator_fit.py --component level
+```
+
+Five local synthetic admission checks verify disjoint episodes, stale audit rejection, size coverage and equal sampling. The new GPU fits remain unrun at this update. Source, small reports and review manifests go to the private repository; media, raw recordings and weights stay external.
