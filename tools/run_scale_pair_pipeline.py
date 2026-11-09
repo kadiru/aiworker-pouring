@@ -53,12 +53,17 @@ def main():
         reports={n:sha(ROOT/n) for n in ('cup-neural-localization.json','static-level-fit.json',
                   'level-localization-check.json','component-selection.json','holdout-r0-audit.json',
                   'static-holdout-evaluation.json') if (ROOT/n).exists()}
+        outcomes={key:(read(ROOT/name)['passed'] if name in reports else None) for key,name in
+                  (('locator_passed','cup-neural-localization.json'),('level_passed','static-level-fit.json'),
+                   ('independent_static_passed','static-holdout-evaluation.json'))}
         report=dict(stage=stage,phases=phases,plan_sha256=m['plan_sha256'],checkpoint_sha256=m['checkpoint_sha256'],
             reports=reports,reserved_scenes_started=len(tested),active_controller_unchanged=True,
             autonomous_size_accepted=False,queue_empty=True,recording_inactive=True,runtime=runtime,
-            helper_sha256=sha(Path(__file__)),scope='Static known-size supervised perception only; no autonomous pouring task result.')
+            helper_sha256=sha(Path(__file__)),**outcomes,scope='Static known-size supervised perception only; no autonomous pouring task result.')
         write(output/'completion.json',report);print(json.dumps(dict(stage=stage,reserved_scenes_started=len(tested))),flush=True)
-        current=read(ROOT/'candidate.json');current.update(stage=stage,pair_pipeline_completion_sha256=sha(output/'completion.json'))
+        current=read(ROOT/'candidate.json');current.update(stage=stage,pair_pipeline_completion_sha256=sha(output/'completion.json'),
+            completed_locator_fits=m.get('completed_locator_fits',3)+int(any(p['stage']=='locator' and p['exit_code']==0 for p in phases)),
+            accepted_locator=outcomes['locator_passed'] is True,static_level_accepted=outcomes['level_passed'] is True)
         temp=ROOT/'candidate.tmp';temp.write_text(json.dumps(current,indent=2)+'\n');temp.replace(ROOT/'candidate.json')
     run('locator',['python3',str(ROOT/'run_scale_locator_fit.py'),'--component','locator','--round','r3','--augmentation','integer'])
     if not read(ROOT/'cup-neural-localization.json')['passed']:

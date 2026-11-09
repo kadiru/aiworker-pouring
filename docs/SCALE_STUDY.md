@@ -2,6 +2,8 @@
 
 Started November 9, 2026, after the user accepted two lost particles and provisionally allowed up to five per task. The completed parent stays frozen at **28/30 strict zero-loss passes**, or **30/30 under the later practical tolerance**. This is a separate study, `/workspace/learning/A-scale-20261109-v1`, prefix `SC_A_`. No resized autonomous pour has run and the parent robot checkpoint remains active.
 
+Latest result: the 54 additional recordings and r3 refit are complete. The best validation maximum is **5.6184 mm**, above the 3 mm gate. No level fit or reserved test ran; all nine remain unused. See the completed continuation below.
+
 ## Scope and acceptance
 
 The cup family crosses usable-height and diameter scales **0.9, 1.0, 1.1** independently. Base/wall thickness, original bottle, Material A, 1.8 mm particle resolution, cohesion 0.01 and 32 solver iterations remain fixed. Dimensions are declared fixture inputs, not visually estimated sizes. Particle trajectories and object transforms provide offline labels and scores only.
@@ -25,7 +27,7 @@ These are complete calibration clips with selected-frame manual review, not cont
 
 Before fitting, the frozen parent confirmed **8/9** seed cups with worst localization **5.6327 mm**. Bounding-shape level MAE was 2.2861 points; the other five confirmed cups had 1.6645 points. These are consumed development observations, not independent generalization evidence.
 
-## Completed static collection
+## First completed static collection
 
 Plan v4 SHA `530577c45edff0872ca23091a4803cf1a64ffa18559b649c212e7f5ee19c9415` declares **36 training + 18 validation episodes**, four/two per size. Four training and two validation layouts come from established normal/swapped families. Training cuts 0.22/0.50/0.78/1.0 rotate by size; validation cuts 0.30/1.0 alternate by size. A seed cut is not a physical surface label.
 
@@ -86,12 +88,22 @@ python3 /home/kadir/aiworker-pouring-4070/learning/A-scale-20261109-v1/run_scale
 
 After an accepted locator, the guarded host level command is `run_scale_locator_fit.py --component level`. After accepted level fitting, use `select_scale_static_components.py` inside the owned container with CUDA disabled. Only then may the host observer run `/tmp/aiworker-scale-stage-transfer/watch_scale_stage.py --part holdout --round r0`; its CPU audit, camera review and frozen evaluator must follow. No helper automatically activates a controller.
 
-Current next action is to turn the prepared paired-fill proposal into a new immutable collection plan, collect and review its 54 new training scenes, then refit. No collection or fitting remains running at this closure. A rejected static fit is not an autonomous task result.
+The first-stage next action was the paired-fill supplement; it has now been executed as documented below. A rejected static fit is not an autonomous task result.
 
-## Authorized paired-fill continuation
+## Completed paired-fill continuation
 
-Plan v5 (`e8a89896054825ac3a5e3808bcde68836b016a92401f07d6048c611fed4f54d4`) declares exactly the prepared 54 new training IDs, with unchanged validation/holdout specifications and gates. The old plan, audit, reviews, source versions and rejected r2 model are archived before mutation. All 108 collection and nine holdout geometry checks pass; ten local plan/admission checks pass. The observer selects only `collection_rounds.r1`, while the post-collection audit covers the complete 108 episodes. Previously reviewed frames may carry forward only if native recording SHA is identical; all 54 new final views require actual inspection.
+Plan v5 SHA `e8a89896054825ac3a5e3808bcde68836b016a92401f07d6048c611fed4f54d4` added exactly 54 new training IDs, retaining all validation/holdout specifications and gates. The old plan, audits, reviews, source versions and rejected r2 model were archived before mutation. All 108 collection and nine reserved-fixture geometry checks pass; ten local plan/admission checks pass. The observer ran only `collection_rounds.r1` once, followed by the complete 108-episode audit.
 
-The primary r3 fit returns to the original 384-pixel, integer-translation setup and parent initialization. With 90 training episodes and 13 sampled views each, 240 epochs give 17,760 updates (more updates than the former smaller dataset; this is not a controlled data-only causal ablation). Sampling remains equal per size and episode. `collection_paths` binds fitting and selection to the declared r1 audit/review rather than silently reusing r0. `run_scale_pair_pipeline.py` performs one locator fit, conditional level fitting, then freezes and evaluates nine static holdouts only after both component gates pass. No runtime model is automatically activated.
+All **54 new recordings** are valid, have accepted stable labels and zero measured loss. All **108 combined episodes** are valid and accepted: **90 train / 18 validation**. New measured levels range **19.6846–91.1609%**. All 54 new final cup-detail views were actually inspected across nine sheets; the 54 older reviews carry forward through unchanged recording hashes. Other camera streams pass native integrity checks but were not all manually viewed. This is selected-frame review, not continuous playback. [Audit](../evidence/scale-A/collect-r1-audit.json), [review](../evidence/scale-A/collect-r1-manual-review.json).
 
-The active collection command is `python3 /tmp/aiworker-scale-stage-transfer/watch_scale_stage.py --part collect --round r1`, followed by the native CPU `check_scale_stage.py --part collect --round r1`. Local review uses `.venv/bin/python tools/review_scale_frames.py --part collect --round r1 --plan plan-collection-r1.json --new-only`. Only after that actual review is recorded may the host run `python3 /home/kadir/aiworker-pouring-4070/learning/A-scale-20261109-v1/run_scale_pair_pipeline.py`. Exclusive output paths prevent blind retries.
+The r3 locator fit used the retained single-detector parent, original 384-pixel integer-translation setup, 240 epochs and **17,760 AdamW updates**. There are 1,170/234 training/validation frames from 90/18 episodes. The parent artifact is a single detector, so the report correctly records `member: null`; the protocol's `member_0` shorthand did not select an ensemble member. All 42,947 parameters were fitted for **380.59 seconds** on the guarded 4070. No active robot weights were replaced.
+
+The best attempt is epoch 240: **5.6184 mm maximum validation error**, **5.1479 mm training maximum**, **1.8124 mm validation mean**, and 0.63219 joint synthetic-absence margin. It fails the unchanged 3 mm limit. The rejected checkpoint SHA is `9be92cd1515aecf53e3793cf5dbf0d83f1ae4ff9a3a8f673d403650679397ab4`; it remains native as `cup-neural-localization-attempt.pt`. [Fit report](../evidence/scale-A/locator-r3.json).
+
+The validation comparison verifies identical native recordings and all 234 frame identities. Worst error improves from 5.9966 to 5.6184 mm and overall mean from 1.83197 to 1.81241 mm. Low-fill mean improves from 2.84009 to 2.07182 mm, but near-full mean worsens from 0.82385 to 1.55301 mm and near-full maximum from 2.48327 to **4.57253 mm**. Four validation episodes exceed 3 mm. These are consumed validation measurements, not reserved-test performance; both training data and update count increased, so a causal claim about pairing alone is unwarranted. [Full comparison](../evidence/scale-A/paired-fit-validation-comparison.json).
+
+The conditional runner exited normally at **`localization_gate_failed`**. It ran no level fit, no component selection and **none of the nine reserved static scenes**. The active parent checkpoint, runtime sources and protected historical evidence are verified unchanged. Final queue is empty, recording inactive, and the 4070 guard/resource caps remain intact. No foreign job was signaled or reconfigured. No new controller was activated. [Pipeline closure](../evidence/scale-A/pair-pipeline-r0-completion.json), [stage summary](../evidence/scale-A/paired-stage-summary.json).
+
+The completed commands were the host observer `watch_scale_stage.py --part collect --round r1`, native CPU audit `check_scale_stage.py --part collect --round r1`, local review `review_scale_frames.py --part collect --round r1 --plan plan-collection-r1.json --new-only`, and host `run_scale_pair_pipeline.py`. Exclusive outputs must not be blindly retried. Any next fitting experiment needs a separately declared revision and preservation of this rejected candidate.
+
+Next: diagnose/refine rim-center localization using the existing full-resolution camera data. Added paired-fill coverage alone did not meet accuracy requirements. Keep the reserved test identities unused until both locator and level gates pass; higher-fill, held-bottle/dynamic perception and all-size motion/bottle-grasp checks remain outside this static result.
