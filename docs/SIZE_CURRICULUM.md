@@ -242,3 +242,39 @@ the current 18 mm mouth spans only ten 1.8 mm particle spacings, so changing
 its width also changes the fluid-resolution ratio. The current baseline
 perception evaluation and later cup-size perception acceptance come first;
 this inventory does not authorize resized autonomous cases to bypass them.
+
+
+## Next size-calibration gaps, measured from existing round-3 reports
+
+A CPU-only aggregation of the frozen candidate's existing fitting reports
+finds four of eight resized shapes exceed the 3 mm validation localization
+limit. Maximum errors by (height, diameter scale): (0.9,0.9) 4.195 mm,
+(0.9,1.0) 5.502 mm, (1.0,1.1) 81.839 mm, (1.1,0.9) 4.585 mm.
+This is per-frame validation evidence, not a new temporal or autonomous
+probe. The other four shapes passing this one error threshold does not
+accept them for autonomous pouring.
+
+Each resized shape has only three stationary training episodes / 39 native
+frames and two validation episodes / 26 frames. The baseline group has
+637 native training frames including consumed task views; the counts are
+uneven. This identifies a coverage imbalance, not a proven cause of errors.
+The two wider shapes (1.0,1.1) and (1.1,1.1) have **no** stationary label above
+80% rim height in either training or validation; (0.9,1.1) has none in
+validation. Existing geometric inventory ratios cannot fill this evidence gap.
+
+After the fixed baseline evaluation, the next native size work should first
+collect stable near-full calibration for those wider cups, using a seed that
+actually covers each interior without rescaling particle spacing. Keep
+whole-episode train/validation separation and leave reserved size scenes
+unconsumed. Add varied-position/occlusion training examples for the four
+failed localization groups; select the next model against every declared
+size, with size-balanced sampling, rather than the baseline-only selection
+used in this repair. These are proposed changes, not completed training.
+Only after localization, level prediction, containment and independent
+static checks pass should resized autonomous grasp/pour tests begin.
+Bottle changes follow separately so grip/IK/mass changes can be diagnosed.
+
+`tools/summarize_size_readiness.py` produced the hash-bound
+`evidence/size-A/perception-readiness-r3.json` from already admitted data.
+It performs no inference, fitting, GPU use or runtime modification and
+consumes no observations from the ongoing reserved evaluation.
