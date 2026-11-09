@@ -17,7 +17,7 @@ def main():
     plan=read(ROOT/'plan.json');candidate=read(ROOT/'candidate.json')
     saved=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     assert all(sha(Path(p))==v for p,v in candidate['protected_parent_files'].items())
-    expected={s['name']:s for part in ('diagnostic','development','test') for s in plan[part]}
+    expected={s['name']:s for part in ('diagnostic','impact','development','test') for s in plan.get(part,[])}
     result=[];seen=set();out=ROOT/'review';out.mkdir(exist_ok=True)
     for path in sorted(Path('/workspace/outputs/fountain').glob('*/*SR_A_*/parameters.json')):
         spec=read(path);name=spec['name'];assert name in expected and name not in seen
@@ -38,11 +38,11 @@ def main():
                 assert trajectory.exists()
                 r['trajectory_sha256']=sha(trajectory)
         with h5py.File(h5) as f:
-            d=f['data/demo_0'];r['cameras']={};canvas=Image.new('RGB',(1152,408),(245,245,245));draw=ImageDraw.Draw(canvas)
+            d=f['data/demo_0'];r['cameras']={};cameras=('task','wrist','cup_detail')+(('overview',) if spec.get('record_overview') else ());canvas=Image.new('RGB',(384*len(cameras),408),(245,245,245));draw=ImageDraw.Draw(canvas)
             assert np.allclose(f['calibration/task/intrinsics'][:],saved['calibration']['K'],rtol=0,atol=1e-3)
             assert np.allclose(d['obs/task_world_T_camera'][:],saved['calibration']['T'],rtol=0,atol=1e-6)
             r['legacy_task_camera_unchanged']=True
-            for i,camera in enumerate(('task','wrist','cup_detail')):
+            for i,camera in enumerate(cameras):
                 a=decode(d['next_obs/'+camera+'_image'][-1],'jpeg95')
                 cal=dict(K=f['calibration/'+camera+'/intrinsics'][:].tolist(),T=d['next_obs/'+camera+'_world_T_camera'][-1].tolist(),table_z=1.04)
                 r['cameras'][camera]=dict(calibration=cal,resolution=[a.shape[1],a.shape[0]])

@@ -23,6 +23,12 @@ def pending(part):
         for key in ('checkpoint_sha256','plan_sha256','runtime_sources'):
             assert selection[key] == manifest[key]
         assert selection['development_passes'] == 6
+        assert selection['development_acceptances'] == 6
+        assert sha(ROOT/'development-outcomes.json') == selection['development_outcomes_sha256']
+        development = read(ROOT/'development-outcomes.json')
+        assert development['counts']['completed'] == development['counts']['accepted'] == 6
+        assert sha(ROOT/'development-manual-review.json') == selection['development_manual_review_sha256']
+        assert read(ROOT/'development-manual-review.json')['accepted']
     started = {read(p)['name'] for p in Path('/workspace/outputs/fountain').glob('*/*'+PREFIX+'*/parameters.json')}
     cases = plan[part]
     assert not {s['name'] for s in cases} & started, 'Never retry or silently resume a started split'

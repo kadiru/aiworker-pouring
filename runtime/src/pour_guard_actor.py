@@ -222,7 +222,7 @@ class Actor:
             profile=early_return_profile(profile,self.saved['early_return_seconds'])
         self.terminal=TerminalPrimitive(self.history,t,profile)
         self.terminal.return_path=monotone_return_path(self.outbound,self.pour_phase,self.history[-1][1],self.qlift)
-        if self.saved.get('side_return'):
+        if self.saved.get('side_return') and self.pour_phase>=60.:
             from pour_side_return import SideTerminal
             try:
                 self.terminal=SideTerminal(self.history,t,profile,self.fk,self.cup_xy,

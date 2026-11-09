@@ -337,7 +337,7 @@ class RobotPour(Pour):
             from bottle_pour import vessel_mask,BOTTLE
             outside=~(vessel_mask(local,self.cup_profile)|vessel_mask((local-self.base)@self.rotation,BOTTLE))
             ids=np.flatnonzero(outside)
-            row['diagnostic_outside_particles']=[dict(index=int(i),origin='bottle' if i<self.initial_bottle_count else 'cup',
+            row['diagnostic_outside_particles']=[dict(index=int(i),origin='impact_seed' if self.spec.get('impact_state_seed') else 'bottle' if i<self.initial_bottle_count else 'cup',
                 xyz_cup_frame_m=local[i].tolist(),velocity_m_s=(v[i]@FRAME).tolist()) for i in ids[:32]]
             row['diagnostic_outside_count']=len(ids)
         if self.spec.get('record_surface_diagnostics'):
@@ -357,6 +357,18 @@ class RobotPour(Pour):
                    grasp_verified=bool(self.verified),contacts=contacts,both_fingers=both,
                    bottle_base_height_m=float(self.base[2]),joint_targets_deg=self.command.tolist(),
                    joint_positions_deg=[float(s.Get()) for s in self.states],command_angle_deg=self.command_angle)
+        if self.spec.get('record_sleep_diagnostics'):
+            # Read-only scoring instrumentation. Never sent to the actor.
+            import omni.usd
+            from omni.physx import get_physx_simulation_interface
+            from pxr import PhysicsSchemaTools, UsdPhysics, Sdf
+            context=omni.usd.get_context();stage=context.get_stage()
+            if not hasattr(self,'sleep_query_paths'):
+                roots=[str(p.GetPath()) for p in stage.Traverse() if p.HasAPI(UsdPhysics.ArticulationRootAPI)]
+                assert len(roots)==1, roots
+                self.sleep_query_paths=roots+['/World/Bottle']
+            row['sleep_diagnostic']={path:bool(get_physx_simulation_interface().is_sleeping(
+                context.get_stage_id(),PhysicsSchemaTools.sdfPathToInt(Sdf.Path(path)))) for path in self.sleep_query_paths}
         return row
 
     def reference_empty_dwell(self):

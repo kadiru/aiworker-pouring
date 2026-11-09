@@ -46,7 +46,7 @@ allowed_commands.add('size_seed_calibration')
 allowed_commands.update(('perception_pilot','perception_collect','perception_development','perception_test'))
 allowed_commands.add('perception_geometry')
 allowed_commands.update(('perception_camera_pilot','perception_holdout'))
-allowed_commands.update(('side_diagnostic','side_development','side_test'))
+allowed_commands.update(('side_diagnostic','side_impact','side_development','side_test'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -271,12 +271,12 @@ def setup(spec):
     particleUtils.add_physx_particle_system(stage,system,contact_offset=contact,rest_offset=contact*.99,
         particle_contact_offset=contact,solid_rest_offset=contact*.99,fluid_rest_offset=s/2,
         solver_position_iterations=spec['iterations'],simulation_owner='/World/Physics',max_neighborhood=spec['neighbors'],
-        enable_ccd=True,max_depenetration_velocity=1.,max_velocity=6.,
+        enable_ccd=True,max_depenetration_velocity=spec.get('max_depenetration_velocity',1.),max_velocity=6.,
         global_self_collision_enabled=True,non_particle_collision_enabled=True)
     physicsmat=Sdf.Path('/World/FluidPhysics')
     particleUtils.add_pbd_particle_material(stage,physicsmat,viscosity=spec['viscosity'],cohesion=spec['cohesion'],
         surface_tension=spec['surface_tension'],friction=spec['friction'],adhesion=spec['adhesion'],
-        damping=spec['damping'],vorticity_confinement=spec['vorticity'])
+        damping=spec['damping'],vorticity_confinement=spec['vorticity'],cfl_coefficient=spec.get('cfl_coefficient'))
     physicsUtils.add_physics_material_to_prim(stage,stage.GetPrimAtPath(system),physicsmat)
     particleUtils.add_physx_particle_isosurface(stage,system,enabled=True,max_vertices=spec.get('isosurface_max_vertices',131072),max_triangles=spec.get('isosurface_max_triangles',262144),
         max_subgrids=spec.get('isosurface_max_subgrids',8192 if s<=.0012 else 4096),grid_spacing=s*spec['grid_spacing'],surface_distance=s*spec['surface_distance'],
@@ -297,6 +297,17 @@ def setup(spec):
     if bottle is not None:
         points=bottle.points
         velocities=np.zeros_like(points)
+    if spec.get('impact_state_seed'):
+        # Explicit offline fluid-impact fixture, never an autonomous episode.
+        import hashlib
+        assert spec.get('calibration_only') and not spec.get('policy_evaluation') and bottle is not None
+        seed_path=Path(spec['impact_state_seed'])
+        assert hashlib.sha256(seed_path.read_bytes()).hexdigest()==spec['impact_state_seed_sha256']
+        seed_data=np.load(seed_path)
+        points=seed_data['positions'].copy();velocities=seed_data['velocities'].copy()
+        assert points.shape==velocities.shape and points.ndim==2 and points.shape[1]==3
+        assert np.isfinite(points).all() and np.isfinite(velocities).all()
+        bottle.points=points.copy();bottle.initial_bottle_count=0
     prim=particleUtils.add_physx_particleset_pointinstancer(stage,Sdf.Path('/World/Particles'),
         Vt.Vec3fArray.FromNumpy(points),Vt.Vec3fArray.FromNumpy(velocities),system,
         self_collision=True,fluid=True,particle_group=1,
@@ -644,7 +655,7 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('side_diagnostic','side_development','side_test'):
+                    if cmd in ('side_diagnostic','side_impact','side_development','side_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before side-return study';continue
                         from pour_side_study import pending as side_pending

@@ -37,7 +37,7 @@ def main():
             for request in (q for q in requests if q['name']==c['name']):
                 group,index=c['mapping'][request['frame']-c['start_frame']]
                 encoded=Image.open(request['path']).convert('RGB')
-                for camera,x,size in [('task',24,512),('cup_detail',568,320),('wrist',920,320)]:
+                for camera,x,size in [('overview',24,512),('cup_detail',568,320),('wrist',920,320)]:
                     native=picture(ds[group+'/'+camera+'_image'],index)
                     if camera=='cup_detail':
                         u,v=r['cameras'][camera]['rim_center_uv'];native=native.crop((round(u-160),round(v-80),round(u+160),round(v+240)))

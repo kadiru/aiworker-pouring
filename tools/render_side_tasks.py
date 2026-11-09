@@ -22,7 +22,7 @@ def card(report,part):
     text(d,(56,420),f"{c['side_returns']} / {n} side returns",25,WHITE,True)
     lines(d,(660,224),'Task: grab and lift a bottle, pour, stop near full or when empty, then set down and release.',25,560,WHITE)
     lines(d,(660,360),'Supervised visual perception; retained motion behavioral cloning + IK; programmed grasp, stop and return.',22,560,MUTED)
-    lines(d,(56,545),'Original cup and bottle sizes. Material A. Native task, wrist and cropped cup-detail views.',21,1168,MUTED)
+    lines(d,(56,545),'Original cup and bottle sizes. Material A. Native overview, wrist and cropped cup-detail views.',21,1168,MUTED)
     lines(d,(56,610),'Simulation only; no RL or physical validation. Loss: final outside / ever near table at 20 Hz.',19,1168,MUTED)
     return im
 def frame(row,record,ds,group,index,t,speed,part,number,total,hold=None):
@@ -30,9 +30,10 @@ def frame(row,record,ds,group,index,t,speed,part,number,total,hold=None):
     text(d,(24,17),'AIWORKER / ISAAC SIM / '+part.upper(),14,MUTED,True)
     goal='Fill the cup' if row['expected_stop']=='cup_near_full' else 'Empty the bottle'
     text(d,(24,45),f"Attempt {int(row['name'].split('_')[-1])+1:02} / {6 if part=='development' else 30:02}   {goal}",25,WHITE,True,max_width=1040)
+    text(d,(1173,10),'FINAL RESULT',10,MUTED,True,anchor='mm')
     d.rounded_rectangle((1090,22,1256,69),radius=9,fill=color)
     text(d,(1173,46),'PASS' if row['strict_pass'] else 'FAIL',25,BG,True,max_width=150,anchor='mm')
-    for camera,x,size,label in (('task',24,512,'TASK CAMERA'),('cup_detail',568,320,'CUP DETAIL / CROPPED'),('wrist',920,320,'WRIST CAMERA')):
+    for camera,x,size,label in (('overview',24,512,'TABLE OVERVIEW'),('cup_detail',568,320,'CUP DETAIL / CROPPED'),('wrist',920,320,'WRIST CAMERA')):
         text(d,(x,88),label,14,MUTED,True);image=picture(ds[group+'/'+camera+'_image'],index)
         if camera=='cup_detail':
             u,v=record['cameras'][camera]['rim_center_uv'];box=(round(u-160),round(v-80),round(u+160),round(v+240))
