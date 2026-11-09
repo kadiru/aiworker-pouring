@@ -550,3 +550,18 @@ The setup authors isosurface mesh smoothing but no particle-position
 smoothing component. That code inspection does not prove live attribute
 equality; a future instrumentation check should compare the available
 arrays directly. No historical result is rescored on this hypothesis.
+
+The second attempt closes as a strict pass at 97.9536% final rim height,
+with 25.899912 nominal mL left in the source and no final-outside or
+ever-near-table loss. Temporary non-airborne outside classification peaks
+at 0.268272 nominal mL; the recorded particles settle back inside. This
+passing final score does not imply zero transient rim exceedance.
+
+The updated read-only CPU replay includes the actual final settled readout
+and agrees with live recorded CNN, color and final predictions to 1e-4.
+Cup localization error is 0.164 mm. At the stop view, the final estimate is
+98.281% versus measured 100%; the raw CNN is 94.206%. A diagnostic ±1 mm
+crop shift spans 93.703%–100%, showing sensitivity despite the actual
+accurate localization. Two selected native stop/final views were inspected;
+whole-batch motion/video review remains pending. No candidate, threshold or
+test score changes result from this diagnostic.

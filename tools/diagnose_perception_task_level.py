@@ -8,6 +8,7 @@ sys.path[:0] = ['/workspace/src', '/workspace']
 from validate_pour_recording import h5py, decode
 from pour_guard_models import CupEstimator
 from pour_guard_vision import cup_crop, color_geometry_readout
+from pour_settled_model import features as settled_features, predict as settled_predict
 ROOT = Path('/workspace/learning/A-perception-20261108-v1')
 def read(p): return json.loads(p.read_text())
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -42,16 +43,25 @@ def main():
                 crop = torch.from_numpy(cup_crop(rgb,center,cal))[None]
                 cnn = float(np.clip(float(model(crop)[0])+saved['cup_bias'],0,1))
                 color = float(color_geometry_readout(crop,saved['surface_geometry'],center)[0].clamp(0,1))
-                variants.append(dict(label=label,cnn=cnn,color=color,error=cnn-observed['cup_fill_fraction']))
+                level = cnn
+                if 'settled_regressor' in saved:
+                    level = float(settled_predict(settled_features(
+                        crop, crop.new_tensor([cnn], dtype=torch.float32), center),
+                        saved['settled_regressor'])[0])
+                variants.append(dict(label=label,cnn=cnn,color=color,
+                    error=cnn-observed['cup_fill_fraction'],level=level,
+                    level_error=level-observed['cup_fill_fraction']))
             assert abs(variants[0]['cnn']-d['cup_predicted_fraction']) < 1e-4
             assert abs(variants[0]['color']-d['surface_geometry_fraction']) < 1e-4
+            if d.get('settled_prediction') is not None:
+                assert abs(variants[0]['level']-d['settled_prediction']) < 1e-4
             rows.append(dict(index=i,time_s=d['t'],mode=d['mode'],pause_count=d['pause_count'],
                 observed_height=observed['cup_fill_fraction'],column_height=observed.get('cup_column_height_fraction'),
                 cup_nominal_ml=observed['cup_ml'],source_nominal_ml=observed['bottle_ml'],
                 localization_error_mm=float(np.linalg.norm(xy-spec['cup_world'][:2])*1000),variants=variants))
             y=row_number*480
             draw.text((8,y+8),f'{a.name} | {i} | {d["t"]:.3f}s | {d["mode"]}',fill='black')
-            draw.text((8,y+28),f'Raw observed {observed["cup_fill_fraction"]:.4f} | CNN {variants[0]["cnn"]:.4f} | Color {variants[0]["color"]:.4f}',fill='black')
+            draw.text((8,y+28),f'Observed {observed["cup_fill_fraction"]:.4f} | Final estimate {variants[0]["level"]:.4f} | CNN {variants[0]["cnn"]:.4f} | Color {variants[0]["color"]:.4f}',fill='black')
             sheet.paste(Image.fromarray(rgb).resize((420,420)),(0,y+52))
             crop=cup_crop(rgb,xy,cal).astype(np.uint8)
             sheet.paste(Image.fromarray(crop).resize((384,384)),(430,y+52))
