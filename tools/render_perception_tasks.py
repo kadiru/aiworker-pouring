@@ -18,12 +18,12 @@ def card(report,part):
     text(d,(56,156),part.upper()+' / ALL ATTEMPTS INCLUDED',18,MUTED,True)
     text(d,(56,224),f"{c['strict_passes']} / {n}",72,WHITE,True)
     text(d,(56,310),'complete tasks passed',23,MUTED)
-    text(d,(56,372),f"{c['zero_measured_loss']} / {n} zero measured spill",25,GREEN,True)
+    text(d,(56,372),f"{c['zero_measured_loss']} / {n} zero final / table loss",25,GREEN,True)
     text(d,(56,420),f"{c['completed_returns']} / {n} completed returns",25,WHITE,True)
     lines(d,(660,224),'Task: grab and lift a bottle, pour, stop near full or when empty, then set down and release.',25,560,WHITE)
     lines(d,(660,360),'Supervised visual perception; retained motion behavioral cloning + IK; programmed grasp, stop and return.',22,560,MUTED)
     lines(d,(56,545),'Original cup and bottle sizes. Material A. Native task, wrist and cropped cup-detail views.',21,1168,MUTED)
-    lines(d,(56,610),'Simulation only. No reinforcement learning or physical robot validation. Spill measured at 20 Hz.',19,1168,MUTED)
+    lines(d,(56,610),'Simulation only; no RL or physical validation. Loss: final outside / ever near table at 20 Hz.',19,1168,MUTED)
     return im
 def frame(row,record,ds,group,index,t,speed,part,number,total,hold=None):
     im=Image.new('RGB',SIZE,BG);d=ImageDraw.Draw(im);color=GREEN if row['strict_pass'] else RED
