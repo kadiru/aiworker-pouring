@@ -45,6 +45,10 @@ def main():
         model_activated=False,autonomous_use_accepted=False,helper_sha256=sha(Path(__file__)),
         scope='Static known-size cup localization and level estimation in the measured collection range only. Freeze before nine unused near-full static holdouts; parent robot checkpoint remains unchanged. Independent color, >=94% fill, held-bottle, dynamic and task gates are not accepted.')
     with output.open('x') as f:json.dump(report,f,indent=2);f.write('\n')
+    m.update(stage='static_components_selected',trained=True,active_checkpoint_retained=True,
+        component_scope='static_known_sizes_only',component_selection_sha256=sha(output),
+        method='Separately trained static cup locator and level readout; active parent robot checkpoint retained. Resized autonomy remains gated.')
+    temp=ROOT/'candidate.tmp';temp.write_text(json.dumps(m,indent=2)+'\n');temp.replace(ROOT/'candidate.json')
     print(json.dumps(dict(selected=True,holdouts=len(plan['holdout']),model_activated=False)))
 
 

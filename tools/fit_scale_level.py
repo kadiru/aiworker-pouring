@@ -39,6 +39,7 @@ def collect():
     assert all(sha(Path(p))==v for p,v in m['protected_parent_files'].items())
     assert all(sha(Path('/workspace/src')/n)==v for n,v in m['runtime_sources'].items())
     loc=torch.load(ROOT/'cup-neural-localization.pt',map_location='cpu',weights_only=False)
+    resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768])
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     model=CupEstimator().cuda().eval();model.load_state_dict(parent['cup_model'])
     data={s:dict(images=[],target=[],xy=[],meta=[]) for s in ('train','validation')};windows=[]
@@ -48,12 +49,12 @@ def collect():
             d=f['data/demo_0'];detail=dict(K=f['calibration/cup_detail/intrinsics'][:].tolist(),
                 T=d['obs/cup_detail_world_T_camera'][0].tolist(),table_z=1.04,
                 resolution_wh=[1024,1024],cup_geometry=spec['declared_cup_geometry'])
-            scaled=np.asarray(detail['K']).copy();scaled[:2]*=384/1024
+            scaled=np.asarray(detail['K']).copy();scaled[:2]*=resolution[0]/1024
             assert np.allclose(scaled,loc['calibration']['K']) and np.allclose(detail['T'],loc['calibration']['T'])
             history=[];accepted=None
             for i in range(12):
                 rgb=decode(d['obs/cup_detail_image'][i],'jpeg95')
-                image=np.asarray(Image.fromarray(rgb).resize((384,384),Image.Resampling.BILINEAR)).copy()
+                image=np.asarray(Image.fromarray(rgb).resize(tuple(resolution),Image.Resampling.BILINEAR)).copy()
                 uv,score=locate(image,loc['bank']);history.append((uv.tolist(),score))
                 accepted=consensus(history,loc['threshold'],loc['consensus'])
                 if accepted is not None:break

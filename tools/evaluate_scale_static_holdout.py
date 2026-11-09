@@ -35,6 +35,7 @@ def main():
     indexed={r['name']:r for r in audit['records']};expected={s['name']:s for s in plan['holdout']}
     assert set(indexed)==set(expected)==set(selection['holdout_names'])
     loc=torch.load(selection['components']['cup-neural-localization.pt']['path'],map_location='cpu',weights_only=False)
+    resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768])
     level=torch.load(selection['components']['static-level-candidate.pt']['path'],map_location='cpu',weights_only=False)
     assert level['accepted'];torch.set_num_threads(2);model=CupEstimator().eval();model.load_state_dict(level['cup_model'])
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
@@ -47,11 +48,11 @@ def main():
         with h5py.File(path) as f:
             d=f['data/demo_0'];cal=dict(K=f['calibration/cup_detail/intrinsics'][:].tolist(),
                 T=d['obs/cup_detail_world_T_camera'][0].tolist(),table_z=1.04,cup_geometry=s['declared_cup_geometry'])
-            scaled=np.asarray(cal['K']).copy();scaled[:2]*=384/1024
+            scaled=np.asarray(cal['K']).copy();scaled[:2]*=resolution[0]/1024
             assert np.allclose(scaled,loc['calibration']['K']) and np.allclose(cal['T'],loc['calibration']['T'])
             for i in range(min(12,len(d['time']))):
                 image=decode(d['obs/cup_detail_image'][i],'jpeg95')
-                image=np.asarray(Image.fromarray(image).resize((384,384),Image.Resampling.BILINEAR)).copy()
+                image=np.asarray(Image.fromarray(image).resize(tuple(resolution),Image.Resampling.BILINEAR)).copy()
                 uv,score=locate(image,loc['bank'],device='cpu');history.append((uv.tolist(),score))
                 accepted=consensus(history,loc['threshold'],loc['consensus'])
                 if accepted is not None:break
@@ -79,7 +80,8 @@ def main():
             if parent_accepted is not None and r['label']['accepted']:
                 pc=parent['cup_localization_calibration'];pd=copy.deepcopy(parent['cup_detail_calibration'])
                 pd['cup_geometry']=s['declared_cup_geometry']
-                assert np.allclose(pc['K'],loc['calibration']['K']) and np.allclose(pc['T'],loc['calibration']['T'])
+                parent_k=np.asarray(cal['K']).copy();parent_k[:2]*=384/1024
+                assert np.allclose(pc['K'],parent_k) and np.allclose(pc['T'],loc['calibration']['T'])
                 assert np.allclose(pd['K'],cal['K']) and np.allclose(pd['T'],cal['T'])
                 xy=plane_point(parent_accepted['uv'],1.04+s['declared_cup_geometry']['rim_z_m'],pc)[:2]
                 parent_error_mm=float(np.linalg.norm(xy-np.asarray(s['cup_world'][:2]))*1000)
@@ -114,6 +116,7 @@ def main():
     report=dict(passed=all(r['passed'] for r in rows),metrics=metrics,cases=rows,parent_reference=parent_reference,
         component_selection_sha256=sha(ROOT/'component-selection.json'),audit_sha256=sha(ROOT/'holdout-r0-audit.json'),
         plan_sha256=m['plan_sha256'],helper_sha256=sha(Path(__file__)),autonomous_use_accepted=False,
+        selected_locator_resolution=resolution,parent_locator_resolution=[384,384],
         scope='Once-only independent near-full static observations at nine declared sizes and small position jitters. No fitting, retries, unknown-size inference or autonomous task claim. Higher-fill, low-fill independent holdouts, held-bottle/dynamic scenes and independent color acceptance remain separate requirements.')
     with output.open('x') as f:json.dump(report,f,indent=2);f.write('\n')
     print(json.dumps(dict(passed=report['passed'],metrics=metrics)),flush=True)

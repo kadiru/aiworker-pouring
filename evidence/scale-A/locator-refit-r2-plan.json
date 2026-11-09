@@ -1,0 +1,28 @@
+{
+  "round": "r2",
+  "parent_round": "r1",
+  "archive_index_sha256": "e7d3ef2d12ff33bd6af34da26c9b879cc0348130ad49885082979211030f9047",
+  "initialization": "locator-rounds/r1/refinement-init.pt",
+  "initialization_sha256": "e1d0d24523390e012072ef173983d59ed3959bf22bea3974054e5f9537aea729",
+  "plan_sha256": "530577c45edff0872ca23091a4803cf1a64ffa18559b649c212e7f5ee19c9415",
+  "audit_sha256": "d6feafafd72cc525f5a25d497421a5b88b23a5bd2467398374a6651982a2dece",
+  "hypothesis": "Using 768 of the native 1024 pixels may improve rim precision; no accuracy is assumed.",
+  "changes": [
+    "768x768 input instead of 384x384, with matching intrinsics and projected targets",
+    "Pixel augmentation, absent masks and consensus radius scaled to preserve their original image extent",
+    "Initialize from the rejected r1 best validation state"
+  ],
+  "unchanged": [
+    "54 episode splits",
+    "all-size 3 mm gate",
+    "absence margin",
+    "240 epochs",
+    "AdamW schedule",
+    "loss",
+    "nine unused holdouts",
+    "active robot checkpoint"
+  ],
+  "model_activated": false,
+  "input_resolution": 768,
+  "relative_receptive_field": "Unchanged 129 input pixels, hence half the previous scene extent"
+}

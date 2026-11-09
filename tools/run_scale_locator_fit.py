@@ -17,7 +17,14 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--component',choices=('locator','level'),default='locator');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--component',choices=('locator','level'),default='locator')
+    parser.add_argument('--round',choices=('r0','r1','r2'),default='r0');parser.add_argument('--refine-from')
+    parser.add_argument('--resolution',type=int,choices=(384,768),default=384);args=parser.parse_args()
+    assert args.component=='locator' or args.resolution==384
+    if args.refine_from:
+        assert args.component=='locator'
+        initialization=(ROOT/args.refine_from).resolve()
+        assert initialization.is_relative_to(ROOT) and initialization.suffix=='.pt' and initialization.is_file()
     helper='fit_scale_locator.py' if args.component=='locator' else 'fit_scale_level.py'
     report_name='cup-neural-localization.json' if args.component=='locator' else 'static-level-fit.json'
     manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');audit=read(ROOT/'collect-r0-audit.json')
@@ -38,12 +45,15 @@ def main():
     assert not (ROOT/report_name).exists()
     if args.component=='level':
         assert read(ROOT/'scope-selection.json')['passed']
-    output=ROOT/(args.component+'-fit-r0');output.mkdir()
-    sources={n:sha(ROOT/n) for n in (helper,'scale_data_admission.py')}
+    output=ROOT/(args.component+'-fit-'+args.round);output.mkdir()
+    sources={n:sha(ROOT/n) for n in (helper,'scale_data_admission.py')+ (('scale_locator_augmentation.py',) if args.component=='locator' else ())}
     (output/'runtime-before.json').write_text(json.dumps(dict(witness,sources=sources,admitted_episodes=len(records)),indent=2)+'\n')
     with (output/'fit.log').open('x') as log:
-        result=subprocess.run(['docker','exec','-e','PYTHONDONTWRITEBYTECODE=1',w.CID,'nice','-n','10',
-            '/isaac-sim/python.sh','/workspace/learning/A-scale-20261109-v1/'+helper],stdout=log,stderr=subprocess.STDOUT)
+        command=['docker','exec','-e','PYTHONDONTWRITEBYTECODE=1',w.CID,'nice','-n','10',
+            '/isaac-sim/python.sh','/workspace/learning/A-scale-20261109-v1/'+helper]
+        if args.refine_from:command+=['--refine-from',str(initialization.relative_to(ROOT))]
+        if args.component=='locator':command+=['--resolution',str(args.resolution)]
+        result=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT)
     (output/'runtime-after.json').write_text(json.dumps(w.isolation(),indent=2)+'\n')
     assert sha(ROOT/'best.pt')==manifest['checkpoint_sha256'] and sha(ROOT/'plan.json')==manifest['plan_sha256']
     assert all(sha(ROOT/n)==h for n,h in sources.items())
