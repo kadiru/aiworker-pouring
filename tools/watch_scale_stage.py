@@ -23,7 +23,7 @@ def write(p, d):
 def main():
     a = argparse.ArgumentParser()
     a.add_argument('--part', choices=('pilot', 'collect', 'holdout'), required=True)
-    a.add_argument('--round', choices=('r0','r1'), default='r0')
+    a.add_argument('--round', choices=('r0','r1','r2'), default='r0')
     a = a.parse_args()
     output = ROOT / (a.part + '-' + a.round)
     assert not output.exists()

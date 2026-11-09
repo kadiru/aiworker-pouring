@@ -21,7 +21,7 @@ def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--part',choices=('pilot','collect','holdout'),required=True)
-    parser.add_argument('--round',choices=('r0','r1'),default='r0');a=parser.parse_args()
+    parser.add_argument('--round',choices=('r0','r1','r2'),default='r0');a=parser.parse_args()
     m=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');expected={s['name']:s for s in plan[a.part]}
     assert sha(ROOT/'plan.json')==m['plan_sha256']
     assert all(sha(Path(p))==h for p,h in m['protected_parent_files'].items())
