@@ -13,6 +13,7 @@ from pour_guard_models import CupEstimator
 from pour_guard_vision import locate,plane_point,cup_crop,color_geometry_readout
 from pour_temporal_localization import consensus
 from pour_settled_model import features,predict
+from scale_rim_refiner import locate_static
 ROOT=Path('/workspace/learning/A-scale-20261109-v1')
 
 
@@ -35,7 +36,8 @@ def main():
     indexed={r['name']:r for r in audit['records']};expected={s['name']:s for s in plan['holdout']}
     assert set(indexed)==set(expected)==set(selection['holdout_names'])
     loc=torch.load(selection['components']['cup-neural-localization.pt']['path'],map_location='cpu',weights_only=False)
-    resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768])
+    resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768],[1024,1024])
+    assert selection['localization_module_sha256']==sha(ROOT/'scale_rim_refiner.py')
     level=torch.load(selection['components']['static-level-candidate.pt']['path'],map_location='cpu',weights_only=False)
     assert level['accepted'];torch.set_num_threads(2);model=CupEstimator().eval();model.load_state_dict(level['cup_model'])
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
@@ -53,7 +55,7 @@ def main():
             for i in range(min(12,len(d['time']))):
                 image=decode(d['obs/cup_detail_image'][i],'jpeg95')
                 image=np.asarray(Image.fromarray(image).resize(tuple(resolution),Image.Resampling.BILINEAR)).copy()
-                uv,score=locate(image,loc['bank'],device='cpu');history.append((uv.tolist(),score))
+                uv,score=locate_static(image,loc['bank'],device='cpu');history.append((uv.tolist(),score))
                 accepted=consensus(history,loc['threshold'],loc['consensus'])
                 if accepted is not None:break
             # Same unused scene and fixed twelve-frame budget, evaluated with

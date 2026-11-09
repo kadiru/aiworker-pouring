@@ -20,6 +20,7 @@ from pour_guard_vision import locate,plane_point,cup_crop,color_geometry_readout
 from pour_settled_model import features,predict
 from pour_temporal_localization import consensus
 from scale_data_admission import admit,balanced_frame_weights,SIZES,collection_paths
+from scale_rim_refiner import locate_static
 ROOT=Path('/workspace/learning/A-scale-20261109-v1')
 
 
@@ -39,7 +40,8 @@ def collect():
     assert all(sha(Path(p))==v for p,v in m['protected_parent_files'].items())
     assert all(sha(Path('/workspace/src')/n)==v for n,v in m['runtime_sources'].items())
     loc=torch.load(ROOT/'cup-neural-localization.pt',map_location='cpu',weights_only=False)
-    resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768])
+    resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768],[1024,1024])
+    if loc['bank']['kind']=='native_rim_refiner':assert selection['module_sha256']==sha(ROOT/'scale_rim_refiner.py')
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     model=CupEstimator().cuda().eval();model.load_state_dict(parent['cup_model'])
     data={s:dict(images=[],target=[],xy=[],meta=[]) for s in ('train','validation')};windows=[]
@@ -55,7 +57,7 @@ def collect():
             for i in range(12):
                 rgb=decode(d['obs/cup_detail_image'][i],'jpeg95')
                 image=np.asarray(Image.fromarray(rgb).resize(tuple(resolution),Image.Resampling.BILINEAR)).copy()
-                uv,score=locate(image,loc['bank']);history.append((uv.tolist(),score))
+                uv,score=locate_static(image,loc['bank']);history.append((uv.tolist(),score))
                 accepted=consensus(history,loc['threshold'],loc['consensus'])
                 if accepted is not None:break
             xy=None if accepted is None else plane_point(accepted['uv'],1.04+spec['declared_cup_geometry']['rim_z_m'],loc['calibration'])[:2]
@@ -157,6 +159,7 @@ def main():
         localization_checkpoint_sha256=sha(ROOT/'cup-neural-localization.pt'),checkpoint_sha256=sha(artifact),
         audit_sha256=sha(audit_path),manual_review_sha256=sha(review_path),
         helper_sha256=sha(Path(__file__)),feature_helper_sha256=sha(Path('/workspace/src/pour_settled_model.py')),
+        localization_module_sha256=sha(ROOT/'scale_rim_refiner.py'),
         device=torch.cuda.get_device_name(),autonomous_use_accepted=False,
         method='Supervised 139-feature, 32/16 tanh residual regressor over a frozen CNN. Equal size/episode weighted squared error plus 0.02 residual penalty; AdamW, 1200 steps. Whole-episode validation and per-size error gates. No RL.',
         limitations=['Static scenes, original bottle and declared cup dimensions only.',

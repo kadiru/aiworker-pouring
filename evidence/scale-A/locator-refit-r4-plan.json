@@ -1,0 +1,53 @@
+{
+  "round": "r4",
+  "plan_sha256": "e8a89896054825ac3a5e3808bcde68836b016a92401f07d6048c611fed4f54d4",
+  "audit_sha256": "d2fea71ab360b01569e84b41846b7d5233a592785a1b937932f17ecd091b5c6a",
+  "review_sha256": "37c7fcfb8d93cb324bece0f352ab1c97bd2f8872396be32c8893853305567bab",
+  "coarse_checkpoint": "locator-rounds/r3/cup-neural-localization-attempt.pt",
+  "coarse_checkpoint_sha256": "9be92cd1515aecf53e3793cf5dbf0d83f1ae4ff9a3a8f673d403650679397ab4",
+  "method": "Frozen 384-pixel coarse CNN followed by a learned native-resolution 256-pixel rim crop heatmap. RGB only at inference; no truth-centered inference crops.",
+  "crop_size": 256,
+  "epochs": 160,
+  "learning_rate": 0.0003,
+  "seed": 26110984,
+  "translation_pixels": 24,
+  "max_correction_pixels": 32.0,
+  "native_resolution": 1024,
+  "validation_interval": 10,
+  "unchanged": [
+    "108 episode identities and splits",
+    "all accuracy thresholds",
+    "nine unused holdouts",
+    "active robot and runtime sources"
+  ],
+  "selection": "Best validation maximum among candidates passing both split maxima, absence margin and twelve-frame temporal confirmation; CPU/GPU parity required.",
+  "scope": "Known-size static perception only; no autonomous model activation.",
+  "runtime_before": {
+    "utc": "2026-11-09T21:00:00.704415+00:00",
+    "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+    "limits": {
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "NanoCpus": 4000000000,
+      "CpusetCpus": "16-23",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "MemorySwap": 17179869184
+    },
+    "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 3750988, 4751 MiB",
+    "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+  }
+}

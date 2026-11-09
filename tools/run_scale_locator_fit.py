@@ -18,7 +18,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--component',choices=('locator','level'),default='locator')
-    parser.add_argument('--round',choices=('r0','r1','r2','r3'),default='r0');parser.add_argument('--refine-from')
+    parser.add_argument('--round',choices=('r0','r1','r2','r3','r4','r5','r6'),default='r0');parser.add_argument('--refine-from')
     parser.add_argument('--resolution',type=int,choices=(384,768),default=384)
     parser.add_argument('--augmentation',choices=('integer','continuous'),default='continuous');args=parser.parse_args()
     assert args.component=='locator' or args.resolution==384
@@ -27,12 +27,19 @@ def main():
         initialization=(ROOT/args.refine_from).resolve()
         assert initialization.is_relative_to(ROOT) and initialization.suffix=='.pt' and initialization.is_file()
     helper='fit_scale_locator.py' if args.component=='locator' else 'fit_scale_level.py'
+    if args.component=='locator' and args.round in ('r4','r5','r6'):
+        helper='fit_scale_rim_calibration.py' if args.round=='r6' else 'fit_scale_rim_refiner.py'
+        assert args.refine_from is None and args.resolution==384
     report_name='cup-neural-localization.json' if args.component=='locator' else 'static-level-fit.json'
     manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');audit_path,review_path=collection_paths(ROOT,manifest)
     audit=read(audit_path)
     if args.component=='locator' and args.round=='r3':
         assert plan['refit_protocol']['round']=='r3' and args.refine_from is None
         assert args.resolution==384 and args.augmentation=='integer'
+    if args.round in ('r4','r5','r6'):
+        protocol=read(ROOT/f'locator-refit-{args.round}-plan.json')
+        assert protocol['plan_sha256']==manifest['plan_sha256']
+        assert protocol['audit_sha256']==sha(audit_path) and protocol['review_sha256']==sha(review_path)
     assert not manifest['trained'] and not (ROOT/'component-selection.json').exists()
     assert audit['complete']
     records=admit(plan,manifest,audit)
@@ -52,12 +59,19 @@ def main():
         assert read(ROOT/'scope-selection.json')['passed']
     output=ROOT/(args.component+'-fit-'+args.round);output.mkdir()
     sources={n:sha(ROOT/n) for n in (helper,'scale_data_admission.py')+ (('scale_locator_augmentation.py',) if args.component=='locator' else ())}
+    if args.round in ('r4','r5','r6'):
+        sources['scale_rim_refiner.py']=sha(ROOT/'scale_rim_refiner.py')
+        sources['scale_rim_augmentation.py']=sha(ROOT/'scale_rim_augmentation.py')
+        sources['fit_scale_rim_refiner.py']=sha(ROOT/'fit_scale_rim_refiner.py')
     (output/'runtime-before.json').write_text(json.dumps(dict(witness,sources=sources,admitted_episodes=len(records)),indent=2)+'\n')
     with (output/'fit.log').open('x') as log:
         command=['docker','exec','-e','PYTHONDONTWRITEBYTECODE=1',w.CID,'nice','-n','10',
             '/isaac-sim/python.sh','/workspace/learning/A-scale-20261109-v1/'+helper]
         if args.refine_from:command+=['--refine-from',str(initialization.relative_to(ROOT))]
-        if args.component=='locator':command+=['--resolution',str(args.resolution),'--augmentation',args.augmentation]
+        if args.component=='locator':
+            if args.round in ('r4','r5'):command+=['--round',args.round]
+            elif args.round=='r6':pass
+            else:command+=['--resolution',str(args.resolution),'--augmentation',args.augmentation]
         result=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT)
     (output/'runtime-after.json').write_text(json.dumps(w.isolation(),indent=2)+'\n')
     assert sha(ROOT/'best.pt')==manifest['checkpoint_sha256'] and sha(ROOT/'plan.json')==manifest['plan_sha256']

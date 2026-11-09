@@ -1,0 +1,64 @@
+{
+  "round": "r5",
+  "plan_sha256": "e8a89896054825ac3a5e3808bcde68836b016a92401f07d6048c611fed4f54d4",
+  "audit_sha256": "d2fea71ab360b01569e84b41846b7d5233a592785a1b937932f17ecd091b5c6a",
+  "review_sha256": "37c7fcfb8d93cb324bece0f352ab1c97bd2f8872396be32c8893853305567bab",
+  "coarse_checkpoint": "locator-rounds/r3/cup-neural-localization-attempt.pt",
+  "coarse_checkpoint_sha256": "9be92cd1515aecf53e3793cf5dbf0d83f1ae4ff9a3a8f673d403650679397ab4",
+  "method": "Same frozen r3 coarse and native-detail refiner; initialize from rejected r4 best-validation attempt and fit with label-consistent continuous affine RGB crop augmentation.",
+  "crop_size": 256,
+  "epochs": 160,
+  "learning_rate": 0.0001,
+  "seed": 26110985,
+  "translation_pixels": 24,
+  "max_correction_pixels": 32.0,
+  "native_resolution": 1024,
+  "validation_interval": 10,
+  "unchanged": [
+    "108 episode identities and splits",
+    "all accuracy thresholds",
+    "nine unused holdouts",
+    "active robot and runtime sources"
+  ],
+  "selection": "Best validation maximum among candidates passing both split maxima, absence margin and twelve-frame temporal confirmation; CPU/GPU parity required.",
+  "scope": "Known-size static perception only; no autonomous model activation.",
+  "runtime_before": {
+    "utc": "2026-11-09T21:03:47.114290+00:00",
+    "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+    "limits": {
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "NanoCpus": 4000000000,
+      "CpusetCpus": "16-23",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "MemorySwap": 17179869184
+    },
+    "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 3750988, 4751 MiB",
+    "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+  },
+  "fine_initialization": "locator-rounds/r4/cup-neural-localization-attempt.pt",
+  "fine_initialization_sha256": "76f31c4e9f91e28543fefb479ff94493804ecbb907c3bc95ad1d544d6f94bdba",
+  "augmentation": {
+    "kind": "affine",
+    "rotation_degrees": 12.0,
+    "scale_min": 0.9,
+    "scale_max": 1.1,
+    "aspect_log_range": 0.06,
+    "translation_pixels": 24.0
+  },
+  "rationale": "r4 validation best 3.0905 mm at epoch 20, training maximum 3.7451 mm; later training improves while validation worsens. Broaden image transformations to address observed overfit without changing splits or gates."
+}

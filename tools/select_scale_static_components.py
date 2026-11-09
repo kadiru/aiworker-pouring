@@ -35,6 +35,7 @@ def main():
     assert level['localization_checkpoint_sha256']==loc['checkpoint_sha256']==sha(ROOT/'cup-neural-localization.pt')
     assert level['parent_checkpoint_sha256']==m['checkpoint_sha256']
     assert level['checkpoint_sha256']==sha(ROOT/'static-level-candidate.pt')
+    assert loc['module_sha256']==level['localization_module_sha256']==sha(ROOT/'scale_rim_refiner.py')
     selected=ROOT/'selected-static';selected.mkdir()
     files={}
     for name in ('cup-neural-localization.pt','static-level-candidate.pt','cup-neural-localization.json',
@@ -43,6 +44,7 @@ def main():
     report=dict(checkpoint_sha256=m['checkpoint_sha256'],plan_sha256=m['plan_sha256'],runtime_sources=m['runtime_sources'],
         all_size_component_gates_passed=True,components=files,holdout_names=[s['name'] for s in plan['holdout']],
         evaluation_helper_sha256=sha(ROOT/'evaluate_scale_static_holdout.py'),evaluation_observation_frames=12,
+        localization_module_sha256=sha(ROOT/'scale_rim_refiner.py'),
         primary_model='selected_static_candidate',comparison_model='frozen_parent_no_selection',
         model_activated=False,autonomous_use_accepted=False,helper_sha256=sha(Path(__file__)),
         scope='Static known-size cup localization and level estimation in the measured collection range only. Freeze before nine unused near-full static holdouts; parent robot checkpoint remains unchanged. Independent color, >=94% fill, held-bottle, dynamic and task gates are not accepted.')

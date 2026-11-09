@@ -1,0 +1,54 @@
+{
+  "round": "r6",
+  "plan_sha256": "e8a89896054825ac3a5e3808bcde68836b016a92401f07d6048c611fed4f54d4",
+  "audit_sha256": "d2fea71ab360b01569e84b41846b7d5233a592785a1b937932f17ecd091b5c6a",
+  "review_sha256": "37c7fcfb8d93cb324bece0f352ab1c97bd2f8872396be32c8893853305567bab",
+  "parent": "locator-rounds/r4/cup-neural-localization-attempt.pt",
+  "parent_sha256": "76f31c4e9f91e28543fefb479ff94493804ecbb907c3bc95ad1d544d6f94bdba",
+  "ridge_slope_penalty": 0.1,
+  "ridge_intercept_penalty": 1e-08,
+  "max_affine_correction_pixels": 2.0,
+  "fitting": "Six coefficients in delta=[1,(u-512)/512,(v-512)/512] @ B. One mean per training episode, equal episode weighting; CUDA float64 ridge solve.",
+  "unchanged": [
+    "108 episode identities and splits",
+    "all accuracy thresholds",
+    "nine unused holdouts",
+    "active robot and runtime sources"
+  ],
+  "required": [
+    "both split frame maxima under 3 mm",
+    "absence margin",
+    "all twelve-frame temporal confirmations",
+    "end-to-end inference parity",
+    "subsequent level gates before reserved tests"
+  ],
+  "scope": "Known-size static perception only; no autonomous activation.",
+  "runtime_before": {
+    "utc": "2026-11-09T21:08:12.169737+00:00",
+    "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+    "limits": {
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "NanoCpus": 4000000000,
+      "CpusetCpus": "16-23",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "MemorySwap": 17179869184
+    },
+    "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 3750988, 4751 MiB",
+    "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+  }
+}

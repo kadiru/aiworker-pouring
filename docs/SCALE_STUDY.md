@@ -2,7 +2,7 @@
 
 Started November 9, 2026, after the user accepted two lost particles and provisionally allowed up to five per task. The completed parent stays frozen at **28/30 strict zero-loss passes**, or **30/30 under the later practical tolerance**. This is a separate study, `/workspace/learning/A-scale-20261109-v1`, prefix `SC_A_`. No resized autonomous pour has run and the parent robot checkpoint remains active.
 
-Latest result: the 54 additional recordings and r3 refit are complete. The best validation maximum is **5.6184 mm**, above the 3 mm gate. No level fit or reserved test ran; all nine remain unused. See the completed continuation below.
+Latest result: native-resolution rim refinement and train-only calibration now pass localization (**2.9033 mm validation maximum, 2.9766 mm training maximum**). The subsequent level fit fails its per-size error gate, so **none of the nine reserved tests ran**. The active robot remains unchanged. See [Rim localization continuation](RIM_LOCALIZATION.md).
 
 ## Scope and acceptance
 
@@ -106,4 +106,4 @@ The conditional runner exited normally at **`localization_gate_failed`**. It ran
 
 The completed commands were the host observer `watch_scale_stage.py --part collect --round r1`, native CPU audit `check_scale_stage.py --part collect --round r1`, local review `review_scale_frames.py --part collect --round r1 --plan plan-collection-r1.json --new-only`, and host `run_scale_pair_pipeline.py`. Exclusive outputs must not be blindly retried. Any next fitting experiment needs a separately declared revision and preservation of this rejected candidate.
 
-Next: diagnose/refine rim-center localization using the existing full-resolution camera data. Added paired-fill coverage alone did not meet accuracy requirements. Keep the reserved test identities unused until both locator and level gates pass; higher-fill, held-bottle/dynamic perception and all-size motion/bottle-grasp checks remain outside this static result.
+That next action is complete: [native-resolution rim refinement](RIM_LOCALIZATION.md) passes the development localization gate. Level generalization is now the blocking component. The reserved test identities remain unused until all gates pass; higher-fill, held-bottle/dynamic perception and all-size motion/bottle-grasp checks remain outside this static result.
