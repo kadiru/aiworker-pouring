@@ -40,6 +40,8 @@ def main():
         shutil.copy2(ROOT/name,selected/name);files[name]=dict(path=str(selected/name),sha256=sha(selected/name))
     report=dict(checkpoint_sha256=m['checkpoint_sha256'],plan_sha256=m['plan_sha256'],runtime_sources=m['runtime_sources'],
         all_size_component_gates_passed=True,components=files,holdout_names=[s['name'] for s in plan['holdout']],
+        evaluation_helper_sha256=sha(ROOT/'evaluate_scale_static_holdout.py'),evaluation_observation_frames=12,
+        primary_model='selected_static_candidate',comparison_model='frozen_parent_no_selection',
         model_activated=False,autonomous_use_accepted=False,helper_sha256=sha(Path(__file__)),
         scope='Static known-size cup localization and level estimation in the measured collection range only. Freeze before nine unused near-full static holdouts; parent robot checkpoint remains unchanged. Independent color, >=94% fill, held-bottle, dynamic and task gates are not accepted.')
     with output.open('x') as f:json.dump(report,f,indent=2);f.write('\n')
