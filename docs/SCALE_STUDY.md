@@ -50,3 +50,8 @@ python3 /home/kadir/aiworker-pouring-4070/learning/A-scale-20261109-v1/run_scale
 ```
 
 Five local synthetic admission checks verify disjoint episodes, stale audit rejection, size coverage and equal sampling. The new GPU fits remain unrun at this update. Source, small reports and review manifests go to the private repository; media, raw recordings and weights stay external.
+
+
+An additional local analytic proposal integrates the 20-sided visual bottle shell plus circular base, retaining wall and base thickness. Calibrating effective density to the authored 180 g baseline yields **164.03–196.70 g** across the nine proposed bottle variants. This is not a measured material density or a native PhysX mass/inertia result: collider sectors overlap, and native computed properties still need comparison. No runtime setting changed. Three computational checks cover physical scaling powers, subdivision invariance and invalid profiles. The input inventory hash matches both prior grasp screens. `bottle-mass-proposal.json` retains mass, center of mass and inertia proposals for later dynamic setup.
+
+Prepared static selection/evaluation helpers preserve the active robot checkpoint. They freeze separately fitted locator/level artifacts and unused holdout identities, then score every one of the nine near-full static holdouts once, without retries or fitting. A static pass does not authorize autonomous motion or accept the retained independent color model. These helpers are prepared, not executed at this update.
