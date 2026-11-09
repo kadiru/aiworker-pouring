@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "height_scale": 0.95,
+      "body_diameter_scale": 0.95,
+      "cross_section_particles": 377,
+      "layers": 39,
+      "max_initial_particles": 14703,
+      "max_initial_nominal_ml": 85.747896,
+      "initial_100_nominal_ml_fits": false
+    },
+    {
+      "height_scale": 0.95,
+      "body_diameter_scale": 1.0,
+      "cross_section_particles": 437,
+      "layers": 39,
+      "max_initial_particles": 17043,
+      "max_initial_nominal_ml": 99.394776,
+      "initial_100_nominal_ml_fits": false
+    },
+    {
+      "height_scale": 0.95,
+      "body_diameter_scale": 1.05,
+      "cross_section_particles": 489,
+      "layers": 39,
+      "max_initial_particles": 19071,
+      "max_initial_nominal_ml": 111.222072,
+      "initial_100_nominal_ml_fits": true
+    },
+    {
+      "height_scale": 1.0,
+      "body_diameter_scale": 0.95,
+      "cross_section_particles": 377,
+      "layers": 41,
+      "max_initial_particles": 15457,
+      "max_initial_nominal_ml": 90.145224,
+      "initial_100_nominal_ml_fits": false
+    },
+    {
+      "height_scale": 1.0,
+      "body_diameter_scale": 1.0,
+      "cross_section_particles": 437,
+      "layers": 41,
+      "max_initial_particles": 17917,
+      "max_initial_nominal_ml": 104.49194399999999,
+      "initial_100_nominal_ml_fits": true
+    },
+    {
+      "height_scale": 1.0,
+      "body_diameter_scale": 1.05,
+      "cross_section_particles": 489,
+      "layers": 41,
+      "max_initial_particles": 20049,
+      "max_initial_nominal_ml": 116.92576799999999,
+      "initial_100_nominal_ml_fits": true
+    },
+    {
+      "height_scale": 1.05,
+      "body_diameter_scale": 0.95,
+      "cross_section_particles": 377,
+      "layers": 43,
+      "max_initial_particles": 16211,
+      "max_initial_nominal_ml": 94.542552,
+      "initial_100_nominal_ml_fits": false
+    },
+    {
+      "height_scale": 1.05,
+      "body_diameter_scale": 1.0,
+      "cross_section_particles": 437,
+      "layers": 43,
+      "max_initial_particles": 18791,
+      "max_initial_nominal_ml": 109.589112,
+      "initial_100_nominal_ml_fits": true
+    },
+    {
+      "height_scale": 1.05,
+      "body_diameter_scale": 1.05,
+      "cross_section_particles": 489,
+      "layers": 43,
+      "max_initial_particles": 21027,
+      "max_initial_nominal_ml": 122.62946399999998,
+      "initial_100_nominal_ml_fits": true
+    }
+  ],
+  "spacing_m": 0.0018,
+  "source_sha256": "52d230d500d35ca879a9cc6d35c87c679ca80ea847c64b65b9e26a0b7a803537",
+  "runtime_modified": false,
+  "scope": "Offline capacity of the current sparse body-only initial grid if rebuilt for each proposed bottle profile. Nominal particle volume, not geometric liquid capacity or a measured full-bottle volume. No particle injection or simulation performed.",
+  "native_algorithm_source_sha256": "2a772d7e5e86cbff9b35ce245c67b32e3ca150fc734b40f979db1c9cd7c42986",
+  "method": {
+    "radius": "inner_body_radius*cos(pi/20) - 2*spacing",
+    "cross_section": "integer square-grid points strictly inside the conservative radius, using the native initial_points predicate",
+    "layers": "floor((body_top - spacing - (base_height + 2*spacing))/spacing) + 1",
+    "capacity": "cross_section_count * layers * spacing^3 * 1e6 nominal mL"
+  },
+  "initial_100_nominal_ml_rejected": 4
+}
