@@ -11,13 +11,17 @@ from pour_wide_report import strict_success
 ROOT=Path(__file__).resolve().parents[1];E=ROOT/'evidence/side-return-A'
 FPS=20;SIZE=(1280,720);BG='#101820';WHITE='#F3F6F7';MUTED='#B3C0CC';GREEN='#67D6B1';RED='#FFAAA3'
 def read(p):return json.loads(p.read_text())
-def card(report,part):
+def card(report,part,batch=0):
     im=Image.new('RGB',SIZE,BG);d=ImageDraw.Draw(im);c=report['counts'];n=c['completed']
     text(d,(56,40),'AIWORKER / ISAAC SIM',18,MUTED,True)
     text(d,(56,90),'Grasp. Pour. Stop. Put the bottle down.',36,WHITE,True)
-    text(d,(56,156),part.upper()+' / ALL ATTEMPTS INCLUDED',18,MUTED,True)
+    heading=part.upper()+' / ALL ATTEMPTS INCLUDED'
+    if part=='test':
+        assert 1<=batch<=3
+        heading=f'TEST / PART {batch} OF 3 / ATTEMPTS {(batch-1)*10+1:02}-{batch*10:02}'
+    text(d,(56,156),heading,18,MUTED,True)
     text(d,(56,224),f"{c['accepted']} / {n}",72,WHITE,True)
-    text(d,(56,310),'complete tasks passed',23,MUTED)
+    text(d,(56,310),'complete tasks passed' if part=='development' else f'overall task passes / {n} completed tests',23,MUTED,max_width=540)
     text(d,(56,372),f"{c['zero_measured_loss']} / {n} zero final / table loss",25,GREEN,True)
     text(d,(56,420),f"{c['side_returns']} / {n} side return + placement checks",25,WHITE,True)
     lines(d,(660,224),'Task: grab and lift a bottle, pour, stop near full or when empty, then set down and release.',25,560,WHITE)
@@ -72,7 +76,7 @@ def main():
     if a.part=='test':
         assert 1<=a.batch<=3;rows=rows[(a.batch-1)*10:a.batch*10]
     folder=E/(outstem+'-video-preview');folder.mkdir(exist_ok=True)
-    opening=card(report,a.part);opening.save(folder/'opening.png')
+    opening=card(report,a.part,a.batch);opening.save(folder/'opening.png')
     output=E/(outstem+'.mp4');assert a.preview or not output.exists(),'Preserve existing videos'
     proc=None if a.preview else subprocess.Popen(['/opt/homebrew/bin/ffmpeg','-v','error','-f','rawvideo','-pixel_format','rgb24','-video_size','1280x720','-framerate',str(FPS),'-i','pipe:0','-an','-c:v','libx264','-preset','fast','-threads','2','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(output)],stdin=subprocess.PIPE)
     count=0;clips=[]
