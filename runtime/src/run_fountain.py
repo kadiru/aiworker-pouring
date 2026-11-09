@@ -47,6 +47,7 @@ allowed_commands.update(('perception_pilot','perception_collect','perception_dev
 allowed_commands.add('perception_geometry')
 allowed_commands.update(('perception_camera_pilot','perception_holdout'))
 allowed_commands.update(('side_diagnostic','side_impact','side_impact_followup','side_support','side_development','side_test'))
+allowed_commands.update(('scale_pilot','scale_collect','scale_holdout'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -308,6 +309,11 @@ def setup(spec):
         assert points.shape==velocities.shape and points.ndim==2 and points.shape[1]==3
         assert np.isfinite(points).all() and np.isfinite(velocities).all()
         bottle.points=points.copy();bottle.initial_bottle_count=0
+    seed_fill=None
+    if spec.get('calibration_fill'):
+        from pour_scale_fill import SeedFill
+        assert bottle is not None and spec.get('robot') and not spec.get('impact_state_seed')
+        seed_fill=SeedFill(spec,len(points))
     prim=particleUtils.add_physx_particleset_pointinstancer(stage,Sdf.Path('/World/Particles'),
         Vt.Vec3fArray.FromNumpy(points),Vt.Vec3fArray.FromNumpy(velocities),system,
         self_collision=True,fluid=True,particle_group=1,
@@ -381,7 +387,7 @@ def setup(spec):
             kind='prescribed kinematic hinge; accelerating return and hard stop at table',
             obstacles=OBSTACLES,fluid_impulse=False,table_impact_force_measured=False))
         stage.Export(str(folder/'scene-start.usda'))
-    return dict(spec=spec,bottle=bottle,inst=inst,cross=cross,period=period,speed=speed,emitted_layers=1,
+    return dict(spec=spec,bottle=bottle,inst=inst,cross=cross,period=period,speed=speed,emitted_layers=1,seed_fill=seed_fill,
                 expected_count=len(points),t=float(sim.current_time) if recording else 0.,recording=recording,replay=replay,samples=[],folder=folder,frame=0,wall=time.monotonic(),
                 actor=actor,trajectory=[],mesh_counts=[],kicked=False,receiver_orient=receiver_orient,
                 readback_audit=dict(calls=0,max_position_correction_m=0.,max_velocity_correction_m_s=0.))
@@ -539,6 +545,11 @@ def finish(trial):
             metrics['recovery_success_zero_spill']=bool(metrics['eligible'] and metrics['zero_spill'] and
                 (metrics['expected_stop']!='cup_near_full' or metrics['bottle_result']['cup_inventory_fraction']>=.90))
             metrics['task_success_zero_spill']=False
+    if trial.get('seed_fill'):
+        metrics.update(attribution='Authored gradual cup filling and settling; no autonomous controller',
+                       task_success_zero_spill=False, surface_task_success_zero_spill=False,
+                       seed_fill=trial['seed_fill'].evidence())
+        json_write(trial['folder']/'seed-fill.json',trial['seed_fill'].evidence())
     if trial.get('recording'):
         recording_cameras = list(trial['recording'].cameras)
         recording_path = trial['recording'].finish(metrics)
@@ -655,7 +666,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('side_diagnostic','side_impact','side_impact_followup','side_support','side_development','side_test'):
+                    if cmd in ('scale_pilot','scale_collect','scale_holdout'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before size calibration';continue
+                        from pour_scale_study import pending as scale_pending
+                        pending.extend(scale_pending(cmd.removeprefix('scale_')))
+                    elif cmd in ('side_diagnostic','side_impact','side_impact_followup','side_support','side_development','side_test'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before side-return study';continue
                         from pour_side_study import pending as side_pending
@@ -937,6 +953,10 @@ try:
                                 drive.Set(float(target))
                     else:
                         trial['bottle'].drive(trial['t']+spec['dt'])
+                    if trial.get('seed_fill'):
+                        from pour_scale_fill import emit_native
+                        assert not trial.get('actor') and trial['replay'] is None and not trial.get('expert')
+                        emit_native(trial)
                     if substep == 0 and trial.get('recording'):
                         transition_action = trial['bottle'].command.copy()
                         if spec.get('noisy_expert') and not spec.get('policy_evaluation'):
@@ -997,6 +1017,8 @@ try:
                 complete=((trial['actor'].complete() or trial['t']>=spec['max_seconds']) if trial.get('actor') else
                           trial['frame'] >= len(trial['replay']['actions']) if trial['replay'] is not None
                           else trial['bottle'].complete(trial['t']))
+                if trial.get('seed_fill'):
+                    complete=trial['seed_fill'].complete(trial['t']) or trial['t']>=spec['max_seconds']
                 if spec.get('expert_recovery'):
                     complete=bool(trial.get('recovery_error') or trial['t']>=spec['max_seconds'] or
                                   (trial.get('expert') and trial['expert'].complete(trial['t'])))
