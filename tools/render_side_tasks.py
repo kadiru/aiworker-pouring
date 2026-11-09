@@ -82,7 +82,7 @@ def main():
             for _ in range(6*FPS):emit(opening)
         for number,row in enumerate(rows,1):
             assert row['strict_pass']==strict_success(row)
-            row=dict(row,strict_pass=row['accepted'],failure_reasons=row['acceptance_failures'])
+            row=dict(row,original_strict_pass=row['strict_pass'],original_failure_reasons=row['failure_reasons'],strict_pass=row['accepted'],failure_reasons=row['acceptance_failures'])
             record=indexed[row['name']];assert record['sha256']==row['source_sha256']
             identity=dict(record,relative_path=str(PurePosixPath(record['path']).relative_to('/workspace/outputs/fountain')))
             speed=2 if row['accepted'] else 1
@@ -96,7 +96,7 @@ def main():
                 for j,(group,i) in enumerate(schedule):
                     hold='Initial layout' if j<FPS else 'Final frame held' if j>=len(schedule)-2*FPS else None
                     emit(frame(row,record,ds,group,i,float(ds['time' if group=='obs' else 'next_time'][i]),speed,a.part,number,len(rows),hold))
-                clips.append(dict(name=row['name'],strict_pass=row['strict_pass'],failure_reasons=row['failure_reasons'],source_sha256=record['sha256'],start_frame=start,end_frame_exclusive=count,playback_speed=speed,native_frames=len(times),mapping=schedule))
+                clips.append(dict(name=row['name'],strict_pass=row['original_strict_pass'],failure_reasons=row['original_failure_reasons'],accepted=row['accepted'],acceptance_failures=row['failure_reasons'],source_sha256=record['sha256'],start_frame=start,end_frame_exclusive=count,playback_speed=speed,native_frames=len(times),mapping=schedule))
             print(row['name'],row['strict_pass'],flush=True)
         if a.preview:return
         for _ in range(5*FPS):emit(opening)

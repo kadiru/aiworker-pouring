@@ -58,7 +58,7 @@ def main():
                         return_frames.append(dict(index=index,camera='overview',t=float(times[index])))
                 strip.save(out/(name+'-return.jpg'),quality=94)
         dest=out/(name+'.jpg');canvas.save(dest,quality=94)
-        records.append(dict(name=name,source_sha256=r['sha256'],strict_pass=result['accepted'],failure_reasons=result['acceptance_failures'],
+        records.append(dict(name=name,source_sha256=r['sha256'],strict_pass=result['strict_pass'],accepted=result['accepted'],failure_reasons=result['failure_reasons'],acceptance_failures=result['acceptance_failures'],
             frames=frames,return_frames=return_frames,reviewed_files={str(dest):sha(dest),**({str(out/(name+'-return.jpg')):sha(out/(name+'-return.jpg'))} if strip is not None else {})},manual_review='pending'))
     report=dict(checkpoint_sha256=candidate['checkpoint_sha256'],cases=records,manual_review='pending',audit_sha256=sha(ROOT/'recording-audit.json'),
         helper_sha256=sha(Path(__file__)),scope='Twelve task keyframes and, when available, twelve evenly spaced return frames per attempt, resized only for display. Not continuous playback. Independent raw-sample scoring retains every failure. Manual review must be recorded only after inspection.')
