@@ -8,6 +8,7 @@ import json
 import shutil
 import urllib.request
 from pathlib import Path
+from scale_data_admission import collection_paths
 ROOT=Path('/workspace/learning/A-scale-20261109-v1')
 
 
@@ -18,6 +19,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
     output=ROOT/'component-selection.json';assert not output.exists()
     m=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json')
+    audit_path,review_path=collection_paths(ROOT,m)
     assert sha(ROOT/'plan.json')==m['plan_sha256'] and sha(ROOT/'best.pt')==m['checkpoint_sha256']
     assert all(sha(Path(p))==d for p,d in m['protected_parent_files'].items())
     assert all(sha(Path('/workspace/src')/n)==d for n,d in m['runtime_sources'].items())
@@ -28,8 +30,8 @@ def main():
     loc=read(ROOT/'cup-neural-localization.json');level=read(ROOT/'static-level-fit.json')
     assert loc['passed'] and loc['scope']=='all_nine_declared_cup_sizes' and level['passed']
     assert loc['plan_sha256']==level['plan_sha256']==m['plan_sha256']
-    assert loc['audit_sha256']==level['audit_sha256']==sha(ROOT/'collect-r0-audit.json')
-    assert loc['manual_review_sha256']==level['manual_review_sha256']==sha(ROOT/'collect-r0-manual-review.json')
+    assert loc['audit_sha256']==level['audit_sha256']==sha(audit_path)
+    assert loc['manual_review_sha256']==level['manual_review_sha256']==sha(review_path)
     assert level['localization_checkpoint_sha256']==loc['checkpoint_sha256']==sha(ROOT/'cup-neural-localization.pt')
     assert level['parent_checkpoint_sha256']==m['checkpoint_sha256']
     assert level['checkpoint_sha256']==sha(ROOT/'static-level-candidate.pt')

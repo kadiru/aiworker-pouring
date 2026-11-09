@@ -9,7 +9,7 @@ sys.path[:0]=['/workspace/src','/workspace']
 from validate_pour_recording import h5py,decode
 from pour_guard_vision import project,plane_point
 from pour_cup_locator import CupLocator,centers
-from scale_data_admission import admit,balanced_frame_weights
+from scale_data_admission import admit,balanced_frame_weights,collection_paths
 from scale_locator_augmentation import translate
 ROOT=Path('/workspace/learning/A-scale-20261109-v1')
 def read(p):return json.loads(p.read_text())
@@ -17,9 +17,9 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def write(n,v):(ROOT/n).write_text(json.dumps(v,indent=2)+'\n')
 
 def collect(resolution=384):
-    plan=read(ROOT/'plan.json');candidate=read(ROOT/'candidate.json');audit=read(ROOT/'collect-r0-audit.json')
-    review=read(ROOT/'collect-r0-manual-review.json')
-    assert review['accepted'] and review['audit_sha256']==sha(ROOT/'collect-r0-audit.json')
+    plan=read(ROOT/'plan.json');candidate=read(ROOT/'candidate.json');audit_path,review_path=collection_paths(ROOT,candidate)
+    audit=read(audit_path);review=read(review_path)
+    assert review['accepted'] and review['audit_sha256']==sha(audit_path)
     assert sha(ROOT/'plan.json')==candidate['plan_sha256'] and sha(ROOT/'best.pt')==candidate['checkpoint_sha256']
     assert all(sha(Path(p))==v for p,v in candidate['protected_parent_files'].items())
     assert all(sha(Path('/workspace/src')/n)==v for n,v in candidate['runtime_sources'].items())
@@ -72,12 +72,14 @@ def validate(model,data):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--refine-from',type=Path);parser.add_argument('--member',type=int,choices=(0,1))
-    parser.add_argument('--resolution',type=int,choices=(384,768),default=384);args=parser.parse_args()
+    parser.add_argument('--resolution',type=int,choices=(384,768),default=384)
+    parser.add_argument('--augmentation',choices=('integer','continuous'),default='continuous');args=parser.parse_args()
     resolution=args.resolution;factor=resolution//384;cells=resolution//4
     refinement=None
     if args.refine_from is not None:
         refinement=(ROOT/args.refine_from).resolve();assert refinement.is_relative_to(ROOT) and refinement.is_file() and refinement.suffix=='.pt'
     candidate=read(ROOT/'candidate.json');assert candidate.get('seed_and_camera_accepted') and not candidate.get('trained')
+    audit_path,review_path=collection_paths(ROOT,candidate)
     assert not (ROOT/'component-selection.json').exists(), 'Preserve a selected candidate'
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10));assert not h['queue'] and not h['recording']['active'] and not h.get('error')
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name()
@@ -102,8 +104,14 @@ def main():
             for g in opt.param_groups:g['lr']/=3
         for ids in torch.multinomial(train['weights'],len(train['x']),replacement=True).split(16):
             x=train['x'][ids].float();u=train['u'][ids].clone();n=len(x)
-            dx,dy=np.random.default_rng(261109+steps).uniform(-28.*factor,28.*factor,2).tolist()
-            x,u=translate(x,u,dx,dy)
+            rng=np.random.default_rng(261109+steps)
+            if args.augmentation=='continuous':
+                dx,dy=rng.uniform(-28.*factor,28.*factor,2).tolist();x,u=translate(x,u,dx,dy)
+            else:
+                dx,dy=rng.integers(-28*factor,28*factor+1,2).tolist();pad=32*factor
+                padded=F.pad(x.permute(0,3,1,2),(pad,pad,pad,pad),value=180)
+                x=padded[:,:,pad-dy:pad+resolution-dy,pad-dx:pad+resolution-dx].permute(0,2,3,1).contiguous()
+                u+=u.new_tensor([dx,dy])
             positive=torch.rand(n,device='cuda')>.25
             for j in torch.nonzero(~positive,as_tuple=True)[0].tolist():
                 px,py=u[j].round().long().tolist();x[j,max(0,py-24*factor):min(resolution,py+48*factor),max(0,px-50*factor):min(resolution,px+50*factor)]=180
@@ -127,13 +135,14 @@ def main():
                 best=dict(epoch=epoch,state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()},validation=result,training=training,threshold=(minimum+maximum)/2)
             if epoch%20==0:print(json.dumps(row),flush=True)
     report=dict(passed=best is not None,scope='all_nine_declared_cup_sizes',epochs=epochs,optimizer_steps=steps,learned_parameters=sum(p.numel() for p in model.parameters()),
-        plan_sha256=sha(ROOT/'plan.json'),audit_sha256=sha(ROOT/'collect-r0-audit.json'),manual_review_sha256=sha(ROOT/'collect-r0-manual-review.json'),augmentation_helper_sha256=sha(ROOT/'scale_locator_augmentation.py'),
+        plan_sha256=sha(ROOT/'plan.json'),audit_sha256=sha(audit_path),manual_review_sha256=sha(review_path),augmentation_helper_sha256=sha(ROOT/'scale_locator_augmentation.py'),
+        augmentation=args.augmentation,collection_audit_path=str(audit_path),collection_review_path=str(review_path),
         initialization=dict(path=str(ROOT/'best.pt') if refinement is None else str(refinement),sha256=sha(ROOT/'best.pt' if refinement is None else refinement),member=member),native_frames_per_episode=13,
         fit_seconds=time.perf_counter()-fit_start,total_seconds=time.perf_counter()-start,device=torch.cuda.get_device_name(),source_sha256=sha(Path(__file__)),module_sha256=sha(Path('/workspace/src/pour_cup_locator.py')),admission_helper_sha256=sha(ROOT/'scale_data_admission.py'),
         counts={s:dict(images=len(a['x']),episodes=len({m['name'] for m in a['meta']}),native_images=sum(m['domain']=='native_detail' for m in a['meta'])) for s,a in data.items()},
         history=history,selected=None if best is None else dict(epoch=best['epoch'],**best['validation']),
         best_attempt=dict(epoch=best_attempt['epoch'],**best_attempt['validation']),receptive_field_pixels=129,input_resolution=resolution,
-        method='Fully convolutional RGB rim-center heatmap with subpixel offsets. Focal heatmap loss plus 2x smooth-L1 offsets, AdamW, continuous bilinear image translation and photometric augmentation; generated absent-cup masks are training/validation diagnostics. Equal probability per size and per episode within each size. Whole-episode splits. All-size selection, including the baseline. No reserved images or simulator truth at inference.')
+        method='Fully convolutional RGB rim-center heatmap with subpixel offsets. Focal heatmap loss plus 2x smooth-L1 offsets, AdamW, '+args.augmentation+' image translation and photometric augmentation; generated absent-cup masks are training/validation diagnostics. Equal probability per size and per episode within each size. Whole-episode splits. All-size selection, including the baseline. No reserved images or simulator truth at inference.')
     torch.save(dict(state=best_attempt['state'],validation=best_attempt['validation'],epoch=best_attempt['epoch'],accepted=False),ROOT/'cup-neural-localization-attempt.pt')
     report['attempt_checkpoint_sha256']=sha(ROOT/'cup-neural-localization-attempt.pt')
     if best:

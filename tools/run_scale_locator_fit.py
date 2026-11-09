@@ -9,7 +9,7 @@ sys.path.insert(0,'/tmp')
 import watch_wide_collection as w
 ROOT=w.HOST_ROOT/'learning/A-scale-20261109-v1'
 sys.path.insert(0,str(ROOT))
-from scale_data_admission import admit
+from scale_data_admission import admit,collection_paths
 
 
 def read(p):return json.loads(p.read_text())
@@ -18,8 +18,9 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--component',choices=('locator','level'),default='locator')
-    parser.add_argument('--round',choices=('r0','r1','r2'),default='r0');parser.add_argument('--refine-from')
-    parser.add_argument('--resolution',type=int,choices=(384,768),default=384);args=parser.parse_args()
+    parser.add_argument('--round',choices=('r0','r1','r2','r3'),default='r0');parser.add_argument('--refine-from')
+    parser.add_argument('--resolution',type=int,choices=(384,768),default=384)
+    parser.add_argument('--augmentation',choices=('integer','continuous'),default='continuous');args=parser.parse_args()
     assert args.component=='locator' or args.resolution==384
     if args.refine_from:
         assert args.component=='locator'
@@ -27,12 +28,16 @@ def main():
         assert initialization.is_relative_to(ROOT) and initialization.suffix=='.pt' and initialization.is_file()
     helper='fit_scale_locator.py' if args.component=='locator' else 'fit_scale_level.py'
     report_name='cup-neural-localization.json' if args.component=='locator' else 'static-level-fit.json'
-    manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');audit=read(ROOT/'collect-r0-audit.json')
+    manifest=read(ROOT/'candidate.json');plan=read(ROOT/'plan.json');audit_path,review_path=collection_paths(ROOT,manifest)
+    audit=read(audit_path)
+    if args.component=='locator' and args.round=='r3':
+        assert plan['refit_protocol']['round']=='r3' and args.refine_from is None
+        assert args.resolution==384 and args.augmentation=='integer'
     assert not manifest['trained'] and not (ROOT/'component-selection.json').exists()
     assert audit['complete']
     records=admit(plan,manifest,audit)
-    review=read(ROOT/'collect-r0-manual-review.json')
-    assert review['accepted'] and review['audit_sha256']==sha(ROOT/'collect-r0-audit.json')
+    review=read(review_path)
+    assert review['accepted'] and review['audit_sha256']==sha(audit_path)
     started={read(p)['name'] for p in (w.HOST_ROOT/'outputs/fountain').glob('*/*SC_A_*/parameters.json')}
     assert not started & {s['name'] for s in plan['holdout']}, 'Holdout must remain unstarted before model selection'
     assert sha(ROOT/'plan.json')==manifest['plan_sha256'] and sha(ROOT/'best.pt')==manifest['checkpoint_sha256']
@@ -52,7 +57,7 @@ def main():
         command=['docker','exec','-e','PYTHONDONTWRITEBYTECODE=1',w.CID,'nice','-n','10',
             '/isaac-sim/python.sh','/workspace/learning/A-scale-20261109-v1/'+helper]
         if args.refine_from:command+=['--refine-from',str(initialization.relative_to(ROOT))]
-        if args.component=='locator':command+=['--resolution',str(args.resolution)]
+        if args.component=='locator':command+=['--resolution',str(args.resolution),'--augmentation',args.augmentation]
         result=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT)
     (output/'runtime-after.json').write_text(json.dumps(w.isolation(),indent=2)+'\n')
     assert sha(ROOT/'best.pt')==manifest['checkpoint_sha256'] and sha(ROOT/'plan.json')==manifest['plan_sha256']

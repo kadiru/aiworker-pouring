@@ -38,10 +38,15 @@ def main():
     h, witness = check()
     assert not h['queue'] and not (h.get('recording') or {}).get('active')
     plan = read(ROOT/'plan.json'); cases = {s['name']:s for s in plan[a.part]}
+    if a.part=='collect' and 'collection_rounds' in plan:
+        declared=set(plan['collection_rounds'][a.round])
+        assert declared <= cases.keys()
+        cases={name:s for name,s in cases.items() if name in declared}
     if a.part=='pilot':assert plan.get('pilot_round','r0')==a.round
     assert cases
     preflight = read(ROOT/(a.part+'-geometry.json'))
     assert preflight['complete'] and preflight['passed'] and preflight['plan_sha256'] == m['plan_sha256']
+    assert cases.keys() <= {r['name'] for r in preflight['cases'] if r['passed']}
     outputs = w.HOST_ROOT/'outputs/fountain'
     existing = {read(p)['name'] for p in outputs.glob('*/*SC_A_*/parameters.json')}
     assert not cases.keys() & existing, 'Started IDs cannot be retried'

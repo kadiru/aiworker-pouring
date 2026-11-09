@@ -1,7 +1,8 @@
 import copy
 import unittest
 from collections import defaultdict
-from scale_data_admission import SIZES,admit,balanced_frame_weights
+from pathlib import Path
+from scale_data_admission import SIZES,admit,balanced_frame_weights,collection_paths
 
 
 def fixture():
@@ -20,6 +21,14 @@ def fixture():
 
 
 class AdmissionTests(unittest.TestCase):
+    def test_declared_evidence_revision_and_study_local_paths(self):
+        root=Path('/synthetic/study')
+        audit,review=collection_paths(root,dict(collection_audit='collect-r1-audit.json',collection_review='collect-r1-manual-review.json'))
+        self.assertEqual(audit,root/'collect-r1-audit.json')
+        self.assertEqual(review,root/'collect-r1-manual-review.json')
+        for value in ('../old-audit.json','/other/audit.json','not-json.txt'):
+            with self.assertRaises(ValueError):collection_paths(root,dict(collection_audit=value))
+
     def test_all_sizes_and_whole_episodes(self):
         p,m,a=fixture();self.assertEqual(len(admit(p,m,a)),54)
 

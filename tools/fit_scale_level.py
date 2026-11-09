@@ -19,7 +19,7 @@ from pour_guard_models import CupEstimator
 from pour_guard_vision import locate,plane_point,cup_crop,color_geometry_readout
 from pour_settled_model import features,predict
 from pour_temporal_localization import consensus
-from scale_data_admission import admit,balanced_frame_weights,SIZES
+from scale_data_admission import admit,balanced_frame_weights,SIZES,collection_paths
 ROOT=Path('/workspace/learning/A-scale-20261109-v1')
 
 
@@ -30,9 +30,9 @@ def write(name,data):(ROOT/name).write_text(json.dumps(data,indent=2)+'\n')
 
 @torch.no_grad()
 def collect():
-    plan=read(ROOT/'plan.json');m=read(ROOT/'candidate.json');audit=read(ROOT/'collect-r0-audit.json')
-    review=read(ROOT/'collect-r0-manual-review.json');selection=read(ROOT/'scope-selection.json')
-    assert review['accepted'] and review['audit_sha256']==sha(ROOT/'collect-r0-audit.json')
+    plan=read(ROOT/'plan.json');m=read(ROOT/'candidate.json');audit_path,review_path=collection_paths(ROOT,m)
+    audit=read(audit_path);review=read(review_path);selection=read(ROOT/'scope-selection.json')
+    assert review['accepted'] and review['audit_sha256']==sha(audit_path)
     assert selection['passed'] and selection['scope']=='all_nine_declared_cup_sizes'
     assert sha(ROOT/'plan.json')==m['plan_sha256'] and sha(ROOT/'best.pt')==m['checkpoint_sha256']
     assert sha(ROOT/'cup-neural-localization.pt')==selection['checkpoint_sha256']
@@ -106,6 +106,7 @@ def main():
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name()
     torch.set_num_threads(4);torch.manual_seed(26110971);started=time.perf_counter()
     plan,parent,model,data=collect();gate=plan['component_gates'];tr=data['train'];va=data['validation']
+    audit_path,review_path=collection_paths(ROOT,read(ROOT/'candidate.json'))
     with torch.no_grad():
         raw=metrics(va['cnn'],va);retained=metrics(predict(va['features'],parent['settled_regressor']),va)
     # Keep the existing RGB feature definition and architecture, but fit a
@@ -154,7 +155,7 @@ def main():
         fit_seconds=fit_seconds,total_seconds=time.perf_counter()-started,
         plan_sha256=sha(ROOT/'plan.json'),parent_checkpoint_sha256=sha(ROOT/'best.pt'),
         localization_checkpoint_sha256=sha(ROOT/'cup-neural-localization.pt'),checkpoint_sha256=sha(artifact),
-        audit_sha256=sha(ROOT/'collect-r0-audit.json'),manual_review_sha256=sha(ROOT/'collect-r0-manual-review.json'),
+        audit_sha256=sha(audit_path),manual_review_sha256=sha(review_path),
         helper_sha256=sha(Path(__file__)),feature_helper_sha256=sha(Path('/workspace/src/pour_settled_model.py')),
         device=torch.cuda.get_device_name(),autonomous_use_accepted=False,
         method='Supervised 139-feature, 32/16 tanh residual regressor over a frozen CNN. Equal size/episode weighted squared error plus 0.02 residual penalty; AdamW, 1200 steps. Whole-episode validation and per-size error gates. No RL.',

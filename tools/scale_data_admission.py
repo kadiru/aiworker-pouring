@@ -9,6 +9,16 @@ import math
 SIZES=tuple((h,d) for h in (.9,1.,1.1) for d in (.9,1.,1.1))
 
 
+def collection_paths(root, manifest):
+    """Choose the declared audit/review revision; never silently reuse old data."""
+    names=(manifest.get('collection_audit','collect-r0-audit.json'),
+           manifest.get('collection_review','collect-r0-manual-review.json'))
+    for name in names:
+        if not isinstance(name,str) or root.joinpath(name).name!=name or not name.endswith('.json'):
+            raise ValueError('Collection evidence must be a study-local JSON basename')
+    return tuple(root/name for name in names)
+
+
 def size(spec):
     key=(float(spec['cup_height_scale']),float(spec['cup_diameter_scale']))
     if key not in SIZES:raise ValueError('Undeclared cup size')
