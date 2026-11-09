@@ -46,6 +46,13 @@ def main():
                 a=decode(d['next_obs/'+camera+'_image'][-1],'jpeg95')
                 cal=dict(K=f['calibration/'+camera+'/intrinsics'][:].tolist(),T=d['next_obs/'+camera+'_world_T_camera'][-1].tolist(),table_z=1.04)
                 r['cameras'][camera]=dict(calibration=cal,resolution=[a.shape[1],a.shape[0]])
+                skews=[]
+                for group,clock in (('obs','time'),('next_obs','next_time')):
+                    times=d[group+'/'+camera+'_time'][:];reference=d[clock][:]
+                    assert times.shape==reference.shape and np.isfinite(times).all()
+                    skews.append(float(np.max(np.abs(times-reference))))
+                r['cameras'][camera]['max_clock_skew_s']=max(skews)
+                assert max(skews)<1e-4,(name,camera,skews)
                 if camera=='cup_detail':
                     size=spec.get('cup_detail_resolution',768);focal=spec.get('cup_detail_focal_m',.045)
                     assert a.shape==(size,size,3)
