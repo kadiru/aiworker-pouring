@@ -278,3 +278,13 @@ Bottle changes follow separately so grip/IK/mass changes can be diagnosed.
 `evidence/size-A/perception-readiness-r3.json` from already admitted data.
 It performs no inference, fitting, GPU use or runtime modification and
 consumes no observations from the ongoing reserved evaluation.
+
+
+The completed original-size round-3 reserved evaluation is **4/6 strict
+passes**, with two two-particle spills before empty-stop and six complete
+returns. Both full cases pass final level but approach the brim before
+stopping. This is not a zero-spill baseline acceptance. Diagnose those
+losses and stopping/settling behavior before accepting resized autonomy;
+stationary size-perception calibration can remain a separate bounded step.
+No new bottle geometry or resized autonomous trial was spawned in this
+closure. The proposed nine bottle shapes remain unvalidated calculations.

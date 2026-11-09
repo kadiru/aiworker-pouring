@@ -5,6 +5,25 @@ separate development study; the V24 25/30 benchmark and V25 3/6 consumed-layout
 regressions remain immutable. Parent checkpoint is
 `a38f447160d8f9de664494f6d685e628daa9c0d647ecf922d5223b7d892bdeaf`.
 
+## Current round-3 result
+
+The frozen original-size candidate closes at **4/6 reserved strict passes**,
+**4/6 zero measured loss**, and **6/6 ordered returns**, after 9/9 static
+checks and 6/6 development passes. The zero-spill goal is not achieved.
+Tests00/04 each lose two particles before their empty-stop command; both
+full-stop tests finish at 96.1034% / 96.8963% rim height. All four empty
+bottles end with zero source particles. No fitting, retries, threshold or
+runtime changes occurred during the six reserved attempts.
+
+The complete [171.4-second labeled test video](../evidence/perception-A/test-r3.mp4)
+includes both failures at 1× and all passes at 2×. The separate
+[149.5-second development video](../evidence/perception-A/development-r3.mp4)
+retains all six development passes. These are Isaac Sim results at original
+vessel sizes and fresh small jitters of prior layout families, not new-size,
+novel-layout or hardware validation. The method is supervised visual
+perception, retained motion behavioral cloning/IK, and programmed grasp,
+stop and return; no reinforcement learning.
+
 ## Evidence and current interpretation
 
 Three 768×768 camera pilots and three particle-backed repeats retain all
@@ -637,3 +656,56 @@ stop time, instantaneous/terminal heights and constant-inventory terminal
 height changes. Near-table loss is position-based scoring, not a measured
 contact force. It makes no causal claim and never replaces task scoring.
 The same helper will analyze the reserved batch only after its audit/backup.
+
+
+## Reserved round-3 closure and next gate
+
+| Native case | Goal | Result | Final rim height | Source nominal mL | Final/near-table lost particles |
+|---|---|---|---:|---:|---:|
+| PV_A_test_00 | Empty | Fail: spill | 57.9319% | 0 | 2 |
+| PV_A_test_01 | Empty | Pass | 53.5148% | 0 | 0 |
+| PV_A_test_02 | Full | Pass | 96.1034% | 33.633144 | 0 |
+| PV_A_test_03 | Full | Pass | 96.8963% | 34.875360 | 0 |
+| PV_A_test_04 | Empty | Fail: spill | 68.1276% | 0 | 2 |
+| PV_A_test_05 | Empty | Pass | 49.6510% | 0 | 0 |
+
+All six meet every other strict task requirement and pass the additional
+ordered return check. No post-release gripper contacts occur; maximum
+sampled stationary upright pause over the cup is 0.05 s. Native selected
+frames show set-down, release and hand withdrawal. Both failed cases show
+small red specks outside the cup around the recorded loss; exact particle
+counts come from the scalar audit, not visual counting.
+
+First near-table loss samples precede stop commands by 0.40 / 0.35 s in
+00/04. These position-based measurements are not contact-force readings.
+No per-particle trajectories were saved in the original reserved plan,
+so the precise escape mechanism remains unresolved. The two full passes
+have first post-stop heights of 98.5654% / 99.5600%, then lower final levels.
+Their peak transient outside classifications (0.023328 / 0.034992 nominal
+mL) return inside; neither has final outside or ever-near-table loss.
+A pass therefore does not establish continuously splash-free behavior or
+ample stopping headroom. Late terminal height drops also persist at constant
+inventory; the solver/sleep hypothesis above remains untested.
+
+All 135 complete native records pass integrity checks, with no incompletes;
+558 scalar sidecars are SHA-verified locally. Raw HDF5/trajectories stay on
+Ubuntu. The 171.4-second test video is 3,428 frames at 20 fps, 1280×720,
+17,499,345 bytes, SHA256
+`dc773b0df5dc30306ba477ffef84339f655dcbea0c42e405a44a3e53694380db`.
+Complete decoding and 54 camera comparisons pass, maximum mean pixel error
+1.372/255. All 72 selected native and 20 selected encoded frames were
+inspected, not continuous manual playback. Separate manual-review manifests
+preserve the hash bindings of the generated pending-review reports.
+
+`test-r3-closure.json` binds the outcomes, audit, backup manifest, stop-event
+analysis, source/resource witnesses and actual manual reviews. The simulator
+is idle with no queued tasks. The finite observer and delivery helper ended.
+The 4070-only caps and guard remain verified; other jobs were not modified.
+The final witness also records a separate 4090 process.
+
+Before accepting broader autonomy, collect particle trajectories in separate
+development reproductions of the two final-droplet losses and investigate
+the narrow stopping margin/late settling. Retain this 4/6 result unchanged;
+any future reuse of these tests must be declared as consumed development
+and followed by new reserved cases. Resized cup/bottle autonomy remains
+unaccepted. Existing size calibration gaps are in `SIZE_CURRICULUM.md`.
