@@ -2,7 +2,7 @@
 
 Updated: November 9, 2026 (America/Los_Angeles).
 
-**Current: six r1 development pours accepted and reviewed; thirty fresh once-only tests are running on the guarded RTX 4070. No reserved outcome is claimed yet.**
+**Current: six r1 development pours accepted and reviewed; thirty fresh once-only tests are running on the guarded RTX 4070. Reserved progress: 3/3 completed attempts accepted with zero final/table loss; 27 remain. The first full case settles at 95.1809% rim height, peak 95.4112%, with 0.1663 mm placement error. The second correctly empties its bottle and has 0.8948 mm placement error. The third full case settles at 95.8183%, peak 96.1504%, and 0.5283 mm placement error. An early reserved isolation witness confirms unchanged caps/guard and frozen hashes while a separate compute process is active on the 4090.**
 
 The frozen side-return candidate passes **6/6 complete-task, stopping-margin, side-motion, placement and ordered-release checks**, with **6/6 zero final/table loss**. Full cases settle at **93.6666%, 92.6027%, 94.5600%** of rim height; the three empty cases have zero remaining source particles. Maximum sampled peak is **94.8078%**, maximum placement error **0.9036 mm**. Every rotating return sample also translates; there are zero upright-over-cup samples. Five cases use the feasible robot-left fallback; the fifth case places 180.49 mm to robot-right (world −Y), with 0.1754 mm error.
 
