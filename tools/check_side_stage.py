@@ -70,7 +70,7 @@ def main():
     report=dict(records=result,protected_parent_files_unchanged=True,unstarted=sorted(set(expected)-seen),
         started_incomplete=sorted(seen-{r['name'] for r in result}),
         scope='Native recording integrity and camera audit. Authored stationary/held fixtures are calibration only; autonomous outcomes are scored separately.',helper_sha256=sha(Path(__file__)))
-    (ROOT/'recording-audit.json').write_text(json.dumps(report,indent=2)+'\n')
+    temporary=ROOT/'recording-audit.tmp';temporary.write_text(json.dumps(report,indent=2)+'\n');temporary.replace(ROOT/'recording-audit.json')
     print(json.dumps(dict(complete=len(result),accepted_labels=sum(r.get('label',{}).get('accepted',False) for r in result),
         closed_by_split=dict(Counter(r['split'] for r in result)),
         rejected_labels=[r['name'] for r in result if 'label' in r and not r['label']['accepted']],

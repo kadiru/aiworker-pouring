@@ -42,7 +42,8 @@ print(json.dumps(dict(ready=ready,completed=progress['completed'],strict_passes=
     for name,suffix in ((a.part+'-outcomes.json','-outcomes.json'),(a.part+'-visual-review.json','-visual-review.json'),('recording-audit.json','-audit.json')):
         copy(STUDY+'/'+name,E/(stem+suffix))
     for name in ('progress','runtime-before','runtime-after'):copy(STUDY+'/'+stem+'/'+name+'.json',E/(stem+'-'+name+'.json'))
-    copy(STUDY+'/'+a.part+'-review',E/(stem+'-native-review'),True)
+    review_directory=a.part+'-review'+(f'-r{a.round}' if a.round else '')
+    copy(STUDY+'/'+review_directory,E/(stem+'-native-review'),True)
     outcomes=json.loads((E/(stem+'-outcomes.json')).read_text());assert outcomes['counts']['completed']==count
     env=dict(os.environ,PYTHONPATH=str(PROJECT/'runtime/src')+':'+str(PROJECT/'tools'),PYTHONPYCACHEPREFIX='/tmp/aiworker-side-pycache')
     def local(tool,*args):subprocess.run([sys.executable,str(PROJECT/'tools'/tool),*args],cwd=PROJECT,env=env,check=True,timeout=7200)

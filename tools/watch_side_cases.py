@@ -3,6 +3,7 @@ import argparse,datetime,hashlib,json,subprocess,sys,time
 from pathlib import Path
 sys.path.insert(0,'/tmp')
 import watch_wide_collection as w
+from side_recording_ready import committed_recording_paths
 ROOT=w.HOST_ROOT/'learning/A-side-return-20261108-v1'
 sys.path.insert(0,str(w.HOST_ROOT/'src'))
 from pour_robust_report import completed_row
@@ -28,16 +29,21 @@ def main():
     outputs=w.HOST_ROOT/'outputs/fountain'
     existing={read(p)['name'] for p in outputs.glob('*/*SR_A_*/parameters.json')}
     assert not expected.keys()&existing,'Never retry or silently resume a started split'
-    h=w.health();assert not h['queue'] and not h.get('recording',{}).get('active',False) and not h.get('error')
+    h=w.health();assert not h['queue'] and not (h.get('recording') or {}).get('active',False) and not h.get('error')
     a.output.mkdir();(a.output/'runtime-before.json').write_text(json.dumps(capture(manifest),indent=2)+'\n')
     w.command('side_'+a.part);seen={};deadline=time.monotonic()+12*3600
     while time.monotonic()<deadline:
         assert subprocess.check_output(['docker','inspect','-f','{{.State.Running}}',w.CID],text=True).strip()=='true','Priority stop respected; no auto-restart'
         assert sha(ROOT/'best.pt')==manifest['checkpoint_sha256'] and sha(ROOT/'plan.json')==manifest['plan_sha256']
         assert all(sha(w.HOST_ROOT/'src'/n)==d for n,d in manifest['runtime_sources'].items())
+        committed={}
         for p in outputs.glob('*/*SR_A_*/metrics.json'):
             spec=read(p.parent/'parameters.json');name=spec['name']
             if name not in expected or name in seen:continue
+            run=p.parent.parent
+            if run not in committed:committed[run]=committed_recording_paths(run)
+            native_folder=str(Path('/workspace')/p.parent.relative_to(w.HOST_ROOT))
+            if native_folder not in committed[run]:continue
             assert all(spec[k]==v for k,v in expected[name].items())
             if a.part.startswith('impact') or a.part=='support':
                 m=read(p);row=dict(name=name,status='complete',path=str(p.parent),strict_pass=bool(m['zero_spill']),failure_reasons=[] if m['zero_spill'] else ['measured_spill'],scope='Containment in non-autonomous calibration only; task/support outcomes are scored separately')
@@ -52,7 +58,7 @@ def main():
             status='complete' if seen.keys()==expected.keys() else 'running',planned=len(expected),completed=len(seen),
             strict_passes=sum(r['strict_pass'] for r in seen.values()),
             cases=list(seen.values()),health={k:h.get(k) for k in ('phase','sim_time','recording','error')})
-        (a.output/'progress.json').write_text(json.dumps(progress,indent=2)+'\n')
+        temporary=a.output/'progress.tmp';temporary.write_text(json.dumps(progress,indent=2)+'\n');temporary.replace(a.output/'progress.json')
         if seen.keys()==expected.keys() and not h['queue'] and not h['recording']['active']:break
         time.sleep(20)
     else:raise TimeoutError('Finite observer expired; recordings retained; no automatic restart')

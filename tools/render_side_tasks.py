@@ -19,7 +19,7 @@ def card(report,part):
     text(d,(56,224),f"{c['accepted']} / {n}",72,WHITE,True)
     text(d,(56,310),'complete tasks passed',23,MUTED)
     text(d,(56,372),f"{c['zero_measured_loss']} / {n} zero final / table loss",25,GREEN,True)
-    text(d,(56,420),f"{c['side_returns']} / {n} side returns",25,WHITE,True)
+    text(d,(56,420),f"{c['side_returns']} / {n} side return + placement checks",25,WHITE,True)
     lines(d,(660,224),'Task: grab and lift a bottle, pour, stop near full or when empty, then set down and release.',25,560,WHITE)
     lines(d,(660,360),'Supervised visual perception; retained motion behavioral cloning + IK; programmed grasp, stop and return.',22,560,MUTED)
     lines(d,(56,545),'Original cup and bottle sizes. Material A. Native overview, wrist and cropped cup-detail views.',21,1168,MUTED)

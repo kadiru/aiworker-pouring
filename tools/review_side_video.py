@@ -9,8 +9,9 @@ from finish_media_source import verified_recording
 ROOT=Path(__file__).resolve().parents[1];E=ROOT/'evidence/side-return-A'
 def read(p):return json.loads(p.read_text())
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--part',choices=('development','test'),required=True);p.add_argument('--round',type=int,required=True);p.add_argument('--batch',type=int,default=0);a=p.parse_args()
-    base=f'{a.part}-r{a.round}';stem=base+(f'-part{a.batch}' if a.part=='test' else '');manifest=read(E/(stem+'-video.json'));video=Path(manifest['video'])
+    p=argparse.ArgumentParser();p.add_argument('--part',choices=('development','test'),required=True);p.add_argument('--round',type=int,required=True);p.add_argument('--batch',type=int,default=0);p.add_argument('--returns-only',action='store_true');a=p.parse_args()
+    assert not a.returns_only or (a.part=='development' and a.batch==0)
+    base=f'{a.part}-r{a.round}';stem=base+(f'-part{a.batch}' if a.part=='test' else '')+('-returns' if a.returns_only else '');manifest=read(E/(stem+'-video.json'));video=Path(manifest['video'])
     assert sha(video)==manifest['sha256'];dest=E/(stem+'-encoded-review');dest.mkdir(exist_ok=False)
     subprocess.run(['/opt/homebrew/bin/ffmpeg','-v','error','-threads','2','-i',str(video),'-f','null','-'],check=True)
     probe=json.loads(subprocess.check_output(['/opt/homebrew/bin/ffprobe','-v','error','-show_streams','-show_format','-of','json',str(video)]))
