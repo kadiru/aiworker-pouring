@@ -200,6 +200,11 @@ class RobotPour(Pour):
                 calibration_pose_scope='Authored stationary occlusion fixture; never autonomous grasp evidence')
         elif 'calibration_arm_angle_deg' in spec:
             self.scene_evidence['calibration_pose_scope']='Authored empty-hand pose with dynamic bottle on table; not an autonomous grasp attempt'
+        if spec.get('calibration_motion'):
+            from pour_dynamic_motion import path
+            assert 'calibration_hold_angle_deg' in spec
+            self.calibration_motion_path=path(spec,self.path_planner)
+            self.scene_evidence.update(bottle_kinematic=True,calibration_pose_scope='Authored moving bottle and actuated hand fixture; not autonomous grasp, transport or pouring evidence')
 
         self.drives=[]
         self.states=[]
@@ -243,6 +248,10 @@ class RobotPour(Pour):
 
     def drive(self,t):
         if self.spec.get('calibration_only'):
+            if self.spec.get('calibration_motion'):
+                from pour_dynamic_motion import apply
+                apply(self,t)
+                return
             self.command=self.calibration_command.copy()
             self.phase='Stationary liquid-level calibration'
             for drive,target in zip(self.drives,self.command):drive.Set(float(target))

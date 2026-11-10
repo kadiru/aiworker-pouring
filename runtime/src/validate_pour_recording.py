@@ -93,7 +93,7 @@ def validate(path):
                     duration_sim_s=float(ends[-1]-starts[0]),max_camera_state_skew_s=max_skew,
                     camera_timestamp_tolerance_s=camera_tolerance,
                     physical_success=bool(file.attrs['physical_success']),
-                    training_eligible=not prefix and file.attrs.get('task_scope')!='stationary_perception_calibration' and bool(file.attrs['physical_success']) and reviewed and
+                    training_eligible=not prefix and file.attrs.get('task_scope') not in ('stationary_perception_calibration','moving_perception_calibration') and bool(file.attrs['physical_success']) and reviewed and
                         file.attrs['evidence_kind'] in ('scripted_reference','noisy_expert_reference'),camera=cameras,
                     task_scope=file.attrs.get('task_scope','full_pour'),
                     corrective_training_eligible=bool(prefix and reviewed and metrics.get('prefix_success') and

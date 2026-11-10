@@ -25,7 +25,8 @@ class SeedFill:
         values = [self.spacing, self.flow, self.target, self.start, self.duration, self.settle]
         if not np.isfinite(values).all() or self.spacing != .0018:
             raise ValueError('Finite values and the fixed 1.8 mm particle resolution required')
-        if not (2 <= self.flow <= 8 and .85 <= self.target <= .92 and
+        flow_min,flow_max,target_min,target_max=(.5,2.,.94,.965) if spec.get('calibration_protocol')=='size_dynamic_v1' else (2.,8.,.85,.92)
+        if not (flow_min <= self.flow <= flow_max and target_min <= self.target <= target_max and
                 .3 <= self.start <= 1 and 1 <= self.duration <= 15 and 3 <= self.settle <= 6):
             raise ValueError('Outside the bounded seed-fill protocol')
         if type(initial_count) is not int or not 0 < initial_count < 20000:

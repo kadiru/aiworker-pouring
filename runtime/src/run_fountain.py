@@ -48,6 +48,7 @@ allowed_commands.add('perception_geometry')
 allowed_commands.update(('perception_camera_pilot','perception_holdout'))
 allowed_commands.update(('side_diagnostic','side_impact','side_impact_followup','side_support','side_development','side_test'))
 allowed_commands.update(('scale_pilot','scale_collect','scale_holdout'))
+allowed_commands.update('dynamic_'+s for s in ('seed_pilot','seed_remaining','low_train','train','validation','holdout','autonomy'))
 preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
@@ -666,7 +667,12 @@ try:
                     if stage: set_view(cmd=='close_view')
                 else:
                     best=best_result()
-                    if cmd in ('scale_pilot','scale_collect','scale_holdout'):
+                    if cmd.startswith('dynamic_'):
+                        if current is not None or pending:
+                            state['control_message']='Wait for idle before dynamic perception calibration';continue
+                        from pour_dynamic_study import pending as dynamic_pending
+                        pending.extend(dynamic_pending(cmd.removeprefix('dynamic_')))
+                    elif cmd in ('scale_pilot','scale_collect','scale_holdout'):
                         if current is not None or pending:
                             state['control_message']='Wait for idle before size calibration';continue
                         from pour_scale_study import pending as scale_pending

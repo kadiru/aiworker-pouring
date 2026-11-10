@@ -1,0 +1,3194 @@
+{
+  "part": "seed_remaining",
+  "records": [
+    {
+      "name": "SD_A_high_r0_01",
+      "path": "/workspace/outputs/fountain/20261110T010827Z/993-SD_A_high_r0_01-296578/episode.hdf5",
+      "sha256": "24ac27679c32270d428e462a08b540b09de98879e096a2c63c6a0c3652e5e71f",
+      "bytes": 54119691,
+      "split": "train",
+      "label": {
+        "accepted": true,
+        "target": 0.954508392639408,
+        "field": "cup_fill_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.0003259555966247385,
+        "half_window_drift": 9.141326729777965e-05,
+        "height_min": 0.9541398372525469,
+        "height_max": 0.955043548852009,
+        "final_sample": 0.9547683545966538,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "column_label": {
+        "accepted": true,
+        "target": 0.9563779332279366,
+        "field": "cup_column_height_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.000779145683338478,
+        "half_window_drift": 0.0001266111735425124,
+        "height_min": 0.9552793378144294,
+        "height_max": 0.9574317277646518,
+        "final_sample": 0.9572155148375254,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "recording_validation": {
+        "valid": true,
+        "path": "/workspace/outputs/fountain/20261110T010827Z/993-SD_A_high_r0_01-296578/episode.hdf5",
+        "transitions": 166,
+        "control_hz": 20.0,
+        "duration_sim_s": 8.300000001229346,
+        "max_camera_state_skew_s": 1.867488030882214e-07,
+        "camera_timestamp_tolerance_s": 0.0001,
+        "physical_success": false,
+        "training_eligible": false,
+        "camera": {
+          "task": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 1.6666169343171295,
+            "intrinsics": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "wrist": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.8193088107638888,
+            "intrinsics": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "cup_detail": {
+            "resolution": [
+              1024,
+              1024
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.9442078272501627,
+            "intrinsics": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "task_scope": "stationary_perception_calibration",
+        "corrective_training_eligible": false,
+        "recovery_training_eligible": false,
+        "metrics": {
+          "eligible": false,
+          "gates": [
+            "wrong_stop_condition",
+            "grip_not_sustained"
+          ],
+          "bottle_result": {
+            "t": 8.355,
+            "finite": true,
+            "count": 13534,
+            "bottle_ml": 19.997927999999998,
+            "cup_ml": 58.932359999999996,
+            "airborne_ml": 0.0,
+            "spilled_ml": 0.0,
+            "cup_fill_fraction": 0.9547683545966538,
+            "bottle_pose_xyz": [
+              0.49853283166885376,
+              -0.2595508396625519,
+              1.040000081062317
+            ],
+            "bottle_quat_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "bottle_tilt_deg": 0.0,
+            "stop_command": true,
+            "stop_reason": "grasp_failed",
+            "stop_time": 3.304999998770595,
+            "phase": "Stationary liquid-level calibration",
+            "initial_ml": 78.93028799999999,
+            "capacity_geometric_ml": 45.892731868612195,
+            "cup_inventory_fraction": 0.899456043956044,
+            "source_outflow_ml_s": 0.0,
+            "predicted_cup_ml": 58.932359999999996,
+            "outside_peak_z_m": null,
+            "diagnostic_outside_particles": [],
+            "diagnostic_outside_count": 0,
+            "surface_column_diagnostic": {
+              "valid": true,
+              "cells": 24,
+              "height_fraction": 0.9572155148375254,
+              "height_m": 0.03329079475402828,
+              "cell_top_iqr_m": 0.00018894672393798828,
+              "pitch_m": 0.0045,
+              "central_radius_m": 0.015
+            },
+            "cup_column_height_fraction": 0.9572155148375254,
+            "ever_table_ml": 0.0,
+            "grasp_verified": false,
+            "contacts": [
+              "Bench"
+            ],
+            "both_fingers": false,
+            "bottle_base_height_m": 8.106231685900411e-08,
+            "joint_targets_deg": [
+              34.14094296674203,
+              -12.97136305770377,
+              -4.192882959093058,
+              -138.07744994252275,
+              -13.464686625750046,
+              13.60331349169223,
+              -7.056797212193221,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "joint_positions_deg": [
+              34.14094161987305,
+              -12.971363067626953,
+              -4.192883491516113,
+              -138.07745361328125,
+              -13.464686393737793,
+              13.603318214416504,
+              -7.056800365447998,
+              -9.268602552126026e-10,
+              -6.862435064647343e-10,
+              4.306982548385463e-10,
+              -7.777192223556995e-10
+            ],
+            "command_angle_deg": 0.0,
+            "sleep_diagnostic": {
+              "/World/Robot/ffw_bg2_follower/root_joint": true,
+              "/World/Bottle": false
+            }
+          },
+          "expected_stop": "cup_near_full",
+          "attribution": "Authored gradual cup filling and settling; no autonomous controller",
+          "grasp_verified": false,
+          "bilateral_fraction_during_pour": 0.0,
+          "hold_height_m": 8.106231685900411e-08,
+          "scene": {
+            "bottle_mass_kg": 0.18,
+            "bottle_gravity_enabled": true,
+            "bottle_kinematic": false,
+            "bottle_attachment_joints": [],
+            "robot_arm_gravity_compensation": true,
+            "finger_static_friction": 1.15,
+            "finger_dynamic_friction": 1.0,
+            "arm_control": "Joint position drives with native actuator torque limits",
+            "observation_source": "Simulator particle inventory and fill height",
+            "home_clearance_m": 0.1,
+            "dof_names": [
+              "arm_r_joint1",
+              "arm_r_joint2",
+              "arm_r_joint3",
+              "arm_r_joint4",
+              "arm_r_joint5",
+              "arm_r_joint6",
+              "arm_r_joint7",
+              "gripper_r_joint1",
+              "gripper_r_joint2",
+              "gripper_r_joint3",
+              "gripper_r_joint4"
+            ],
+            "cup_frame_world": [
+              0.490411899518823,
+              -0.1395366450384487,
+              1.04
+            ],
+            "cup_frame_rotation": [
+              [
+                2.220446049250313e-16,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                2.220446049250313e-16,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "bottle_support_contact": {
+              "static": 0.4,
+              "dynamic": 0.3,
+              "combine": "max",
+              "collider": "/World/Bottle/Base",
+              "scope": "Authored rigid support contact; not a measured glass/table coefficient. No wall, finger, particle or render-material changes."
+            }
+          },
+          "spill": {
+            "final_outside_ml": 0.0,
+            "ever_table_ml": 0.0,
+            "particle_quantum_ml": 0.0058319999999999995
+          },
+          "zero_spill": true,
+          "task_success_zero_spill": false,
+          "surface_task_success_zero_spill": false,
+          "seed_fill": {
+            "kind": "authored finite calibration jet, not robot pouring",
+            "initial_count": 12904,
+            "emitted_count": 630,
+            "emitted_nominal_ml": 3.6741599999999996,
+            "flow_nominal_ml_s": 0.75,
+            "stop_time": 5.354999998770792,
+            "stop_reason": "measured_target",
+            "target_height_fraction": 0.956,
+            "nozzle_world_m": [
+              0.490411899518823,
+              -0.1395366450384487,
+              1.0818
+            ],
+            "particle_mass_kg": 5.831999999999999e-06
+          }
+        }
+      },
+      "sidecars": {
+        "parameters.json": "fb58a70661f3525051245763ac8839b8b1818ace09070520636d0528f1a98e96",
+        "seed-fill.json": "3e86c298e69903579732ec0810d4aab4ee134c61d410712b8def4486405832f6",
+        "metrics.json": "598699e6c18dcccae3a0a2a4a96d68e1a74fceb6071c21f892ee8f750eb4b7f2",
+        "readback-audit.json": "7d637f8d7473b22a037b4e83fcf90624992b59e6c3b8d5738b786f9a0d358a4d",
+        "samples.json": "9208479c9e6092a22bd094abca49a18db9b9f711b1f931c4278ee32f58b3e26d"
+      },
+      "trajectory_sha256": "75fd7b3b39fccb9fcde5b20188a65f73a8a3f1b646eeb73cbb40ed6f69e7d822",
+      "containment": {
+        "final_outside_ml": 0.0,
+        "final_airborne_ml": 0.0,
+        "ever_table_ml": 0.0
+      },
+      "cameras": {
+        "task": {
+          "calibration": {
+            "K": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.6757246285173463,
+                -0.3140807876509529,
+                0.6668954080241154,
+                0.8499999999999999
+              ],
+              [
+                0.7371541402007413,
+                0.2879073886800402,
+                -0.6113207906887725,
+                -0.5500000000000002
+              ],
+              [
+                0.0,
+                0.9046892252989406,
+                0.4260720662376292,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.9999999999999999
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "wrist": {
+          "calibration": {
+            "K": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.4913228871365475,
+                0.5064046211959733,
+                -0.7086297906574145,
+                0.24299962373440961
+              ],
+              [
+                -0.870977508608745,
+                0.28567345746605927,
+                -0.3997359818643946,
+                -0.33500020254119
+              ],
+              [
+                8.573886114166026e-06,
+                0.8136000462947082,
+                0.5814249432177278,
+                1.3479962807195882
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "cup_detail": {
+          "calibration": {
+            "K": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.675254067189361,
+                -0.3806611182473653,
+                0.6317666165593837,
+                0.8499999999999999
+              ],
+              [
+                0.7375852118529941,
+                0.34849257304336273,
+                -0.5783778883994359,
+                -0.5499999999999999
+              ],
+              [
+                -2.7755575615628914e-17,
+                0.8565337352307157,
+                0.5160910388794966,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            1024,
+            1024
+          ]
+        },
+        "overview": {
+          "calibration": {
+            "K": [
+              [
+                439.799560546875,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                439.799560546875,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.7071067811865476,
+                -0.4187140229674477,
+                0.5698057273934826,
+                1.0000000000000002
+              ],
+              [
+                0.7071067811865476,
+                0.4187140229674477,
+                -0.5698057273934826,
+                -0.7300000000000001
+              ],
+              [
+                0.0,
+                0.8058269875977297,
+                0.592151050036364,
+                1.65
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        }
+      },
+      "review_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seed_remaining-r0-review/SD_A_high_r0_01.jpg",
+      "review_sha256": "db0f244b3806a0e7e1f241f086455045a9497aa6e67507f61577c83aea501867",
+      "settled_seed_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seeds/SD_A_high_r0_01-settled.npz",
+      "settled_seed_sha256": "56e56dee8fda790bdd177b1115e551f19b74383b39938d342d5bf631ce4d0df7",
+      "settled_seed_particles": 10105,
+      "high_fill_coverage": true
+    },
+    {
+      "name": "SD_A_high_r0_02",
+      "path": "/workspace/outputs/fountain/20261110T010827Z/994-SD_A_high_r0_02-442530/episode.hdf5",
+      "sha256": "e0ae64932ac612e0b3705ab2c6dd0890da2b8f1370222fbad381642a1fcbccb1",
+      "bytes": 59105473,
+      "split": "train",
+      "label": {
+        "accepted": true,
+        "target": 0.9565509035696378,
+        "field": "cup_fill_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.0006996728236378091,
+        "half_window_drift": 0.0006420160430707922,
+        "height_min": 0.9555145229389451,
+        "height_max": 0.9572958642361197,
+        "final_sample": 0.9570294938056283,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "column_label": {
+        "accepted": true,
+        "target": 0.9704882615531957,
+        "field": "cup_column_height_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.0008765388937558294,
+        "half_window_drift": 6.62273830838167e-05,
+        "height_min": 0.9691403395210202,
+        "height_max": 0.9720231785493725,
+        "final_sample": 0.9707570668139475,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "recording_validation": {
+        "valid": true,
+        "path": "/workspace/outputs/fountain/20261110T010827Z/994-SD_A_high_r0_02-442530/episode.hdf5",
+        "transitions": 185,
+        "control_hz": 20.0,
+        "duration_sim_s": 9.250000001229346,
+        "max_camera_state_skew_s": 2.0798295707891157e-07,
+        "camera_timestamp_tolerance_s": 0.0001,
+        "physical_success": false,
+        "training_eligible": false,
+        "camera": {
+          "task": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 1.8431215639467593,
+            "intrinsics": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "wrist": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.8260339807581019,
+            "intrinsics": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "cup_detail": {
+            "resolution": [
+              1024,
+              1024
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.921598752339681,
+            "intrinsics": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "task_scope": "stationary_perception_calibration",
+        "corrective_training_eligible": false,
+        "recovery_training_eligible": false,
+        "metrics": {
+          "eligible": false,
+          "gates": [
+            "wrong_stop_condition",
+            "grip_not_sustained"
+          ],
+          "bottle_result": {
+            "t": 9.305,
+            "finite": true,
+            "count": 15708,
+            "bottle_ml": 19.997927999999998,
+            "cup_ml": 71.611128,
+            "airborne_ml": 0.0,
+            "spilled_ml": 0.0,
+            "cup_fill_fraction": 0.9570294938056283,
+            "bottle_pose_xyz": [
+              0.5361913442611694,
+              -0.11891784518957138,
+              1.040000081062317
+            ],
+            "bottle_quat_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "bottle_tilt_deg": 0.0,
+            "stop_command": true,
+            "stop_reason": "grasp_failed",
+            "stop_time": 3.304999998770595,
+            "phase": "Stationary liquid-level calibration",
+            "initial_ml": 91.609056,
+            "capacity_geometric_ml": 55.53020556102077,
+            "cup_inventory_fraction": 0.9032776314594494,
+            "source_outflow_ml_s": 0.0,
+            "predicted_cup_ml": 71.611128,
+            "outside_peak_z_m": null,
+            "diagnostic_outside_particles": [],
+            "diagnostic_outside_count": 0,
+            "surface_column_diagnostic": {
+              "valid": true,
+              "cells": 32,
+              "height_fraction": 0.9707570668139475,
+              "height_m": 0.0337051662445068,
+              "cell_top_iqr_m": 0.000417858362197876,
+              "pitch_m": 0.0045,
+              "central_radius_m": 0.0165
+            },
+            "cup_column_height_fraction": 0.9707570668139475,
+            "ever_table_ml": 0.0,
+            "grasp_verified": false,
+            "contacts": [
+              "Bench"
+            ],
+            "both_fingers": false,
+            "bottle_base_height_m": 8.106231685900411e-08,
+            "joint_targets_deg": [
+              34.14094296674203,
+              -12.97136305770377,
+              -4.192882959093058,
+              -138.07744994252275,
+              -13.464686625750046,
+              13.60331349169223,
+              -7.056797212193221,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "joint_positions_deg": [
+              34.14094161987305,
+              -12.971363067626953,
+              -4.192883491516113,
+              -138.07745361328125,
+              -13.464686393737793,
+              13.603318214416504,
+              -7.056800365447998,
+              -9.268602552126026e-10,
+              -6.862435064647343e-10,
+              4.306982548385463e-10,
+              -7.777192223556995e-10
+            ],
+            "command_angle_deg": 0.0,
+            "sleep_diagnostic": {
+              "/World/Robot/ffw_bg2_follower/root_joint": true,
+              "/World/Bottle": false
+            }
+          },
+          "expected_stop": "cup_near_full",
+          "attribution": "Authored gradual cup filling and settling; no autonomous controller",
+          "grasp_verified": false,
+          "bilateral_fraction_during_pour": 0.0,
+          "hold_height_m": 8.106231685900411e-08,
+          "scene": {
+            "bottle_mass_kg": 0.18,
+            "bottle_gravity_enabled": true,
+            "bottle_kinematic": false,
+            "bottle_attachment_joints": [],
+            "robot_arm_gravity_compensation": true,
+            "finger_static_friction": 1.15,
+            "finger_dynamic_friction": 1.0,
+            "arm_control": "Joint position drives with native actuator torque limits",
+            "observation_source": "Simulator particle inventory and fill height",
+            "home_clearance_m": 0.1,
+            "dof_names": [
+              "arm_r_joint1",
+              "arm_r_joint2",
+              "arm_r_joint3",
+              "arm_r_joint4",
+              "arm_r_joint5",
+              "arm_r_joint6",
+              "arm_r_joint7",
+              "gripper_r_joint1",
+              "gripper_r_joint2",
+              "gripper_r_joint3",
+              "gripper_r_joint4"
+            ],
+            "cup_frame_world": [
+              0.4334012319655689,
+              -0.3029361889249044,
+              1.04
+            ],
+            "cup_frame_rotation": [
+              [
+                2.220446049250313e-16,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                2.220446049250313e-16,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "bottle_support_contact": {
+              "static": 0.4,
+              "dynamic": 0.3,
+              "combine": "max",
+              "collider": "/World/Bottle/Base",
+              "scope": "Authored rigid support contact; not a measured glass/table coefficient. No wall, finger, particle or render-material changes."
+            }
+          },
+          "spill": {
+            "final_outside_ml": 0.0,
+            "ever_table_ml": 0.0,
+            "particle_quantum_ml": 0.0058319999999999995
+          },
+          "zero_spill": true,
+          "task_success_zero_spill": false,
+          "surface_task_success_zero_spill": false,
+          "seed_fill": {
+            "kind": "authored finite calibration jet, not robot pouring",
+            "initial_count": 14952,
+            "emitted_count": 756,
+            "emitted_nominal_ml": 4.408992,
+            "flow_nominal_ml_s": 0.75,
+            "stop_time": 6.30499999877094,
+            "stop_reason": "measured_target",
+            "target_height_fraction": 0.956,
+            "nozzle_world_m": [
+              0.4334012319655689,
+              -0.3029361889249044,
+              1.0818
+            ],
+            "particle_mass_kg": 5.831999999999999e-06
+          }
+        }
+      },
+      "sidecars": {
+        "parameters.json": "dbb505b16f00705b56f58fe33bf6f8a076916c1464a2fcb596cbd688d1d83f9a",
+        "seed-fill.json": "50fe22cf6329065c48c4d89e327dd7329f085d72034270ec96ad77edde002b6c",
+        "metrics.json": "788544e1cf2a2b6f03f33c308bebed2e091be3f93bd980f741fd305de22f85fe",
+        "readback-audit.json": "7d637f8d7473b22a037b4e83fcf90624992b59e6c3b8d5738b786f9a0d358a4d",
+        "samples.json": "2d473a84ca003f4da6e24b278cee33bb358d63f71d2cdc22f79f5afcc34324a8"
+      },
+      "trajectory_sha256": "090b2c5b202344eef11ba1c6d1a7ac749b0044c809480176c25f8bdeb3b204b4",
+      "containment": {
+        "final_outside_ml": 0.0,
+        "final_airborne_ml": 0.0,
+        "ever_table_ml": 0.0
+      },
+      "cameras": {
+        "task": {
+          "calibration": {
+            "K": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.6757246285173463,
+                -0.3140807876509529,
+                0.6668954080241154,
+                0.8499999999999999
+              ],
+              [
+                0.7371541402007413,
+                0.2879073886800402,
+                -0.6113207906887725,
+                -0.5500000000000002
+              ],
+              [
+                0.0,
+                0.9046892252989406,
+                0.4260720662376292,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.9999999999999999
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "wrist": {
+          "calibration": {
+            "K": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.4913228871365475,
+                0.5064046211959733,
+                -0.7086297906574145,
+                0.24299962373440961
+              ],
+              [
+                -0.870977508608745,
+                0.28567345746605927,
+                -0.3997359818643946,
+                -0.33500020254119
+              ],
+              [
+                8.573886114166026e-06,
+                0.8136000462947082,
+                0.5814249432177278,
+                1.3479962807195882
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "cup_detail": {
+          "calibration": {
+            "K": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.675254067189361,
+                -0.3806611182473653,
+                0.6317666165593837,
+                0.8499999999999999
+              ],
+              [
+                0.7375852118529941,
+                0.34849257304336273,
+                -0.5783778883994359,
+                -0.5499999999999999
+              ],
+              [
+                -2.7755575615628914e-17,
+                0.8565337352307157,
+                0.5160910388794966,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            1024,
+            1024
+          ]
+        },
+        "overview": {
+          "calibration": {
+            "K": [
+              [
+                439.799560546875,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                439.799560546875,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.7071067811865476,
+                -0.4187140229674477,
+                0.5698057273934826,
+                1.0000000000000002
+              ],
+              [
+                0.7071067811865476,
+                0.4187140229674477,
+                -0.5698057273934826,
+                -0.7300000000000001
+              ],
+              [
+                0.0,
+                0.8058269875977297,
+                0.592151050036364,
+                1.65
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        }
+      },
+      "review_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seed_remaining-r0-review/SD_A_high_r0_02.jpg",
+      "review_sha256": "8195ed2d3f95ee2da2de0b80b8fb28cda24d4f1c2c9bab83c30538bd34be283c",
+      "settled_seed_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seeds/SD_A_high_r0_02-settled.npz",
+      "settled_seed_sha256": "3fefe0b6ea8a9392488e259a8f92879fcd0d9a225290d6c3a136b29ded065e0e",
+      "settled_seed_particles": 12279,
+      "high_fill_coverage": true
+    },
+    {
+      "name": "SD_A_high_r0_03",
+      "path": "/workspace/outputs/fountain/20261110T010827Z/995-SD_A_high_r0_03-59659/episode.hdf5",
+      "sha256": "fe28cb0fea3e0123f4b147277f4ddd8be1499f54ad251dd554e95f51dd322d4d",
+      "bytes": 50766861,
+      "split": "train",
+      "label": {
+        "accepted": true,
+        "target": 0.9565455955617557,
+        "field": "cup_fill_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.00037193298339821546,
+        "half_window_drift": 0.00013831783743467607,
+        "height_min": 0.9556557683383705,
+        "height_max": 0.9574145611594693,
+        "final_sample": 0.9565725929596832,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "column_label": {
+        "accepted": true,
+        "target": 0.9603482667137582,
+        "field": "cup_column_height_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.0011991052066578911,
+        "half_window_drift": 0.0005355652640848252,
+        "height_min": 0.9574872437645394,
+        "height_max": 0.9617875435773051,
+        "final_sample": 0.9605323398814469,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "recording_validation": {
+        "valid": true,
+        "path": "/workspace/outputs/fountain/20261110T010827Z/995-SD_A_high_r0_03-59659/episode.hdf5",
+        "transitions": 156,
+        "control_hz": 20.0,
+        "duration_sim_s": 7.800000001229346,
+        "max_camera_state_skew_s": 1.7557293219283565e-07,
+        "camera_timestamp_tolerance_s": 0.0001,
+        "physical_success": false,
+        "training_eligible": false,
+        "camera": {
+          "task": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 1.6639833803530093,
+            "intrinsics": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "wrist": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.7852195457175926,
+            "intrinsics": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "cup_detail": {
+            "resolution": [
+              1024,
+              1024
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.954991340637207,
+            "intrinsics": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "task_scope": "stationary_perception_calibration",
+        "corrective_training_eligible": false,
+        "recovery_training_eligible": false,
+        "metrics": {
+          "eligible": false,
+          "gates": [
+            "wrong_stop_condition",
+            "grip_not_sustained"
+          ],
+          "bottle_result": {
+            "t": 7.855,
+            "finite": true,
+            "count": 12530,
+            "bottle_ml": 19.997927999999998,
+            "cup_ml": 53.077031999999996,
+            "airborne_ml": 0.0,
+            "spilled_ml": 0.0,
+            "cup_fill_fraction": 0.9565725929596832,
+            "bottle_pose_xyz": [
+              0.5350808501243591,
+              -0.3069755434989929,
+              1.040000081062317
+            ],
+            "bottle_quat_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "bottle_tilt_deg": 0.0,
+            "stop_command": true,
+            "stop_reason": "grasp_failed",
+            "stop_time": 3.304999998770595,
+            "phase": "Stationary liquid-level calibration",
+            "initial_ml": 73.07495999999999,
+            "capacity_geometric_ml": 41.30345868175098,
+            "cup_inventory_fraction": 0.9000989010989009,
+            "source_outflow_ml_s": 0.0,
+            "predicted_cup_ml": 53.077031999999996,
+            "outside_peak_z_m": null,
+            "diagnostic_outside_particles": [],
+            "diagnostic_outside_count": 0,
+            "surface_column_diagnostic": {
+              "valid": true,
+              "cells": 16,
+              "height_fraction": 0.9605323398814469,
+              "height_m": 0.0366580995559692,
+              "cell_top_iqr_m": 0.0001595020294189453,
+              "pitch_m": 0.0045,
+              "central_radius_m": 0.013500000000000002
+            },
+            "cup_column_height_fraction": 0.9605323398814469,
+            "ever_table_ml": 0.0,
+            "grasp_verified": false,
+            "contacts": [
+              "Bench"
+            ],
+            "both_fingers": false,
+            "bottle_base_height_m": 8.106231685900411e-08,
+            "joint_targets_deg": [
+              34.14094296674203,
+              -12.97136305770377,
+              -4.192882959093058,
+              -138.07744994252275,
+              -13.464686625750046,
+              13.60331349169223,
+              -7.056797212193221,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "joint_positions_deg": [
+              34.14094161987305,
+              -12.971363067626953,
+              -4.192883491516113,
+              -138.07745361328125,
+              -13.464686393737793,
+              13.603318214416504,
+              -7.056800365447998,
+              -9.268602552126026e-10,
+              -6.862435064647343e-10,
+              4.306982548385463e-10,
+              -7.777192223556995e-10
+            ],
+            "command_angle_deg": 0.0,
+            "sleep_diagnostic": {
+              "/World/Robot/ffw_bg2_follower/root_joint": true,
+              "/World/Bottle": false
+            }
+          },
+          "expected_stop": "cup_near_full",
+          "attribution": "Authored gradual cup filling and settling; no autonomous controller",
+          "grasp_verified": false,
+          "bilateral_fraction_during_pour": 0.0,
+          "hold_height_m": 8.106231685900411e-08,
+          "scene": {
+            "bottle_mass_kg": 0.18,
+            "bottle_gravity_enabled": true,
+            "bottle_kinematic": false,
+            "bottle_attachment_joints": [],
+            "robot_arm_gravity_compensation": true,
+            "finger_static_friction": 1.15,
+            "finger_dynamic_friction": 1.0,
+            "arm_control": "Joint position drives with native actuator torque limits",
+            "observation_source": "Simulator particle inventory and fill height",
+            "home_clearance_m": 0.1,
+            "dof_names": [
+              "arm_r_joint1",
+              "arm_r_joint2",
+              "arm_r_joint3",
+              "arm_r_joint4",
+              "arm_r_joint5",
+              "arm_r_joint6",
+              "arm_r_joint7",
+              "gripper_r_joint1",
+              "gripper_r_joint2",
+              "gripper_r_joint3",
+              "gripper_r_joint4"
+            ],
+            "cup_frame_world": [
+              0.4335582482709143,
+              -0.11057328529891747,
+              1.04
+            ],
+            "cup_frame_rotation": [
+              [
+                2.220446049250313e-16,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                2.220446049250313e-16,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "bottle_support_contact": {
+              "static": 0.4,
+              "dynamic": 0.3,
+              "combine": "max",
+              "collider": "/World/Bottle/Base",
+              "scope": "Authored rigid support contact; not a measured glass/table coefficient. No wall, finger, particle or render-material changes."
+            }
+          },
+          "spill": {
+            "final_outside_ml": 0.0,
+            "ever_table_ml": 0.0,
+            "particle_quantum_ml": 0.0058319999999999995
+          },
+          "zero_spill": true,
+          "task_success_zero_spill": false,
+          "surface_task_success_zero_spill": false,
+          "seed_fill": {
+            "kind": "authored finite calibration jet, not robot pouring",
+            "initial_count": 11963,
+            "emitted_count": 567,
+            "emitted_nominal_ml": 3.306744,
+            "flow_nominal_ml_s": 0.75,
+            "stop_time": 4.8549999987707135,
+            "stop_reason": "measured_target",
+            "target_height_fraction": 0.956,
+            "nozzle_world_m": [
+              0.4335582482709143,
+              -0.11057328529891747,
+              1.0852
+            ],
+            "particle_mass_kg": 5.831999999999999e-06
+          }
+        }
+      },
+      "sidecars": {
+        "parameters.json": "55d39b6c76f30efe4b76da33baefafaaad5b9a64cb2ac5c40adf808964ea6df8",
+        "seed-fill.json": "06d314e206bec161f1bc3b1c5099d751ff05bfbc1fdaea702aed1094ed2381af",
+        "metrics.json": "db17d777fa1cd5ee35b782858f02578dc1103f21034f4b48ea96067f7fd82078",
+        "readback-audit.json": "7d637f8d7473b22a037b4e83fcf90624992b59e6c3b8d5738b786f9a0d358a4d",
+        "samples.json": "cd5923adc211237a962f6b6fe90a28903caa2126ef096f98e217cc0844a140e5"
+      },
+      "trajectory_sha256": "65d1b3d1316de40271db97e14852890a957e399a98986c7336e5769ce3178c3e",
+      "containment": {
+        "final_outside_ml": 0.0,
+        "final_airborne_ml": 0.0,
+        "ever_table_ml": 0.0
+      },
+      "cameras": {
+        "task": {
+          "calibration": {
+            "K": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.6757246285173463,
+                -0.3140807876509529,
+                0.6668954080241154,
+                0.8499999999999999
+              ],
+              [
+                0.7371541402007413,
+                0.2879073886800402,
+                -0.6113207906887725,
+                -0.5500000000000002
+              ],
+              [
+                0.0,
+                0.9046892252989406,
+                0.4260720662376292,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.9999999999999999
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "wrist": {
+          "calibration": {
+            "K": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.4913228871365475,
+                0.5064046211959733,
+                -0.7086297906574145,
+                0.24299962373440961
+              ],
+              [
+                -0.870977508608745,
+                0.28567345746605927,
+                -0.3997359818643946,
+                -0.33500020254119
+              ],
+              [
+                8.573886114166026e-06,
+                0.8136000462947082,
+                0.5814249432177278,
+                1.3479962807195882
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "cup_detail": {
+          "calibration": {
+            "K": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.675254067189361,
+                -0.3806611182473653,
+                0.6317666165593837,
+                0.8499999999999999
+              ],
+              [
+                0.7375852118529941,
+                0.34849257304336273,
+                -0.5783778883994359,
+                -0.5499999999999999
+              ],
+              [
+                -2.7755575615628914e-17,
+                0.8565337352307157,
+                0.5160910388794966,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            1024,
+            1024
+          ]
+        },
+        "overview": {
+          "calibration": {
+            "K": [
+              [
+                439.799560546875,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                439.799560546875,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.7071067811865476,
+                -0.4187140229674477,
+                0.5698057273934826,
+                1.0000000000000002
+              ],
+              [
+                0.7071067811865476,
+                0.4187140229674477,
+                -0.5698057273934826,
+                -0.7300000000000001
+              ],
+              [
+                0.0,
+                0.8058269875977297,
+                0.592151050036364,
+                1.65
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        }
+      },
+      "review_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seed_remaining-r0-review/SD_A_high_r0_03.jpg",
+      "review_sha256": "25b0a6779fd50772265f57a090203795169e75883667943b86ebc4e791512359",
+      "settled_seed_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seeds/SD_A_high_r0_03-settled.npz",
+      "settled_seed_sha256": "f02898437cb74212e2f3ede9aa8b05cf791fa66f1b1046b067d3bb993d14c9bc",
+      "settled_seed_particles": 9101,
+      "high_fill_coverage": true
+    },
+    {
+      "name": "SD_A_high_r0_05",
+      "path": "/workspace/outputs/fountain/20261110T010827Z/996-SD_A_high_r0_05-320179/episode.hdf5",
+      "sha256": "17e84d5a3dc02c13b8da09bdb8c3142d7591385b08395ec8c662e283863c87e6",
+      "bytes": 62134302,
+      "split": "train",
+      "label": {
+        "accepted": true,
+        "target": 0.9498029253062066,
+        "field": "cup_fill_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.00013482921263729963,
+        "half_window_drift": 2.491123536074724e-05,
+        "height_min": 0.9494704541038052,
+        "height_max": 0.9502843204666575,
+        "final_sample": 0.9497867794597836,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "column_label": {
+        "accepted": true,
+        "target": 0.9554343896753635,
+        "field": "cup_column_height_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.000936143538531109,
+        "half_window_drift": 4.1197328006559175e-05,
+        "height_min": 0.9542931360356935,
+        "height_max": 0.9567351733936971,
+        "final_sample": 0.9561987315907186,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "recording_validation": {
+        "valid": true,
+        "path": "/workspace/outputs/fountain/20261110T010827Z/996-SD_A_high_r0_05-320179/episode.hdf5",
+        "transitions": 189,
+        "control_hz": 20.0,
+        "duration_sim_s": 9.450000001229347,
+        "max_camera_state_skew_s": 2.1245330650287997e-07,
+        "camera_timestamp_tolerance_s": 0.0001,
+        "physical_success": false,
+        "training_eligible": false,
+        "camera": {
+          "task": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 1.6713234230324074,
+            "intrinsics": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "wrist": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.81939697265625,
+            "intrinsics": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "cup_detail": {
+            "resolution": [
+              1024,
+              1024
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.9678614934285482,
+            "intrinsics": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "task_scope": "stationary_perception_calibration",
+        "corrective_training_eligible": false,
+        "recovery_training_eligible": false,
+        "metrics": {
+          "eligible": false,
+          "gates": [
+            "wrong_stop_condition",
+            "grip_not_sustained"
+          ],
+          "bottle_result": {
+            "t": 9.505,
+            "finite": true,
+            "count": 17007,
+            "bottle_ml": 19.997927999999998,
+            "cup_ml": 79.18689599999999,
+            "airborne_ml": 0.0,
+            "spilled_ml": 0.0,
+            "cup_fill_fraction": 0.9497867794597836,
+            "bottle_pose_xyz": [
+              0.49853280186653137,
+              -0.25955086946487427,
+              1.040000081062317
+            ],
+            "bottle_quat_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "bottle_tilt_deg": 0.0,
+            "stop_command": true,
+            "stop_reason": "grasp_failed",
+            "stop_time": 3.304999998770595,
+            "phase": "Stationary liquid-level calibration",
+            "initial_ml": 99.18482399999999,
+            "capacity_geometric_ml": 61.70022840113419,
+            "cup_inventory_fraction": 0.8989521387703202,
+            "source_outflow_ml_s": 0.0,
+            "predicted_cup_ml": 79.18689599999999,
+            "outside_peak_z_m": null,
+            "diagnostic_outside_particles": [],
+            "diagnostic_outside_count": 0,
+            "surface_column_diagnostic": {
+              "valid": true,
+              "cells": 32,
+              "height_fraction": 0.9561987315907186,
+              "height_m": 0.036510756874084435,
+              "cell_top_iqr_m": 0.00012576580047607422,
+              "pitch_m": 0.0045,
+              "central_radius_m": 0.0165
+            },
+            "cup_column_height_fraction": 0.9561987315907186,
+            "ever_table_ml": 0.0,
+            "grasp_verified": false,
+            "contacts": [
+              "Bench"
+            ],
+            "both_fingers": false,
+            "bottle_base_height_m": 8.106231685900411e-08,
+            "joint_targets_deg": [
+              34.14094296674203,
+              -12.97136305770377,
+              -4.192882959093058,
+              -138.07744994252275,
+              -13.464686625750046,
+              13.60331349169223,
+              -7.056797212193221,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "joint_positions_deg": [
+              34.14094161987305,
+              -12.971363067626953,
+              -4.192883491516113,
+              -138.07745361328125,
+              -13.464686393737793,
+              13.603318214416504,
+              -7.056800365447998,
+              -9.268602552126026e-10,
+              -6.862435064647343e-10,
+              4.306982548385463e-10,
+              -7.777192223556995e-10
+            ],
+            "command_angle_deg": 0.0,
+            "sleep_diagnostic": {
+              "/World/Robot/ffw_bg2_follower/root_joint": true,
+              "/World/Bottle": false
+            }
+          },
+          "expected_stop": "cup_near_full",
+          "attribution": "Authored gradual cup filling and settling; no autonomous controller",
+          "grasp_verified": false,
+          "bilateral_fraction_during_pour": 0.0,
+          "hold_height_m": 8.106231685900411e-08,
+          "scene": {
+            "bottle_mass_kg": 0.18,
+            "bottle_gravity_enabled": true,
+            "bottle_kinematic": false,
+            "bottle_attachment_joints": [],
+            "robot_arm_gravity_compensation": true,
+            "finger_static_friction": 1.15,
+            "finger_dynamic_friction": 1.0,
+            "arm_control": "Joint position drives with native actuator torque limits",
+            "observation_source": "Simulator particle inventory and fill height",
+            "home_clearance_m": 0.1,
+            "dof_names": [
+              "arm_r_joint1",
+              "arm_r_joint2",
+              "arm_r_joint3",
+              "arm_r_joint4",
+              "arm_r_joint5",
+              "arm_r_joint6",
+              "arm_r_joint7",
+              "gripper_r_joint1",
+              "gripper_r_joint2",
+              "gripper_r_joint3",
+              "gripper_r_joint4"
+            ],
+            "cup_frame_world": [
+              0.490411899518823,
+              -0.1395366450384487,
+              1.04
+            ],
+            "cup_frame_rotation": [
+              [
+                2.220446049250313e-16,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                2.220446049250313e-16,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "bottle_support_contact": {
+              "static": 0.4,
+              "dynamic": 0.3,
+              "combine": "max",
+              "collider": "/World/Bottle/Base",
+              "scope": "Authored rigid support contact; not a measured glass/table coefficient. No wall, finger, particle or render-material changes."
+            }
+          },
+          "spill": {
+            "final_outside_ml": 0.0,
+            "ever_table_ml": 0.0,
+            "particle_quantum_ml": 0.0058319999999999995
+          },
+          "zero_spill": true,
+          "task_success_zero_spill": false,
+          "surface_task_success_zero_spill": false,
+          "seed_fill": {
+            "kind": "authored finite calibration jet, not robot pouring",
+            "initial_count": 16230,
+            "emitted_count": 777,
+            "emitted_nominal_ml": 4.531464,
+            "flow_nominal_ml_s": 0.75,
+            "stop_time": 6.502499998770971,
+            "stop_reason": "finite_feed_limit",
+            "target_height_fraction": 0.956,
+            "nozzle_world_m": [
+              0.490411899518823,
+              -0.1395366450384487,
+              1.0852
+            ],
+            "particle_mass_kg": 5.831999999999999e-06
+          }
+        }
+      },
+      "sidecars": {
+        "parameters.json": "5e1babf22d789e9696acd4b5522cd6d620cadb9da7762481503e87a7349b1014",
+        "seed-fill.json": "4875a7ffd3774876f68b5af6e2ae86d13c158856b0c05883d95b60025efbb7ca",
+        "metrics.json": "2978a1400f2caafaa61220f8667b524b0246f3a2f170e3e54e188126e37a54d5",
+        "readback-audit.json": "7d637f8d7473b22a037b4e83fcf90624992b59e6c3b8d5738b786f9a0d358a4d",
+        "samples.json": "cf9a7b65b5a631b57d5c957d9c8b6ada483f85a6dddc133ccec4b09060fe2322"
+      },
+      "trajectory_sha256": "d7157b3a47fe4bf6ca44bc1b06af5d8942d5e41ac21a78cf0713e4b4b2b3e800",
+      "containment": {
+        "final_outside_ml": 0.0,
+        "final_airborne_ml": 0.0,
+        "ever_table_ml": 0.0
+      },
+      "cameras": {
+        "task": {
+          "calibration": {
+            "K": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.6757246285173463,
+                -0.3140807876509529,
+                0.6668954080241154,
+                0.8499999999999999
+              ],
+              [
+                0.7371541402007413,
+                0.2879073886800402,
+                -0.6113207906887725,
+                -0.5500000000000002
+              ],
+              [
+                0.0,
+                0.9046892252989406,
+                0.4260720662376292,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.9999999999999999
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "wrist": {
+          "calibration": {
+            "K": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.4913228871365475,
+                0.5064046211959733,
+                -0.7086297906574145,
+                0.24299962373440961
+              ],
+              [
+                -0.870977508608745,
+                0.28567345746605927,
+                -0.3997359818643946,
+                -0.33500020254119
+              ],
+              [
+                8.573886114166026e-06,
+                0.8136000462947082,
+                0.5814249432177278,
+                1.3479962807195882
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "cup_detail": {
+          "calibration": {
+            "K": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.675254067189361,
+                -0.3806611182473653,
+                0.6317666165593837,
+                0.8499999999999999
+              ],
+              [
+                0.7375852118529941,
+                0.34849257304336273,
+                -0.5783778883994359,
+                -0.5499999999999999
+              ],
+              [
+                -2.7755575615628914e-17,
+                0.8565337352307157,
+                0.5160910388794966,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            1024,
+            1024
+          ]
+        },
+        "overview": {
+          "calibration": {
+            "K": [
+              [
+                439.799560546875,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                439.799560546875,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.7071067811865476,
+                -0.4187140229674477,
+                0.5698057273934826,
+                1.0000000000000002
+              ],
+              [
+                0.7071067811865476,
+                0.4187140229674477,
+                -0.5698057273934826,
+                -0.7300000000000001
+              ],
+              [
+                0.0,
+                0.8058269875977297,
+                0.592151050036364,
+                1.65
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        }
+      },
+      "review_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seed_remaining-r0-review/SD_A_high_r0_05.jpg",
+      "review_sha256": "661a7f7daffafd8a85ff8b587ae4cd5ef253691a1a728b4623202a78c639431a",
+      "settled_seed_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seeds/SD_A_high_r0_05-settled.npz",
+      "settled_seed_sha256": "e22c41d46bc82b6ae7d9127235cda8be05e3e887941eac74cb70e60ec476b1e7",
+      "settled_seed_particles": 13578,
+      "high_fill_coverage": true
+    },
+    {
+      "name": "SD_A_high_r0_06",
+      "path": "/workspace/outputs/fountain/20261110T010827Z/997-SD_A_high_r0_06-996725/episode.hdf5",
+      "sha256": "0f63ac69f9ee24c5e31a4f3b6158d8839a22604620101d39838122ccc88cfa33",
+      "bytes": 54000079,
+      "split": "train",
+      "label": {
+        "accepted": true,
+        "target": 0.9558075736550713,
+        "field": "cup_fill_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.000292477123240098,
+        "half_window_drift": 6.080789362050698e-05,
+        "height_min": 0.9554514438710738,
+        "height_max": 0.9562816855741684,
+        "final_sample": 0.9557393311179246,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "column_label": {
+        "accepted": true,
+        "target": 0.9627918993088002,
+        "field": "cup_column_height_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.0016447057061017567,
+        "half_window_drift": 0.0007944629791585278,
+        "height_min": 0.9603089036788521,
+        "height_max": 0.9648573436839046,
+        "final_sample": 0.9633815709282358,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "recording_validation": {
+        "valid": true,
+        "path": "/workspace/outputs/fountain/20261110T010827Z/997-SD_A_high_r0_06-996725/episode.hdf5",
+        "transitions": 169,
+        "control_hz": 20.0,
+        "duration_sim_s": 8.450000001229347,
+        "max_camera_state_skew_s": 1.9010156471210848e-07,
+        "camera_timestamp_tolerance_s": 0.0001,
+        "physical_success": false,
+        "training_eligible": false,
+        "camera": {
+          "task": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 3.1144816080729165,
+            "intrinsics": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "wrist": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.8010886863425926,
+            "intrinsics": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "cup_detail": {
+            "resolution": [
+              1024,
+              1024
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.920734723409017,
+            "intrinsics": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "task_scope": "stationary_perception_calibration",
+        "corrective_training_eligible": false,
+        "recovery_training_eligible": false,
+        "metrics": {
+          "eligible": false,
+          "gates": [
+            "wrong_stop_condition",
+            "grip_not_sustained"
+          ],
+          "bottle_result": {
+            "t": 8.505,
+            "finite": true,
+            "count": 13473,
+            "bottle_ml": 19.997927999999998,
+            "cup_ml": 58.57660799999999,
+            "airborne_ml": 0.0,
+            "spilled_ml": 0.0,
+            "cup_fill_fraction": 0.9557393311179246,
+            "bottle_pose_xyz": [
+              0.5361913442611694,
+              -0.11891783028841019,
+              1.040000081062317
+            ],
+            "bottle_quat_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "bottle_tilt_deg": 0.0,
+            "stop_command": true,
+            "stop_reason": "grasp_failed",
+            "stop_time": 3.304999998770595,
+            "phase": "Stationary liquid-level calibration",
+            "initial_ml": 78.574536,
+            "capacity_geometric_ml": 45.43380454992607,
+            "cup_inventory_fraction": 0.903056943056943,
+            "source_outflow_ml_s": 0.0,
+            "predicted_cup_ml": 58.57660799999999,
+            "outside_peak_z_m": null,
+            "diagnostic_outside_particles": [],
+            "diagnostic_outside_count": 0,
+            "surface_column_diagnostic": {
+              "valid": true,
+              "cells": 16,
+              "height_fraction": 0.9633815709282358,
+              "height_m": 0.04003047075271603,
+              "cell_top_iqr_m": 0.00027745962142944336,
+              "pitch_m": 0.0045,
+              "central_radius_m": 0.013500000000000002
+            },
+            "cup_column_height_fraction": 0.9633815709282358,
+            "ever_table_ml": 0.0,
+            "grasp_verified": false,
+            "contacts": [
+              "Bench"
+            ],
+            "both_fingers": false,
+            "bottle_base_height_m": 8.106231685900411e-08,
+            "joint_targets_deg": [
+              34.14094296674203,
+              -12.97136305770377,
+              -4.192882959093058,
+              -138.07744994252275,
+              -13.464686625750046,
+              13.60331349169223,
+              -7.056797212193221,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "joint_positions_deg": [
+              34.14094161987305,
+              -12.971363067626953,
+              -4.192883491516113,
+              -138.07745361328125,
+              -13.464686393737793,
+              13.603318214416504,
+              -7.056800365447998,
+              -9.268602552126026e-10,
+              -6.862435064647343e-10,
+              4.306982548385463e-10,
+              -7.777192223556995e-10
+            ],
+            "command_angle_deg": 0.0,
+            "sleep_diagnostic": {
+              "/World/Robot/ffw_bg2_follower/root_joint": true,
+              "/World/Bottle": false
+            }
+          },
+          "expected_stop": "cup_near_full",
+          "attribution": "Authored gradual cup filling and settling; no autonomous controller",
+          "grasp_verified": false,
+          "bilateral_fraction_during_pour": 0.0,
+          "hold_height_m": 8.106231685900411e-08,
+          "scene": {
+            "bottle_mass_kg": 0.18,
+            "bottle_gravity_enabled": true,
+            "bottle_kinematic": false,
+            "bottle_attachment_joints": [],
+            "robot_arm_gravity_compensation": true,
+            "finger_static_friction": 1.15,
+            "finger_dynamic_friction": 1.0,
+            "arm_control": "Joint position drives with native actuator torque limits",
+            "observation_source": "Simulator particle inventory and fill height",
+            "home_clearance_m": 0.1,
+            "dof_names": [
+              "arm_r_joint1",
+              "arm_r_joint2",
+              "arm_r_joint3",
+              "arm_r_joint4",
+              "arm_r_joint5",
+              "arm_r_joint6",
+              "arm_r_joint7",
+              "gripper_r_joint1",
+              "gripper_r_joint2",
+              "gripper_r_joint3",
+              "gripper_r_joint4"
+            ],
+            "cup_frame_world": [
+              0.4334012319655689,
+              -0.3029361889249044,
+              1.04
+            ],
+            "cup_frame_rotation": [
+              [
+                2.220446049250313e-16,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                2.220446049250313e-16,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "bottle_support_contact": {
+              "static": 0.4,
+              "dynamic": 0.3,
+              "combine": "max",
+              "collider": "/World/Bottle/Base",
+              "scope": "Authored rigid support contact; not a measured glass/table coefficient. No wall, finger, particle or render-material changes."
+            }
+          },
+          "spill": {
+            "final_outside_ml": 0.0,
+            "ever_table_ml": 0.0,
+            "particle_quantum_ml": 0.0058319999999999995
+          },
+          "zero_spill": true,
+          "task_success_zero_spill": false,
+          "surface_task_success_zero_spill": false,
+          "seed_fill": {
+            "kind": "authored finite calibration jet, not robot pouring",
+            "initial_count": 12822,
+            "emitted_count": 651,
+            "emitted_nominal_ml": 3.796632,
+            "flow_nominal_ml_s": 0.75,
+            "stop_time": 5.504999998770815,
+            "stop_reason": "measured_target",
+            "target_height_fraction": 0.956,
+            "nozzle_world_m": [
+              0.4334012319655689,
+              -0.3029361889249044,
+              1.0886
+            ],
+            "particle_mass_kg": 5.831999999999999e-06
+          }
+        }
+      },
+      "sidecars": {
+        "parameters.json": "6d760cfe8d0ddddd2f6b62e9f12470941982f673b6d97010d4f3f1bba2014544",
+        "seed-fill.json": "183c4b160e6de9eb62e6f8ae3cf53452adb2cddb981b3d3d926b71bc34415279",
+        "metrics.json": "e6bbf7d6f17f76b1482d26a330a88db19bd4c55e02d6b171b9256e327ff29b41",
+        "readback-audit.json": "7d637f8d7473b22a037b4e83fcf90624992b59e6c3b8d5738b786f9a0d358a4d",
+        "samples.json": "b6671f9402f41355a39f3e088bc1402a071648d93945ce98d7efb3c3fef60288"
+      },
+      "trajectory_sha256": "d0320cec4548d58d72b1a296c1e4e3b2249fb10bb8781b5f89586172493dab81",
+      "containment": {
+        "final_outside_ml": 0.0,
+        "final_airborne_ml": 0.0,
+        "ever_table_ml": 0.0
+      },
+      "cameras": {
+        "task": {
+          "calibration": {
+            "K": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.6757246285173463,
+                -0.3140807876509529,
+                0.6668954080241154,
+                0.8499999999999999
+              ],
+              [
+                0.7371541402007413,
+                0.2879073886800402,
+                -0.6113207906887725,
+                -0.5500000000000002
+              ],
+              [
+                0.0,
+                0.9046892252989406,
+                0.4260720662376292,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.9999999999999999
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "wrist": {
+          "calibration": {
+            "K": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.4913228871365475,
+                0.5064046211959733,
+                -0.7086297906574145,
+                0.24299962373440961
+              ],
+              [
+                -0.870977508608745,
+                0.28567345746605927,
+                -0.3997359818643946,
+                -0.33500020254119
+              ],
+              [
+                8.573886114166026e-06,
+                0.8136000462947082,
+                0.5814249432177278,
+                1.3479962807195882
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "cup_detail": {
+          "calibration": {
+            "K": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.675254067189361,
+                -0.3806611182473653,
+                0.6317666165593837,
+                0.8499999999999999
+              ],
+              [
+                0.7375852118529941,
+                0.34849257304336273,
+                -0.5783778883994359,
+                -0.5499999999999999
+              ],
+              [
+                -2.7755575615628914e-17,
+                0.8565337352307157,
+                0.5160910388794966,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            1024,
+            1024
+          ]
+        },
+        "overview": {
+          "calibration": {
+            "K": [
+              [
+                439.799560546875,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                439.799560546875,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.7071067811865476,
+                -0.4187140229674477,
+                0.5698057273934826,
+                1.0000000000000002
+              ],
+              [
+                0.7071067811865476,
+                0.4187140229674477,
+                -0.5698057273934826,
+                -0.7300000000000001
+              ],
+              [
+                0.0,
+                0.8058269875977297,
+                0.592151050036364,
+                1.65
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        }
+      },
+      "review_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seed_remaining-r0-review/SD_A_high_r0_06.jpg",
+      "review_sha256": "6e2f5f5c737a74f6a8fb090642abc728cef49c32a9c0756200547313548fe56c",
+      "settled_seed_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seeds/SD_A_high_r0_06-settled.npz",
+      "settled_seed_sha256": "ef97583d7a4c2233f23c93817a94aa645881a0e02b1a7a46bde939c68557cf64",
+      "settled_seed_particles": 10044,
+      "high_fill_coverage": true
+    },
+    {
+      "name": "SD_A_high_r0_07",
+      "path": "/workspace/outputs/fountain/20261110T010827Z/998-SD_A_high_r0_07-958881/episode.hdf5",
+      "sha256": "eaf044fc72547eb6e289efd19dac6e921e8ba5eeca89e510394fff628e0748dd",
+      "bytes": 61917434,
+      "split": "train",
+      "label": {
+        "accepted": true,
+        "target": 0.9551230605273312,
+        "field": "cup_fill_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.00033141138719394725,
+        "half_window_drift": 0.00015659765763731404,
+        "height_min": 0.9549089937924052,
+        "height_max": 0.9561741740945816,
+        "final_sample": 0.9551632697569484,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "column_label": {
+        "accepted": true,
+        "target": 0.9617814890203618,
+        "field": "cup_column_height_fraction",
+        "window_s": 1.0,
+        "samples": 21,
+        "height_iqr": 0.0012351229866557345,
+        "half_window_drift": 0.0009992543388814834,
+        "height_min": 0.9598722279390538,
+        "height_max": 0.9642214545591619,
+        "final_sample": 0.9615280895947124,
+        "inventory_range_nominal_ml": 0.0,
+        "scope": "Training-only stationary-window label; original instantaneous task scores remain unchanged."
+      },
+      "recording_validation": {
+        "valid": true,
+        "path": "/workspace/outputs/fountain/20261110T010827Z/998-SD_A_high_r0_07-958881/episode.hdf5",
+        "transitions": 189,
+        "control_hz": 20.0,
+        "duration_sim_s": 9.450000001229347,
+        "max_camera_state_skew_s": 2.1245330650287997e-07,
+        "camera_timestamp_tolerance_s": 0.0001,
+        "physical_success": false,
+        "training_eligible": false,
+        "camera": {
+          "task": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 1.7944426359953705,
+            "intrinsics": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "wrist": {
+            "resolution": [
+              384,
+              384
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.8201904296875,
+            "intrinsics": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "cup_detail": {
+            "resolution": [
+              1024,
+              1024
+            ],
+            "rgb_dtype": "uint8",
+            "encoding": "jpeg95",
+            "first_last_mean_pixel_change": 0.9798641204833984,
+            "intrinsics": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "task_scope": "stationary_perception_calibration",
+        "corrective_training_eligible": false,
+        "recovery_training_eligible": false,
+        "metrics": {
+          "eligible": false,
+          "gates": [
+            "wrong_stop_condition",
+            "grip_not_sustained"
+          ],
+          "bottle_result": {
+            "t": 9.505,
+            "finite": true,
+            "count": 15877,
+            "bottle_ml": 19.997927999999998,
+            "cup_ml": 72.59673599999999,
+            "airborne_ml": 0.0,
+            "spilled_ml": 0.0,
+            "cup_fill_fraction": 0.9551632697569484,
+            "bottle_pose_xyz": [
+              0.5350808501243591,
+              -0.30697551369667053,
+              1.040000081062317
+            ],
+            "bottle_quat_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "bottle_tilt_deg": 0.0,
+            "stop_command": true,
+            "stop_reason": "grasp_failed",
+            "stop_time": 3.304999998770595,
+            "phase": "Stationary liquid-level calibration",
+            "initial_ml": 92.594664,
+            "capacity_geometric_ml": 56.091116728303795,
+            "cup_inventory_fraction": 0.9065526473526473,
+            "source_outflow_ml_s": 0.0,
+            "predicted_cup_ml": 72.59673599999999,
+            "outside_peak_z_m": null,
+            "diagnostic_outside_particles": [],
+            "diagnostic_outside_count": 0,
+            "surface_column_diagnostic": {
+              "valid": true,
+              "cells": 24,
+              "height_fraction": 0.9615280895947124,
+              "height_m": 0.03996115055084225,
+              "cell_top_iqr_m": 0.0002608299255371094,
+              "pitch_m": 0.0045,
+              "central_radius_m": 0.015
+            },
+            "cup_column_height_fraction": 0.9615280895947124,
+            "ever_table_ml": 0.0,
+            "grasp_verified": false,
+            "contacts": [
+              "Bench"
+            ],
+            "both_fingers": false,
+            "bottle_base_height_m": 8.106231685900411e-08,
+            "joint_targets_deg": [
+              34.14094296674203,
+              -12.97136305770377,
+              -4.192882959093058,
+              -138.07744994252275,
+              -13.464686625750046,
+              13.60331349169223,
+              -7.056797212193221,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "joint_positions_deg": [
+              34.14094161987305,
+              -12.971363067626953,
+              -4.192883491516113,
+              -138.07745361328125,
+              -13.464686393737793,
+              13.603318214416504,
+              -7.056800365447998,
+              -9.268602552126026e-10,
+              -6.862435064647343e-10,
+              4.306982548385463e-10,
+              -7.777192223556995e-10
+            ],
+            "command_angle_deg": 0.0,
+            "sleep_diagnostic": {
+              "/World/Robot/ffw_bg2_follower/root_joint": true,
+              "/World/Bottle": false
+            }
+          },
+          "expected_stop": "cup_near_full",
+          "attribution": "Authored gradual cup filling and settling; no autonomous controller",
+          "grasp_verified": false,
+          "bilateral_fraction_during_pour": 0.0,
+          "hold_height_m": 8.106231685900411e-08,
+          "scene": {
+            "bottle_mass_kg": 0.18,
+            "bottle_gravity_enabled": true,
+            "bottle_kinematic": false,
+            "bottle_attachment_joints": [],
+            "robot_arm_gravity_compensation": true,
+            "finger_static_friction": 1.15,
+            "finger_dynamic_friction": 1.0,
+            "arm_control": "Joint position drives with native actuator torque limits",
+            "observation_source": "Simulator particle inventory and fill height",
+            "home_clearance_m": 0.1,
+            "dof_names": [
+              "arm_r_joint1",
+              "arm_r_joint2",
+              "arm_r_joint3",
+              "arm_r_joint4",
+              "arm_r_joint5",
+              "arm_r_joint6",
+              "arm_r_joint7",
+              "gripper_r_joint1",
+              "gripper_r_joint2",
+              "gripper_r_joint3",
+              "gripper_r_joint4"
+            ],
+            "cup_frame_world": [
+              0.4335582482709143,
+              -0.11057328529891747,
+              1.04
+            ],
+            "cup_frame_rotation": [
+              [
+                2.220446049250313e-16,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                2.220446049250313e-16,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "bottle_support_contact": {
+              "static": 0.4,
+              "dynamic": 0.3,
+              "combine": "max",
+              "collider": "/World/Bottle/Base",
+              "scope": "Authored rigid support contact; not a measured glass/table coefficient. No wall, finger, particle or render-material changes."
+            }
+          },
+          "spill": {
+            "final_outside_ml": 0.0,
+            "ever_table_ml": 0.0,
+            "particle_quantum_ml": 0.0058319999999999995
+          },
+          "zero_spill": true,
+          "task_success_zero_spill": false,
+          "surface_task_success_zero_spill": false,
+          "seed_fill": {
+            "kind": "authored finite calibration jet, not robot pouring",
+            "initial_count": 15100,
+            "emitted_count": 777,
+            "emitted_nominal_ml": 4.531464,
+            "flow_nominal_ml_s": 0.75,
+            "stop_time": 6.502499998770971,
+            "stop_reason": "finite_feed_limit",
+            "target_height_fraction": 0.956,
+            "nozzle_world_m": [
+              0.4335582482709143,
+              -0.11057328529891747,
+              1.0886
+            ],
+            "particle_mass_kg": 5.831999999999999e-06
+          }
+        }
+      },
+      "sidecars": {
+        "parameters.json": "6f06c1eb9a1dfed1c9c9eab9a113250bde2d1b052a183f7df2a57da90f55c5c1",
+        "seed-fill.json": "480a74756de706342cee44279b0d94f38ac7591d2a2f42a391aa60fe1eaa8e84",
+        "metrics.json": "89b3d2c3771afa0fa19f089f277a8d817d1542e82ab507d443a104825cfd83fc",
+        "readback-audit.json": "7d637f8d7473b22a037b4e83fcf90624992b59e6c3b8d5738b786f9a0d358a4d",
+        "samples.json": "5b2f9555691ac06a580c39b2b45fb9f050fd0452c212cf01ec8f954eb8c982a9"
+      },
+      "trajectory_sha256": "b2938956d09bdc35433af73359ba323f53715bd502253ec97352ded49b270586",
+      "containment": {
+        "final_outside_ml": 0.0,
+        "final_airborne_ml": 0.0,
+        "ever_table_ml": 0.0
+      },
+      "cameras": {
+        "task": {
+          "calibration": {
+            "K": [
+              [
+                549.7494506835938,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                549.7494506835938,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.6757246285173463,
+                -0.3140807876509529,
+                0.6668954080241154,
+                0.8499999999999999
+              ],
+              [
+                0.7371541402007413,
+                0.2879073886800402,
+                -0.6113207906887725,
+                -0.5500000000000002
+              ],
+              [
+                0.0,
+                0.9046892252989406,
+                0.4260720662376292,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.9999999999999999
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "wrist": {
+          "calibration": {
+            "K": [
+              [
+                128.27487182617188,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                128.27487182617188,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.4913228871365475,
+                0.5064046211959733,
+                -0.7086297906574145,
+                0.24299962373440961
+              ],
+              [
+                -0.870977508608745,
+                0.28567345746605927,
+                -0.3997359818643946,
+                -0.33500020254119
+              ],
+              [
+                8.573886114166026e-06,
+                0.8136000462947082,
+                0.5814249432177278,
+                1.3479962807195882
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        },
+        "cup_detail": {
+          "calibration": {
+            "K": [
+              [
+                1465.99853515625,
+                0.0,
+                512.0
+              ],
+              [
+                0.0,
+                1465.99853515625,
+                512.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.675254067189361,
+                -0.3806611182473653,
+                0.6317666165593837,
+                0.8499999999999999
+              ],
+              [
+                0.7375852118529941,
+                0.34849257304336273,
+                -0.5783778883994359,
+                -0.5499999999999999
+              ],
+              [
+                -2.7755575615628914e-17,
+                0.8565337352307157,
+                0.5160910388794966,
+                1.35
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            1024,
+            1024
+          ]
+        },
+        "overview": {
+          "calibration": {
+            "K": [
+              [
+                439.799560546875,
+                0.0,
+                192.0
+              ],
+              [
+                0.0,
+                439.799560546875,
+                192.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "T": [
+              [
+                0.7071067811865476,
+                -0.4187140229674477,
+                0.5698057273934826,
+                1.0000000000000002
+              ],
+              [
+                0.7071067811865476,
+                0.4187140229674477,
+                -0.5698057273934826,
+                -0.7300000000000001
+              ],
+              [
+                0.0,
+                0.8058269875977297,
+                0.592151050036364,
+                1.65
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "table_z": 1.04
+          },
+          "resolution": [
+            384,
+            384
+          ]
+        }
+      },
+      "review_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seed_remaining-r0-review/SD_A_high_r0_07.jpg",
+      "review_sha256": "2eca5a03390282226608b47668535103438005d70ea564946f84b44a3eac0a7e",
+      "settled_seed_path": "/workspace/learning/A-scale-dynamic-20261109-v1/seeds/SD_A_high_r0_07-settled.npz",
+      "settled_seed_sha256": "fbf5e505d864bf5ce40a7370ff1e24bc55dd337b0e2028f27e2e9f057736fc34",
+      "settled_seed_particles": 12448,
+      "high_fill_coverage": true
+    }
+  ],
+  "complete": true,
+  "protected_parent_files_unchanged": true,
+  "labels_accepted": 6,
+  "manual_review": "pending",
+  "protocol_sha256": "5ca33ab99d00dd088ffcfc6e3c0c4c110fdba2a75a7fdc31687a796d6efc3adf",
+  "plan_sha256": "4efcc93638e4abc10a6222712470f395aa71a5812e117373d6a1693c6364bf47",
+  "checkpoint_sha256": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+  "helper_sha256": "837b5d12dccc19d39d59429c0c93caf13e3691650acafaab912f49dbb4eac8b9",
+  "scope": "Stationary authored calibration and physical settling, not autonomous pouring or a visual-size estimator."
+}

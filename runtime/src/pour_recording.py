@@ -148,6 +148,9 @@ class PourRecording:
         if spec.get('calibration_only'):
             self.file.attrs['task_scope']='stationary_perception_calibration'
             self.file.attrs['evidence_kind']='stationary_perception_calibration'
+            if spec.get('calibration_motion'):
+                self.file.attrs['task_scope']='moving_perception_calibration'
+                self.file.attrs['evidence_kind']='authored_moving_perception_calibration'
         self.file.attrs['spec'] = json.dumps(spec)
         self.file['data'].attrs['env_args'] = json.dumps({
             'env_name':'AIWorkerPourNative-v1', 'type':2,

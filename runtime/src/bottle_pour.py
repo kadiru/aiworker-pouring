@@ -65,6 +65,10 @@ def initial_points(spec):
     cross = sorted(((i*spacing, j*spacing) for i in range(-n,n+1) for j in range(-n,n+1)
                     if (i*i+j*j)*spacing**2 < radius**2), key=lambda xy: xy[0]**2+xy[1]**2)
     count = round(spec['initial_ml']/(spacing**3*1e6))
+    if count==0:
+        if spec.get('calibration_only') and spec.get('calibration_motion') and not spec.get('policy_evaluation'):
+            return np.empty((0,3),dtype=np.float32)
+        raise ValueError('An empty initial bottle is supported only by authored motion calibration')
     pts = np.array([[*cross[i%len(cross)], BOTTLE[0][0]+2*spacing+(i//len(cross))*spacing]
                     for i in range(count)], dtype=np.float32)
     if pts[:,2].max() > BOTTLE[1][0] - spacing:
