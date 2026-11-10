@@ -1,0 +1,298 @@
+{
+  "status": "tracking_accepted_level_pair_rejected_reserved_unused",
+  "runtime": {
+    "utc": "2026-11-10T04:42:53.117432+00:00",
+    "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+    "limits": {
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "NanoCpus": 4000000000,
+      "CpusetCpus": "16-23",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "MemorySwap": 17179869184
+    },
+    "gpu_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 866779, 968 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 533805, 4857 MiB",
+    "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+  },
+  "health": {
+    "run": "20261110T010827Z",
+    "phase": "Trial finished with failed checks",
+    "queue": [],
+    "recording": {
+      "active": false,
+      "path": "/workspace/outputs/fountain/20261110T010827Z/1052-SD_A_motion_train_r0_08_high-249203/episode.hdf5",
+      "cameras": [
+        "task",
+        "wrist",
+        "overview",
+        "cup_detail"
+      ],
+      "resolution": [
+        384,
+        384
+      ],
+      "control_hz": 20,
+      "camera_resolutions": {
+        "task": [
+          384,
+          384
+        ],
+        "wrist": [
+          384,
+          384
+        ],
+        "overview": [
+          384,
+          384
+        ],
+        "cup_detail": [
+          1024,
+          1024
+        ]
+      },
+      "frames": 59
+    },
+    "error": null,
+    "learning_error": null
+  },
+  "active_checkpoint_sha256": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+  "protected_parent_files_verified": 2284,
+  "runtime_sources_verified": 135,
+  "reused_development_episodes": 207,
+  "new_native_scenes_this_followup": 0,
+  "reserved_scenes_started": 0,
+  "autonomy_accepted": false,
+  "no_active_controller_change": true,
+  "component_jobs_running": false,
+  "archives": [
+    {
+      "path": "/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1/tracker-t1-frozen-inputs",
+      "protocol_sha256": "694ecb768a9f3bdec4f09b9f9ca0243a08ce4181723b147156285abdcf8cfc37",
+      "frozen_inputs": 30
+    },
+    {
+      "path": "/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1/pair-r4-frozen-inputs",
+      "protocol_sha256": "42434b38100b0b64ad7348497d8430124e8412e32b3fa4e452d12ab2c83efa60",
+      "frozen_inputs": 39
+    }
+  ],
+  "reports": {
+    "tracker-t0.json": "437d1c7120e48a2a320447273fa7bae4ff8c28bdd87e52166a39e779ac04c24b",
+    "tracker-t1.json": "57833f7afe94dda81cd69cddbe7faa9393d3374712160b69d01f9c32b977d009",
+    "pair-r4.json": "55d4a7d63efbf57608183c71affd6512dbb7e3feea8128d620391e54600cd14c",
+    "pair-r4-rgb.json": "510119dc4ce9d52c75f1ec13f3bd718eb52362efd05f29026d517bf8cfbd6d01",
+    "pair-r4-color.json": "3bfaf122f4215b759fbb07dd15ab2bc88abce2e1c9cd7fd5114395a126f00d97",
+    "level-localization-check.json": "a2c2fd249a35957a8080f499823010e3e0d7094781f285594c9f5c944dc0ec06",
+    "dynamic-localization-check.json": "34125ec5817ad1d394de7b6626c295dd8a0997711c628a0c955632934bcced50"
+  },
+  "jobs": {
+    "tracker-eval-t0": {
+      "before": {
+        "utc": "2026-11-10T04:25:34.991420+00:00",
+        "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+        "limits": {
+          "DeviceRequests": [
+            {
+              "Driver": "",
+              "Count": 0,
+              "DeviceIDs": [
+                "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+              ],
+              "Capabilities": [
+                [
+                  "gpu"
+                ]
+              ],
+              "Options": {}
+            }
+          ],
+          "NanoCpus": 4000000000,
+          "CpusetCpus": "16-23",
+          "CpuShares": 256,
+          "Memory": 17179869184,
+          "MemorySwap": 17179869184
+        },
+        "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 533805, 4857 MiB",
+        "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+      },
+      "completion": {
+        "exit_code": 0,
+        "helper": "evaluate_dynamic_tracker.py",
+        "helper_sha256": "8ee4220a37da6a8b0fb4f8462415c59885ed326d44510e4bbead1b140991a486",
+        "runtime": {
+          "utc": "2026-11-10T04:27:38.334157+00:00",
+          "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+          "limits": {
+            "DeviceRequests": [
+              {
+                "Driver": "",
+                "Count": 0,
+                "DeviceIDs": [
+                  "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+                ],
+                "Capabilities": [
+                  [
+                    "gpu"
+                  ]
+                ],
+                "Options": {}
+              }
+            ],
+            "NanoCpus": 4000000000,
+            "CpusetCpus": "16-23",
+            "CpuShares": 256,
+            "Memory": 17179869184,
+            "MemorySwap": 17179869184
+          },
+          "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 533805, 4857 MiB",
+          "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+        }
+      },
+      "log_sha256": "3e7a5fb5a893118355175115ae0a342b1ce2ddbc234e0f3d415c35514f48dfa6"
+    },
+    "tracker-eval-t1": {
+      "before": {
+        "utc": "2026-11-10T04:30:31.349512+00:00",
+        "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+        "limits": {
+          "DeviceRequests": [
+            {
+              "Driver": "",
+              "Count": 0,
+              "DeviceIDs": [
+                "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+              ],
+              "Capabilities": [
+                [
+                  "gpu"
+                ]
+              ],
+              "Options": {}
+            }
+          ],
+          "NanoCpus": 4000000000,
+          "CpusetCpus": "16-23",
+          "CpuShares": 256,
+          "Memory": 17179869184,
+          "MemorySwap": 17179869184
+        },
+        "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 533805, 4857 MiB",
+        "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+      },
+      "completion": {
+        "exit_code": 0,
+        "helper": "evaluate_dynamic_tracker.py",
+        "helper_sha256": "52b884d34d60985bd7a86362df6f3026a7a37b0c4758e6f8845822ec4f7d4755",
+        "runtime": {
+          "utc": "2026-11-10T04:32:43.844570+00:00",
+          "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+          "limits": {
+            "DeviceRequests": [
+              {
+                "Driver": "",
+                "Count": 0,
+                "DeviceIDs": [
+                  "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+                ],
+                "Capabilities": [
+                  [
+                    "gpu"
+                  ]
+                ],
+                "Options": {}
+              }
+            ],
+            "NanoCpus": 4000000000,
+            "CpusetCpus": "16-23",
+            "CpuShares": 256,
+            "Memory": 17179869184,
+            "MemorySwap": 17179869184
+          },
+          "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 533805, 4857 MiB",
+          "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+        }
+      },
+      "log_sha256": "f8b807954fb71fc41cf94833c296b169a262ba588c52119cf3318b1c0c73abb3"
+    },
+    "pair-fit-r4": {
+      "before": {
+        "utc": "2026-11-10T04:33:57.653930+00:00",
+        "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+        "limits": {
+          "DeviceRequests": [
+            {
+              "Driver": "",
+              "Count": 0,
+              "DeviceIDs": [
+                "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+              ],
+              "Capabilities": [
+                [
+                  "gpu"
+                ]
+              ],
+              "Options": {}
+            }
+          ],
+          "NanoCpus": 4000000000,
+          "CpusetCpus": "16-23",
+          "CpuShares": 256,
+          "Memory": 17179869184,
+          "MemorySwap": 17179869184
+        },
+        "gpu_processes": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 533805, 4857 MiB",
+        "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+      },
+      "completion": {
+        "exit_code": 0,
+        "helper": "fit_dynamic_pair.py",
+        "helper_sha256": "44f6e54e549663d98769cb4ee68553421deb1d2f0b1203324a0d97182f45778f",
+        "runtime": {
+          "utc": "2026-11-10T04:38:42.970304+00:00",
+          "container": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+          "limits": {
+            "DeviceRequests": [
+              {
+                "Driver": "",
+                "Count": 0,
+                "DeviceIDs": [
+                  "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+                ],
+                "Capabilities": [
+                  [
+                    "gpu"
+                  ]
+                ],
+                "Options": {}
+              }
+            ],
+            "NanoCpus": 4000000000,
+            "CpusetCpus": "16-23",
+            "CpuShares": 256,
+            "Memory": 17179869184,
+            "MemorySwap": 17179869184
+          },
+          "gpu_processes": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 866779, 968 MiB\nGPU-cde23916-c5fa-f18e-a343-127f732cc2f6, 533805, 4857 MiB",
+          "guard": "3747905 /usr/bin/python3 /home/kadir/aiworker-pouring-4070/gpu_priority_guard.py 0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
+        }
+      },
+      "log_sha256": "188849cb6748e17bc8445b1e68bf48d0f6f824f6b5b3f086bdc482595aa16e2c"
+    }
+  },
+  "helper_sha256": "f446638875ace1dbbab83eedc61dfd2f3df79853e04a32e1820ec7d814b2bc49",
+  "scope": "Tracked perception accepted only for this declared known-size stationary-cup scope. RGB/color development gates fail. All 18 reserved scenes remain unused. No foreign job signaled or reconfigured; point-in-time snapshots do not prove uninterrupted execution."
+}

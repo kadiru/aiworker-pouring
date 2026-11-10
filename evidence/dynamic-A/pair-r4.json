@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "models": {
+    "rgb": {
+      "passed": false,
+      "parameters": 58770,
+      "optimizer_steps": 9120,
+      "fit_seconds": 72.27269332500873,
+      "cpu_gpu_difference": 2.4437904357910156e-05,
+      "inference_path_difference": 1.7881393432617188e-07,
+      "checkpoint_sha256": "c680eee51f5dd7dafe41dab877ec6c89fe81231f9e9f8533f0292a32744a6b3b"
+    },
+    "color": {
+      "passed": false,
+      "parameters": 58770,
+      "optimizer_steps": 11400,
+      "fit_seconds": 90.09487000503577,
+      "cpu_gpu_difference": 1.7970800399780273e-05,
+      "inference_path_difference": 1.1920928955078125e-07,
+      "checkpoint_sha256": "5b3a5ac3dd918dadfce57fa4c0c463cd1109d9bb7b3d92d17bab029b391a3b15"
+    }
+  },
+  "counts": {
+    "train": {
+      "episodes": 171,
+      "frames": 2403
+    },
+    "validation": {
+      "episodes": 36,
+      "frames": 918
+    }
+  },
+  "protocol_sha256": "42434b38100b0b64ad7348497d8430124e8412e32b3fa4e452d12ab2c83efa60",
+  "scene_protocol_sha256": "7f3ade6f0389380732df4c8630c7a66129222e5d3fb033e6376107d2fdaf32ad",
+  "total_seconds": 283.0109601999866,
+  "method": "Separate supervised RGB and binary-color-mask regressors; equal-size/equal-episode sampled squared error with AdamW. No RL or primary-to-color distillation.",
+  "autonomy_accepted": false
+}

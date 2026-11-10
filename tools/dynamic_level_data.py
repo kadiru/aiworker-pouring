@@ -24,6 +24,10 @@ def collect(parts,locator_name='cup-neural-localization.pt',selection_name='scop
     assert not protocol.get('draft_only')
     specs={s['name']:s for s in plan['collect']};windows=[]
     loc=torch.load(ROOT/locator_name,map_location='cpu',weights_only=False)
+    tracking=loc['bank']['kind']=='stationary_cup_tracker'
+    if tracking:
+        from dynamic_cup_tracker import CupTracker
+        assert loc['accepted']
     resolution=tuple(loc['calibration']['resolution_wh']);new={k:dict(images=[],target=[],xy=[],meta=[]) for k in data}
     for part in parts:
         assert part in ('seed_pilot','seed_remaining','low_train','train','validation')
@@ -44,9 +48,13 @@ def collect(parts,locator_name='cup-neural-localization.pt',selection_name='scop
                 k=np.asarray(cal['K']).copy();k[:2]*=resolution[0]/1024
                 assert np.allclose(k,loc['calibration']['K']) and np.allclose(cal['T'],loc['calibration']['T'])
                 history=[];accepted=None
+                tracker=CupTracker(loc,s['declared_cup_geometry']) if tracking else None
                 for i in range(12):
                     image=decode(d['obs/cup_detail_image'][i],'jpeg95');image=np.asarray(Image.fromarray(image).resize(resolution,Image.Resampling.BILINEAR)).copy()
-                    uv,score=locate_static(image,loc['bank']);history.append((uv.tolist(),score));accepted=consensus(history,loc['threshold'],loc['consensus'])
+                    if tracking:
+                        result=tracker.update(image);history.append(result);accepted=dict(uv=result['uv']) if result['valid'] else None
+                    else:
+                        uv,score=locate_static(image,loc['bank']);history.append((uv.tolist(),score));accepted=consensus(history,loc['threshold'],loc['consensus'])
                     if accepted is not None:break
                 xy=None if accepted is None else plane_point(accepted['uv'],1.04+s['declared_cup_geometry']['rim_z_m'],loc['calibration'])[:2]
                 error=None if xy is None else float(np.linalg.norm(xy-s['cup_world'][:2])*1000)
@@ -57,7 +65,9 @@ def collect(parts,locator_name='cup-neural-localization.pt',selection_name='scop
                 indices=np.flatnonzero((times>=.5)&(times<=2.5)) if moving else np.flatnonzero(times>=times[-1]-1.-1e-7)
                 samples=read(path.parent/'samples.json');sample_times=np.asarray([v['t'] for v in samples]);a=new[r['split']]
                 for index in (indices if moving else indices[::2]):
-                    rgb=decode(d['next_obs/cup_detail_image'][int(index)],'jpeg95');a['images'].append(cup_crop(rgb,xy,cal));a['xy'].append(xy)
+                    rgb=decode(d['next_obs/cup_detail_image'][int(index)],'jpeg95')
+                    if tracking:assert tracker.update(rgb)['valid'],'Tracked crop lost visual confirmation before fitting'
+                    a['images'].append(cup_crop(rgb,xy,cal));a['xy'].append(xy)
                     label=r['label']['target']
                     if moving:
                         j=int(np.abs(sample_times-times[index]).argmin());assert abs(sample_times[j]-times[index])<1e-6

@@ -4,6 +4,7 @@ Both regress measured height with squared error. The mask network never consumes
 RGB-model predictions or weights. Agreement is a selection gate, not a loss.
 """
 import argparse,hashlib,json,time
+import numpy as np
 import torch
 from dynamic_level_data import ROOT,collect,sha,read
 from fit_scale_level import metrics,eligible
@@ -36,6 +37,13 @@ def main():
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name();torch.set_num_threads(4)
     torch.manual_seed(config['seed']);started=time.perf_counter();protocol,parent,data=collect(config['parts'],config.get('locator','cup-neural-localization.pt'),config.get('locator_selection','scope-selection.json'));gates=protocol['gates']
     tr=data['train'];va=data['validation'];assert any(m.get('moving') for m in va['meta'])
+    if config.get('balance_motion_groups'):
+        from scale_data_admission import balanced_frame_weights
+        weights=np.zeros(len(tr['meta']))
+        for moving in (False,True):
+            ids=[i for i,m in enumerate(tr['meta']) if bool(m.get('moving'))==moving]
+            weights[ids]=np.asarray(balanced_frame_weights([tr['meta'][i] for i in ids]))*.5
+        assert abs(weights.sum()-1)<1e-6;tr['weights']=torch.tensor(weights,device='cuda')
     initial=torch.load(ROOT/config['rgb_initialization'],map_location='cpu',weights_only=False)
     summaries={};models={};primary_predictions={}
     for kind in ('rgb','color'):

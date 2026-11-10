@@ -14,6 +14,28 @@ The high-fill fixtures target 95.6% height using a bounded 0.75 nominal-mL/s nat
 
 Moving fixtures start upright, tilt and translate, then return. Non-high-cup views use a 20 nominal-mL colored bottle and a 65-degree maximum angle; high-cup views use an empty bottle and an 82-degree maximum. The nine training cases named `_low` preserve source seed cutoffs of 0.22 (five cases), 0.50 (two) and 0.78 (two); they are not uniformly low-filled. Training targets use measured height, never the name or initialization cutoff. Moving validation/reserved non-high fixtures use their declared low seed. Translation is transverse to the tilt plane. Full-resolution cup-detail images are retained. Actual bottle movement and containment are measured independently; projected/planned movement alone is not acceptance evidence.
 
+## Current tracking and paired-fit result
+
+Tracker t1 passes all **207 development episodes / 4,131 sampled frames**, with maximum raw initial / tracked validation errors **2.9896 / 2.4745 mm**. Every one of the original sampled frames is retained in chronological order; all twelve raw initial predictions per episode also remain below 3 mm. Initial confirmation requires eight frames, and unconfirmed frames cannot authorize control. Two frozen native-rim CNNs average predictions across nine translated crops each; their confirmed anchor remains fixed while normalized gradient correlation checks the visible lower cup outline. At least two of three patches must have correlation ≥0.75 and displacement ≤1.5 mm; coarse association is bounded at 24 native pixels. Cup absence, reference loss and movement latch rejection until a new tracker is initialized. No scene coordinates or liquid labels enter inference.
+
+All **180 synthetic erased-cup / ±3.5 mm view-translation challenges** reject. These are synthetic rejection tests, not physically moved-cup trials. CPU/GPU coordinate difference is **0.00485 native pixels**; all checked status decisions agree. Seven focused CPU tests pass. Tracker t0 rejected eight genuine stationary-cup views because bottle overlap changed its reference; four native diagnostic frames were actually inspected before moving the ROI lower and adding separate patch support. Both candidates and exact sources are retained. [T1](../evidence/dynamic-A/tracker-t1.json), [T0](../evidence/dynamic-A/tracker-t0.json), [visual diagnosis](../evidence/dynamic-A/tracker-t0-rejection-review.json).
+
+The accepted tracker is used by both old and new crop loaders. All 144 old and 63 new episode localization/admission checks pass. Separate RGB and binary-red-mask CNNs then fit measured normalized height with **58,770 parameters each**. Training is weighted squared error, with half the sampling weight on static episodes and half on moving episodes, then equal size/episode weights. The color model never receives RGB model predictions or weights. This is supervised learning, not reinforcement learning.
+
+R4 uses **171 training / 36 validation episodes**, **2,403 / 918 frames**. RGB runs 240 epochs / 9,120 AdamW updates (72.27 s), selecting epoch 195; color runs 300 epochs / 11,400 updates (90.09 s), selecting epoch 15. Total including extraction/parity is 283.01 s. Both fail the unchanged gates:
+
+| Selected candidate | Worst-size validation MAE | Near-full max error | Near-full max overestimate |
+|---|---:|---:|---:|
+| RGB r4 | 2.1164 pp | 2.5674 pp | 2.2073 pp |
+| Color r4 | 2.8857 pp | 4.6779 pp | 3.4299 pp |
+| Required | <2 pp | <3.5 pp | <2.5 pp |
+
+The selected color model also has **11.2232 pp training near-full error**, and maximum RGB/color disagreement across train/validation is **11.2117 pp** versus <3.5 pp required. It is the best validation-score unsuccessful candidate, not an accepted checkpoint. Later epochs and all failed checks remain in the report. CPU/GPU differences (RGB 0.00002444; color 0.00001797 fraction), shared-path parity and absent-color rejection pass. [Pair](../evidence/dynamic-A/pair-r4.json), [RGB](../evidence/dynamic-A/pair-r4-rgb.json), [color](../evidence/dynamic-A/pair-r4-color.json).
+
+No reserved scene ran. The failed-pair selection gate was exercised and refused access; a second component job was also correctly rejected while the fit was running. Eight CPU reserved-evaluator tests pass, including stale/invalid locations and incomplete frame coverage. These CPU tests are not held-out results. No active controller change or simulator restart occurred in this follow-up. All 2,284 protected parent files and 135 runtime sources verify unchanged; GPU/CPU/RAM limits and priority guard are retained. [Closure](../evidence/dynamic-A/tracking-closure.json).
+
+The next diagnosis targets are shared low-fill bias (moving validation case 05 is +4.031 pp RGB / +5.152 pp color), residual crop/pose bias, and color occlusion/high-fill errors. Their causes are not yet established. Keep tracker t1 fixed while investigating the existing development recordings, then freeze a new pair fit. Reserved data remain excluded.
+
 ## Preserved unsuccessful candidates
 
 All three initial fits used only the existing 126 training / 18 validation episodes on the 4070. None is accepted or activated for autonomy.
@@ -36,7 +58,7 @@ All nine high-fill scenes pass and all 36 final camera frames were inspected. Al
 
 A read-only CPU diagnostic of the retained models on the nine reviewed high-fill training recordings confirms all nine cup locations, with maximum error **1.0671 mm**. The retained primary/color maximum absolute errors are **3.4425 / 5.4770 percentage points**; maximum pairwise disagreement is only **2.7684 points**. Agreement alone therefore does not establish level accuracy. This diagnostic accepts no model and does not substitute for the forthcoming 4070 validation. [Diagnostic](../evidence/dynamic-A/retained-high-cpu-probe.json).
 
-## Moving localization blocker and repair
+## Earlier moving-localization failures
 
 The first combined attempt, r3, stops before any level/color optimizer update: **7/18 moving validation locations fail** (three unconfirmed, four errors of 3.592–4.462 mm). All 27 new static locations pass. [Rejected gate](../evidence/dynamic-A/localization-r3-rejected.json), [zero-update attempt](../evidence/dynamic-A/pair-r3-aborted.json). All 27 frozen inputs are archived natively under `pair-r3-frozen-inputs/`; the old checkpoint is not overwritten.
 
@@ -50,7 +72,7 @@ Coarse d2 passes after 120 epochs / 22,080 updates, selecting epoch 120: crop er
 
 Two no-fit alternatives also fail on the same development frames: retained fine/affine correction with repaired coarse crops reaches 48.54/33.15 mm train/validation maxima; fixed projected rim-edge alignment reaches 27.05/24.27 mm. Neither consumes reserved images or activates a model. [Reuse diagnostic](../evidence/dynamic-A/rim-reuse-probe.json), [edge diagnostic](../evidence/dynamic-A/rim-edge-probe.json).
 
-An exploratory replay blends the old and d2 fine predictions before initial temporal confirmation. Equal weights confirm all 207 episodes, with train/validation maximum confirmation errors 2.177/2.513 mm. However, raw initial validation frames reach 3.041 mm, and no stationary-cup tracker or explicit disappearance/movement rejection has been implemented. This is a development hypothesis, **not a passing localization candidate**; thresholds remain unchanged. The reproducible CPU helper is `probe_dynamic_rim_temporal.py`. [Replay](../evidence/dynamic-A/rim-temporal-feasibility.json).
+An exploratory replay blends the old and d2 fine predictions before initial temporal confirmation. Equal weights confirm all 207 episodes, with train/validation maximum confirmation errors 2.177/2.513 mm. However, raw initial validation frames reach 3.041 mm, and at that stage no stationary-cup tracker or explicit disappearance/movement rejection had been implemented. This is a development hypothesis, **not a passing localization candidate**; thresholds remain unchanged. The reproducible CPU helper is `probe_dynamic_rim_temporal.py`. [Replay](../evidence/dynamic-A/rim-temporal-feasibility.json).
 
 The development pass closes with all 63 calibration scenes audited/reviewed, all 18 reserved moving scenes unused, no successor activation, and no component job running. All 2,284 protected parent files and 135 runtime sources verify unchanged against the current manifest. [Closure and runtime witnesses](../evidence/dynamic-A/development-closure.json).
 
@@ -67,9 +89,9 @@ The owned container keeps 4070-only GPU access, a four-core CPU quota on CPUs 16
 
 Run native CPU helpers through `/isaac-sim/python.sh` with `CUDA_VISIBLE_DEVICES=` inside the owned container. Host observers and the deployment/component wrappers run with host `python3`. Keep collection and GPU fitting sequential.
 
-1. Collection and actual visual review are complete. Keep all original recordings, failed candidates and frozen-input archives. Do not rerun consumed IDs or overwrite exclusive reports.
-2. Coarse d2 passes internal prerequisites; fine d1/d2, detector reuse and edge alignment fail. No paired r4 fit is authorized by the development gates yet.
-3. Reproduce the exploratory CPU replay with `/isaac-sim/python.sh /workspace/learning/A-scale-dynamic-20261109-v1/probe_dynamic_rim_temporal.py`, using `CUDA_VISIBLE_DEVICES=` and nice 10 inside the owned container. It asserts exact equality with the saved diagnostic and accepts nothing.
-4. Implement a separate stationary-cup tracker candidate only with explicit disappearance/movement rejection and the retained accuracy requirements. Re-evaluate all old/new development scenes before selecting any successor detector. The fusion replay alone is insufficient.
-5. Only after a fully passing detector exists, freeze its exact selection in a new paired-fit protocol and run the independent RGB/color fit on the guarded 4070. Do not point `prepare_dynamic_fit.py` at failed rim d2.
-6. Any development failure keeps all 18 reserved cases and autonomy unused. Frozen component selection permits reserved perception evaluation only. Autonomous pouring additionally requires runtime integration/parity, all-size motion clearance and explicit all-gate acceptance.
+1. Tracker t1 is accepted for known-size stationary-cup perception; r4 RGB/color gates fail. The complete reports and exact input archives are retained. Do not overwrite closed protocols or rerun consumed IDs.
+2. Reproduce the current tracker CPU contracts with `/isaac-sim/python.sh /workspace/learning/A-scale-dynamic-20261109-v1/test_dynamic_cup_tracker.py` and evaluator contracts with `test_dynamic_holdout_metrics.py`, using `CUDA_VISIBLE_DEVICES=` and nice 10 inside the owned container.
+3. Investigate the existing low-fill and high-fill/occluded development errors with tracker t1 frozen. Declare a new pair revision before fitting; do not reuse exclusive r4 output names or the eighteen reserved images.
+4. Only a fully passing pair may be frozen by `freeze_dynamic_components.py`. It currently refuses r4, as required. That selection permits reserved perception fixtures only, never autonomous pouring.
+5. If a future pair passes, bind the exact evaluator/source/model hashes, run the finalized reserved-geometry preflight, collect the 18 once-only fixtures with `run_dynamic_collection.py holdout`, audit and actually review their native images, then run the guarded reserved evaluator. Do not launch collection during fitting.
+6. Autonomous pouring needs separate runtime integration/parity, all-size motion clearance and explicit all-gate acceptance. No such acceptance exists.

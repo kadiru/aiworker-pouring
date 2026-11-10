@@ -42,6 +42,10 @@ def collect(surface=False,locator_name='cup-neural-localization.pt',selection_na
     loc=torch.load(ROOT/locator_name,map_location='cpu',weights_only=False)
     resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768],[1024,1024])
     if loc['bank']['kind']=='native_rim_refiner':assert selection['module_sha256']==sha(ROOT/'scale_rim_refiner.py')
+    tracking=loc['bank']['kind']=='stationary_cup_tracker'
+    if tracking:
+        from dynamic_cup_tracker import CupTracker
+        assert selection['module_sha256']==sha(ROOT/'dynamic_cup_tracker.py') and loc['accepted']
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)
     model=CupEstimator().cuda().eval();model.load_state_dict(parent['cup_model'])
     data={s:dict(images=[],target=[],xy=[],meta=[]) for s in ('train','validation')};windows=[]
@@ -57,11 +61,16 @@ def collect(surface=False,locator_name='cup-neural-localization.pt',selection_na
             scaled=np.asarray(detail['K']).copy();scaled[:2]*=resolution[0]/1024
             assert np.allclose(scaled,loc['calibration']['K']) and np.allclose(detail['T'],loc['calibration']['T'])
             history=[];accepted=None
+            tracker=CupTracker(loc,spec['declared_cup_geometry']) if tracking else None
             for i in range(12):
                 rgb=decode(d['obs/cup_detail_image'][i],'jpeg95')
                 image=np.asarray(Image.fromarray(rgb).resize(tuple(resolution),Image.Resampling.BILINEAR)).copy()
-                uv,score=locate_static(image,loc['bank']);history.append((uv.tolist(),score))
-                accepted=consensus(history,loc['threshold'],loc['consensus'])
+                if tracking:
+                    result=tracker.update(image);history.append(result)
+                    accepted=dict(uv=result['uv']) if result['valid'] else None
+                else:
+                    uv,score=locate_static(image,loc['bank']);history.append((uv.tolist(),score))
+                    accepted=consensus(history,loc['threshold'],loc['consensus'])
                 if accepted is not None:break
             xy=None if accepted is None else plane_point(accepted['uv'],1.04+spec['declared_cup_geometry']['rim_z_m'],loc['calibration'])[:2]
             error=None if xy is None else float(np.linalg.norm(xy-spec['cup_world'][:2])*1000)
@@ -73,6 +82,7 @@ def collect(surface=False,locator_name='cup-neural-localization.pt',selection_na
             if surface:lookup=surface_lookup(xy,detail,spec['declared_cup_geometry'])
             for index in np.flatnonzero(times>=times[-1]-1.-1e-7)[::2]:
                 rgb=decode(d['next_obs/cup_detail_image'][int(index)],'jpeg95')
+                if tracking:assert tracker.update(rgb)['valid'],'Tracked static crop lost visual confirmation before fitting'
                 a['images'].append(cup_crop(rgb,xy,detail))
                 if surface:
                     a['surface_images'].append(surface_crop(rgb,xy,detail,spec['declared_cup_geometry']))

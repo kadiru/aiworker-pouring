@@ -1,0 +1,387 @@
+{
+  "status": "tracking_passed_pair_failed_reserved_unused",
+  "tracker": {
+    "passed": true,
+    "episodes": 207,
+    "frames": 4131,
+    "raw_initial_max_mm": 2.9896149287349436,
+    "tracked_max_mm": 2.4744841895657568,
+    "cpu_gpu_max_pixels": 0.004846839391387412,
+    "rejected_synthetic_challenges": 180,
+    "synthetic_challenges": 180,
+    "optimizer_steps": 0,
+    "total_seconds": 129.89520589099266
+  },
+  "models": {
+    "rgb": {
+      "passed": false,
+      "selected_epoch": 195,
+      "parameters": 58770,
+      "optimizer_steps": 9120,
+      "fit_seconds": 72.27269332500873,
+      "validation_mae": 0.012666658498346806,
+      "worst_size_validation_mae": 0.021163711324334145,
+      "near_full_validation_max_error": 0.02567356824874878,
+      "near_full_validation_max_overestimate": 0.02207326889038086,
+      "maximum_primary_color_disagreement": null,
+      "cpu_gpu_difference": 2.4437904357910156e-05,
+      "absent_color_rejected": null,
+      "largest_validation_biases": [
+        {
+          "name": "SD_A_motion_validation_r0_05_low",
+          "mean_error": 0.04030787186587666,
+          "mae": 0.04030787186587666,
+          "maximum_absolute_error": 0.043267915529364376
+        },
+        {
+          "name": "SC_A_static_validation_01_01",
+          "mean_error": -0.037984641920718626,
+          "mae": 0.037984641920718626,
+          "maximum_absolute_error": 0.03906698505473172
+        },
+        {
+          "name": "SD_A_motion_validation_r0_01_low",
+          "mean_error": -0.035765519492278255,
+          "mae": 0.035765519492278255,
+          "maximum_absolute_error": 0.03907367343606394
+        },
+        {
+          "name": "SC_A_static_validation_03_01",
+          "mean_error": -0.026593307664686552,
+          "mae": 0.026593307664686552,
+          "maximum_absolute_error": 0.02866309250102217
+        },
+        {
+          "name": "SC_A_static_validation_05_01",
+          "mean_error": 0.026297119785758716,
+          "mae": 0.026297119785758716,
+          "maximum_absolute_error": 0.02838077895781682
+        },
+        {
+          "name": "SD_A_motion_validation_r0_00_low",
+          "mean_error": -0.02521159412716606,
+          "mae": 0.02521159412716606,
+          "maximum_absolute_error": 0.02718177885790929
+        }
+      ],
+      "training_violations": [],
+      "validation_violations": [
+        {
+          "group": "moving",
+          "size": "1/1.1",
+          "metric": "mae",
+          "value": 0.021163711324334145,
+          "limit": 0.02
+        }
+      ]
+    },
+    "color": {
+      "passed": false,
+      "selected_epoch": 15,
+      "parameters": 58770,
+      "optimizer_steps": 11400,
+      "fit_seconds": 90.09487000503577,
+      "validation_mae": 0.017166128382086754,
+      "worst_size_validation_mae": 0.028857331722974777,
+      "near_full_validation_max_error": 0.04677855968475342,
+      "near_full_validation_max_overestimate": 0.03429877758026123,
+      "maximum_primary_color_disagreement": 0.1121172308921814,
+      "cpu_gpu_difference": 1.7970800399780273e-05,
+      "absent_color_rejected": true,
+      "largest_validation_biases": [
+        {
+          "name": "SD_A_motion_validation_r0_05_low",
+          "mean_error": 0.05151730762685154,
+          "mae": 0.05151730762685154,
+          "maximum_absolute_error": 0.06256855515872844
+        },
+        {
+          "name": "SD_A_motion_validation_r0_00_low",
+          "mean_error": -0.04631995955859401,
+          "mae": 0.04631995955859401,
+          "maximum_absolute_error": 0.04927459115685856
+        },
+        {
+          "name": "SC_A_static_validation_03_01",
+          "mean_error": -0.03868802073486242,
+          "mae": 0.03868802073486242,
+          "maximum_absolute_error": 0.04029237592921431
+        },
+        {
+          "name": "SC_A_static_validation_02_01",
+          "mean_error": 0.03395471711705709,
+          "mae": 0.03395471711705709,
+          "maximum_absolute_error": 0.034298776801116926
+        },
+        {
+          "name": "SD_A_motion_validation_r0_02_low",
+          "mean_error": -0.03159533880066515,
+          "mae": 0.03159533880066515,
+          "maximum_absolute_error": 0.034660292119760516
+        },
+        {
+          "name": "SC_A_static_validation_01_01",
+          "mean_error": -0.029350741148277112,
+          "mae": 0.029350741148277112,
+          "maximum_absolute_error": 0.030873924299002042
+        }
+      ],
+      "training_violations": [
+        {
+          "group": "all",
+          "size": "0.9/0.9",
+          "metric": "near_overestimate",
+          "value": 0.030336320400238037,
+          "limit": 0.025
+        },
+        {
+          "group": "all",
+          "size": "0.9/1",
+          "metric": "near_overestimate",
+          "value": 0.032934725284576416,
+          "limit": 0.025
+        },
+        {
+          "group": "all",
+          "size": "0.9/1.1",
+          "metric": "near_max",
+          "value": 0.03864586353302002,
+          "limit": 0.035
+        },
+        {
+          "group": "all",
+          "size": "1/1",
+          "metric": "near_overestimate",
+          "value": 0.03020232915878296,
+          "limit": 0.025
+        },
+        {
+          "group": "all",
+          "size": "1/1.1",
+          "metric": "near_overestimate",
+          "value": 0.027055680751800537,
+          "limit": 0.025
+        },
+        {
+          "group": "all",
+          "size": "1.1/0.9",
+          "metric": "near_max",
+          "value": 0.04670119285583496,
+          "limit": 0.035
+        },
+        {
+          "group": "all",
+          "size": "1.1/1.1",
+          "metric": "near_max",
+          "value": 0.1122315526008606,
+          "limit": 0.035
+        },
+        {
+          "group": "all",
+          "size": "1.1/1.1",
+          "metric": "near_overestimate",
+          "value": 0.030892610549926758,
+          "limit": 0.025
+        },
+        {
+          "group": "static",
+          "size": "0.9/0.9",
+          "metric": "near_overestimate",
+          "value": 0.030336320400238037,
+          "limit": 0.025
+        },
+        {
+          "group": "static",
+          "size": "0.9/1",
+          "metric": "near_overestimate",
+          "value": 0.032934725284576416,
+          "limit": 0.025
+        },
+        {
+          "group": "static",
+          "size": "1/1",
+          "metric": "near_overestimate",
+          "value": 0.03020232915878296,
+          "limit": 0.025
+        },
+        {
+          "group": "static",
+          "size": "1/1.1",
+          "metric": "near_overestimate",
+          "value": 0.027055680751800537,
+          "limit": 0.025
+        },
+        {
+          "group": "static",
+          "size": "1.1/1.1",
+          "metric": "near_overestimate",
+          "value": 0.030892610549926758,
+          "limit": 0.025
+        },
+        {
+          "group": "moving",
+          "size": "0.9/1.1",
+          "metric": "near_max",
+          "value": 0.03864586353302002,
+          "limit": 0.035
+        },
+        {
+          "group": "moving",
+          "size": "1.1/0.9",
+          "metric": "near_max",
+          "value": 0.04670119285583496,
+          "limit": 0.035
+        },
+        {
+          "group": "moving",
+          "size": "1.1/1.1",
+          "metric": "near_max",
+          "value": 0.1122315526008606,
+          "limit": 0.035
+        }
+      ],
+      "validation_violations": [
+        {
+          "group": "all",
+          "size": "0.9/0.9",
+          "metric": "mae",
+          "value": 0.025814421474933624,
+          "limit": 0.02
+        },
+        {
+          "group": "all",
+          "size": "0.9/1",
+          "metric": "mae",
+          "value": 0.022867674008011818,
+          "limit": 0.02
+        },
+        {
+          "group": "all",
+          "size": "0.9/1.1",
+          "metric": "mae",
+          "value": 0.026216896250844002,
+          "limit": 0.02
+        },
+        {
+          "group": "all",
+          "size": "0.9/1.1",
+          "metric": "near_max",
+          "value": 0.04539448022842407,
+          "limit": 0.035
+        },
+        {
+          "group": "all",
+          "size": "0.9/1.1",
+          "metric": "near_overestimate",
+          "value": 0.03429877758026123,
+          "limit": 0.025
+        },
+        {
+          "group": "all",
+          "size": "1/1",
+          "metric": "near_max",
+          "value": 0.04677855968475342,
+          "limit": 0.035
+        },
+        {
+          "group": "all",
+          "size": "1/1.1",
+          "metric": "mae",
+          "value": 0.025238242000341415,
+          "limit": 0.02
+        },
+        {
+          "group": "static",
+          "size": "0.9/1",
+          "metric": "mae",
+          "value": 0.020808398723602295,
+          "limit": 0.02
+        },
+        {
+          "group": "static",
+          "size": "0.9/1.1",
+          "metric": "mae",
+          "value": 0.028857331722974777,
+          "limit": 0.02
+        },
+        {
+          "group": "static",
+          "size": "0.9/1.1",
+          "metric": "near_overestimate",
+          "value": 0.03429877758026123,
+          "limit": 0.025
+        },
+        {
+          "group": "static",
+          "size": "1/0.9",
+          "metric": "mae",
+          "value": 0.0241054929792881,
+          "limit": 0.02
+        },
+        {
+          "group": "moving",
+          "size": "0.9/0.9",
+          "metric": "mae",
+          "value": 0.02799432910978794,
+          "limit": 0.02
+        },
+        {
+          "group": "moving",
+          "size": "0.9/1",
+          "metric": "mae",
+          "value": 0.023433972150087357,
+          "limit": 0.02
+        },
+        {
+          "group": "moving",
+          "size": "0.9/1.1",
+          "metric": "mae",
+          "value": 0.0254907738417387,
+          "limit": 0.02
+        },
+        {
+          "group": "moving",
+          "size": "0.9/1.1",
+          "metric": "near_max",
+          "value": 0.04539448022842407,
+          "limit": 0.035
+        },
+        {
+          "group": "moving",
+          "size": "1/1",
+          "metric": "near_max",
+          "value": 0.04677855968475342,
+          "limit": 0.035
+        },
+        {
+          "group": "moving",
+          "size": "1/1.1",
+          "metric": "mae",
+          "value": 0.02669343911111355,
+          "limit": 0.02
+        }
+      ]
+    }
+  },
+  "counts": {
+    "train": {
+      "episodes": 171,
+      "frames": 2403
+    },
+    "validation": {
+      "episodes": 36,
+      "frames": 918
+    }
+  },
+  "total_pair_seconds": 283.0109601999866,
+  "reserved_started": 0,
+  "autonomy_accepted": false,
+  "method": "Frozen coarse/fine ensemble with crop averaging, eight-frame consensus and stationary-foot image registration; separate supervised RGB and binary-red-mask CNN regression with equal static/moving, size and episode weights. No RL or cross-model distillation.",
+  "scope": "Known-size stationary cups and authored moving bottles in Isaac Sim. Native perception validation, not autonomous pouring or physical robot evidence.",
+  "report_hashes": {
+    "tracker-t1.json": "57833f7afe94dda81cd69cddbe7faa9393d3374712160b69d01f9c32b977d009",
+    "pair-r4.json": "55d4a7d63efbf57608183c71affd6512dbb7e3feea8128d620391e54600cd14c",
+    "pair-r4-rgb.json": "510119dc4ce9d52c75f1ec13f3bd718eb52362efd05f29026d517bf8cfbd6d01",
+    "pair-r4-color.json": "3bfaf122f4215b759fbb07dd15ab2bc88abce2e1c9cd7fd5114395a126f00d97"
+  }
+}
