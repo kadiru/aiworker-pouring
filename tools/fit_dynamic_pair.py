@@ -34,7 +34,7 @@ def main():
     assert config['protocol_sha256']==sha(ROOT/'protocol.json')
     assert all(sha(ROOT/n)==v for n,v in config['frozen_files'].items())
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name();torch.set_num_threads(4)
-    torch.manual_seed(config['seed']);started=time.perf_counter();protocol,parent,data=collect(config['parts']);gates=protocol['gates']
+    torch.manual_seed(config['seed']);started=time.perf_counter();protocol,parent,data=collect(config['parts'],config.get('locator','cup-neural-localization.pt'),config.get('locator_selection','scope-selection.json'));gates=protocol['gates']
     tr=data['train'];va=data['validation'];assert any(m.get('moving') for m in va['meta'])
     initial=torch.load(ROOT/config['rgb_initialization'],map_location='cpu',weights_only=False)
     summaries={};models={};primary_predictions={}

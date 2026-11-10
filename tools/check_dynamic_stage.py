@@ -78,7 +78,7 @@ def main():
     result=dict(part=a.part,records=records,complete=True,protected_parent_files_unchanged=True,
                 labels_accepted=sum(r['label']['accepted'] for r in records),manual_review='pending',
                 protocol_sha256=sha(ROOT/'protocol.json'),plan_sha256=m['plan_sha256'],checkpoint_sha256=m['checkpoint_sha256'],helper_sha256=sha(Path(__file__)),
-                scope='Stationary authored calibration and physical settling, not autonomous pouring or a visual-size estimator.')
+                scope='Authored perception calibration and physical settling; bottle/hand motion is measured where declared. Not autonomous pouring or a visual-size estimator.')
     destination=ROOT/(a.part+'-'+a.round+'-audit.json')
     with destination.open('x') as f:json.dump(result,f,indent=2);f.write('\n')
 

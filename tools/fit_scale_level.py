@@ -30,16 +30,16 @@ def write(name,data):(ROOT/name).write_text(json.dumps(data,indent=2)+'\n')
 
 
 @torch.no_grad()
-def collect(surface=False):
+def collect(surface=False,locator_name='cup-neural-localization.pt',selection_name='scope-selection.json'):
     plan=read(ROOT/'plan.json');m=read(ROOT/'candidate.json');audit_path,review_path=collection_paths(ROOT,m)
-    audit=read(audit_path);review=read(review_path);selection=read(ROOT/'scope-selection.json')
+    audit=read(audit_path);review=read(review_path);selection=read(ROOT/selection_name)
     assert review['accepted'] and review['audit_sha256']==sha(audit_path)
     assert selection['passed'] and selection['scope']=='all_nine_declared_cup_sizes'
     assert sha(ROOT/'plan.json')==m['plan_sha256'] and sha(ROOT/'best.pt')==m['checkpoint_sha256']
-    assert sha(ROOT/'cup-neural-localization.pt')==selection['checkpoint_sha256']
+    assert sha(ROOT/locator_name)==selection['checkpoint_sha256']
     assert all(sha(Path(p))==v for p,v in m['protected_parent_files'].items())
     assert all(sha(Path('/workspace/src')/n)==v for n,v in m['runtime_sources'].items())
-    loc=torch.load(ROOT/'cup-neural-localization.pt',map_location='cpu',weights_only=False)
+    loc=torch.load(ROOT/locator_name,map_location='cpu',weights_only=False)
     resolution=loc['calibration']['resolution_wh'];assert resolution in ([384,384],[768,768],[1024,1024])
     if loc['bank']['kind']=='native_rim_refiner':assert selection['module_sha256']==sha(ROOT/'scale_rim_refiner.py')
     parent=torch.load(ROOT/'best.pt',map_location='cpu',weights_only=False)

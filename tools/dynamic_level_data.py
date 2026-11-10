@@ -19,11 +19,11 @@ from scale_rim_refiner import locate_static
 from scale_data_admission import balanced_frame_weights
 
 @torch.inference_mode()
-def collect(parts):
-    plan,parent,_,data=baseline.collect();protocol=read(ROOT/'protocol.json')
+def collect(parts,locator_name='cup-neural-localization.pt',selection_name='scope-selection.json'):
+    plan,parent,_,data=baseline.collect(locator_name=locator_name,selection_name=selection_name);protocol=read(ROOT/'protocol.json')
     assert not protocol.get('draft_only')
     specs={s['name']:s for s in plan['collect']};windows=[]
-    loc=torch.load(ROOT/'cup-neural-localization.pt',map_location='cpu',weights_only=False)
+    loc=torch.load(ROOT/locator_name,map_location='cpu',weights_only=False)
     resolution=tuple(loc['calibration']['resolution_wh']);new={k:dict(images=[],target=[],xy=[],meta=[]) for k in data}
     for part in parts:
         assert part in ('seed_pilot','seed_remaining','low_train','train','validation')
@@ -56,14 +56,14 @@ def collect(parts):
                 times=d['next_time'][:];moving=s.get('calibration_motion')
                 indices=np.flatnonzero((times>=.5)&(times<=2.5)) if moving else np.flatnonzero(times>=times[-1]-1.-1e-7)
                 samples=read(path.parent/'samples.json');sample_times=np.asarray([v['t'] for v in samples]);a=new[r['split']]
-                for index in indices[::2]:
+                for index in (indices if moving else indices[::2]):
                     rgb=decode(d['next_obs/cup_detail_image'][int(index)],'jpeg95');a['images'].append(cup_crop(rgb,xy,cal));a['xy'].append(xy)
                     label=r['label']['target']
                     if moving:
                         j=int(np.abs(sample_times-times[index]).argmin());assert abs(sample_times[j]-times[index])<1e-6
                         label=samples[j]['cup_fill_fraction']
                     a['target'].append(label);a['meta'].append(dict(name=s['name'],cup_height_scale=s['cup_height_scale'],cup_diameter_scale=s['cup_diameter_scale'],index=int(index),source_sha256=r['sha256'],moving=bool(moving)))
-    report=dict(passed=all(w['passed'] for w in windows),windows=windows,parts=parts,protocol_sha256=sha(ROOT/'protocol.json'),locator_sha256=sha(ROOT/'cup-neural-localization.pt'))
+    report=dict(passed=all(w['passed'] for w in windows),windows=windows,parts=parts,moving_frame_stride=1,protocol_sha256=sha(ROOT/'protocol.json'),locator_sha256=sha(ROOT/locator_name))
     (ROOT/'dynamic-localization-check.json').write_text(json.dumps(report,indent=2)+'\n')
     assert report['passed'],'New view localization gate failed; no level/color fitting permitted'
     for split,a in data.items():

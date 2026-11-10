@@ -30,11 +30,19 @@ Reports: [r0](../evidence/dynamic-A/color-r0.json), [r1](../evidence/dynamic-A/c
 
 The three bounding high-fill pilots pass recording integrity, stable-label and zero-loss checks. Measured median levels are 95.6598%, 95.5368% and 94.6471%. All twelve final camera views were actually inspected on three sheets. This is selected-frame review, not full playback. [Pilot audit](../evidence/dynamic-A/seed_pilot-r0-audit.json), [review](../evidence/dynamic-A/seed_pilot-r0-manual-review.json).
 
-All nine parked high-fill layouts, eighteen low-fill training layouts, and proposed moving training/validation paths pass sampled CPU geometry screening. All 18 reserved layouts also pass the same geometry preflight; no reserved images have been collected. Actual moving-view accuracy remains unverified at this checkpoint. Nine native CPU motion/emitter checks and five synthetic acceptance-gate checks pass. Synthetic checks do not count as simulated task successes.
+All nine parked high-fill layouts, eighteen low-fill training layouts, and proposed moving training/validation paths pass sampled CPU geometry screening. All 18 reserved layouts also pass the same geometry preflight; no reserved images have been collected. Moving localization now has a measured failed gate, described below. Nine native CPU motion/emitter checks and five synthetic acceptance-gate checks pass. Synthetic checks do not count as simulated task successes.
 
-All nine high-fill scenes now pass and all 36 final camera frames were inspected; twelve of eighteen low-fill training scenes are complete with zero loss. [Nine-scene summary](../evidence/dynamic-A/high-fill-summary.json). Moving collection, the updated fit, independent evaluation and any autonomous pours remain pending. The active parent robot checkpoint is unchanged. No resized autonomous acceptance has been issued.
+All nine high-fill scenes pass and all 36 final camera frames were inspected. All eighteen low-fill training scenes pass at 26.2482–28.2414% measured height with zero loss; all 72 final camera frames were inspected. [Nine-scene summary](../evidence/dynamic-A/high-fill-summary.json). All eighteen moving validation scenes pass integrity, stable-label, motion and zero-loss checks. All 180 selected final/motion camera frames were actually inspected. Minimum measured motion is 45.903 mm translation and 64.991 degrees rotation; cup inventory stays constant. Independent evaluation and autonomous pours remain unused. The active parent robot checkpoint is unchanged. No resized autonomous acceptance has been issued.
 
 A read-only CPU diagnostic of the retained models on the nine reviewed high-fill training recordings confirms all nine cup locations, with maximum error **1.0671 mm**. The retained primary/color maximum absolute errors are **3.4425 / 5.4770 percentage points**; maximum pairwise disagreement is only **2.7684 points**. Agreement alone therefore does not establish level accuracy. This diagnostic accepts no model and does not substitute for the forthcoming 4070 validation. [Diagnostic](../evidence/dynamic-A/retained-high-cpu-probe.json).
+
+## Moving localization blocker and repair
+
+The first combined attempt, r3, stops before any level/color optimizer update: **7/18 moving validation locations fail** (three unconfirmed, four errors of 3.592–4.462 mm). All 27 new static locations pass. [Rejected gate](../evidence/dynamic-A/localization-r3-rejected.json), [zero-update attempt](../evidence/dynamic-A/pair-r3-aborted.json). All 27 frozen inputs are archived natively under `pair-r3-frozen-inputs/`; the old checkpoint is not overwritten.
+
+Eighteen predeclared moving training scenes are collecting after finalized geometry checks. The separate `rim-d0` repair fine-tunes the native 256-pixel rim crop CNN with its coarse detector frozen, whole-episode splits, Gaussian heatmap cross-entropy plus 0.02 smooth-L1 coordinate loss. It rechecks old static and new moving frames, temporal confirmation, synthetic absence separation and CPU/GPU parity. No gate is relaxed. It cannot be used for level fitting unless its full development report passes.
+
+Moving level evaluation was expanded from the draft stride of two to **every recorded 20 Hz frame from 0.5 through 2.5 seconds**, before the first moving fit or error evaluation. Scene identities, physical motion and accuracy limits are unchanged. The r3 frame policy is frozen in its protocol.
 
 ## Operation and artifacts
 
@@ -49,9 +57,8 @@ The owned container keeps 4070-only GPU access, a four-core CPU quota on CPUs 16
 
 Run native CPU helpers through `/isaac-sim/python.sh` with `CUDA_VISIBLE_DEVICES=` inside the owned container. Host observers and the deployment/component wrappers run with host `python3`. Keep collection and GPU fitting sequential.
 
-1. Let `run_dynamic_collection.py seed_remaining low_train` finish; inspect all resulting camera sheets and record their exact audit/image hashes in `*-r0-manual-review.json`.
-2. Run `finalize_dynamic_protocol.py` only after all nine high seeds have passed actual review. It preserves protocol v2 and binds measured seeds into the predeclared moving cases.
-3. Run `preflight_dynamic_geometry.py --part validation`, then `run_dynamic_collection.py validation`. Audit and actually review all moving views before admitting them.
-4. Run `prepare_dynamic_fit.py --round r3`, then host `run_dynamic_component.py --helper fit_dynamic_pair.py --label pair-fit-r3 --round r3`. This checks localization before fitting. R3 trains on the original 126 episodes plus 27 new static episodes and selects against the original 18 plus 18 new moving validation episodes.
-5. If development accuracy fails, reserved cases and autonomy stay unused. R4 support can add the already-declared 18 moving training scenes after native audit/review; it must retain all R3 failures and unchanged validation identities/limits.
-6. Only a separately frozen component selection permits the 18 fresh reserved moving cases. Autonomous pouring additionally requires all-size robot motion clearance, runtime integration/parity and explicit all-gate acceptance. No command above grants that acceptance.
+1. Finish `run_dynamic_collection.py train`; inspect all final and motion camera sheets and bind the audit/image hashes in `train-r0-manual-review.json`.
+2. Run `prepare_dynamic_rim.py`, then guarded host `run_dynamic_component.py --helper fit_dynamic_rim.py --label rim-fit-d0`. All rim gates must pass; active models remain unchanged.
+3. If the rim repair passes, run `prepare_dynamic_fit.py --round r4`, then guarded `run_dynamic_component.py --helper fit_dynamic_pair.py --label pair-fit-r4 --round r4`. R4 explicitly selects the new locator for both old and new images. It starts RGB/color from their preserved originals because r3 made zero updates.
+4. Any development failure keeps all 18 reserved cases and autonomy unused. Only a separately frozen component selection permits the fresh reserved moving cases.
+5. Autonomous pouring additionally requires all-size robot motion clearance, runtime integration/parity and explicit all-gate acceptance. None of these preparation commands grants acceptance.

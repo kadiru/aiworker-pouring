@@ -1,0 +1,62 @@
+{
+  "round": "r3",
+  "seed": 261110203,
+  "parts": [
+    "seed_pilot",
+    "seed_remaining",
+    "low_train",
+    "validation"
+  ],
+  "moving_frame_sampling": "Every recorded 20 Hz frame from 0.5 through 2.5 seconds. Denser than the scene draft stride of two; expanded before any moving-view fit or model-error evaluation. Scene IDs and gates unchanged.",
+  "rgb_initialization": "primary-level.pt",
+  "color_initialization": "color-mask-r2.pt",
+  "color_initialization_sha256": "0b6baa77049629c0c92db104336547e00f58c286ccf25beeeb66cef7dfc643fe",
+  "rgb": {
+    "epochs": 240,
+    "lr": 0.00035,
+    "lr_steps": [
+      121,
+      181
+    ]
+  },
+  "color": {
+    "epochs": 300,
+    "lr": 0.0007,
+    "lr_steps": [
+      151,
+      241
+    ]
+  },
+  "jitter_pixels": 0.35,
+  "protocol_sha256": "7f3ade6f0389380732df4c8630c7a66129222e5d3fb033e6376107d2fdaf32ad",
+  "frozen_files": {
+    "best.pt": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+    "candidate.json": "65a744eb4989db47c28f54c5401d8db7c9afbc9a09dd23ec7d9cd6fa7424c841",
+    "collect-r2-audit.json": "fe2b27fed31f97537c36b2ea358397924de9d98f149dce480d1191871146d47d",
+    "collect-r2-manual-review.json": "5ebbd28d37ededf2880defc099649005c72eb3c774cea3b6de9f7ad477c0ab70",
+    "color-mask-r2.pt": "0b6baa77049629c0c92db104336547e00f58c286ccf25beeeb66cef7dfc643fe",
+    "cup-neural-localization.pt": "a19e1ff32746e6541ecfad3e8b6e1ab88ab04a3d41a78c5fa274c98ea1717570",
+    "dynamic_level_data.py": "aae65c683f4b36ca73fe93d5b53c7d511800ba317332342e83f91d3c13d5708c",
+    "fit_dynamic_pair.py": "230e26371f7e1b9d5f7db6a4ba8b74702ba592b928a1a043bd0aad5ea8677f70",
+    "fit_scale_level.py": "859d2381277fc5e24b224e84c726bb7d4c83df8c1eeae4dc476c7e988d472aa2",
+    "low_train-r0-audit.json": "22fab8a0ca3fa4efa5ae325d719d791ba99f8f803bd95f8d1474e560035cd8ff",
+    "low_train-r0-manual-review.json": "575a18932efdabf5ede7cf2b31e49525164c59c4517e52ed9e9a5493b8e3d87f",
+    "plan.json": "4efcc93638e4abc10a6222712470f395aa71a5812e117373d6a1693c6364bf47",
+    "primary-level.pt": "e218aa9e25dde7bbf453ae36d0b45eb6192b196d4a26c02d451ad8c9cc15b6a0",
+    "protocol.json": "7f3ade6f0389380732df4c8630c7a66129222e5d3fb033e6376107d2fdaf32ad",
+    "scale_color_mask.py": "f5c813bf5bd708c56ca098204a530e167bda4994ef0f7f330426ce44abdd9661",
+    "scale_data_admission.py": "b064a54373e9dbff46ae3a1d4cfc0556bd8261f0187d3d55627f27618298d4d0",
+    "scale_level_cnn.py": "1905aaa34cdc3a5e0f624b9428fbbe219f63d18baf5a8214ba65e82915dec64f",
+    "scale_level_readout.py": "51cacbd7a5a2b625b17a749b89d53ea73bb6902f84808d964612cd936e5dbb15",
+    "scale_rim_augmentation.py": "3f52f7eb18b529663402fe96498f21030e184c3ae8509de966d54aaf6f6a92d6",
+    "scale_rim_refiner.py": "8569afe13cdab2701b83d87089b9387772721f2ca64059ede37e7a4ad72afed3",
+    "scope-selection.json": "ff51f752580435ee1db70382bf21fc04146df5875afb131a40fa7e2fe232f373",
+    "seed_pilot-r0-audit.json": "775845f38827e738cfa43a53b0001043952d3b0a7ba235523d005511016626a5",
+    "seed_pilot-r0-manual-review.json": "0a9e039c437dad775d432be010031005e6cb8ba14aa16f2294b871af573a9f11",
+    "seed_remaining-r0-audit.json": "e9472d0855ef6360544c2a026ae7d0d2f6467d2a779e7d0e9a8d87ad1f1755ad",
+    "seed_remaining-r0-manual-review.json": "f2b18d8654a2d1deaf6d59051835e7c9983fc1da56143d5129c1566a69544d6b",
+    "validation-r0-audit.json": "abebb9011139540710f9a445afab8393f0e8782788acf1998843a6ea71f5047e",
+    "validation-r0-manual-review.json": "97dc836fb7fd2bfac3d9a198b9259b6a23bb463777511a0a2a32f5f0e92bdd40"
+  },
+  "scope": "Train only on declared train images; select on separate development validation; retired and fresh reserved images excluded. No autonomous acceptance."
+}
