@@ -52,18 +52,48 @@ bottle occlusion. Six actual recorded frames were reviewed. The batch was
 stopped, preserving four complete recordings, one aborted recording and
 31 unstarted IDs. None are admitted to fitting and no IDs are retried.
 
-A separately named static replacement collects the missing low/intermediate
+A separately named static replacement collected the missing low/intermediate
 fill coverage at those same two layouts. The bottle stays still, and the
 original accepted moving examples remain in the dataset. Both original
 and replacement geometry screens pass. Existing validation/reserved case
 specifications and original accuracy thresholds remain byte-equivalent
 as protocol v3 advances through the preserved v4 and v5 revisions.
 
-The static replacement must pass native recording/label/containment checks,
-actual camera review and the unchanged tracker before extending the cache.
-R7 is prepared to fine-tune the independent R5 RGB/color models on that
-expanded development set, retaining all original gates and the added
-per-episode gate. It has not run at the time this draft was written.
+All 36 static recordings completed once and pass recording, stable-label and
+containment audits, with zero measured loss. Measured levels span
+20.6323–37.2887%. All 144 selected final camera frames were inspected on
+12 pages; this is not continuous playback or autonomous pouring.
+
+The unchanged tracker passes only **30/36** new scenes. All six failures
+have the widest declared cup diameter (1.1×); five stable anchors exceed
+3 mm and a sixth has a passing stable anchor but failing raw initial
+detections. Worst stable/raw errors are **4.7044 / 4.8195 mm**. All 396
+sampled tail frames report temporal validity: stable tracking does not
+establish accurate localization. These cases expose an extension beyond
+the original 207-episode tracker acceptance, not a changed checkpoint.
+
+The all-case admission assertion stopped the pipeline before writing cache
+v3 or preparing/fitting R7. R7 helpers exist, but **R7 has not trained**.
+No failing frames or cases were discarded, no thresholds were weakened,
+and all 18 reserved cases remain unused. No model or runtime source was
+activated. The requested low-fill/color repair is **not accepted**.
+
+Next dependency: resolve this low-fill/wide-cup localization limitation
+before expanding the admitted training cache. Keeping the current tracker
+byte-identical cannot make these six recorded anchors pass. A separate
+tracker repair would change the user's current constraint; restricting new
+calibration to previously supported layouts would narrow the claim and
+still would not validate these failed scenes. Preserve both alternatives
+explicitly rather than silently selecting away failures.
+
+The closure audit rechecks the 36 native recording hashes, all review pages,
+every retained complete/partial moving record, R5/R6 frozen inputs and
+weights, 2,284 protected parent files, 135 runtime sources and unused test
+IDs. Its executable is
+`/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1/close_level_repair.py`
+on Ubuntu. It writes an exclusive receipt and refuses to overwrite it.
+Inspect the saved result with
+`ssh kfuUbuntu 'cat /home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1/level-repair-closure.json'`.
 
 Twelve CPU regression checks cover per-episode failure visibility, removing
 position as an input in R6, retaining color-reference structure, absent-color
