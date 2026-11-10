@@ -1,5 +1,5 @@
 """Development-only rim repair; whole-episode splits, no reserved images."""
-import copy,hashlib,json,sys,time
+import argparse,copy,hashlib,json,sys,time
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -16,9 +16,13 @@ from fit_scale_rim_refiner import evaluate,windows
 ROOT=Path('/workspace/learning/A-scale-dynamic-20261109-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def protected_unchanged():
+    m=read(ROOT/'candidate.json')
+    assert all(sha(Path(p))==v for p,v in m['protected_parent_files'].items())
+    assert all(sha(Path('/workspace/src')/n)==v for n,v in m['runtime_sources'].items())
 
 @torch.inference_mode()
-def collect(coarse):
+def collect(coarse,coarse_only=False,manifest_name='rim-d0-data.json'):
     plan=read(ROOT/'plan.json');candidate=read(ROOT/'candidate.json');protocol=read(ROOT/'protocol.json')
     ap,rp=collection_paths(ROOT,candidate)
     assert read(rp)['accepted'] and read(rp)['audit_sha256']==sha(ap)
@@ -54,7 +58,7 @@ def collect(coarse):
             negative[:,max(0,py-24):min(384,py+48),max(0,px-50):min(384,px+50)]=180
             _,absent=centers(coarse(negative));a=data[split]
             for j,(g,i) in enumerate(frames):
-                crop,origin=crop_native(rgb[j],center[j]);a['images'].append(crop);a['target'].append(truth-origin);a['origin'].append(origin);a['coarse'].append(center[j])
+                crop,origin=crop_native(rgb[j],center[j]);a['images'].append(small[j] if coarse_only else crop);a['target'].append(truth*(384/1024) if coarse_only else truth-origin);a['origin'].append(origin);a['coarse'].append(center[j])
                 a['score'].append(float(scores[j]));a['absent'].append(float(absent[j]))
                 a['meta'].append(dict(name=spec['name'],group=g,index=i,xy=spec['cup_world'][:2],z=z,cup_height_scale=spec['cup_height_scale'],cup_diameter_scale=spec['cup_diameter_scale'],moving=bool(spec.get('calibration_motion')),truth_uv=truth.tolist()))
             if split=='validation':a['parity'].append((len(a['meta'])-1,rgb[-1]))
@@ -62,15 +66,20 @@ def collect(coarse):
     for a in data.values():
         a['x']=torch.tensor(np.stack(a.pop('images')),device='cuda');a['u']=torch.tensor(np.asarray(a['target']),device='cuda',dtype=torch.float32)
         a['weights']=torch.tensor(balanced_frame_weights(a['meta']),device='cuda')
-    (ROOT/'rim-d0-data.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    (ROOT/manifest_name).write_text(json.dumps(manifest,indent=2)+'\n')
     return data,calibration
 
 def main():
-    cfg=read(ROOT/'rim-d0-protocol.json');assert not (ROOT/'rim-d0.json').exists() and not (ROOT/'component-selection.json').exists()
+    parser=argparse.ArgumentParser();parser.add_argument('--round',choices=('d0','d1'),default='d0');args=parser.parse_args();prefix='rim-'+args.round
+    cfg=read(ROOT/(prefix+'-protocol.json'));assert not (ROOT/(prefix+'.json')).exists() and not (ROOT/'component-selection.json').exists()
     assert all(sha(ROOT/n)==v for n,v in cfg['frozen_files'].items())
+    protected_unchanged()
     assert torch.cuda.device_count()==1 and '4070' in torch.cuda.get_device_name();torch.set_num_threads(4);torch.manual_seed(cfg['seed']);started=time.perf_counter()
     parent=torch.load(ROOT/'cup-neural-localization.pt',map_location='cpu',weights_only=False);bank=parent['bank']
-    coarse=CupLocator().cuda().eval();coarse.load_state_dict(bank['coarse_state']);data,cal=collect(coarse)
+    coarse_state=bank['coarse_state']
+    if cfg.get('coarse_checkpoint'):coarse_state=torch.load(ROOT/cfg['coarse_checkpoint'],map_location='cpu',weights_only=False)['state']
+    coarse=CupLocator().cuda().eval();coarse.load_state_dict(coarse_state);data,cal=collect(coarse,manifest_name=prefix+'-data.json')
+    assert all(bool(((a['u']>16)&(a['u']<240)).all()) for a in data.values()),'Refinement targets outside usable crop; no frames may be dropped'
     tr,va=data['train'],data['validation'];model=RimRefiner().cuda();model.load_state_dict(bank['state'])
     opt=torch.optim.AdamW(model.parameters(),lr=cfg['lr'],weight_decay=1e-4)
     y,x=torch.meshgrid(torch.arange(64,device='cuda')*4+2,torch.arange(64,device='cuda')*4+2,indexing='ij')
@@ -85,7 +94,7 @@ def main():
             matrix=torch.stack((angle.cos()*scale,-angle.sin()*scale,angle.sin()*scale,angle.cos()*scale),1).reshape(n,2,2)
             image,target=affine(image,target,matrix,(torch.rand(n,2,device='cuda')*2-1)*8)
             image=(image*(.95+.1*torch.rand(n,1,1,1,device='cuda'))).clamp(0,255)
-            logits=model(image);g=torch.exp(-((x-target[:,0,None,None])**2+(y-target[:,1,None,None])**2)/32);g/=g.sum((1,2),keepdim=True)
+            logits=model(image);g=(-((x-target[:,0,None,None])**2+(y-target[:,1,None,None])**2)/32).flatten(1).softmax(1).reshape(-1,64,64)
             loss=-(g.flatten(1)*logits.flatten(1).log_softmax(1)).sum(1).mean()+.02*F.smooth_l1_loss(coordinates(logits),target)
             assert torch.isfinite(loss);opt.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(model.parameters(),5);opt.step();steps+=1
         if epoch%5:continue
@@ -99,14 +108,16 @@ def main():
         if attempt is None or row['validation_max_mm']<attempt['row']['validation_max_mm']:attempt=result
         if ok and (best is None or row['validation_max_mm']<best['row']['validation_max_mm']):best=result
     chosen=best or attempt;identity=hashlib.sha256(b''.join(v.numpy().tobytes() for k,v in sorted(chosen['state'].items()))).hexdigest()
-    newbank=dict(kind='native_rim_refiner',identity=identity,coarse_state=bank['coarse_state'],state=chosen['state'],crop_size=bank['crop_size'],max_correction_pixels=bank['max_correction_pixels'])
+    identity=hashlib.sha256((identity+sha(ROOT/cfg['coarse_checkpoint'])).encode()).hexdigest() if cfg.get('coarse_checkpoint') else identity
+    newbank=dict(kind='native_rim_refiner',identity=identity,coarse_state=coarse_state,state=chosen['state'],crop_size=bank['crop_size'],max_correction_pixels=bank['max_correction_pixels'])
     parity=[];shared=[]
     for i,image in va['parity']:
         cpu,_=locate_static(image,newbank,device='cpu');gpu,_=locate_static(image,newbank,device='cuda');parity.append(float(np.linalg.norm(cpu-gpu)));shared.append(float(np.linalg.norm(gpu-chosen['validation']['rows'][i]['uv'])))
     passed=best is not None and max(parity)<.1 and max(shared)<.01
     artifact=dict(bank=newbank,calibration=cal,threshold=chosen['threshold'],consensus=chosen['consensus'],accepted=passed)
-    torch.save(artifact,ROOT/'rim-d0.pt');chosen.pop('state')
-    report=dict(passed=passed,selected=chosen,history=history,counts={s:dict(episodes=len({m['name'] for m in a['meta']}),frames=len(a['meta'])) for s,a in data.items()},parameters=sum(p.numel() for p in model.parameters()),steps=steps,cpu_gpu_max_pixels=max(parity),shared_path_max_pixels=max(shared),checkpoint_sha256=sha(ROOT/'rim-d0.pt'),protocol_sha256=sha(ROOT/'rim-d0-protocol.json'),fit_seconds=time.perf_counter()-fit_started,total_seconds=time.perf_counter()-started,autonomy_accepted=False)
+    torch.save(artifact,ROOT/(prefix+'.pt'));chosen.pop('state')
+    report=dict(passed=passed,selected=chosen,history=history,counts={s:dict(episodes=len({m['name'] for m in a['meta']}),frames=len(a['meta'])) for s,a in data.items()},parameters=sum(p.numel() for p in model.parameters()),steps=steps,cpu_gpu_max_pixels=max(parity),shared_path_max_pixels=max(shared),checkpoint_sha256=sha(ROOT/(prefix+'.pt')),protocol_sha256=sha(ROOT/(prefix+'-protocol.json')),fit_seconds=time.perf_counter()-fit_started,total_seconds=time.perf_counter()-started,autonomy_accepted=False)
     assert all(sha(ROOT/n)==v for n,v in cfg['frozen_files'].items())
-    (ROOT/'rim-d0.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(dict(passed=passed,selected=chosen['row'])),flush=True)
+    protected_unchanged()
+    (ROOT/(prefix+'.json')).write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(dict(passed=passed,selected=chosen['row'])),flush=True)
 if __name__=='__main__':main()

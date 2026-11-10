@@ -1,10 +1,11 @@
 """Freeze the development-only moving-rim repair after actual review."""
-import hashlib,json,urllib.request
+import argparse,hashlib,json,urllib.request
 from pathlib import Path
 ROOT=Path('/workspace/learning/A-scale-dynamic-20261109-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--round',choices=('d0','d1'),default='d0');parser.add_argument('--coarse-round',choices=('d1','d2'),default='d1');args=parser.parse_args();prefix='rim-'+args.round;coarse_prefix='coarse-'+args.coarse_round
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10))
     assert not h['queue'] and not (h.get('recording') or {}).get('active') and not h.get('error') and not h.get('learning_error')
     assert not (ROOT/'component-selection.json').exists()
@@ -20,11 +21,15 @@ def main():
         assert all(v['recording_validation']['valid'] and v['label']['accepted'] for v in a['records'])
         if part in ('train','validation'):assert all(v['motion']['passed'] for v in a['records'])
         files += [ap.name,rp.name]
-    config=dict(seed=261110310,epochs=120,lr=.0003,lr_steps=[61,91],batch_size=16,
+    if args.round=='d1':
+        coarse=read(ROOT/(coarse_prefix+'.json'));assert coarse['passed_for_refinement'] and coarse['checkpoint_sha256']==sha(ROOT/(coarse_prefix+'.pt'))
+        files+=[coarse_prefix+'.pt',coarse_prefix+'.json',coarse_prefix+'-protocol.json','rim-d0-failed.json','rim-d0-crop-diagnostic.json']
+    config=dict(seed=261110310 if args.round=='d0' else 261110412,epochs=120,lr=.0003,lr_steps=[61,91],batch_size=16,
         augmentation=dict(translation_pixels=8,rotation_degrees=3,scale=[.98,1.02],brightness=[.95,1.05]),
         frame_selection='First 12 observation frames and final next-observation frame in all scenes; also every 20 Hz next-observation frame from 0.5 through 2.5 seconds in moving scenes.',
         frozen_files={n:sha(ROOT/n) for n in sorted(set(files))},
-        scope='Separate supervised fine-rim repair. Frozen coarse CNN, no validation gradient updates, no reserved images, no active robot change. Unchanged 3 mm/absence/temporal/parity gates. Parent affine correction is replaced by direct fine-model learning, not applied twice.')
-    with (ROOT/'rim-d0-protocol.json').open('x') as f:json.dump(config,f,indent=2);f.write('\n')
+        scope='Separate supervised fine-rim repair. Coarse CNN frozen during this fit, no validation gradient updates, no reserved images, no active robot change. Unchanged 3 mm/absence/temporal/parity gates. Parent affine correction is replaced by direct fine-model learning, not applied twice.')
+    if args.round=='d1':config['coarse_checkpoint']=coarse_prefix+'.pt'
+    with (ROOT/(prefix+'-protocol.json')).open('x') as f:json.dump(config,f,indent=2);f.write('\n')
     print(json.dumps(dict(prepared=True,autonomy_accepted=False)))
 if __name__=='__main__':main()
