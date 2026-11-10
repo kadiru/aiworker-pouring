@@ -1,0 +1,904 @@
+{
+  "version": 1,
+  "status": "planned_not_launched_runtime_integration_required",
+  "max_wall_seconds": 28800,
+  "device_uuid": "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6",
+  "owned_container_id": "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1",
+  "resource_limits": {
+    "cpu_quota_cores": 4,
+    "cpuset": "16-23",
+    "cpu_shares": 256,
+    "memory_gib": 16,
+    "nice": 10
+  },
+  "stages": [
+    {
+      "id": "readiness",
+      "minutes": 30,
+      "work": "Freeze input/source/checkpoint hashes; verify idle owned container, GPU guard, disk budget, closed recordings and all current level/tracker gates."
+    },
+    {
+      "id": "dry_geometry",
+      "minutes": 45,
+      "max_episodes": 45,
+      "work": "Native derived collision/mass/inertia inspection, IK clearance, then up to three grasp/lift/tilt/side-return/release trials per 15 development shapes; zero liquid."
+    },
+    {
+      "id": "calibration",
+      "minutes": 150,
+      "max_episodes": 120,
+      "work": "Up to 90 training and 30 development-validation episodes, split by complete episode before capture. Six train/two validation per shape. Balance low/intermediate/high cup fills and static/moving source views; vary table layout. Native integrity and actual camera review required."
+    },
+    {
+      "id": "supervised_fit",
+      "minutes": 75,
+      "max_candidates": 3,
+      "work": "Independent RGB/color and bottle localization/source-presence fits, plus contextual BC only from verified motion demonstrations if collected. Checkpoint every ten epochs; unchanged accuracy gates; no heldout fitting."
+    },
+    {
+      "id": "development",
+      "minutes": 60,
+      "max_episodes": 12,
+      "work": "Only after all perception/geometry checks pass: six full-stop and six empty-stop development pours covering height/width extremes, simultaneous upright-and-side-return. Preserve all failures; repair only within stage budget."
+    },
+    {
+      "id": "reserved",
+      "minutes": 90,
+      "max_episodes": 30,
+      "work": "Only after development passes, freeze everything; 30 once-only autonomous tests, 15 full/15 empty, including the four withheld intermediate shapes and new layout/fill combinations. No tuning, retries or online updates."
+    },
+    {
+      "id": "archive",
+      "minutes": 30,
+      "work": "Close HDF5, hash reports/models/sources, audit all outcomes, produce labeled all-attempt video and commit/push small evidence. Preserve failed or interrupted attempts as failures/incomplete, never silently retry."
+    }
+  ],
+  "development_shapes": [
+    {
+      "id": "B_h0.850_w1.000",
+      "height_scale": 0.85,
+      "body_scale": 1.0,
+      "profile": [
+        [
+          0.004,
+          0.025
+        ],
+        [
+          0.065,
+          0.025
+        ],
+        [
+          0.07708214285714286,
+          0.025
+        ],
+        [
+          0.09484999999999999,
+          0.009
+        ],
+        [
+          0.11474999999999999,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.11474999999999999,
+      "outer_body_diameter_m": 0.0548,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 163.16776404630104,
+      "proposed_empty_mass_kg": 0.16194377118860365,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h0.925_w1.000",
+      "height_scale": 0.925,
+      "body_scale": 1.0,
+      "profile": [
+        [
+          0.004,
+          0.025
+        ],
+        [
+          0.065,
+          0.025
+        ],
+        [
+          0.07954107142857143,
+          0.025
+        ],
+        [
+          0.100925,
+          0.009
+        ],
+        [
+          0.12487500000000001,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.12487500000000001,
+      "outer_body_diameter_m": 0.0548,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 172.398311358384,
+      "proposed_empty_mass_kg": 0.17097188559430201,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.000_w1.000",
+      "height_scale": 1.0,
+      "body_scale": 1.0,
+      "profile": [
+        [
+          0.004,
+          0.025
+        ],
+        [
+          0.065,
+          0.025
+        ],
+        [
+          0.082,
+          0.025
+        ],
+        [
+          0.107,
+          0.009
+        ],
+        [
+          0.135,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.135,
+      "outer_body_diameter_m": 0.0548,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 181.62885867046703,
+      "proposed_empty_mass_kg": 0.17999999999999997,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.075_w1.000",
+      "height_scale": 1.075,
+      "body_scale": 1.0,
+      "profile": [
+        [
+          0.004,
+          0.025
+        ],
+        [
+          0.065,
+          0.025
+        ],
+        [
+          0.08445892857142857,
+          0.025
+        ],
+        [
+          0.113075,
+          0.009
+        ],
+        [
+          0.145125,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.145125,
+      "outer_body_diameter_m": 0.0548,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 190.85940598255002,
+      "proposed_empty_mass_kg": 0.18902811440569828,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.150_w1.000",
+      "height_scale": 1.15,
+      "body_scale": 1.0,
+      "profile": [
+        [
+          0.004,
+          0.025
+        ],
+        [
+          0.065,
+          0.025
+        ],
+        [
+          0.08691785714285714,
+          0.025
+        ],
+        [
+          0.11914999999999999,
+          0.009
+        ],
+        [
+          0.15525,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.15525,
+      "outer_body_diameter_m": 0.0548,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 200.08995329463306,
+      "proposed_empty_mass_kg": 0.19805622881139626,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h0.850_w0.950",
+      "height_scale": 0.85,
+      "body_scale": 0.95,
+      "profile": [
+        [
+          0.004,
+          0.02375
+        ],
+        [
+          0.065,
+          0.02375
+        ],
+        [
+          0.07708214285714286,
+          0.02375
+        ],
+        [
+          0.09484999999999999,
+          0.009
+        ],
+        [
+          0.11474999999999999,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.11474999999999999,
+      "outer_body_diameter_m": 0.0523,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 148.084699732466,
+      "proposed_empty_mass_kg": 0.1535671548746185,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h0.925_w0.950",
+      "height_scale": 0.925,
+      "body_scale": 0.95,
+      "profile": [
+        [
+          0.004,
+          0.02375
+        ],
+        [
+          0.065,
+          0.02375
+        ],
+        [
+          0.07954107142857143,
+          0.02375
+        ],
+        [
+          0.100925,
+          0.009
+        ],
+        [
+          0.12487500000000001,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.12487500000000001,
+      "outer_body_diameter_m": 0.0523,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 156.583332016131,
+      "proposed_empty_mass_kg": 0.1623145679997854,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.000_w0.950",
+      "height_scale": 1.0,
+      "body_scale": 0.95,
+      "profile": [
+        [
+          0.004,
+          0.02375
+        ],
+        [
+          0.065,
+          0.02375
+        ],
+        [
+          0.082,
+          0.02375
+        ],
+        [
+          0.107,
+          0.009
+        ],
+        [
+          0.135,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.135,
+      "outer_body_diameter_m": 0.0523,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 165.08196429979603,
+      "proposed_empty_mass_kg": 0.17106198112495244,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.075_w0.950",
+      "height_scale": 1.075,
+      "body_scale": 0.95,
+      "profile": [
+        [
+          0.004,
+          0.02375
+        ],
+        [
+          0.065,
+          0.02375
+        ],
+        [
+          0.08445892857142857,
+          0.02375
+        ],
+        [
+          0.113075,
+          0.009
+        ],
+        [
+          0.145125,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.145125,
+      "outer_body_diameter_m": 0.0523,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 173.58059658346102,
+      "proposed_empty_mass_kg": 0.17980939425011933,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.150_w0.950",
+      "height_scale": 1.15,
+      "body_scale": 0.95,
+      "profile": [
+        [
+          0.004,
+          0.02375
+        ],
+        [
+          0.065,
+          0.02375
+        ],
+        [
+          0.08691785714285714,
+          0.02375
+        ],
+        [
+          0.11914999999999999,
+          0.009
+        ],
+        [
+          0.15525,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.15525,
+      "outer_body_diameter_m": 0.0523,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 182.07922886712603,
+      "proposed_empty_mass_kg": 0.18855680737528618,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h0.850_w0.900",
+      "height_scale": 0.85,
+      "body_scale": 0.9,
+      "profile": [
+        [
+          0.004,
+          0.022500000000000003
+        ],
+        [
+          0.065,
+          0.022500000000000003
+        ],
+        [
+          0.07708214285714286,
+          0.022500000000000003
+        ],
+        [
+          0.09484999999999999,
+          0.009
+        ],
+        [
+          0.11474999999999999,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.11474999999999999,
+      "outer_body_diameter_m": 0.049800000000000004,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 133.76456710816586,
+      "proposed_empty_mass_kg": 0.14532987081284,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h0.925_w0.900",
+      "height_scale": 0.925,
+      "body_scale": 0.9,
+      "profile": [
+        [
+          0.004,
+          0.022500000000000003
+        ],
+        [
+          0.065,
+          0.022500000000000003
+        ],
+        [
+          0.07954107142857143,
+          0.022500000000000003
+        ],
+        [
+          0.100925,
+          0.009
+        ],
+        [
+          0.12487500000000001,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.12487500000000001,
+      "outer_body_diameter_m": 0.049800000000000004,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 141.5666695683491,
+      "proposed_empty_mass_kg": 0.15379658265747576,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.000_w0.900",
+      "height_scale": 1.0,
+      "body_scale": 0.9,
+      "profile": [
+        [
+          0.004,
+          0.022500000000000003
+        ],
+        [
+          0.065,
+          0.022500000000000003
+        ],
+        [
+          0.082,
+          0.022500000000000003
+        ],
+        [
+          0.107,
+          0.009
+        ],
+        [
+          0.135,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.135,
+      "outer_body_diameter_m": 0.049800000000000004,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 149.36877202853242,
+      "proposed_empty_mass_kg": 0.16226329450211122,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.075_w0.900",
+      "height_scale": 1.075,
+      "body_scale": 0.9,
+      "profile": [
+        [
+          0.004,
+          0.022500000000000003
+        ],
+        [
+          0.065,
+          0.022500000000000003
+        ],
+        [
+          0.08445892857142857,
+          0.022500000000000003
+        ],
+        [
+          0.113075,
+          0.009
+        ],
+        [
+          0.145125,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.145125,
+      "outer_body_diameter_m": 0.049800000000000004,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 157.1708744887157,
+      "proposed_empty_mass_kg": 0.1707300063467469,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "B_h1.150_w0.900",
+      "height_scale": 1.15,
+      "body_scale": 0.9,
+      "profile": [
+        [
+          0.004,
+          0.022500000000000003
+        ],
+        [
+          0.065,
+          0.022500000000000003
+        ],
+        [
+          0.08691785714285714,
+          0.022500000000000003
+        ],
+        [
+          0.11914999999999999,
+          0.009
+        ],
+        [
+          0.15525,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.15525,
+      "outer_body_diameter_m": 0.049800000000000004,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 164.97297694889897,
+      "proposed_empty_mass_kg": 0.17919671819138255,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    }
+  ],
+  "reserved_shapes": [
+    {
+      "id": "BH_h0.900_w0.925",
+      "height_scale": 0.9,
+      "body_scale": 0.925,
+      "profile": [
+        [
+          0.004,
+          0.023125000000000003
+        ],
+        [
+          0.065,
+          0.023125000000000003
+        ],
+        [
+          0.07872142857142858,
+          0.023125000000000003
+        ],
+        [
+          0.0989,
+          0.009
+        ],
+        [
+          0.12150000000000001,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.12150000000000001,
+      "outer_body_diameter_m": 0.051050000000000005,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 146.2598964399955,
+      "proposed_empty_mass_kg": 0.15516913796880433,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "BH_h0.900_w0.975",
+      "height_scale": 0.9,
+      "body_scale": 0.975,
+      "profile": [
+        [
+          0.004,
+          0.024375
+        ],
+        [
+          0.065,
+          0.024375
+        ],
+        [
+          0.07872142857142858,
+          0.024375
+        ],
+        [
+          0.0989,
+          0.009
+        ],
+        [
+          0.12150000000000001,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.12150000000000001,
+      "outer_body_diameter_m": 0.05355,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 161.43764319302963,
+      "proposed_empty_mass_kg": 0.1636632223437069,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "BH_h1.100_w0.925",
+      "height_scale": 1.1,
+      "body_scale": 0.925,
+      "profile": [
+        [
+          0.004,
+          0.023125000000000003
+        ],
+        [
+          0.065,
+          0.023125000000000003
+        ],
+        [
+          0.08527857142857144,
+          0.023125000000000003
+        ],
+        [
+          0.11510000000000001,
+          0.009
+        ],
+        [
+          0.14850000000000002,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.14850000000000002,
+      "outer_body_diameter_m": 0.051050000000000005,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 167.98241436348118,
+      "proposed_empty_mass_kg": 0.17812130459520756,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    },
+    {
+      "id": "BH_h1.100_w0.975",
+      "height_scale": 1.1,
+      "body_scale": 0.975,
+      "profile": [
+        [
+          0.004,
+          0.024375
+        ],
+        [
+          0.065,
+          0.024375
+        ],
+        [
+          0.08527857142857144,
+          0.024375
+        ],
+        [
+          0.11510000000000001,
+          0.009
+        ],
+        [
+          0.14850000000000002,
+          0.009
+        ]
+      ],
+      "lip_height_m": 0.14850000000000002,
+      "outer_body_diameter_m": 0.05355,
+      "inner_mouth_diameter_m": 0.018,
+      "grasp_height_m": 0.048,
+      "grasp_band_m": [
+        0.031,
+        0.065
+      ],
+      "wall_m": 0.0024,
+      "capacity_geometric_ml": 185.06475425238162,
+      "proposed_empty_mass_kg": 0.1873639257181938,
+      "mass_policy": "Constant authored shell density relative to baseline 0.18 kg; not physical calibration; native inertia still required",
+      "native_grasp_accepted": false,
+      "native_inertia_accepted": false,
+      "autonomy_accepted": false
+    }
+  ],
+  "curriculum_order": [
+    "Height only, nominal width: 0.85/1.0/1.15 first",
+    "Remaining height variants",
+    "Widths .95 then .90 after measured contact checks"
+  ],
+  "unchanged": [
+    "Material A",
+    "Liquid/particle settings",
+    "Accepted tracker t1",
+    "Full/empty criteria",
+    "Simultaneous upright and lateral return, robot-right preferred, feasible left fallback"
+  ],
+  "required_runtime_integration": [
+    "One bottle profile for visual/collision shell, particle initialization/containment and capacity",
+    "Geometry-derived mouth/source projection, grasp frame, lift verification and IK",
+    "Scaled authored shell mass and native computed inertia/COM inspection",
+    "Full bottle/robot/table/cup collision envelopes and release/set-down verification",
+    "Neck-relative source/empty image crops and explicit checkpoint size support"
+  ],
+  "gates": {
+    "existing_18_moving_tests": "Run only after all original development gates pass; distinct from these future 30 bottle-task tests",
+    "level_per_size_mae": 0.02,
+    "near_full_absolute_error": 0.035,
+    "near_full_overestimate": 0.025,
+    "rgb_color_disagreement": 0.035,
+    "localization_mm": 3,
+    "full_settled_height_min": 0.9,
+    "maximum_sampled_height": 0.98,
+    "maximum_lost_particles": 5,
+    "report_strict_zero_separately": true,
+    "empty": "Retain existing source-empty threshold and confirmation; no threshold relaxation",
+    "dry": "All shapes must pass contact, lift, clearance, upright placement and ordered release before wet use"
+  },
+  "deadline_policy": {
+    "clock": "Monotonic, persistent start/deadline; restart/resume never resets the eight-hour budget",
+    "admission": "Do not start a trial unless its conservative maximum time plus close/audit margin fits both stage and overall remaining time",
+    "checkpoints": "After every closed episode and every ten optimizer epochs; save model, optimizer, RNG, split, source hashes and progress cursor",
+    "overrun": "Stop admitting work; request owned trial recovery/closure. Never kill a foreign process or restart after GPU-priority shutdown.",
+    "failure": "A failed required gate stops dependent stages; save reports, use remaining time only for declared development work. No automatic heldout retries.",
+    "stage_budgets": "Caps, not promised counts. Incomplete data/validation blocks later stages. Reserve final 30 minutes for closure."
+  },
+  "estimate": "Episode counts are upper bounds pending measured wall time and native recording size; no guarantee the entire curriculum fits eight hours.",
+  "hashes": {
+    "tools/plan_bottle_session.py": "2b686f65dda85712b38ae83432e0094d53f77517e22bbca8cca578230f3c948c",
+    "tools/bottle_curriculum_geometry.py": "6d2eef8474b7dbc5c59361f08d8a21f126af31910839b6b9bea3614c49ee9103"
+  }
+}

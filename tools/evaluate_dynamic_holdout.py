@@ -13,9 +13,19 @@ from scale_rim_refiner import locate_static
 from scale_level_cnn import predict_size_cnn
 from scale_color_mask import predict_mask
 from dynamic_cup_tracker import CupTracker
+from repair_level_model import predict_repair
+from repair_level_model_v2 import predict_repair as predict_repair_v2
 ROOT=Path('/workspace/learning/A-scale-dynamic-20261109-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def primary_prediction(image,xy,geometry,artifact):
+    if artifact.get('kind')=='crop_tolerant_outline_v2':return predict_repair_v2(image,xy,geometry,artifact)[0]
+    if artifact.get('kind')=='crop_tolerant_outline_v1':return predict_repair(image,xy,geometry,artifact)[0]
+    return predict_size_cnn(image,xy,geometry,artifact)
+def color_prediction(image,xy,geometry,artifact):
+    if artifact.get('kind')=='crop_tolerant_outline_v2':return predict_repair_v2(image,xy,geometry,artifact)
+    if artifact.get('kind')=='crop_tolerant_outline_v1':return predict_repair(image,xy,geometry,artifact)
+    return predict_mask(image,xy,geometry,artifact)
 def error_metrics(values,target):
     values=np.asarray(values);target=np.asarray(target)
     if not np.isfinite(values).all():return dict(valid=False,mae=None,max_abs=None,near_max=None,near_overestimate=None)
@@ -77,8 +87,8 @@ def main():
                     small=np.asarray(Image.fromarray(image).resize((384,384),Image.Resampling.BILINEAR)).copy();px,py=np.rint(project(np.r_[s['cup_world'][:2],z],cal)*384/1024).astype(int)
                     small[max(0,py-24):min(384,py+48),max(0,px-50):min(384,px+50)]=180
                     _,ns=centers(coarse(torch.tensor(small,device='cuda')[None]));negative_scores.append(float(ns[0]))
-                    x=torch.tensor(cup_crop(image,xy,cal),device='cuda')[None];a=predict_size_cnn(x,xy,s['declared_cup_geometry'],rgb);b,visible=predict_mask(x,xy,s['declared_cup_geometry'],color)
-                    ca=predict_size_cnn(x.cpu(),xy,s['declared_cup_geometry'],rgb);cb,cv=predict_mask(x.cpu(),xy,s['declared_cup_geometry'],color)
+                    x=torch.tensor(cup_crop(image,xy,cal),device='cuda')[None];a=primary_prediction(x,xy,s['declared_cup_geometry'],rgb);b,visible=color_prediction(x,xy,s['declared_cup_geometry'],color)
+                    ca=primary_prediction(x.cpu(),xy,s['declared_cup_geometry'],rgb);cb,cv=color_prediction(x.cpu(),xy,s['declared_cup_geometry'],color)
                     j=int(np.abs(sample_times-times[i]).argmin());assert abs(sample_times[j]-times[i])<1e-6;target=samples[j]['cup_fill_fraction']
                     valid=bool(visible[0] and cv[0]);av=float(a[0]);bv=float(b[0]) if valid else None
                     frames.append(dict(index=int(i),t=float(times[i]),target=target,localization_valid=localized,localization_error_mm=loc_error,tracker_reason=tr['reason'] if tracking else None,score=score,rgb=av,color=bv,color_valid=valid,level_parity=max(abs(av-float(ca[0])),abs(bv-float(cb[0]))) if valid else None))

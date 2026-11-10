@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "models": {
+    "rgb": {
+      "passed": true,
+      "parameters": 179409,
+      "optimizer_steps": 30400,
+      "fit_seconds": 199.36417889001314,
+      "cpu_gpu_difference": 2.568960189819336e-05,
+      "inference_path_difference": 1.1920928955078125e-07,
+      "checkpoint_sha256": "a6ad64df521f4dd7b200f6a51b218e3ec5ccfed4b7cc7e788eb9e9ce6d8e21e4"
+    },
+    "color": {
+      "passed": false,
+      "parameters": 179409,
+      "optimizer_steps": 30400,
+      "fit_seconds": 199.52692931797355,
+      "cpu_gpu_difference": 1.7821788787841797e-05,
+      "inference_path_difference": 1.1920928955078125e-07,
+      "checkpoint_sha256": "768b797167020755de25554556209c8bd723e94c66e943ad6ca9d4c53789a3ce"
+    }
+  },
+  "counts": {
+    "train": {
+      "episodes": 171,
+      "frames": 2403
+    },
+    "validation": {
+      "episodes": 36,
+      "frames": 918
+    }
+  },
+  "protocol_sha256": "ddc549224365a61f5b421b7a5882791ca74538946e77989f67eddba136f1ff77",
+  "scene_protocol_sha256": "7f3ade6f0389380732df4c8630c7a66129222e5d3fb033e6376107d2fdaf32ad",
+  "total_seconds": 400.88318007200724,
+  "method": "Independent supervised RGB and red-mask/grayscale/edge CNNs, random initialization, equal motion-group/size/episode sampling, MSE plus 0.25 worst-quartile MSE; AdamW. No cross-model loss, no RL.",
+  "autonomy_accepted": false
+}
