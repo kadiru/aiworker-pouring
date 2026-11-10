@@ -70,7 +70,7 @@ def collect(coarse,coarse_only=False,manifest_name='rim-d0-data.json'):
     return data,calibration
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--round',choices=('d0','d1'),default='d0');args=parser.parse_args();prefix='rim-'+args.round
+    parser=argparse.ArgumentParser();parser.add_argument('--round',choices=('d0','d1','d2'),default='d0');args=parser.parse_args();prefix='rim-'+args.round
     cfg=read(ROOT/(prefix+'-protocol.json'));assert not (ROOT/(prefix+'.json')).exists() and not (ROOT/'component-selection.json').exists()
     assert all(sha(ROOT/n)==v for n,v in cfg['frozen_files'].items())
     protected_unchanged()
@@ -80,7 +80,15 @@ def main():
     if cfg.get('coarse_checkpoint'):coarse_state=torch.load(ROOT/cfg['coarse_checkpoint'],map_location='cpu',weights_only=False)['state']
     coarse=CupLocator().cuda().eval();coarse.load_state_dict(coarse_state);data,cal=collect(coarse,manifest_name=prefix+'-data.json')
     assert all(bool(((a['u']>16)&(a['u']<240)).all()) for a in data.values()),'Refinement targets outside usable crop; no frames may be dropped'
-    tr,va=data['train'],data['validation'];model=RimRefiner().cuda();model.load_state_dict(bank['state'])
+    tr,va=data['train'],data['validation'];model=RimRefiner().cuda()
+    initial=bank['state'] if not cfg.get('fine_initialization') else torch.load(ROOT/cfg['fine_initialization'],map_location='cpu',weights_only=False)['bank']['state']
+    model.load_state_dict(initial)
+    if cfg.get('balance_motion_groups'):
+        weights=np.zeros(len(tr['meta']))
+        for moving in (False,True):
+            ids=[i for i,m in enumerate(tr['meta']) if bool(m['moving'])==moving]
+            weights[ids]=np.asarray(balanced_frame_weights([tr['meta'][i] for i in ids]))*.5
+        assert abs(weights.sum()-1)<1e-6;tr['weights']=torch.tensor(weights,device='cuda')
     opt=torch.optim.AdamW(model.parameters(),lr=cfg['lr'],weight_decay=1e-4)
     y,x=torch.meshgrid(torch.arange(64,device='cuda')*4+2,torch.arange(64,device='cuda')*4+2,indexing='ij')
     best=attempt=None;history=[];steps=0;gate=read(ROOT/'protocol.json')['gates'];fit_started=time.perf_counter()

@@ -1,0 +1,60 @@
+{
+  "seed": 261110414,
+  "epochs": 160,
+  "lr": 0.0001,
+  "lr_steps": [
+    81,
+    121
+  ],
+  "batch_size": 16,
+  "augmentation": {
+    "translation_pixels": 8,
+    "rotation_degrees": 3,
+    "scale": [
+      0.98,
+      1.02
+    ],
+    "brightness": [
+      0.95,
+      1.05
+    ]
+  },
+  "frame_selection": "First 12 observation frames and final next-observation frame in all scenes; also every 20 Hz next-observation frame from 0.5 through 2.5 seconds in moving scenes.",
+  "frozen_files": {
+    "best.pt": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+    "candidate.json": "65a744eb4989db47c28f54c5401d8db7c9afbc9a09dd23ec7d9cd6fa7424c841",
+    "coarse-d2-protocol.json": "08e42ce4b7162620c38e3abab8094fa2e48645ce0983ab40b82b3b89861e44c9",
+    "coarse-d2.json": "5f742d5e8c9a7fd80d119d4a69c343969f296e4e0622f032d5561202759d90dc",
+    "coarse-d2.pt": "d8c9074849ae5046838532701ba4906260e2ed61581f493edfe411369011f80f",
+    "collect-r2-audit.json": "fe2b27fed31f97537c36b2ea358397924de9d98f149dce480d1191871146d47d",
+    "collect-r2-manual-review.json": "5ebbd28d37ededf2880defc099649005c72eb3c774cea3b6de9f7ad477c0ab70",
+    "cup-neural-localization.pt": "a19e1ff32746e6541ecfad3e8b6e1ab88ab04a3d41a78c5fa274c98ea1717570",
+    "fit_dynamic_rim.py": "3d33c979081e6b0a184098b7d0deaa8b91e74e41430d147e33bea39d25c08426",
+    "fit_scale_rim_refiner.py": "335cf22f1653d8db1866cb22a5e4822e43bf35d05d1c038e872318d57aba71e1",
+    "low_train-r0-audit.json": "22fab8a0ca3fa4efa5ae325d719d791ba99f8f803bd95f8d1474e560035cd8ff",
+    "low_train-r0-manual-review.json": "575a18932efdabf5ede7cf2b31e49525164c59c4517e52ed9e9a5493b8e3d87f",
+    "plan.json": "4efcc93638e4abc10a6222712470f395aa71a5812e117373d6a1693c6364bf47",
+    "protocol.json": "7f3ade6f0389380732df4c8630c7a66129222e5d3fb033e6376107d2fdaf32ad",
+    "rim-d0-crop-diagnostic.json": "b1a93b45cc324bb1481b2c219e8f99eb91f438ce8dc257d146bec3ad8cbdc491",
+    "rim-d0-failed.json": "602e2d0a9af4c5b877b2a5c93c453fd2ed177d2e53bee3baf8236eb9949f4146",
+    "rim-d1-protocol.json": "5cdd7dced5a517d96a5d233d0d41b04060fae5352cdb006f022741fd657576b7",
+    "rim-d1.json": "655c4b103fdbbc38d22aafb49e8a8cb0faddd50317e0c28877a78fa068c99304",
+    "rim-d1.pt": "100447b9be78f82c45d2a42703ae01e6a03eaa5e0cffee5426e13395f8070f89",
+    "scale_data_admission.py": "b064a54373e9dbff46ae3a1d4cfc0556bd8261f0187d3d55627f27618298d4d0",
+    "scale_rim_augmentation.py": "3f52f7eb18b529663402fe96498f21030e184c3ae8509de966d54aaf6f6a92d6",
+    "scale_rim_refiner.py": "8569afe13cdab2701b83d87089b9387772721f2ca64059ede37e7a4ad72afed3",
+    "scope-selection.json": "ff51f752580435ee1db70382bf21fc04146df5875afb131a40fa7e2fe232f373",
+    "seed_pilot-r0-audit.json": "775845f38827e738cfa43a53b0001043952d3b0a7ba235523d005511016626a5",
+    "seed_pilot-r0-manual-review.json": "0a9e039c437dad775d432be010031005e6cb8ba14aa16f2294b871af573a9f11",
+    "seed_remaining-r0-audit.json": "e9472d0855ef6360544c2a026ae7d0d2f6467d2a779e7d0e9a8d87ad1f1755ad",
+    "seed_remaining-r0-manual-review.json": "f2b18d8654a2d1deaf6d59051835e7c9983fc1da56143d5129c1566a69544d6b",
+    "train-r0-audit.json": "aa17319cd26ecf92808422e429f41204cddc67e00f320c146fc1697ba508db8e",
+    "train-r0-manual-review.json": "69a4a1f8faab3564e09e6c9498bb218aeab2912b446fb115f0c970dde7616071",
+    "validation-r0-audit.json": "abebb9011139540710f9a445afab8393f0e8782788acf1998843a6ea71f5047e",
+    "validation-r0-manual-review.json": "97dc836fb7fd2bfac3d9a198b9259b6a23bb463777511a0a2a32f5f0e92bdd40"
+  },
+  "scope": "Separate supervised fine-rim repair. Coarse CNN frozen during this fit, no validation gradient updates, no reserved images, no active robot change. Unchanged 3 mm/absence/temporal/parity gates. Parent affine correction is replaced by direct fine-model learning, not applied twice.",
+  "coarse_checkpoint": "coarse-d2.pt",
+  "fine_initialization": "rim-d1.pt",
+  "balance_motion_groups": true
+}

@@ -44,6 +44,16 @@ All eighteen predeclared moving training scenes pass integrity/stability/motion 
 
 Moving level evaluation was expanded from the draft stride of two to **every recorded 20 Hz frame from 0.5 through 2.5 seconds**, before the first moving fit or error evaluation. Scene identities, physical motion and accuracy limits are unchanged. The r3 frame policy is frozen in its protocol.
 
+
+
+Coarse d2 passes after 120 epochs / 22,080 updates, selecting epoch 120: crop errors 5.288/14.854 native pixels, absence margin 0.05949, CPU/GPU difference 0.02507 native pixels. This is only coarse-crop acceptance. Fine d1 then fails the unchanged 3 mm gate after 22,080 updates, despite 207/207 temporal confirmations: selected validation maximum 9.546 mm and training maximum 8.234 mm. Fine d2 retains every frame and old static check, balances static/moving training groups equally and starts from retained d1. It completes 160 epochs / 29,440 updates in 308.15 seconds, selecting epoch 105: train/validation maxima **2.480 / 9.073 mm**. All 207 temporal confirmations, 0.00746-pixel CPU/GPU difference and 0.00209-pixel shared-path difference pass, but full localization fails. No new level/color checkpoint or autonomous acceptance exists. [D2 report](../evidence/dynamic-A/rim-d2.json).
+
+Two no-fit alternatives also fail on the same development frames: retained fine/affine correction with repaired coarse crops reaches 48.54/33.15 mm train/validation maxima; fixed projected rim-edge alignment reaches 27.05/24.27 mm. Neither consumes reserved images or activates a model. [Reuse diagnostic](../evidence/dynamic-A/rim-reuse-probe.json), [edge diagnostic](../evidence/dynamic-A/rim-edge-probe.json).
+
+An exploratory replay blends the old and d2 fine predictions before initial temporal confirmation. Equal weights confirm all 207 episodes, with train/validation maximum confirmation errors 2.177/2.513 mm. However, raw initial validation frames reach 3.041 mm, and no stationary-cup tracker or explicit disappearance/movement rejection has been implemented. This is a development hypothesis, **not a passing localization candidate**; thresholds remain unchanged. The reproducible CPU helper is `probe_dynamic_rim_temporal.py`. [Replay](../evidence/dynamic-A/rim-temporal-feasibility.json).
+
+The development pass closes with all 63 calibration scenes audited/reviewed, all 18 reserved moving scenes unused, no successor activation, and no component job running. All 2,284 protected parent files and 135 runtime sources verify unchanged against the current manifest. [Closure and runtime witnesses](../evidence/dynamic-A/development-closure.json).
+
 ## Operation and artifacts
 
 Native root: `/workspace/learning/A-scale-dynamic-20261109-v1`; Ubuntu host root: `/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1`. Small reports are copied to `evidence/dynamic-A/`; weights, camera sheets, seeds and HDF5 recordings stay outside Git. Unchanged baseline plan/audit/locator files are copied natively from the completed parent study and are already versioned under `evidence/scale-A/`.
@@ -57,9 +67,9 @@ The owned container keeps 4070-only GPU access, a four-core CPU quota on CPUs 16
 
 Run native CPU helpers through `/isaac-sim/python.sh` with `CUDA_VISIBLE_DEVICES=` inside the owned container. Host observers and the deployment/component wrappers run with host `python3`. Keep collection and GPU fitting sequential.
 
-1. Collection and actual visual review are complete. Keep all original recordings and failed candidates.
-2. Finish guarded `run_dynamic_component.py --helper fit_dynamic_coarse.py --label coarse-fit-d2 --round d2`. Its crop/absence/parity checks must pass before fine refinement.
-3. If that report passes, run `prepare_dynamic_rim.py --round d1 --coarse-round d2`, then guarded `run_dynamic_component.py --helper fit_dynamic_rim.py --label rim-fit-d1 --round d1`. The complete detector must pass all unchanged accuracy/absence/temporal/parity gates.
-4. If the rim repair passes, run `prepare_dynamic_fit.py --round r4 --rim-round d1`, then guarded `run_dynamic_component.py --helper fit_dynamic_pair.py --label pair-fit-r4 --round r4`. R4 uses the selected locator for old and new images. RGB/color start from their preserved originals because r3 made zero updates.
-5. Any development failure keeps all 18 reserved cases and autonomy unused. Only a separately frozen component selection permits the fresh reserved moving cases.
-6. Autonomous pouring additionally requires all-size robot motion clearance, runtime integration/parity and explicit all-gate acceptance. None of these preparation commands grants acceptance.
+1. Collection and actual visual review are complete. Keep all original recordings, failed candidates and frozen-input archives. Do not rerun consumed IDs or overwrite exclusive reports.
+2. Coarse d2 passes internal prerequisites; fine d1/d2, detector reuse and edge alignment fail. No paired r4 fit is authorized by the development gates yet.
+3. Reproduce the exploratory CPU replay with `/isaac-sim/python.sh /workspace/learning/A-scale-dynamic-20261109-v1/probe_dynamic_rim_temporal.py`, using `CUDA_VISIBLE_DEVICES=` and nice 10 inside the owned container. It asserts exact equality with the saved diagnostic and accepts nothing.
+4. Implement a separate stationary-cup tracker candidate only with explicit disappearance/movement rejection and the retained accuracy requirements. Re-evaluate all old/new development scenes before selecting any successor detector. The fusion replay alone is insufficient.
+5. Only after a fully passing detector exists, freeze its exact selection in a new paired-fit protocol and run the independent RGB/color fit on the guarded 4070. Do not point `prepare_dynamic_fit.py` at failed rim d2.
+6. Any development failure keeps all 18 reserved cases and autonomy unused. Frozen component selection permits reserved perception evaluation only. Autonomous pouring additionally requires runtime integration/parity, all-size motion clearance and explicit all-gate acceptance.

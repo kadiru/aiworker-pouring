@@ -5,7 +5,7 @@ ROOT=Path('/workspace/learning/A-scale-dynamic-20261109-v1')
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--round',choices=('r3','r4'),default='r3');p.add_argument('--rim-round',choices=('d0','d1'),default='d1');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--round',choices=('r3','r4'),default='r3');p.add_argument('--rim-round',choices=('d0','d1','d2'),default='d1');a=p.parse_args()
     h=json.load(urllib.request.urlopen('http://192.168.68.60:8212/health',timeout=10))
     assert not h['queue'] and not (h.get('recording') or {}).get('active') and not h.get('error') and not h.get('learning_error')
     assert not (ROOT/'component-selection.json').exists()

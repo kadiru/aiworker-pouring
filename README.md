@@ -2,7 +2,7 @@
 
 Native Isaac Sim experiments for a stationary ROBOTIS FFW-BG2 learning to grasp a bottle, pour a colored drink, and stop near full or when empty. The historical companion explores Al-Jazari's drink-serving automata.
 
-**In progress — independent color/high-fill/moving views:** three baseline color candidates failed the unchanged accuracy gates; none is activated. All nine high-fill calibration scenes pass at 94.65–95.66% measured height with zero loss. All 18 additional low-fill and 18 moving validation scenes pass physical recording checks, but moving cup localization fails 7/18 accuracy checks. A supervised rim repair is in progress on the guarded 4070. Autonomous pours remain disabled for this successor study. [Current method and evidence](docs/DYNAMIC_COLOR_STUDY.md).
+**Color/high-fill/moving-view validation is still blocked:** 63 new calibration scenes across nine cup sizes pass physical checks with zero loss, including high fills of 94.65–95.66%. The 4070 coarse-detector repair passes, but fine-rim validation reaches 9.07 mm versus the 3 mm limit. The independent color cross-check remains unaccepted. All 18 reserved moving tests and autonomous pours remain unused; no successor controller is activated. [Current method and evidence](docs/DYNAMIC_COLOR_STUDY.md).
 
 **Latest cup-size perception result:** supervised level estimation retrained on the RTX 4070 passes all declared development gates and **9/9 fresh reserved static tests** across nine known cup sizes. Mean/max held-out level errors are **0.66 / 1.42 percentage points**. The active pouring controller is unchanged; resized autonomous pouring remains gated on higher-fill, dynamic and independent-color checks. [Method and evidence](docs/LEVEL_SIZE_STUDY.md).
 
