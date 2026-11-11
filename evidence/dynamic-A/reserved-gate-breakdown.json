@@ -1,0 +1,812 @@
+{
+  "passed": false,
+  "passed_cases": 12,
+  "total_cases": 18,
+  "motion_frames": 720,
+  "gate_pass_counts": {
+    "physical": 18,
+    "complete": 18,
+    "tracker_status_parity": 18,
+    "raw_localization": 18,
+    "anchor_localization": 18,
+    "tracked_localization": 17,
+    "rgb_level": 18,
+    "color_level": 18,
+    "independent_agreement": 17,
+    "locator_cpu_gpu_parity": 18,
+    "level_cpu_gpu_parity": 18,
+    "absent_cup_rejection": 14,
+    "absence_margin": 15
+  },
+  "failure_counts": {
+    "absent_cup_rejection": 4,
+    "absence_margin": 3,
+    "independent_agreement": 1,
+    "tracked_localization": 1
+  },
+  "aggregate": {
+    "rgb": {
+      "finite_frames": 720,
+      "total_frames": 720,
+      "mae": 0.005633647305349728,
+      "max_abs": 0.025187501426816195,
+      "near_max": 0.017220186801696347,
+      "near_overestimate": 0.011635304816751235,
+      "worst_episode_mae": 0.012694492889309137
+    },
+    "color": {
+      "finite_frames": 720,
+      "total_frames": 720,
+      "mae": 0.004950504073739128,
+      "max_abs": 0.02448819813298808,
+      "near_max": 0.02448819813298808,
+      "near_overestimate": 0.01850752865385108,
+      "worst_episode_mae": 0.018162690283035663
+    }
+  },
+  "raw_initial_max_mm": 1.4824269179615037,
+  "tracked_max_mm": 1.3799946228552125,
+  "max_disagreement": 0.03954710675561546,
+  "cpu_gpu_level_max": 5.010125778137642e-07,
+  "threshold": 0.39654640853405,
+  "cases": [
+    {
+      "name": "SD_A_motion_holdout_r0_00_low",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 1.3727550280417717,
+      "tracked_max_mm": 1.3080364382698604,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.009630813318253767,
+        "max_abs": 0.011925042982881162,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0047168296927803345,
+        "max_abs": 0.008877234685634339,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.00714614323109386,
+      "synthetic_absent_max": 0.22625012695789337,
+      "minimum_present_score": 0.9215118288993835,
+      "negative_margin": 0.6952617019414902
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_00_high",
+      "passed": false,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": false,
+        "absence_margin": true
+      },
+      "failed_checks": [
+        "absent_cup_rejection"
+      ],
+      "raw_max_mm": 0.5348757238134882,
+      "tracked_max_mm": 0.5031875656954496,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.0016161725765927587,
+        "max_abs": 0.0074358673433030376,
+        "near_max": 0.0074358673433030376,
+        "near_overestimate": 0.004767062092475016
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.003910863975472617,
+        "max_abs": 0.009582703588860264,
+        "near_max": 0.009582703588860264,
+        "near_overestimate": 0.009582703588860264
+      },
+      "max_disagreement": 0.007171474754431251,
+      "synthetic_absent_max": 0.6973677277565002,
+      "minimum_present_score": 0.83232182264328,
+      "negative_margin": 0.13495409488677979
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_01_low",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 1.4478044962133645,
+      "tracked_max_mm": 1.3799946228552125,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.012266222608406251,
+        "max_abs": 0.022537446754292645,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.003950028143513756,
+        "max_abs": 0.017996098373376568,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.021512762293219523,
+      "synthetic_absent_max": 0.058953993022441864,
+      "minimum_present_score": 0.7640451788902283,
+      "negative_margin": 0.7050911858677864
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_01_high",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.2976177033661718,
+      "tracked_max_mm": 0.22432442312626466,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.0019097890658665822,
+        "max_abs": 0.004039990695534068,
+        "near_max": 0.004039990695534068,
+        "near_overestimate": 0.004039990695534068
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0023807437704480793,
+        "max_abs": 0.0053623841866149435,
+        "near_max": 0.0053623841866149435,
+        "near_overestimate": 0.0053623841866149435
+      },
+      "max_disagreement": 0.006012319173851699,
+      "synthetic_absent_max": 0.0018080685986205935,
+      "minimum_present_score": 0.9035439491271973,
+      "negative_margin": 0.9017358805285767
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_02_low",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.6411325146819983,
+      "tracked_max_mm": 0.5988154870438243,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.009514130850758754,
+        "max_abs": 0.013356655376946469,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0035379682865720853,
+        "max_abs": 0.00848805237229494,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.009848972096573039,
+      "synthetic_absent_max": 0.25553736090660095,
+      "minimum_present_score": 0.8755732178688049,
+      "negative_margin": 0.620035856962204
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_02_high",
+      "passed": false,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": false,
+        "absence_margin": false
+      },
+      "failed_checks": [
+        "absent_cup_rejection",
+        "absence_margin"
+      ],
+      "raw_max_mm": 0.777047085000458,
+      "tracked_max_mm": 0.7324715246295914,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.012694492889309137,
+        "max_abs": 0.017220186801696347,
+        "near_max": 0.017220186801696347,
+        "near_overestimate": -0.005944446749486576
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.018162690283035663,
+        "max_abs": 0.02448819813298808,
+        "near_max": 0.02448819813298808,
+        "near_overestimate": -0.0059084702375418185
+      },
+      "max_disagreement": 0.009968454012485362,
+      "synthetic_absent_max": 0.7116070985794067,
+      "minimum_present_score": 0.5418438911437988,
+      "negative_margin": -0.1697632074356079
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_03_low",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 1.4824269179615037,
+      "tracked_max_mm": 1.3632931518868963,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.008808846122863388,
+        "max_abs": 0.025187501426816195,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0048236475608000335,
+        "max_abs": 0.014722197370311774,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.025519490602321337,
+      "synthetic_absent_max": 0.09826317429542542,
+      "minimum_present_score": 0.8654518127441406,
+      "negative_margin": 0.7671886384487152
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_03_high",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.19647665460994052,
+      "tracked_max_mm": 0.014387659634284823,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.001061037581413357,
+        "max_abs": 0.005643608131261968,
+        "near_max": 0.005643608131261968,
+        "near_overestimate": 0.0021816108685536184
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0017077472530153738,
+        "max_abs": 0.005188754941722107,
+        "near_max": 0.005188754941722107,
+        "near_overestimate": 0.0008215066631743762
+      },
+      "max_disagreement": 0.003666526524211622,
+      "synthetic_absent_max": 0.0037963378708809614,
+      "minimum_present_score": 0.8474330306053162,
+      "negative_margin": 0.8436366927344352
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_04_low",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.9989854059681187,
+      "tracked_max_mm": 0.8444374177137297,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.008582486683419963,
+        "max_abs": 0.011641111511296598,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.012187040186765499,
+        "max_abs": 0.016355602176033712,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.0061236548730913,
+      "synthetic_absent_max": 0.15844789147377014,
+      "minimum_present_score": 0.6861252784729004,
+      "negative_margin": 0.5276773869991302
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_04_high",
+      "passed": false,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": false,
+        "absence_margin": false
+      },
+      "failed_checks": [
+        "absent_cup_rejection",
+        "absence_margin"
+      ],
+      "raw_max_mm": 0.5094508490958105,
+      "tracked_max_mm": 0.4762922502841728,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.0027046196617727,
+        "max_abs": 0.0094032281364973,
+        "near_max": 0.0094032281364973,
+        "near_overestimate": 0.004516987026843222
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.005831122910551443,
+        "max_abs": 0.013291949795372182,
+        "near_max": 0.013291949795372182,
+        "near_overestimate": 0.013291949795372182
+      },
+      "max_disagreement": 0.013510194584595792,
+      "synthetic_absent_max": 0.5358132719993591,
+      "minimum_present_score": 0.4351294934749603,
+      "negative_margin": -0.1006837785243988
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_05_low",
+      "passed": false,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": false,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [
+        "independent_agreement"
+      ],
+      "raw_max_mm": 1.3808004658446968,
+      "tracked_max_mm": 1.3062644298931478,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.005595013101711762,
+        "max_abs": 0.020834486663378116,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.00933181422271824,
+        "max_abs": 0.02107009114781988,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.03954710675561546,
+      "synthetic_absent_max": 0.06546513736248016,
+      "minimum_present_score": 0.5978238582611084,
+      "negative_margin": 0.5323587208986282
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_05_high",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.07193496368283246,
+      "tracked_max_mm": 0.013637359763360526,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.0017981705882453985,
+        "max_abs": 0.005428401683685746,
+        "near_max": 0.005428401683685746,
+        "near_overestimate": 0.0007984952007092927
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0007323372154001446,
+        "max_abs": 0.0026558025919720674,
+        "near_max": 0.0026558025919720674,
+        "near_overestimate": 0.0017223571014315375
+      },
+      "max_disagreement": 0.004849996311288685,
+      "synthetic_absent_max": 0.003389354795217514,
+      "minimum_present_score": 0.896271288394928,
+      "negative_margin": 0.8928819335997105
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_06_low",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 1.0482524531248871,
+      "tracked_max_mm": 0.8291895236830303,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.002886516072201106,
+        "max_abs": 0.006460924469048612,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.003956924936782166,
+        "max_abs": 0.007855528554818358,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.009019042668606758,
+      "synthetic_absent_max": 0.12578542530536652,
+      "minimum_present_score": 0.821245014667511,
+      "negative_margin": 0.6954595893621445
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_06_high",
+      "passed": false,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": false,
+        "absence_margin": true
+      },
+      "failed_checks": [
+        "absent_cup_rejection"
+      ],
+      "raw_max_mm": 0.5804862576605733,
+      "tracked_max_mm": 0.5535613501720074,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.005047283440206302,
+        "max_abs": 0.007797220847132413,
+        "near_max": 0.007797220847132413,
+        "near_overestimate": 0.0071233725438683
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0040323787324105355,
+        "max_abs": 0.01464531956303139,
+        "near_max": 0.01464531956303139,
+        "near_overestimate": 0.01464531956303139
+      },
+      "max_disagreement": 0.014601876922523571,
+      "synthetic_absent_max": 0.4311017096042633,
+      "minimum_present_score": 0.4739530086517334,
+      "negative_margin": 0.04285129904747009
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_07_low",
+      "passed": false,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": false,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": false
+      },
+      "failed_checks": [
+        "tracked_localization",
+        "absence_margin"
+      ],
+      "raw_max_mm": 1.01614196418559,
+      "tracked_max_mm": 0.9744916139436144,
+      "localized_frames": 24,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.008503239424467176,
+        "max_abs": 0.02010534152253679,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0035512387047945807,
+        "max_abs": 0.021138265642972442,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.015342700414731236,
+      "synthetic_absent_max": 0.11794878542423248,
+      "minimum_present_score": 0.0,
+      "negative_margin": -0.11794878542423248
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_07_high",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.18306829948272532,
+      "tracked_max_mm": 0.1450604176506876,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.001016162941888435,
+        "max_abs": 0.0058739262023778105,
+        "near_max": 0.0058739262023778105,
+        "near_overestimate": 0.002750718270272734
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0009155903463521437,
+        "max_abs": 0.005925470568762137,
+        "near_max": 0.005925470568762137,
+        "near_overestimate": 0.002589441415307925
+      },
+      "max_disagreement": 0.006421911651952161,
+      "synthetic_absent_max": 0.004951924551278353,
+      "minimum_present_score": 0.9428780674934387,
+      "negative_margin": 0.9379261429421604
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_08_low",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.952333329290178,
+      "tracked_max_mm": 0.6887644678219256,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.004338805065099825,
+        "max_abs": 0.010512067653328516,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0017688559030222054,
+        "max_abs": 0.0037906823882020158,
+        "near_max": null,
+        "near_overestimate": null
+      },
+      "max_disagreement": 0.010206227295495474,
+      "synthetic_absent_max": 0.09663550555706024,
+      "minimum_present_score": 0.9147289991378784,
+      "negative_margin": 0.8180934935808182
+    },
+    {
+      "name": "SD_A_motion_holdout_r0_08_high",
+      "passed": true,
+      "checks": {
+        "physical": true,
+        "complete": true,
+        "tracker_status_parity": true,
+        "raw_localization": true,
+        "anchor_localization": true,
+        "tracked_localization": true,
+        "rgb_level": true,
+        "color_level": true,
+        "independent_agreement": true,
+        "locator_cpu_gpu_parity": true,
+        "level_cpu_gpu_parity": true,
+        "absent_cup_rejection": true,
+        "absence_margin": true
+      },
+      "failed_checks": [],
+      "raw_max_mm": 0.5989765361935794,
+      "tracked_max_mm": 0.5527460535353926,
+      "localized_frames": 40,
+      "rgb_metrics": {
+        "valid": true,
+        "mae": 0.003431849503818507,
+        "max_abs": 0.011635304816751235,
+        "near_max": 0.011635304816751235,
+        "near_overestimate": 0.011635304816751235
+      },
+      "color_metrics": {
+        "valid": true,
+        "mae": 0.0036112512028694367,
+        "max_abs": 0.01850752865385108,
+        "near_max": 0.01850752865385108,
+        "near_overestimate": 0.01850752865385108
+      },
+      "max_disagreement": 0.010478314074579997,
+      "synthetic_absent_max": 0.37814417481422424,
+      "minimum_present_score": 0.404777854681015,
+      "negative_margin": 0.02663367986679077
+    }
+  ],
+  "evaluation_sha256": "744b941c34f9e491abdc60f499672bba4c1f20d7e526cedb82096ed5eeadb179",
+  "selection_sha256": "40bb882828c243e43aef6d8b6d8aa83a2e5a3a89eddd43f550fcf268c8d23a5c",
+  "helper_sha256": "b6b97fdf9e37fbeaf502d96efd0e30caa1e0a3e86f1e45871148dded9187e08e",
+  "scope": "Read-only explanation of original frozen scores. No inference rerun, fitting, thresholds changed, retest, or active controller update.",
+  "autonomy_accepted": false
+}

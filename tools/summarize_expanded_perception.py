@@ -47,6 +47,8 @@ def main():
     if (root/'moving-holdout-evaluation.json').exists():
         r=read('moving-holdout-evaluation.json')
         summary['reserved_result']=dict(passed=r['passed'],passed_cases=r['passed_cases'],cases=[{k:v for k,v in row.items() if k not in ('frames','initial_raw_errors_mm')} for row in r['cases']],source_report_sha256=sha(root/'moving-holdout-evaluation.json'))
+    if (root/'reserved-gate-breakdown.json').exists():summary['reserved_gate_breakdown']=read('reserved-gate-breakdown.json')
+    if (root/'expanded-repair-closure.json').exists():summary['closure_sha256']=sha(root/'expanded-repair-closure.json')
     with a.output.open('x') as f:json.dump(summary,f,indent=2);f.write('\n')
     print(json.dumps(dict(output=str(a.output),tracker_passed=summary['tracker']['passed'],fits={k:v['passed'] for k,v in summary['fits'].items()},reserved_started=len(started))),flush=True)
 if __name__=='__main__':main()

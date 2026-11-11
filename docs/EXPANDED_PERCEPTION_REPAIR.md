@@ -165,4 +165,62 @@ worst episode MAE 1.9591 pp RGB / 1.8723 pp color; CPU/GPU differences
 inference checks on CPU and GPU. Missing color rejects. Frozen component
 selection uses t3, R17 RGB and R17 color; the reserved evaluator changes only
 prediction dispatch, with scoring/main functions AST-identical to the original.
-The once-only 18-scene result remains pending until collection and evaluation.
+The once-only 18-scene result is recorded below.
+
+
+The reserved batch is complete: **12/18 pass overall**. Every case was recorded
+and scored exactly once after the frozen development selection. All 18 native
+data audits pass, with stable levels and zero measured loss. Near-full settled
+labels span 94.6700–95.6428%; these are prefilled perception fixtures, not liquid
+transfers. Six four-camera final pages and nine six-time-point motion pages
+were actually reviewed: 72 final camera images plus 108 cup-detail motion
+images. This is selected-frame review, not continuous playback.
+
+All 720 motion frames have finite RGB/color estimates. Both branches pass their
+individual accuracy limits in every scene. Aggregate RGB/color MAE is
+0.5634/0.4951 percentage points; worst episode MAE is 1.2694/1.8163 points.
+Near-full maximum absolute errors are 1.7220/2.4488 points and maximum
+overestimates 1.1635/1.8508 points. Initial localization passes 18/18, with
+maximum error 1.4824 mm. Valid tracked outputs have maximum error 1.3800 mm;
+one scene loses valid tracking, so that maximum does not establish uninterrupted
+tracking. CPU/GPU level discrepancy stays below 0.000051 percentage points.
+
+The six failed scene suffixes and causes are:
+
+| Scene | Failed checks |
+| --- | --- |
+| 00_high | Synthetic missing-cup rejection |
+| 02_high | Missing-cup rejection and confidence margin |
+| 04_high | Missing-cup rejection and confidence margin |
+| 05_low | RGB/color disagreement: 3.9547 pp > 3.5 pp |
+| 06_high | Synthetic missing-cup rejection |
+| 07_low | Tracking rejection for 16/40 frames; confidence margin |
+
+The retained coarse detector assigns confidence 0.4311–0.7116 in those four
+synthetic erased-cup challenges, above its unchanged 0.39655 threshold. This is
+a rejection failure, not evidence that the measured cup coordinates were wrong.
+For 07_low, one `cup_absent_or_uncertain` rejection at 1.705 s is followed by
+15 `latched_rejection` frames through 2.455 s. For 05_low at 1.805 s, true height
+is 28.3996%, RGB predicts 26.3729%, and color predicts 30.3277%. These preserved
+observations explain why individually passing average errors do not imply a
+passing combined controller input.
+
+`explain_reserved_perception.py` reads stored predictions only and asserts its
+check-by-check explanation matches the original evaluator. Its first reporting
+attempt did not handle missing tracked-coordinate values; the reporting-only
+bug was fixed, with the original source and failure log retained. The evaluator
+and inference were not rerun. No candidate weights, scoring thresholds, reserved
+recordings or active controller were changed after test observation.
+
+Final closure verifies 2,284 protected parent files and 135 runtime sources,
+all earlier frozen fit inputs, 36 added training recordings and their review
+hashes, unchanged validation/reserved specifications, and exactly 18 consumed
+reserved IDs. The owned simulator is stopped (its 30-second stop grace expired,
+exit 137, `OOMKilled=false`, after recording/audit completion). No AIWorker GPU
+process remains. The separate 4090 process is present; no foreign process was
+signaled or reconfigured. Storage has 94.96 GiB free.
+
+The next repair targets coarse rejection with development distractor/missing-
+cup examples, moving low-fill cross-check consistency and transient tracking
+confidence. These 18 tests are consumed and must not be represented as fresh
+again. Resized autonomous pouring and bottle-size training remain unaccepted.
