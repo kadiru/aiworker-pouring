@@ -30,3 +30,11 @@ The owned launcher pins simulation to the RTX 4070 with four CPU cores of
 quota, a 16 GiB memory cap, and no external network interface. It checks for
 competing 4070 processes and yields its own container on contention. The
 benchmark uses a separate source mount and a dedicated recordings directory.
+
+Both [development pours](../evidence/sized-autonomy-A/development-results.json)
+passed. The smallest cup finished at 96.12% of rim height and received 24.33
+nominal mL. The largest finished at 93.44% and received 41.52 nominal mL.
+Both had zero measured particle loss and completed the ordered side return.
+The peak sampled heights were 96.45% and 93.79%. The two trials took 713 and
+968 wall-clock seconds, so the guarded nine-case batch has a four-hour
+deadline to accommodate completion under the same resource caps.

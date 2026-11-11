@@ -103,7 +103,8 @@ def main():
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
     args=parser.parse_args()
-    assert args.label.replace("-","").isalnum() and 0<args.seconds<=7200
+    deadline_limit = 7200 if args.part == "development" else 14400
+    assert args.label.replace("-","").isalnum() and 0 < args.seconds <= deadline_limit
     with (ROOT/"isolated-job.lock").open("a") as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         subprocess.run([sys.executable,str(HOST/"tools/verify_robot_training_storage.py"),"--minimum-free-gib","57"],check=True)
