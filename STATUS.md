@@ -1,6 +1,8 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 10, 2026 (America/Los_Angeles).
+Updated: November 11, 2026 (America/Los_Angeles).
+
+**November 11 perception repair: 297/297 development recordings pass and the 18 fresh scenes are recording.** The RTX 4070 presence fit and two independent temporal calibrations pass all retained accuracy, rejection, tracking, agreement, and CPU/GPU checks. Across 4,833 scored frames, maximum disagreement is 2.222 percentage points, worst tracked error is 1.616 mm, and all 270 translated-view and erased-cup challenges reject. The 18 prior test scenes are now development regressions and all pass. All 18 new scenes passed geometry preflight before freeze. [Method](docs/PERCEPTION_FOLLOWUP.md), [development scores](evidence/dynamic-A/followup-development.json), [frozen selection](evidence/dynamic-A/followup-selection.json).
 
 **Completed repair cycle — November 10: development passes; reserved result is 12/18, so overall acceptance remains blocked.** Retraining and evaluation used only the guarded RTX 4070. The d4/t3 locator passes all 279 development episodes; R17 combines separately trained direct/landmark RGB estimates and retains an independent color-landmark estimate. All original development gates passed before component freeze and the 18 once-only reserved recordings. The dataset has **243 training episodes / 3,195 images** and **36 validation episodes / 918 images**, including 36 new reviewed low-fill recordings. All **46 native CPU contracts and eight host guard tests** pass. [Method](docs/EXPANDED_PERCEPTION_REPAIR.md), [final report](evidence/dynamic-A/expanded-repair-final.json).
 
