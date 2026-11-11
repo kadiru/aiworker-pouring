@@ -22,7 +22,7 @@
   "sircus_mjlab_completion": "User confirmed completed in this chat.",
   "proposed_fstab_entry": "UUID=e7cfe6a5-0495-4ada-9f12-8ed2033be904 /mnt/robot-training ext4 defaults,noatime,nofail,x-systemd.device-timeout=10s 0 2",
   "proposed_project_directory": "/mnt/robot-training/aiworker-pouring",
-  "scope": "User applied the primary mount helper with sudo. SSH verified UUID, persistent fstab entry, write/fsync/read access and active swap. Recordings were copied and checksum-verified; bind-path activation and removal of originals still await user administrator authentication.",
+  "scope": "Primary partition mount and recording bind mount both applied and independently verified. All recordings retained on the new partition; verified old duplicates removed. No simulation/training started.",
   "mount_helper": {
     "local": "tools/configure_robot_training_mount.py",
     "ubuntu": "/home/kadir/aiworker-pouring-4070/tools/configure_robot_training_mount.py",
@@ -33,5 +33,9 @@
   },
   "read_write_test_passed": true,
   "swap_active": true,
-  "swap_warning": "findmnt warned about the pre-existing regular-file /swapfile entry; swapon confirms it is active."
+  "swap_warning": "findmnt warned about the pre-existing regular-file /swapfile entry; swapon confirms it is active.",
+  "recording_path_switch_applied": true,
+  "original_recording_duplicate_removed": true,
+  "recordings_directory": "/mnt/robot-training/aiworker-pouring/outputs",
+  "compatible_recordings_path": "/home/kadir/aiworker-pouring-4070/outputs"
 }
