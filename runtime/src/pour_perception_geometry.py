@@ -5,7 +5,9 @@ import numpy as np
 def calibration_seed_points(spec, seed):
     from pour_vessel_geometry import cup_profile
     from bottle_pour import SIDES
-    assert spec.get('calibration_only') and not spec.get('policy_evaluation')
+    calibration=spec.get('calibration_only') and not spec.get('policy_evaluation')
+    autonomous_prefill=spec.get('size_autonomy_prefill') and spec.get('policy_evaluation')
+    assert calibration or autonomous_prefill
     fraction=float(spec['calibration_initial_height'])
     if not .08 <= fraction <= 1.:
         raise ValueError('Calibration seed cut must be in [.08, 1]')

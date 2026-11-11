@@ -21,7 +21,8 @@ GPU = 'GPU-cde23916-c5fa-f18e-a343-127f732cc2f6'
 visible = subprocess.check_output(['nvidia-smi','--query-gpu=uuid','--format=csv,noheader'],text=True).strip().splitlines()
 if visible != [GPU]: raise RuntimeError(f'GPU isolation failed: {visible}')
 RUN = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
-ROOT = Path('/workspace/outputs/fountain')
+BATCH = os.environ.get('AIWORKER_AUTONOMY_BATCH')
+ROOT = Path(os.environ['AIWORKER_AUTONOMY_OUTPUT']) if BATCH else Path('/workspace/outputs/fountain')
 OUT = ROOT/RUN
 OUT.mkdir(parents=True,exist_ok=True)
 state = dict(ready=False, profile='fountain', phase='Starting Isaac Sim', paused=False,
@@ -49,17 +50,18 @@ allowed_commands.update(('perception_camera_pilot','perception_holdout'))
 allowed_commands.update(('side_diagnostic','side_impact','side_impact_followup','side_support','side_development','side_test'))
 allowed_commands.update(('scale_pilot','scale_collect','scale_holdout'))
 allowed_commands.update('dynamic_'+s for s in ('seed_pilot','seed_remaining','low_train','train','validation','holdout','autonomy'))
-preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands)
+preview = Preview(state, directory='/workspace/fountain-viewer',allowed_commands=allowed_commands,serve=not BATCH)
 
 os.environ['OMNICLIENT_HUB_MODE']='disabled'
 from isaacsim import SimulationApp
-app = SimulationApp(dict(headless=True, width=1280, height=720,
-                         window_width=1280, window_height=720, multi_gpu=False,
+viewport_width, viewport_height = (640, 360) if BATCH else (1280, 720)
+app = SimulationApp(dict(headless=True, width=viewport_width, height=viewport_height,
+                         window_width=viewport_width, window_height=viewport_height, multi_gpu=False,
                          renderer='RayTracedLighting', anti_aliasing=3,limit_cpu_threads=8,
                          extra_args=['--reset-user','--/plugins/carb.tasking.plugin/threadCount=8',
                                      '--/plugins/omni.tbb.globalcontrol/maxThreadCount=8',
                                      '--/renderer/multiGpu/enabled=false',
-                                     '--/log/file=/workspace/logs51/fountain-kit.log']))
+                                     f'--/log/file={OUT}/fountain-kit.log' if BATCH else '--/log/file=/workspace/logs51/fountain-kit.log']))
 import carb
 import numpy as np
 import omni.usd
@@ -88,6 +90,9 @@ if os.environ.get('FOUNTAIN_RESUME')=='1' and (ROOT/'latest.json').exists():
     results=previous['results']
     pending=[]
     state['resumed_from']=previous['run']
+if BATCH:
+    from pour_size_autonomy import batch_specs
+    pending = batch_specs(BATCH)
 mode = 'water'
 vessels_frosted = True
 
@@ -587,6 +592,9 @@ print('FOUNTAIN_APP_READY',flush=True)
 save_results()
 try:
     while app.is_running():
+        if BATCH and not pending and current is None:
+            print('AUTONOMY_BATCH_COMPLETE', flush=True)
+            break
         try:
             while True:
                 cmd=preview.commands.get_nowait()

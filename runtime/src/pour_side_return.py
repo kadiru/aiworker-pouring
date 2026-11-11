@@ -43,6 +43,7 @@ def paths(planner,current,home,cup_xy,table_z,config):
     duration=float(config.get('upright_seconds',2.4))
     place_s=float(config.get('place_seconds',1.8));retreat_s=float(config.get('retreat_seconds',2.6))
     assert 1.8<=duration<=4 and 1.5<=place_s<=3 and 2<=retreat_s<=4
+    rim_z=float(config.get('rim_z_m', .038))
     current=np.asarray(current);tcp,r0=planner.fk(current)
     # At upright the TCP orientation is WRIST; its relative rotation is the
     # physical vessel rotation. This is the same fixed calibration as pouring.
@@ -61,8 +62,8 @@ def paths(planner,current,home,cup_xy,table_z,config):
                 base[2]+=.025*np.sin(np.pi*u)**2
                 # Conservative swept vessel lower bound over receiving rim.
                 lower=float((shell@br.T)[:,2].min())
-                base[2]=max(base[2],table_z+.038+.012-lower)
-                min_margin=min(min_margin,base[2]+lower-table_z-.038)
+                base[2]=max(base[2],table_z+rim_z+.012-lower)
+                min_margin=min(min_margin,base[2]+lower-table_z-rim_z)
                 result.append(solve(planner,result[-1],base+br@[0.,0.,GRASP_Z],r));times.append(float(t))
             place=[result[-1].copy()]
             start_tcp=planner.fk(place[0])[0];end_tcp=np.r_[choice['xy'],table_z+GRASP_Z+.0005]

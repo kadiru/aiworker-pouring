@@ -75,6 +75,15 @@ class Actor:
         self.cup_cal=self.saved.get('cup_localization_calibration',self.cal)
         self.level_cal=self.saved.get('cup_detail_calibration',self.cal)
         self.cup_localization_image=None
+        self.sized_perception=None
+        self.cup_perception_diagnostic=None
+        self.invalid_cup_since=None
+        self.cup_volume_scale=72.8
+        if 'sized_cup_perception' in self.saved:
+            from pour_size_autonomy import SizedCupPerception
+            geometry=self.cal['cup_geometry']
+            self.sized_perception=SizedCupPerception(self.saved['sized_cup_perception'],geometry)
+            self.cup_volume_scale=geometry['legacy_brim_nominal_ml']
         self.presence_detector=None
         if 'wrist_presence_model' in self.saved:
             from pour_wide_empty import EmptyWrist
@@ -106,12 +115,22 @@ class Actor:
             self.localization_start=t;self.home=q[:7].copy()
             self.localization_history={'source':[],'cup':[]}
         neck,self.source_score=locate(task,self.saved['source_bank'])
-        rim,self.cup_score=locate(task if self.cup_localization_image is None else self.cup_localization_image,self.saved['cup_bank'])
+        if self.sized_perception is None:
+            rim,self.cup_score=locate(task if self.cup_localization_image is None else self.cup_localization_image,self.saved['cup_bank'])
+        else:
+            track=self.sized_perception.track_result
+            rim=track['uv']
+            self.cup_score=track.get('score',0.)
         config=self.saved.get('localization_consensus')
         if config:
             from pour_temporal_localization import consensus
             accepted={}
-            for kind,uv,score in (('source',neck,self.source_score),('cup',rim,self.cup_score)):
+            detections=[('source',neck,self.source_score)]
+            if self.sized_perception is None:
+                detections.append(('cup',rim,self.cup_score))
+            else:
+                accepted['cup']=dict(uv=rim) if track['valid'] else None
+            for kind,uv,score in detections:
                 self.localization_history[kind].append((uv.tolist(),score))
                 self.localization_history[kind]=self.localization_history[kind][-config[kind]['window']:]
                 accepted[kind]=consensus(self.localization_history[kind],self.threshold[kind+'_localization_score'],config[kind])
@@ -253,7 +272,10 @@ class Actor:
             width,height=self.level_cal['resolution_wh']
             assert level_image.shape==(height,width,3)
             assert np.allclose(observation['cup_detail_world_T_camera'],self.level_cal['T'],atol=1e-6,rtol=0)
-            self.cup_localization_image=np.asarray(Image.fromarray(level_image).resize((384,384),Image.Resampling.BILINEAR))
+            if self.sized_perception is None:
+                self.cup_localization_image=np.asarray(Image.fromarray(level_image).resize((384,384),Image.Resampling.BILINEAR))
+            elif self.terminal is None:
+                self.sized_perception.track(level_image)
         geo=cnn=flow=empty=present=tilt=0.;mass=0.;settled_prediction=None;empty_views=None
         if not self.grasp_confirmed and self.terminal is None:
             targets,phase=self.grasp_action(task,q,t,age)
@@ -261,18 +283,37 @@ class Actor:
         else:
             if not self.outbound or self.pour_phase>self.outbound[-1][0]+.3:
                 self.outbound.append((self.pour_phase,q[:7].copy()))
-            normalized=cup_crop(level_image,self.cup_xy,self.level_cal);a=torch.as_tensor(normalized,device='cuda')[None]
-            cnn=float(self.cup_model(a)[0])+self.saved['cup_bias'];features,_,n=surface_features(a);mass=float(n[0])
-            from pour_guard_vision import color_geometry_readout
-            geom=self.saved['surface_geometry']
-            geo=float(color_geometry_readout(a,geom,self.cup_xy)[0]) if mass>1. else 0.
-            geo=float(np.clip(geo,0,1));cnn=float(np.clip(cnn,0,1))
-            self.filtered=cnn if self.filtered is None else .6*self.filtered+.4*cnn
-            self.level_history.append((t,geo,cnn,self.filtered))
-            if 'settled_regressor' in self.saved:
-                from pour_settled_model import features,predict
-                settled_prediction=float(predict(features(a,a.new_tensor([cnn],dtype=torch.float32),self.cup_xy),self.saved['settled_regressor'])[0])
-                self.settled_history.append((t,settled_prediction))
+            level_valid=True
+            level_upper=None
+            if self.sized_perception is None:
+                normalized=cup_crop(level_image,self.cup_xy,self.level_cal);a=torch.as_tensor(normalized,device='cuda')[None]
+                cnn=float(self.cup_model(a)[0])+self.saved['cup_bias'];features,_,n=surface_features(a);mass=float(n[0])
+                from pour_guard_vision import color_geometry_readout
+                geom=self.saved['surface_geometry']
+                geo=float(color_geometry_readout(a,geom,self.cup_xy)[0]) if mass>1. else 0.
+                geo=float(np.clip(geo,0,1));cnn=float(np.clip(cnn,0,1))
+                self.filtered=cnn if self.filtered is None else .6*self.filtered+.4*cnn
+                self.level_history.append((t,geo,cnn,self.filtered))
+                if 'settled_regressor' in self.saved:
+                    from pour_settled_model import features,predict
+                    settled_prediction=float(predict(features(a,a.new_tensor([cnn],dtype=torch.float32),self.cup_xy),self.saved['settled_regressor'])[0])
+                    self.settled_history.append((t,settled_prediction))
+            elif self.terminal is None:
+                self.cup_perception_diagnostic=self.sized_perception.level(level_image,self.cup_xy)
+                measured=self.cup_perception_diagnostic
+                level_valid=measured['valid']
+                if level_valid:
+                    cnn=measured['filtered']['rgb']
+                    geo=measured['filtered']['color']
+                    self.filtered=max(cnn,geo)
+                    level_upper=max(self.filtered,*measured['raw'].values())
+                    self.level_history.append((t,geo,cnn,self.filtered))
+                    self.invalid_cup_since=None
+                else:
+                    self.level_history.clear()
+                    if self.invalid_cup_since is None:self.invalid_cup_since=t
+                    if self.pour_phase>80. and self.fill_mode not in ('brake','settle'):
+                        self.fill_mode='brake';self.pause_count+=1;self.full_votes=0
             if len(self.level_history)>=9:
                 newer=np.median([x[3] for x in self.level_history[-3:]]);older=np.median([x[3] for x in self.level_history[-9:-6]])
                 flow=float(np.clip((newer-older)/.3,0,.45))
@@ -307,7 +348,7 @@ class Actor:
                 present=visible if held else 0.
                 empty_views=dict(empty_views or {},wrist_present=visible,encoder_hold=held)
             tilt=float(np.degrees(np.arccos(np.clip(up[2],-1,1))))
-            is_empty=empty>=self.threshold['empty_probability'] and present>=.7 and tilt>=95 and flow*72.8<3.
+            is_empty=empty>=self.threshold['empty_probability'] and present>=.7 and tilt>=95 and flow*self.cup_volume_scale<3.
             self.empty_votes=self.empty_votes+1 if is_empty else 0;self.lost_votes=self.lost_votes+1 if present<.05 else 0
             cap=self.saved['pour_primitive']['phase_cap_deg']
             if self.pour_phase>=cap-.25 and self.cap_start is None:self.cap_start=t
@@ -315,15 +356,17 @@ class Actor:
             if 'slow_empty_probability' in self.threshold:
                 gap=self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']
                 slow=slow_empty_evidence(self.threshold,self.pour_phase,cap,tilt,None if self.cap_start is None else t-self.cap_start,
-                    held_gripper(q,gap),present,empty,flow*72.8)
+                    held_gripper(q,gap),present,empty,flow*self.cup_volume_scale)
             self.slow_empty_votes=self.slow_empty_votes+1 if slow else 0
             recovery=None
             if self.source_watchdog is not None and self.stop_latched is None:
                 recovery=self.source_watchdog.update(t,
                     held=held_gripper(q,self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']),
-                    present=present,empty=empty,tilt=tilt,phase=self.pour_phase,cap=cap,flow_ml_s=flow*72.8)
+                    present=present,empty=empty,tilt=tilt,phase=self.pour_phase,cap=cap,flow_ml_s=flow*self.cup_volume_scale)
             if self.stop_latched is None:
-                if self.empty_votes>=12 or (slow and self.slow_empty_votes>=self.threshold['slow_empty_votes']):self.latch('bottle_empty',t,robot)
+                if self.sized_perception is not None and self.invalid_cup_since is not None and t-self.invalid_cup_since>=.75 and self.fill_mode not in ('brake','settle'):
+                    self.latch('cup_tracking_lost',t,robot)
+                elif self.empty_votes>=12 or (slow and self.slow_empty_votes>=self.threshold['slow_empty_votes']):self.latch('bottle_empty',t,robot)
                 elif self.source_watchdog is not None:
                     if recovery:self.latch(recovery,t,robot)
                 elif self.lost_votes>=8:self.latch('source_tracking_lost',t,robot)
@@ -337,18 +380,27 @@ class Actor:
                     self.pour_phase=80.
                     if t-self.pause_start>=self.threshold['settle_seconds']:
                         last=[x for x in self.level_history if x[0]>=self.pause_start+.35][-6:]
-                        other=float(np.median([x[1] for x in last]))
-                        if 'settled_regressor' in self.saved:
-                            from pour_settled_model import assess
-                            levels=[x[1] for x in self.settled_history if x[0]>=self.pause_start+.35][-6:]
-                            settled,stable,full=assess(levels,other,self.threshold['full_settled_target'],
-                                self.threshold['settled_stability_std'],self.threshold['settled_geometry_tolerance'],mass)
+                        if self.sized_perception is not None:
+                            from pour_size_autonomy import settled_pair
+                            settled,stable,full=settled_pair(
+                                [(x[2],x[1]) for x in last] if level_valid else [],
+                                self.threshold['full_settled_target'],self.sized_perception.agreement_limit,
+                                self.threshold['settled_stability_std'])
                         else:
-                            settled=float(np.quantile([x[2] for x in last],.25))
-                            stable=np.std([x[2] for x in last])<.012
-                            full=settled>=self.threshold['full_settled_target'] and abs(other-settled)<.06 and stable and mass>1.
+                            other=float(np.median([x[1] for x in last]))
+                            if 'settled_regressor' in self.saved:
+                                from pour_settled_model import assess
+                                levels=[x[1] for x in self.settled_history if x[0]>=self.pause_start+.35][-6:]
+                                settled,stable,full=assess(levels,other,self.threshold['full_settled_target'],
+                                    self.threshold['settled_stability_std'],self.threshold['settled_geometry_tolerance'],mass)
+                            else:
+                                settled=float(np.quantile([x[2] for x in last],.25))
+                                stable=np.std([x[2] for x in last])<.012
+                                full=settled>=self.threshold['full_settled_target'] and abs(other-settled)<.06 and stable and mass>1.
                         self.full_votes=self.full_votes+1 if full else 0
                         if self.full_votes>=3:self.latch('cup_near_full',t,robot)
+                        elif self.sized_perception is not None and (settled is None or not stable):
+                            if t-self.pause_start>2.5:self.latch('level_unconfirmed',t,robot)
                         elif not full and settled>=self.threshold['full_settled_target']:
                             if t-self.pause_start>2.5:self.latch('level_unconfirmed',t,robot)
                         elif not full and (stable or t-self.pause_start>1.6):
@@ -370,8 +422,9 @@ class Actor:
                     elif self.threshold.get('adaptive_trim'):
                         rate=self.threshold['trim_fast_rate_deg_s'] if self.pour_phase<self.trim_cap-2. else self.threshold['trim_creep_rate_deg_s']
                     else:rate=20. if self.pour_phase<self.peak_phase-2 else 2.
-                    if self.fill_mode=='coarse' and self.filtered>self.threshold.get('coarse_flow_min_level',1.) and flow*72.8>self.threshold.get('coarse_flow_limit_ml_s',float('inf')):rate=0.
-                    if self.filtered>.65 and flow*72.8>6. and not (self.fill_mode=='trim' and self.threshold.get('discrete_topup')):rate=0.
+                    if self.fill_mode=='coarse' and self.filtered is not None and self.filtered>self.threshold.get('coarse_flow_min_level',1.) and flow*self.cup_volume_scale>self.threshold.get('coarse_flow_limit_ml_s',float('inf')):rate=0.
+                    if self.filtered is not None and self.filtered>.65 and flow*self.cup_volume_scale>6. and not (self.fill_mode=='trim' and self.threshold.get('discrete_topup')):rate=0.
+                    if not level_valid:rate=0.
                     self.pour_phase=min(movement['phase_cap_deg'],self.pour_phase+.05*rate)
                     if self.fill_mode=='trim':
                         self.pour_phase=min(self.trim_cap,self.pour_phase)
@@ -389,7 +442,12 @@ class Actor:
                         timed_brake=pulse_finished(self.pour_phase,self.trim_cap,t-self.trim_entered,self.threshold['trim_total_seconds'])
                         eligible=False
                     feedback=settled_prediction if self.fill_mode=='trim' and settled_prediction is not None else self.filtered
-                    if timed_brake or (eligible and feedback>.60 and feedback+flow*self.threshold['runoff_seconds']>=goal):
+                    if level_upper is not None and self.pour_phase>80.:
+                        if self.fill_mode=='coarse':
+                            feedback=max(feedback,level_upper)
+                        else:
+                            timed_brake=timed_brake or (self.pour_phase>=90. and level_upper>=.945)
+                    if timed_brake or (level_valid and eligible and feedback>.60 and feedback+flow*self.threshold['runoff_seconds']>=goal):
                         self.fill_mode='brake';self.pause_count+=1;self.full_votes=0
                 if self.terminal is not None:targets,phase=self.terminal.act(t)
                 else:
@@ -422,6 +480,7 @@ class Actor:
             cup_xy=None if self.cup_xy is None else self.cup_xy.tolist(),cup_predicted_fraction=cnn,surface_geometry_fraction=geo,
             cup_level_camera='cup_detail' if 'cup_detail_calibration' in self.saved else 'task',
             source_presence_model='wrist_presence_cnn' if self.presence_detector is not None else 'legacy_source_fusion',
+            sized_cup_perception=self.cup_perception_diagnostic,
             settled_prediction=settled_prediction,empty_views=empty_views,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,

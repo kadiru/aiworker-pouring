@@ -9,8 +9,9 @@ from threading import Thread
 
 
 class Preview:
-    def __init__(self, state, directory="/workspace/viewer", allowed_commands=None):
+    def __init__(self, state, directory="/workspace/viewer", allowed_commands=None, serve=True):
         self.state = state
+        self.capture_enabled = serve
         self.commands = queue.Queue(maxsize=32)
         self.jpeg = b""
         self.cameras = {}
@@ -19,6 +20,8 @@ class Preview:
         self.pointer = ctypes.pythonapi.PyCapsule_GetPointer
         self.pointer.restype = ctypes.c_void_p
         self.pointer.argtypes = [ctypes.py_object, ctypes.c_char_p]
+        if not serve:
+            return
         preview = self
         allowed_commands = allowed_commands or {"start", "save", "discard", "reset", "pause", "camera", "cup_view", "water_view", "motion", "probe", "start_xr", "comparison_view", "spill_view", "surface_legacy", "surface_thin", "spill_1", "spill_2", "spill_3", "spill_4", "spill_5"}
 
@@ -67,7 +70,7 @@ class Preview:
         Thread(target=self.server.serve_forever, daemon=True).start()
 
     def capture(self):
-        if self.pending or time.monotonic() - self.last_capture < 0.2:
+        if not self.capture_enabled or self.pending or time.monotonic() - self.last_capture < 0.2:
             return
         from omni.kit.viewport.utility import capture_viewport_to_buffer, get_active_viewport
         self.pending = True
