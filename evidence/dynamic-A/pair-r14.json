@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "models": {
+    "rgb": {
+      "passed": false,
+      "parameters": 42914,
+      "optimizer_steps": 40000,
+      "fit_seconds": 308.51159339399965,
+      "cpu_gpu_difference": 8.112937828080868e-05,
+      "inference_path_difference": 0.0,
+      "checkpoint_sha256": "a001067a4d855e34d911baa34cc2451a2305fed63e30034457383f5276e8bcab"
+    },
+    "color": {
+      "passed": false,
+      "parameters": 42914,
+      "optimizer_steps": 40000,
+      "fit_seconds": 340.57895677000124,
+      "cpu_gpu_difference": 0.0001004728925192433,
+      "inference_path_difference": 0.0,
+      "checkpoint_sha256": "958ccf178b349b9cb52f679ed21f7ea1b533f7b968c9cc9c6a0142f434cac247"
+    }
+  },
+  "counts": {
+    "train": {
+      "episodes": 243,
+      "frames": 3195
+    },
+    "validation": {
+      "episodes": 36,
+      "frames": 918
+    }
+  },
+  "protocol_sha256": "4e25ee4adcfdecb74c3127330e32d379bbe3d6b1bd42679bdcb10ac67aea3471",
+  "scene_protocol_sha256": "43ed890850170563501e3c3c6f3f9c02f54c9865bf70104e25a819e0fbc0aeb4",
+  "method": "Separate supervised rim/surface heatmap CNNs for RGB and color-outline inputs. Gaussian heatmap cross entropy + 0.2 point smooth-L1 + 40*(level MSE + 0.25 worst-quartile MSE). Calibrated image rays reconstruct normalized liquid height. Native train-only crop alternatives; no validation gradients or reserved images.",
+  "total_seconds": 652.0883337919986,
+  "autonomy_accepted": false
+}

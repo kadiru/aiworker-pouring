@@ -86,3 +86,83 @@ projective change in scale/shear. Three CPU contracts verify native projection,
 identity resampling, and same-world-point consistency. Two preparation/code
 errors stopped before any optimizer update; their drafts and logs are archived.
 Actual R11 acceptance must come from its final report, not this plan.
+
+R11 finished with worst episode MAE 2.2746 pp RGB / 2.7560 pp color;
+near-full color overestimate remained 2.7877 pp. It failed and remains archived.
+The subsequent d4 rim fit also uses the new 36 calibration scenes: 243 training
+and 36 validation episodes, with 12 initial images each. The 200-epoch fit
+selected epoch 195. Tracker t3 passes 279/279 scenes, 5,067 sampled frames and
+180/180 rejection challenges, with maximum initial/tracked error
+1.6646/1.6159 mm and CPU/GPU difference 0.00212 pixels. Seven new admission
+contracts reject split leakage, duplicate records, absent review and bad data.
+
+Cache v6 rebuilds all 3,195 training / 918 validation crops from t3 predictions.
+R12 fine-tunes each level branch from the lower retained development score
+between R10/R11, while preserving both failures. Splits, labels, loss and gates
+remain unchanged. The model initialization choice is development selection;
+none of the 18 reserved images has been collected or used for this choice.
+
+R12 remained below the required accuracy. R13 then added 6,390 correlated
+training-only crops directly from the original 1024px recordings, avoiding a
+second resampling of reduced crops; all 3,195 original training frames and
+918 validation images were retained. Nine selected original/offset crops were
+inspected. This augmentation also failed; no reserved tests were started.
+
+R14 changes the representation: two independent convolutional models output
+cup-rim and liquid-surface center heatmaps. Soft-argmax gives image landmarks;
+calibrated image rays reconstruct cup XY at the declared rim height and the
+liquid surface height on that vertical line. The target is still measured
+normalized liquid height. True scene centers author landmark labels only and
+never enter inference. Inputs remain camera RGB (or independently derived
+color/outline), image-estimated crop origin, known cup geometry and calibration.
+
+The new supervised objective is Gaussian heatmap cross-entropy plus 0.2 point
+smooth-L1 plus 40 times the original MSE/worst-quartile level objective. Each
+branch starts independently from random weights. It retains native training
+crop alternatives and the same episode splits. Three CPU contracts verify
+height round trips, crop-origin invariance and finite nonzero gradients.
+The reserved evaluator differs only in model-prediction dispatch: its entire
+main loop and error/scoring functions are AST-identical to the original, a
+condition checked again before any selection freeze. No changed pass threshold
+or autonomous motor-policy claim is implied by this new architecture.
+
+R14 removes the earlier worst low-fill failure, but RGB remains unaccepted at
+2.2179 pp worst episode MAE on a high-fill scene. Its selected color model
+passes the accuracy criteria but fails CPU/GPU parity at 0.0100473 pp versus
+0.01 pp allowed. Neither model pair is activated and reserved tests remain unused.
+
+R15 adds declared height, diameter and aspect channels to feature extraction,
+starting those weights at zero to preserve the original function. The fully
+precise training path projected beyond its frozen time budget; its stable ZIP-
+validated partial checkpoint, protocol and interruption receipt are retained.
+Only that owned container was stopped. R16 repeats the same seed/initialization
+with fast optimization and full-precision validation/inference. Epoch zero is
+eligible for selection, preserving the initial function if fine-tuning degrades
+it. Two conditioning and three precision-mode CPU contracts pass; GPU acceptance
+remains determined by the final fit report. No thresholds were relaxed.
+
+
+R17 tests a fixed equal-weight RGB ensemble of the R12 direct regressor and
+R14 relative-landmark model, while retaining the separate R14 color-landmark
+model. The averaging weights were declared before calculating the ensemble
+screen; color predictions never enter RGB inference. The cached development
+screen passes with worst episode MAE 1.9597 pp (RGB) and 1.8728 pp (color), and
+maximum cross-check disagreement 2.2807 pp. This screen alone grants no test
+permission. Actual full-precision CPU/GPU predictions, single-frame inference,
+missing-color rejection, all original gates and frozen-input hashes must pass.
+Packaging R17 performs zero new optimizer updates; its member CNNs were trained
+on the 4070 during this repair. Full-precision inference addresses the narrow
+R14 numerical-parity failure without changing its accuracy tolerance.
+
+R16 completed both 800-epoch / 40,000-update fits. Color passes with worst
+episode MAE 1.8182 pp and CPU/GPU difference 0.0000437 pp. RGB remains
+unaccepted at 2.2172 pp; the pair is therefore unaccepted. Its completed
+weights, reports and isolation receipt are retained independently of R17.
+
+Actual R17 inference verification passes every original development gate:
+worst episode MAE 1.9591 pp RGB / 1.8723 pp color; CPU/GPU differences
+0.00003354 / 0.00004841 pp. All 918 validation frames also pass single-frame
+inference checks on CPU and GPU. Missing color rejects. Frozen component
+selection uses t3, R17 RGB and R17 color; the reserved evaluator changes only
+prediction dispatch, with scoring/main functions AST-identical to the original.
+The once-only 18-scene result remains pending until collection and evaluation.

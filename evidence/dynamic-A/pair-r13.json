@@ -1,0 +1,39 @@
+{
+  "native_alternative_training_crops": 6390,
+  "passed": false,
+  "models": {
+    "rgb": {
+      "passed": false,
+      "parameters": 179409,
+      "optimizer_steps": 40000,
+      "fit_seconds": 140.12703654800134,
+      "cpu_gpu_difference": 3.057718276977539e-05,
+      "inference_path_difference": 1.1920928955078125e-07,
+      "checkpoint_sha256": "976f0b4df3e2561ac5d3e4fca3ecf6f0aa3ffe6854ca5fef1686a52e5d4809b9"
+    },
+    "color": {
+      "passed": false,
+      "parameters": 179409,
+      "optimizer_steps": 40000,
+      "fit_seconds": 165.21281403899775,
+      "cpu_gpu_difference": 2.1845102310180664e-05,
+      "inference_path_difference": 1.1920928955078125e-07,
+      "checkpoint_sha256": "93a7de704cf744dae09c2ba74a0bd90834e1461b29f70031180df621bfe88879"
+    }
+  },
+  "counts": {
+    "train": {
+      "episodes": 243,
+      "frames": 3195
+    },
+    "validation": {
+      "episodes": 36,
+      "frames": 918
+    }
+  },
+  "protocol_sha256": "d21344c3568c79b94721c768cc7b14c903922f6cd31095646c2804055f2c5215",
+  "scene_protocol_sha256": "43ed890850170563501e3c3c6f3f9c02f54c9865bf70104e25a819e0fbc0aeb4",
+  "total_seconds": 308.26935349499763,
+  "method": "Independent supervised RGB/color-outline CNNs, AdamW MSE plus 0.25 worst-quartile MSE. Each balanced training sample chooses its original crop or one of two native-camera XY-perturbed crops. No second resampling; color features computed after selection. Original train/validation images and all acceptance gates remain unchanged.",
+  "autonomy_accepted": false
+}

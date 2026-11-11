@@ -10,7 +10,7 @@ def native(p):
     path=Path(p)
     return HOST/path.relative_to('/workspace') if path.is_relative_to('/workspace') else path
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--round',choices=('r10','r11','r12'),default='r10');args=parser.parse_args();prefix='pair-'+args.round
+    parser=argparse.ArgumentParser();parser.add_argument('--round',choices=('r10','r11','r12','r13','r14','r15','r16','r17'),default='r10');args=parser.parse_args();prefix='pair-'+args.round
     assert not (ROOT/'expanded-repair-closure.json').exists()
     candidate=read(ROOT/'candidate.json');protocol=read(ROOT/'protocol.json')
     assert all(sha(native(n))==h for n,h in candidate['protected_parent_files'].items())
@@ -19,9 +19,14 @@ def main():
     assert all(protocol[k]==old[k] for k in ('validation','holdout','gates'))
     retained=read(ROOT/'expanded-retained-inputs.json')
     assert all(sha(Path(v['retained_path']))==v['sha256'] for files in retained.values() for v in files.values())
-    for previous in ('r10','r11'):
+    for previous in ('r10','r11','r12','r13','r14','r16'):
         if (ROOT/f'pair-{previous}.json').exists():
             assert all(sha(ROOT/n)==h for n,h in read(ROOT/f'pair-{previous}-protocol.json')['frozen_files'].items())
+    if (ROOT/'conditioned-r15-interruption.json').exists():
+        interruption=read(ROOT/'conditioned-r15-interruption.json')
+        assert sha(ROOT/'pair-r15-rgb-preserved-partial.pt')==interruption['partial_checkpoint_sha256']
+        assert sha(ROOT/'pair-r15-protocol.json')==interruption['protocol_sha256'] and not (ROOT/'pair-r15.json').exists()
+        assert all(sha(ROOT/n)==h for n,h in read(ROOT/'pair-r15-protocol.json')['frozen_files'].items())
     audit=read(ROOT/'train-r3-audit.json');review=read(ROOT/'train-r3-manual-review.json')
     assert audit['complete'] and review['accepted'] and review['audit_sha256']==sha(ROOT/'train-r3-audit.json')
     assert len(audit['records'])==36 and {r['name'] for r in audit['records']}==set(protocol['midfill_train_names'])
@@ -55,7 +60,7 @@ def main():
     container=json.loads(subprocess.check_output(['docker','inspect',CID],text=True))[0]
     caps=container['HostConfig'];assert caps['DeviceRequests'][0]['DeviceIDs']==['GPU-cde23916-c5fa-f18e-a343-127f732cc2f6']
     assert caps['NanoCpus']==4000000000 and caps['CpusetCpus']=='16-23' and caps['Memory']==caps['MemorySwap']==17179869184
-    tracker_name='tracker-t3' if args.round=='r12' else 'tracker-t2'
+    tracker_name='tracker-t3' if args.round in ('r12','r13','r14','r15','r16','r17') else 'tracker-t2'
     report=dict(verified_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),tracker=tracker_name,tracker_passed=read(ROOT/(tracker_name+'.json'))['passed'],
         new_tracker_admission_passed=read(ROOT/'midfill-tracker-admission.json')['passed'],round=args.round,pair_passed=pair['passed'],
         reserved=reserved,new_training_records_verified=36,selected_camera_frames_reviewed=144,

@@ -26,7 +26,9 @@ def main():
             passed_episodes=sum(v['passed'] for v in r['cases']),raw_initial_max_mm=max(v['raw_initial_max_mm'] for v in r['cases']),
             tracked_max_mm=max(v['tracked_max_mm'] for v in r['cases']),synthetic_rejections=sum(v['rejected'] for v in r['synthetic_challenges']),
             synthetic_total=len(r['synthetic_challenges']),cpu_gpu_max_pixels=r['cpu_gpu_max_pixels'],checkpoint_sha256=r['checkpoint_sha256'],source_report_sha256=sha(root/'tracker-t3.json'))
-    for rnd in ('r8','r9','r10','r11','r12'):
+    if (root/'conditioned-r15-interruption.json').exists():summary['interrupted_r15']=read('conditioned-r15-interruption.json')
+    summary['additional_contracts']={name:read(name) for name in ('physical-crop-contracts.json','midfill-localization-data-contracts.json','landmark-geometry-contracts.json','conditioned-landmark-contracts.json','evaluation-precision-contracts.json','ensemble-contracts.json') if (root/name).exists()}
+    for rnd in ('r8','r9','r10','r11','r12','r13','r14','r15','r16','r17'):
         if not (root/f'pair-{rnd}.json').exists():continue
         pair=read(f'pair-{rnd}.json');item=dict(pair,source_report_sha256=sha(root/f'pair-{rnd}.json'),branches={})
         for branch in ('rgb','color'):
@@ -36,9 +38,9 @@ def main():
                 checkpoint_sha256=r['checkpoint_sha256'],source_report_sha256=sha(root/name))
         summary['fits'][rnd]=item
     for name,key in [('level-cache-v4.json','relocalized_cache'),('level-cache-v5.json','midfill_cache'),
-                     ('level-cache-v6.json','refined_midfill_cache'),('midfill-tracker-admission.json','midfill_admission'),('train-r3-manual-review.json','midfill_review')]:
+                     ('level-cache-v6.json','refined_midfill_cache'),('native-shift-crops.json','native_crop_augmentation'),('midfill-tracker-admission.json','midfill_admission'),('train-r3-manual-review.json','midfill_review')]:
         if (root/name).exists():
-            r=read(name);summary[key]={k:v for k,v in r.items() if k not in ('admissions','cases')};summary[key]['source_report_sha256']=sha(root/name)
+            r=read(name);summary[key]={k:v for k,v in r.items() if k not in ('admissions','cases','sources')};summary[key]['source_report_sha256']=sha(root/name)
     native_outputs=root.parents[1]/'outputs/fountain'
     started=list(native_outputs.glob('*/*SD_A_motion_holdout_*/parameters.json'))
     summary['reserved_started']=len(started)

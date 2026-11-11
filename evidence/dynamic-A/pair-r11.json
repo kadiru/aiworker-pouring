@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "models": {
+    "rgb": {
+      "passed": false,
+      "parameters": 179409,
+      "optimizer_steps": 40000,
+      "fit_seconds": 282.24718372700045,
+      "cpu_gpu_difference": 3.075599670410156e-05,
+      "inference_path_difference": 1.1920928955078125e-07,
+      "checkpoint_sha256": "a046265b2892ea9f5bd7523935ab369398af804d1cfa052a76f258dd7db3cbdf"
+    },
+    "color": {
+      "passed": false,
+      "parameters": 179409,
+      "optimizer_steps": 40000,
+      "fit_seconds": 313.30236247300127,
+      "cpu_gpu_difference": 2.3633241653442383e-05,
+      "inference_path_difference": 1.1920928955078125e-07,
+      "checkpoint_sha256": "f404c6acf32b49ecd5c04d689ba1615bbd97527aa45f2b2271f2eb5dc8bb62bd"
+    }
+  },
+  "counts": {
+    "train": {
+      "episodes": 243,
+      "frames": 3195
+    },
+    "validation": {
+      "episodes": 36,
+      "frames": 918
+    }
+  },
+  "protocol_sha256": "2b7f0496194ee1395a62c6f6c34a9237e4b1889f202fb91a1d662d6b7d9415a4",
+  "scene_protocol_sha256": "43ed890850170563501e3c3c6f3f9c02f54c9865bf70104e25a819e0fbc0aeb4",
+  "total_seconds": 597.6863016499992,
+  "method": "Independent supervised RGB/color-outline CNNs, geometry only (no absolute XY context); AdamW MSE plus 0.25 worst-quartile MSE, balanced motion/size/episode sampling. Camera-consistent random XY crop perturbation within 2 mm, matching the observed localization envelope. Color mask/edges recomputed after perturbing RGB. No RL or cross-model loss.",
+  "autonomy_accepted": false
+}

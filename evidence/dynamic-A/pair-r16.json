@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "models": {
+    "rgb": {
+      "passed": false,
+      "parameters": 44114,
+      "optimizer_steps": 40000,
+      "fit_seconds": 621.3723704709992,
+      "cpu_gpu_difference": 7.173468137278149e-07,
+      "inference_path_difference": 0.0,
+      "checkpoint_sha256": "d1c86c7eb941678098afb8f6f58edc0aefa4944f57f2466a56590c012e54097f"
+    },
+    "color": {
+      "passed": true,
+      "parameters": 44114,
+      "optimizer_steps": 40000,
+      "fit_seconds": 656.6095257260022,
+      "cpu_gpu_difference": 4.3659467546808273e-07,
+      "inference_path_difference": 0.0,
+      "checkpoint_sha256": "d426f1dd1cf0a847b2259ada3fe866b1af5e0a19d4c90a509a6db090a5bbfeba"
+    }
+  },
+  "counts": {
+    "train": {
+      "episodes": 243,
+      "frames": 3195
+    },
+    "validation": {
+      "episodes": 36,
+      "frames": 918
+    }
+  },
+  "protocol_sha256": "0a6212d75ad9119c66eace0a56cc7d953eae28bb71cdd693aaf12bdfb81e6084",
+  "scene_protocol_sha256": "43ed890850170563501e3c3c6f3f9c02f54c9865bf70104e25a819e0fbc0aeb4",
+  "method": "Separate supervised rim/surface heatmap CNNs for RGB and color-outline inputs. Gaussian heatmap cross entropy + 0.2 point smooth-L1 + 40*(level MSE + 0.25 worst-quartile MSE). Calibrated image rays reconstruct normalized liquid height. Native train-only crop alternatives; no validation gradients or reserved images. Known height/diameter/aspect channels additionally condition feature extraction; new-channel weights initialize to zero from the respective R14 model. Epoch zero is evaluated to retain a passing baseline. TF32 is permitted only during optimization; validation and inference use full-precision convolutions. Interrupted R15 state is retained; the same seed/initialization are used.",
+  "total_seconds": 1281.0205872709994,
+  "autonomy_accepted": false
+}
