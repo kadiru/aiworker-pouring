@@ -38,3 +38,22 @@ Both had zero measured particle loss and completed the ordered side return.
 The peak sampled heights were 96.45% and 93.79%. The two trials took 713 and
 968 wall-clock seconds, so the guarded nine-case batch has a four-hour
 deadline to accommodate completion under the same resource caps.
+
+All nine fresh attempts completed. Eight passed the full task, and all nine
+had zero measured particle loss. Every attempt transferred liquid and
+completed the ordered return and release. Passing final heights were
+91.69–94.83% of rim height, and the batch peak was 95.08%.
+
+The 0.90× height and 1.00× diameter case ended with a level-confirmation
+stop at 79.04% of rim height. Its final filtered RGB and color estimates were
+82.49% and 78.14%, a difference of 4.35 percentage points against the
+3.5-point limit. The controller kept the upright return and set-down
+sequence after stopping. This case remains an underfill failure despite
+zero measured loss.
+
+The [per-size scores](../evidence/sized-autonomy-A/test-results.json) include
+the stop and spill outcomes, ordered return checks, and recording hashes.
+The [completion audit](../evidence/sized-autonomy-A/completion.json) confirms
+all nine unique IDs used the sealed size checkpoints, the separate 4070
+container exited, and the 135 original runtime sources and parent checkpoint
+matched their recorded hashes. The fresh batch took 1 hour 59 minutes.
