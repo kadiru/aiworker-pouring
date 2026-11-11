@@ -1,0 +1,52 @@
+{
+  "round": "r10",
+  "seed": 261110610,
+  "locator": "tracker-t2.pt",
+  "protocol_sha256": "43ed890850170563501e3c3c6f3f9c02f54c9865bf70104e25a819e0fbc0aeb4",
+  "frozen_files": {
+    "protocol.json": "43ed890850170563501e3c3c6f3f9c02f54c9865bf70104e25a819e0fbc0aeb4",
+    "protocol-v5-before-midfill.json": "b60f73ed620d16caa59db1c7fcbeedafffe70499561982a8d6b26d4a7ff97587",
+    "plan.json": "4efcc93638e4abc10a6222712470f395aa71a5812e117373d6a1693c6364bf47",
+    "candidate.json": "65a744eb4989db47c28f54c5401d8db7c9afbc9a09dd23ec7d9cd6fa7424c841",
+    "tracker-t2.pt": "966e895844fe41c3628df7cd99904036e527b7f2fdb80acc6ef282ef1a581d09",
+    "tracker-t2.json": "f71d75da14abb007e5af9c1933d6248b935232d775dc72a3c2da6a69c70b2b1e",
+    "dynamic_cup_tracker.py": "2157808b4926f39d57e7e80e4490e016a2fd073962ed2331f2b6b2643c6da8ff",
+    "level-cache-v5.npz": "2beebfd1598087647f06e058e914e5de66c501706521cfb81154cc8d1909c4f8",
+    "level-cache-v5-meta.json": "be83ace057663e9f5d97d43ec93f506da3cea49656289d07fbda29985a36e203",
+    "level-cache-v5.json": "50a95c7ca3eead0478aabd7791a28672955adafaafd5a6b7359b3fd0a89cccb8",
+    "level-cache-v4.json": "3ea3b63f3d2830bf7695abbfb99c51d3871fd5775b834daf2651112b334cca63",
+    "midfill-tracker-admission.json": "5b1b814e7fcd8b38bb7d8fc7b97d3592fe188f50b567a488c3e62d7464f8a601",
+    "train-r3-audit.json": "d4905faf815d9cd8dd97d6a734a38848688d158fcd34cef0f7a7b849ca4e7fa2",
+    "train-r3-manual-review.json": "f7545802e028731cf5b9e998351e73bb8661bd8fc6ead4d7caecdcae1f429e45",
+    "midfill-activation.json": "91e81186fdad186f0ac39e247c65babd6429eee4d3a29dfac9b4427921744954",
+    "fit_midfill_levels.py": "da86237e7cb57f794be0535128cc6cfc8a20940ba912068b4ff382724efa33f2",
+    "prepare_midfill_levels.py": "16ad593b222726165eb1480e10cb14883aec2e8c9d51937fbb4f7c7e8701941e",
+    "repair_level_model.py": "4f6c99862983fa48d225d103876e024d7c1c903bf573963664f2de4cb2b86744",
+    "repair_level_model_v2.py": "10267432b34a7d62f6963bff9df7e4cb6a0568fa33b5700eaa3dafff36f4941a",
+    "fit_dynamic_pair.py": "44f6e54e549663d98769cb4ee68553421deb1d2f0b1203324a0d97182f45778f",
+    "scale_level_cnn.py": "1905aaa34cdc3a5e0f624b9428fbbe219f63d18baf5a8214ba65e82915dec64f",
+    "scale_rim_augmentation.py": "3f52f7eb18b529663402fe96498f21030e184c3ae8509de966d54aaf6f6a92d6",
+    "scale_color_mask.py": "f5c813bf5bd708c56ca098204a530e167bda4994ef0f7f330426ce44abdd9661",
+    "pair-r9-rgb.pt": "dbca12e1898836c0c4e41296d37c82a3735224faaf8b9c049513a4974c22f3de",
+    "pair-r9-color.pt": "bbcc0557a3c52b85cbcabc325a6f317287959bc9cd5ffef46a7fcd57247780fe",
+    "pair-r9.json": "bbbf483b3eb5b966e25f7526c2a52d1df39fa791ca5c2b6f6255e0ef02ec5e6d",
+    "cache_midfill_levels.py": "c6688cab30b5c5c355634efd08bc080e18c1577615ac395d88d571d0eccfc689"
+  },
+  "epochs": 800,
+  "batch_size": 64,
+  "lr": 0.00015,
+  "lr_steps": [
+    401,
+    601
+  ],
+  "jitter_pixels": 1.5,
+  "top_quartile_weight": 0.25,
+  "wall_seconds": 1800,
+  "max_episode_mae": 0.02,
+  "initialization": {
+    "rgb": "pair-r9-rgb.pt",
+    "color": "pair-r9-color.pt"
+  },
+  "method": "Independent supervised RGB/color-outline CNNs, geometry only (no absolute XY context); AdamW MSE plus 0.25 worst-quartile MSE, balanced motion/size/episode sampling. Additional 36 physically measured training-only midfill episodes. No RL or cross-model loss.",
+  "scope": "243 training / 36 validation episodes. Frozen tracker-t2; original accuracy gates and per-episode <2 percentage points retained. No reserved images or active-controller update."
+}

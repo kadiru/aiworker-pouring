@@ -61,3 +61,28 @@ new physical simulation recordings with measured labels, not generated image
 augmentation or copied validation frames. Protocol v6 preserves the original
 validation/holdout specifications and all thresholds; v5 is archived. All new
 cases require physical, camera-review and tracker admission before r10 fitting.
+
+All 36 new static recordings completed with stable measured levels of
+27.9987–33.3014%, zero measured liquid loss, and accepted t2 localization.
+All 144 selected native camera frames were inspected. Cache v5 contains
+3,195 training images from 243 episodes and 918 validation images from 36
+episodes. R10 ran 800 epochs / 40,000 updates per branch; both branches failed.
+Its worst RGB episode MAE was 2.2637 percentage points. Failures are retained.
+
+A development-only crop sensitivity audit found that exact-center cropping
+reduces that low-fill RGB error from 2.2637 to 0.0884 points and color error
+from 2.9888 to 0.7361 points. Other color high-fill errors persist, so localization
+is a contributor rather than the sole cause. Truth crops are diagnostic only:
+they never replace image-localized training, validation, or inference inputs.
+The initial diagnostic hit its 16 GiB cap because the compressed array was
+repeatedly loaded; loading it once fixed the problem. Both receipts are retained.
+
+R11 keeps the same models, data splits, labels, loss and accuracy thresholds.
+Instead of translating a preprocessed crop, it perturbs the image-derived XY
+by a random offset within a 2 mm disk, computes the resulting camera affine
+map, resamples RGB, and only then computes the independent color mask/outline.
+This simulates the observed localization-error envelope and preserves the
+projective change in scale/shear. Three CPU contracts verify native projection,
+identity resampling, and same-world-point consistency. Two preparation/code
+errors stopped before any optimizer update; their drafts and logs are archived.
+Actual R11 acceptance must come from its final report, not this plan.
