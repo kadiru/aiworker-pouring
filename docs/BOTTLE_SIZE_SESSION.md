@@ -166,3 +166,29 @@ python3 run_isolated_perception_job.py --helper prepare_bottle_empty_autonomy.py
 python3 run_isolated_perception_job.py --helper preflight_bottle_empty_autonomy.py --label bottle-empty-r0-geometry --seconds 1000 -- --study bottle-empty-autonomy
 python3 run_bottle_empty_autonomy.py --study bottle-empty-autonomy --part development --label bottle-empty-r0 --seconds 6200
 ```
+
+## First crossed vessel and placement pilot
+
+After the four empty-stop passes, two 4070 development pilots combined new
+cup/bottle pairs with millimetre-scale position shifts and two fill regimes.
+The short, narrow bottle delivered 41.40 nominal mL into the tall, wide
+cup and stopped at 93.26% of rim height. The tall, nominal-width bottle
+emptied into the short, standard-diameter cup, delivering 28.00 nominal
+mL and finishing at 68.17% of rim height. The empty latch followed the
+first zero-source sample by 4.80 simulated seconds. Both passed first
+grasp, strict zero loss and ordered return. The pilot composes previously
+accepted, geometry-bound components. The two cases establish performance
+on these fixtures. [Plan](../evidence/bottle-size-A/mixed-r0-plan.json),
+[scores](../evidence/bottle-size-A/mixed-r0-results.json),
+[audit](../evidence/bottle-size-A/mixed-r0-completion.json).
+
+From the same Ubuntu study root, prepare a fresh `mixed-vessel-autonomy/src`
+copy of the validated runtime and stage the three helpers. The preflight
+and runner names below are staged copies of `tools/preflight_sized_autonomy.py`
+and `tools/run_sized_autonomy.py`.
+
+```sh
+python3 run_isolated_perception_job.py --helper prepare_mixed_vessel_autonomy.py --label mixed-r0-prepare --seconds 300
+python3 run_isolated_perception_job.py --helper preflight_mixed_vessel_autonomy.py --label mixed-r0-geometry --seconds 900 -- --study mixed-vessel-autonomy
+python3 run_mixed_vessel_autonomy.py --study mixed-vessel-autonomy --part development --label mixed-vessel-r0 --seconds 3600
+```
