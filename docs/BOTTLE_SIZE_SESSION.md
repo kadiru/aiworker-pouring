@@ -137,3 +137,32 @@ verifies the four fixture/checkpoint pairs, authored mass properties,
 free-bottle contact and lift, and resource limits. The fresh batch
 took 49 minutes in the dedicated 4070 container. The scope is one
 fresh simulation per geometry using declared bottle dimensions.
+
+## Empty-stop verification
+
+The first empty-stop batch froze the four accepted bottle checkpoints and
+varied only initial inventory and seed within their four fixture layouts.
+Each case started with 28 nominal mL in the source and 13.565 nominal mL
+in the standard cup. All four grasped on the first try, stopped empty,
+returned and released, and finished with zero source particles and zero
+measured particle loss. All four had zero measured source inventory at
+the stop. Stop confirmation followed the first zero-source sample by 0.15
+and 0.35 simulated seconds in the short bottles and 4.85 and 5.75 seconds
+in the tall bottles. This timing uses the 20 Hz recorded inventory for
+scoring. The vision policy uses its retained wrist empty classifier.
+
+The four predeclared trials ran once on the guarded 4070, after four
+geometry screens passed. Both the original runtime and prior weights
+matched their hashes. The separate 4090 process had the same PID and
+allocation at both boundaries. [Plan](../evidence/bottle-size-A/empty-r0-plan.json),
+[scores](../evidence/bottle-size-A/empty-r0-results.json),
+[audit](../evidence/bottle-size-A/empty-r0-completion.json).
+
+With the prepared source tree and archived weights at the original Ubuntu
+study root, the guarded commands for a fresh working copy are:
+
+```sh
+python3 run_isolated_perception_job.py --helper prepare_bottle_empty_autonomy.py --label bottle-empty-r0-prepare --seconds 300
+python3 run_isolated_perception_job.py --helper preflight_bottle_empty_autonomy.py --label bottle-empty-r0-geometry --seconds 1000 -- --study bottle-empty-autonomy
+python3 run_bottle_empty_autonomy.py --study bottle-empty-autonomy --part development --label bottle-empty-r0 --seconds 6200
+```

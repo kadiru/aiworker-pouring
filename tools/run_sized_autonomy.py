@@ -120,7 +120,8 @@ def main():
     parser.add_argument("--part",choices=("development","test"),required=True)
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
-    parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1","bottle-autonomy"),
+    parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1","bottle-autonomy",
+                                          "bottle-empty-autonomy","mixed-vessel-autonomy"),
                         default="sized-autonomy")
     args=parser.parse_args()
     deadline_limit = 7200 if args.part == "development" else 14400
@@ -165,6 +166,9 @@ def run(args,original,gpu_query,before):
         digest=plan["settled_rgb_calibration"]["receipt_sha256"]
         assert sha(receipt)==digest
         files[sandbox(receipt)]=digest
+    for name,digest in plan.get("prerequisite_reports",{}).items():
+        assert sha(native(name))==digest
+        files[name]=digest
     files.update({"/workspace/src/"+name:h for name,h in geometry["sources"].items()})
     for selection_name in ("followup-selection.json","component-selection.json"):
         for name,digest in read(ROOT/selection_name)["frozen_files"].items():
