@@ -228,6 +228,30 @@ The new gate had all ten votes at the latch. The bottle contained zero
 particles at the stop and at the end. The grasp, sideways return, release
 and strict zero-spill checks all passed.
 
+The [fresh batch](../evidence/bottle-size-A/tall-r1-test-results.json)
+completed all six IDs once. Four cases grasped, poured, reached their
+assigned stop labels and completed side return. All six measured zero
+particle loss, including the two localization aborts. Two passed the
+full protocol:
+
+| Test | Goal | Observed outcome |
+|---|---|---|
+| 00 | Empty | Tall nominal-width bottle, new gate at 0.90 s, zero source remaining |
+| 01 | Near full | Cup confirmation timed out before grasp |
+| 02 | Empty | Tall narrow bottle, fallback at 5.60 s, zero source remaining, 4.19-point cup disagreement |
+| 03 | Near full | Short nominal-width bottle, 92.35% of rim height |
+| 04 | Empty | Short narrow bottle, 0.280 nominal mL at stop and 0.146 at set-down |
+| 05 | Near full | Bottle confirmation timed out before grasp |
+
+This protocol requires zero source inventory at the empty latch and final
+sample. The tall fallback in test 02 met that inventory check and failed
+the 3.5-point cup agreement limit. Test 04 used the original short-bottle
+path and failed exact depletion. Neither was retried. The
+[closure audit](../evidence/bottle-size-A/tall-r1-completion.json) binds the
+sealed plan, source, checkpoints and batch scores. The fresh run took
+57.1 minutes on the isolated 4070. The original 135 runtime sources,
+2,284 protected files and parent checkpoint matched their recorded hashes.
+
 From a clean copy of the same Ubuntu study, stage the candidate source
 under `tall-empty-r1/src`. Stage `preflight_sized_autonomy.py` and
 `run_sized_autonomy.py` under the helper names below.
