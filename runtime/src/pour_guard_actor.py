@@ -299,13 +299,14 @@ class Actor:
                     settled_prediction=float(predict(features(a,a.new_tensor([cnn],dtype=torch.float32),self.cup_xy),self.saved['settled_regressor'])[0])
                     self.settled_history.append((t,settled_prediction))
             elif self.terminal is None:
-                self.cup_perception_diagnostic=self.sized_perception.level(level_image,self.cup_xy)
+                self.cup_perception_diagnostic=self.sized_perception.level(
+                    level_image,self.cup_xy,settling=self.fill_mode=='settle')
                 measured=self.cup_perception_diagnostic
                 level_valid=measured['valid']
                 if level_valid:
                     cnn=measured['filtered']['rgb']
                     geo=measured['filtered']['color']
-                    self.filtered=max(cnn,geo)
+                    self.filtered=max(measured.get('guard_filtered',measured['filtered']).values())
                     level_upper=max(self.filtered,*measured['raw'].values())
                     self.level_history.append((t,geo,cnn,self.filtered))
                     self.invalid_cup_since=None

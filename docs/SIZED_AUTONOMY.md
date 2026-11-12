@@ -57,3 +57,39 @@ The [completion audit](../evidence/sized-autonomy-A/completion.json) confirms
 all nine unique IDs used the sealed size checkpoints, the separate 4070
 container exited, and the 135 original runtime sources and parent checkpoint
 matched their recorded hashes. The fresh batch took 1 hour 59 minutes.
+
+## Short-cup calibration
+
+The short, standard-diameter cup's tracked center was within 0.4 mm of its
+recorded center. Reprocessing the frames at the recorded center still showed
+an RGB overestimate in both members of the RGB ensemble. The independent
+color readout was closer to the measured height.
+
+The repair fits one scalar against the measured liquid height from four
+frames in the first settled interval of the failed attempt. For the 0.90×
+height and 1.00× diameter cup, it subtracts up to 3.246 percentage points
+from the filtered RGB level during settle. The correction ramps up between
+75.5% and 79.5%, stays level through 83.5%, and ramps to zero by 89.0% of
+the unadjusted RGB reading. Its mapping is monotone. The unadjusted reading
+still drives braking and flow estimation. The color readout and the
+3.5-point agreement limit stay independent of the fit.
+
+On the second settled interval of the same recording, RGB mean absolute
+error fell from 3.60 to 0.35 percentage points. The largest gap in the last
+six frames fell from 4.38 to 1.13 points. The corrected pair permits another
+top-up at that level. The correction also passed replay on all 35 archived
+perception recordings for this size. The other eight size checkpoints are
+byte-identical to the previous round. [Calibration receipt](../evidence/sized-autonomy-A/r1-calibration.json).
+
+The [frozen follow-up plan](../evidence/sized-autonomy-A/r1-plan.json) calls
+for a strict zero-loss short-cup verification before nine fresh fixtures.
+The fresh tests use new seeds and slight position shifts while keeping
+the same bottle, Material A, and approximately half-height prefill.
+
+All [10 geometry screens](../evidence/sized-autonomy-A/r1-geometry.json)
+and 30 targeted controller tests passed. The
+[short-cup verification](../evidence/sized-autonomy-A/r1-development-results.json)
+settled at 92.33% of rim height, peaked at 92.46% and measured zero particle
+loss. The correction brought 36 of 98 affected settled frames back within
+the agreement limit. At the near-full stop, the gap was 0.21 percentage
+points. The bottle completed the ordered side return and release.

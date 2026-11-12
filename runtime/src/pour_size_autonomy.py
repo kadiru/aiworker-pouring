@@ -9,6 +9,14 @@ import torch
 from pour_guard_vision import cup_crop
 
 
+SETTLED_RGB_KNOTS = (.755, .795, .835, .890)
+MAX_SETTLED_RGB_BIAS = .035
+
+
+def settled_rgb_weight(value):
+    return float(np.interp(value, SETTLED_RGB_KNOTS, (0., 1., 1., 0.)))
+
+
 def sha(path):
     with Path(path).open("rb") as f:
         digest = hashlib.sha256()
@@ -27,6 +35,12 @@ class SizedCupPerception:
         self.models = config["models"]
         self.filters = {k: LevelFilter(v) for k, v in config["filters"].items()}
         self.agreement_limit = config["agreement_limit"]
+        self.settled_rgb_calibration = config.get("settled_rgb_calibration")
+        if self.settled_rgb_calibration is not None:
+            calibration = self.settled_rgb_calibration
+            if (calibration["geometry"] != geometry
+                    or not 0. <= calibration["bias"] <= MAX_SETTLED_RGB_BIAS):
+                raise ValueError("Settled RGB calibration does not match the declared cup or bias bounds")
         self.track_result = None
 
     def track(self, image):
@@ -36,7 +50,7 @@ class SizedCupPerception:
             self.track_result = self.tracker.update(image)
         return self.track_result
 
-    def level(self, image, xy):
+    def level(self, image, xy, *, settling=False):
         from perception_followup import predict_level
         raw, filtered = {}, {}
         track = self.track_result
@@ -50,10 +64,16 @@ class SizedCupPerception:
             updated = self.filters[branch].update(value if both_visible else float("nan"))
             filtered[branch] = float(updated) if np.isfinite(updated) else None
         valid = all(v is not None for v in filtered.values())
+        diagnostic = {}
+        if valid and settling and self.settled_rgb_calibration is not None:
+            correction = self.settled_rgb_calibration["bias"] * settled_rgb_weight(filtered["rgb"])
+            diagnostic.update(guard_filtered=filtered.copy(), rgb_settle_correction=correction)
+            filtered["rgb"] -= correction
         difference = abs(filtered["rgb"] - filtered["color"]) if valid else None
         return dict(track_valid=track["valid"], track_reason=track["reason"],
                     raw=raw, filtered=filtered, valid=valid,
-                    disagreement=difference, agreement=valid and difference < self.agreement_limit)
+                    disagreement=difference, agreement=valid and difference < self.agreement_limit,
+                    **diagnostic)
 
 
 def settled_pair(samples, target, tolerance, stability):

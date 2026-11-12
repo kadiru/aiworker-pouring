@@ -3,10 +3,25 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from pour_size_autonomy import batch_specs, settled_pair, sha
+from pour_size_autonomy import MAX_SETTLED_RGB_BIAS, batch_specs, settled_pair, settled_rgb_weight, sha
 
 
 class SizedStopTests(unittest.TestCase):
+    def test_settled_rgb_correction_is_monotone_and_keeps_full_readings(self):
+        readings = [i / 1000 for i in range(1001)]
+        corrected = [x - MAX_SETTLED_RGB_BIAS * settled_rgb_weight(x) for x in readings]
+        self.assertTrue(all(a < b for a, b in zip(corrected, corrected[1:])))
+        self.assertEqual(corrected[755], .755)
+        self.assertEqual(corrected[925], .925)
+        self.assertAlmostEqual(corrected[825], .790)
+
+    def test_midfill_repair_allows_topup_without_confirming_full(self):
+        rgb, color = .825, .781
+        self.assertFalse(settled_pair([(rgb, color)] * 6, .925, .035, .01)[1])
+        calibrated = rgb - .032 * settled_rgb_weight(rgb)
+        self.assertEqual(settled_pair([(calibrated, color)] * 6, .925, .035, .01),
+                         (color, True, False))
+
     def test_both_branches_have_to_confirm_full(self):
         self.assertEqual(settled_pair([[.94, .93]]*6, .925, .035, .01), (.93, True, True))
         self.assertEqual(settled_pair([[.94, .917]]*6, .925, .035, .01), (.917, True, False))

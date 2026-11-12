@@ -1,4 +1,5 @@
 """Screen approach, held bottle and side return with the declared resized cup."""
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -9,7 +10,9 @@ from scipy.optimize import linprog
 import torch
 
 ROOT = Path(__file__).resolve().parent
-STUDY = ROOT/"sized-autonomy"
+parser = argparse.ArgumentParser()
+parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1"), default="sized-autonomy")
+STUDY = ROOT/parser.parse_args().study
 sys.path[:0] = [str(STUDY/"src"), "/workspace/learning/A-finish-20261106-v1/staged", "/workspace"]
 from preflight_finish_study import geometry, intersections, object_hits, vessel
 from bottle_pour import BOTTLE, GRASP_Z

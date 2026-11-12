@@ -10,7 +10,6 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parent
-STUDY = ROOT / "sized-autonomy"
 HOST = ROOT.parents[1]
 OUTPUT = HOST / "outputs/size-autonomy"
 ORIGINAL = "0d4953102c0be267af64193e1d5afe5cf0847054f19a1bc8897097dee246dbf1"
@@ -85,6 +84,17 @@ def rows_from_disk(output, cases, plan):
                    peak_height=peak, measured_loss_particles=particles,
                    ordered_return=ordered,side_return=side,perception_at_stop=perception,
                    recording_bytes=record.stat().st_size,recording_sha256=sha(record))
+        calibrated = [x["sized_cup_perception"] for x in decisions
+                      if not x["stop_latched"]
+                      and (x.get("sized_cup_perception") or {}).get("rgb_settle_correction", 0.) > 0.]
+        if calibrated:
+            gate = plan["settled_rgb_calibration"]["agreement_limit"]
+            row["settled_rgb_adjustment"] = dict(
+                frames=len(calibrated),
+                restored_agreement_frames=sum(
+                    abs(x["guard_filtered"]["rgb"] - x["guard_filtered"]["color"]) >= gate
+                    and x["agreement"] for x in calibrated),
+                max_correction=max(x["rgb_settle_correction"] for x in calibrated))
         extra=[]
         if peak>=plan["maximum_sample_height"]:extra.append("headroom_exceeded")
         if not ordered or not side:extra.append("side_return_incomplete")
@@ -102,6 +112,7 @@ def main():
     parser.add_argument("--part",choices=("development","test"),required=True)
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
+    parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1"),default="sized-autonomy")
     args=parser.parse_args()
     deadline_limit = 7200 if args.part == "development" else 14400
     assert args.label.replace("-","").isalnum() and 0 < args.seconds <= deadline_limit
@@ -118,26 +129,33 @@ def main():
 
 
 def run(args,original,gpu_query,before):
-    plan=read(STUDY/"plan.json")
-    geometry=read(STUDY/"geometry.json")
-    assert geometry["passed"] and geometry["plan_sha256"]==sha(STUDY/"plan.json")
-    assert all(sha(STUDY/"src"/n)==h for n,h in geometry["sources"].items())
+    study=ROOT/args.study
+    plan=read(study/"plan.json")
+    geometry=read(study/"geometry.json")
+    assert geometry["passed"] and geometry["plan_sha256"]==sha(study/"plan.json")
+    assert all(sha(study/"src"/n)==h for n,h in geometry["sources"].items())
     assert sha(ROOT/"followup-selection.json")==plan["perception_selection_sha256"]
     assert sha(ROOT/"followup-fresh.json")==plan["perception_test_sha256"]
     candidates={s["name"]:s for s in plan[args.part]}
     assert candidates.keys() <= {r["name"] for r in geometry["cases"] if r["passed"]}
     if args.part=="test":
-        dev=read(STUDY/"development-results.json")
-        assert dev["plan_sha256"]==sha(STUDY/"plan.json") and dev["completed"]==len(plan["development"])
-        assert all(r["within_particle_tolerance"] for r in dev["cases"])
+        dev=read(study/"development-results.json")
+        assert dev["plan_sha256"]==sha(study/"plan.json") and dev["completed"]==len(plan["development"])
+        required = "strict_pass" if plan.get("development_requires_strict_zero") else "within_particle_tolerance"
+        assert all(r[required] for r in dev["cases"]), "Development verification failed"
     assert all(sha(native(p))==h for p,h in plan["checkpoints"].items())
     for old in OUTPUT.glob("*/*/*SA_A_*/parameters.json"):
         assert read(old)["name"] not in candidates,"Trial ID already used"
     output=OUTPUT/args.label
     output.mkdir(parents=True,exist_ok=False)
-    batch=STUDY/(args.label+"-batch.json")
-    files={sandbox(STUDY/"plan.json"):sha(STUDY/"plan.json"),
-           sandbox(STUDY/"geometry.json"):sha(STUDY/"geometry.json"),**plan["checkpoints"]}
+    batch=study/(args.label+"-batch.json")
+    files={sandbox(study/"plan.json"):sha(study/"plan.json"),
+           sandbox(study/"geometry.json"):sha(study/"geometry.json"),**plan["checkpoints"]}
+    if "settled_rgb_calibration" in plan:
+        receipt=study/"calibration.json"
+        digest=plan["settled_rgb_calibration"]["receipt_sha256"]
+        assert sha(receipt)==digest
+        files[sandbox(receipt)]=digest
     files.update({"/workspace/src/"+name:h for name,h in geometry["sources"].items()})
     for selection_name in ("followup-selection.json","component-selection.json"):
         for name,digest in read(ROOT/selection_name)["frozen_files"].items():
@@ -153,7 +171,7 @@ def run(args,original,gpu_query,before):
          "--memory","16g","--memory-swap","16g","--shm-size","1g","--pids-limit","512",
          "--security-opt","no-new-privileges","--user",original["Config"]["User"],"--workdir","/isaac-sim",
          "-v",str(HOST)+":/workspace:ro",
-         "-v",str(STUDY/"src")+":/workspace/src:ro","-v",str(output)+":"+sandbox(output)+":rw"]
+         "-v",str(study/"src")+":/workspace/src:ro","-v",str(output)+":"+sandbox(output)+":rw"]
     for mount in original["Mounts"]:
         if mount["Destination"] not in ("/workspace","/root/.nvidia-omniverse/logs"):
             cmd+=["-v",mount["Source"]+":"+mount["Destination"]+":"+("rw" if mount["RW"] else "ro")]
@@ -169,8 +187,8 @@ def run(args,original,gpu_query,before):
     cid=out(*cmd)
     info=json.loads(out("docker","inspect",cid))[0]
     witness=dict(container=cid,started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                 gpu_before=before,limits=info["HostConfig"],batch_sha256=sha(batch),plan_sha256=sha(STUDY/"plan.json"))
-    save(STUDY/(args.label+"-before.json"),witness)
+                 gpu_before=before,limits=info["HostConfig"],batch_sha256=sha(batch),plan_sha256=sha(study/"plan.json"))
+    save(study/(args.label+"-before.json"),witness)
     started=time.monotonic()
     stop=None
     failures=0
@@ -213,16 +231,16 @@ def run(args,original,gpu_query,before):
             out("docker","stop","--timeout","8",cid,timeout=30)
             state=json.loads(out("docker","inspect",cid))[0]["State"]
         log=subprocess.run(["docker","logs",cid],capture_output=True,text=True,timeout=30)
-        (STUDY/(args.label+".log")).write_text(log.stdout+log.stderr)
+        (study/(args.label+".log")).write_text(log.stdout+log.stderr)
         witness.update(state=state,stop_reason=stop,gpu_after=out(*gpu_query),elapsed=time.monotonic()-started)
-        save(STUDY/(args.label+"-isolation.json"),witness)
+        save(study/(args.label+"-isolation.json"),witness)
     rows=rows_from_disk(output,candidates,plan)
     completed=[r for r in rows.values() if r["status"]=="complete"]
-    report=dict(part=args.part,plan_sha256=sha(STUDY/"plan.json"),planned=len(candidates),completed=len(completed),
+    report=dict(part=args.part,plan_sha256=sha(study/"plan.json"),planned=len(candidates),completed=len(completed),
                 strict_passes=sum(r["strict_pass"] for r in completed),
                 tolerance_passes=sum(r["within_particle_tolerance"] for r in completed),
                 cases=[rows.get(n,dict(name=n,status="unstarted")) for n in candidates],runtime=witness)
-    save(STUDY/(args.part+"-results.json"),report)
+    save(study/(args.part+"-results.json"),report)
     print(json.dumps({k:report[k] for k in ("part","planned","completed","strict_passes","tolerance_passes")}),flush=True)
     assert stop is None and len(completed)==len(candidates) and "AUTONOMY_BATCH_COMPLETE" in log.stdout
 
