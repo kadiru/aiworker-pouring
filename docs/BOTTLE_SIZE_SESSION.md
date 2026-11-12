@@ -117,3 +117,23 @@ measured pour, stopped near full and completed the sideways return and
 release with zero measured spill. The short and tall bottles finished
 at 94.03% and 94.60% of rim height, respectively. The frozen test batch
 requires both of these strict passes before it can start.
+
+All four [fresh attempts](../evidence/bottle-size-A/autonomy-r0-test-results.json)
+passed with zero measured particle loss. Each attempt verified the
+grasp on the first try and recorded 19 upright bilateral-contact frames
+with the bottle lifted above 30 mm before tipping. All sustained
+bilateral contact throughout the sampled pour, stopped near full,
+and completed sideways return and release.
+
+| Bottle height | Outer diameter | Final rim height |
+|---:|---:|---:|
+| 124.875 mm | 54.8 mm | 91.87% |
+| 124.875 mm | 52.3 mm | 91.86% |
+| 145.125 mm | 54.8 mm | 92.89% |
+| 145.125 mm | 52.3 mm | 93.91% |
+
+The [completion audit](../evidence/bottle-size-A/autonomy-r0-completion.json)
+verifies the four fixture/checkpoint pairs, authored mass properties,
+free-bottle contact and lift, and resource limits. The fresh batch
+took 49 minutes in the dedicated 4070 container. The scope is one
+fresh simulation per geometry using declared bottle dimensions.
