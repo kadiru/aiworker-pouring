@@ -1,4 +1,4 @@
-"""Screen approach, held bottle and side return with the declared resized cup."""
+"""Screen approach, held bottle and side return with declared vessel geometry."""
 import argparse
 import json
 import sys
@@ -11,17 +11,19 @@ import torch
 
 ROOT = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
-parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1"), default="sized-autonomy")
+parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "bottle-autonomy"),
+                    default="sized-autonomy")
 STUDY = ROOT/parser.parse_args().study
 sys.path[:0] = [str(STUDY/"src"), "/workspace/learning/A-finish-20261106-v1/staged", "/workspace"]
 from preflight_finish_study import geometry, intersections, object_hits, vessel
-from bottle_pour import BOTTLE, GRASP_Z
+from bottle_pour import GRASP_Z, WALL, initial_points
+from pour_bottle_geometry import declared_geometry, profile_for
 from pour_guard_trajectory import target
 from pour_side_return import paths
 from pour_size_autonomy import sha
 from pour_vessel_geometry import cup_profile
 from pour_wide_motion import project_target
-from robot_pour import FRAME, WRIST, build_path
+from robot_pour import FINGERS, FRAME, WRIST, build_path
 from wide_gripper_geometry import finger_meshes
 
 
@@ -45,10 +47,28 @@ def scan(stage, spec, saved, opened, closed):
     cup=np.array(spec["cup_world"])
     source=cup+FRAME@[*spec["source_xy"],0.]
     cup_shape=shape(cup,cup_profile(spec),.0044)
-    bottle=shape(np.zeros(3),BOTTLE,.0024)[0]
+    bottle_profile=profile_for(spec)
+    bottle=shape(np.zeros(3),bottle_profile,WALL)[0]
+    resized=spec.get("bottle_size_autonomy")
+    if resized:
+        assert saved["bottle_geometry"] == spec["declared_bottle_geometry"] == declared_geometry(spec)
+        initial_points(spec)
+        source_shape=shape(source+[0.,0.,.0002],bottle_profile,WALL)
+    else:
+        source_shape=vessel(source,"bottle")
     failures=[]
-    if object_hits(arm,opened,home,vessel(source,"bottle")):
+    if object_hits(arm,opened,home,source_shape):
         failures.append("ready hand intersects source")
+    first_contact=None
+    if resized:
+        for degrees in (32.5,35.,37.5,40.,42.5):
+            fingers=finger_meshes(stage,np.full(4,np.radians(degrees)))
+            hits=object_hits(arm,fingers,approach[-1],source_shape)
+            if all(any(tip in hit for hit in hits) for tip in FINGERS):
+                first_contact=degrees
+                break
+        if first_contact is None:
+            failures.append("no opposed-tip grasp before full closure")
     def check(label, joint, meshes, carrying=False, placed=None):
         if intersections(arm,meshes,joint):
             failures.append(label+": bench")
@@ -66,11 +86,15 @@ def scan(stage, spec, saved, opened, closed):
                     failures.append(label+": bottle/cup")
             if shell[:,2].min()<cup[2]-.002:
                 failures.append(label+": bottle/bench")
-        if placed is not None and object_hits(arm,meshes,joint,vessel(placed,"bottle",margin=0.)):
-            failures.append(label+": arm/placed bottle")
+        if placed is not None:
+            placed_shape=shape(placed,bottle_profile,WALL) if resized else vessel(placed,"bottle",margin=0.)
+            if object_hits(arm,meshes,joint,placed_shape):
+                failures.append(label+": arm/placed bottle")
 
     for joint in approach:
         check("approach",joint,opened)
+        if resized and object_hits(arm,opened,joint,source_shape):
+            failures.append("approach: open hand/source")
     for joint in lift:
         check("lift",joint,closed,True)
     profile=saved["pour_primitive"]
@@ -79,11 +103,13 @@ def scan(stage, spec, saved, opened, closed):
     for phase in phases:
         projected[phase]=project_target(arm,target(profile,lift[-1],cup[:2],phase),
                                        source[:2],cup[:2],cup[2],phase,saved["pour_mouth_z"],
-                                       late_mouth_shift_m=saved["late_mouth_shift_m"])
+                                       late_mouth_shift_m=saved["late_mouth_shift_m"],
+                                       lip_height=bottle_profile[-1][0])
         check("pour "+str(phase),projected[phase],closed,True)
     returns=[]
     for phase in (60.,80.,90.,100.,110.,131.):
-        _,upright,place,retreat,info=paths(arm,projected[phase],home,cup[:2],cup[2],saved["side_return"])
+        _,upright,place,retreat,info=paths(arm,projected[phase],home,cup[:2],cup[2],saved["side_return"],
+                                         bottle_profile=bottle_profile)
         for joint in upright:
             check("upright "+str(phase),joint,closed,True)
         for joint in place:
@@ -92,8 +118,12 @@ def scan(stage, spec, saved, opened, closed):
         for index,joint in enumerate(retreat):
             check("retreat "+str(phase),joint,opened,placed=placed if index else None)
         returns.append(dict(phase_deg=phase,side=info["side"],step_rad=info["max_planned_joint_step_rad"]))
-    return dict(name=spec["name"],passed=not failures,failures=sorted(set(failures)),
-                sampled_outbound_poses=len(projected),returns=returns)
+    row=dict(name=spec["name"],passed=not failures,failures=sorted(set(failures)),
+             sampled_outbound_poses=len(projected),returns=returns)
+    if resized:
+        row.update(first_opposed_tip_contact_deg=first_contact,
+                   bottle_geometry=saved["bottle_geometry"])
+    return row
 
 
 def main():

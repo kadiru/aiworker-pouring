@@ -5,7 +5,7 @@ simulator object transform, contact, fluid inventory or test label is read.
 """
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
-from bottle_pour import BOTTLE, GRASP_Z, ease
+from bottle_pour import BOTTLE, GRASP_Z, WALL, ease
 from robot_pour import WRIST
 from pour_wide_motion import timed_target
 
@@ -34,7 +34,7 @@ def solve(planner,previous,xyz,rotation):
     return q
 
 
-def paths(planner,current,home,cup_xy,table_z,config):
+def paths(planner,current,home,cup_xy,table_z,config,*,bottle_profile=BOTTLE):
     """The bottle base translates throughout the orientation interpolation.
 
     A raised arc gives the carried bottle clearance even for a left fallback.
@@ -50,7 +50,7 @@ def paths(planner,current,home,cup_xy,table_z,config):
     b0=tcp-(r0@WRIST.T)@np.array([0.,0.,GRASP_Z])
     orientation=Slerp([0.,1.],Rotation.from_matrix(np.stack((r0,WRIST))))
     a=np.arange(40)*2*np.pi/40
-    shell=np.array([[(r+.0024)*np.cos(t),(r+.0024)*np.sin(t),z] for z,r in BOTTLE for t in a])
+    shell=np.array([[(r+WALL)*np.cos(t),(r+WALL)*np.sin(t),z] for z,r in bottle_profile for t in a])
     attempts=[]
     for choice in placement_candidates(cup_xy):
         try:
@@ -90,9 +90,10 @@ def paths(planner,current,home,cup_xy,table_z,config):
 
 
 class SideTerminal:
-    def __init__(self,history,start,profile,planner,cup_xy,table_z,config):
+    def __init__(self,history,start,profile,planner,cup_xy,table_z,config,*,bottle_profile=BOTTLE):
         from pour_stop_sequence import TerminalPrimitive
-        self.times,self.path,place,retreat,self.diagnostic=paths(planner,history[-1][1],history[0][1],cup_xy,table_z,config)
+        self.times,self.path,place,retreat,self.diagnostic=paths(
+            planner,history[-1][1],history[0][1],cup_xy,table_z,config,bottle_profile=bottle_profile)
         self.start=start;self.stage=0
         self.profile=dict(profile,return_s=float(self.times[-1]),place_s=config.get('place_seconds',1.8),
             release_s=max(.6,profile['release_s']),retreat_s=config.get('retreat_seconds',2.6))

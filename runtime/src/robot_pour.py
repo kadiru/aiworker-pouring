@@ -3,7 +3,8 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 from scipy.optimize import least_squares
-from bottle_pour import Pour, GRASP_Z, START_X, pose, ease
+from bottle_pour import Pour, GRASP_Z, LIP, START_X, pose, ease
+from pour_bottle_geometry import profile_for
 
 # Cup frame (+X toward the stream) expressed in robot base coordinates.
 CUP_WORLD = np.array([.49, -.15, 1.04])
@@ -17,11 +18,13 @@ FINGERS = ('gripper_r_rh_p12_rn_r2', 'gripper_r_rh_p12_rn_l2')
 
 class ArmPath:
     """Solve wrist poses within the seven USD joint limits, in path order."""
-    def __init__(self, offsets, axes, limits, shoulder, cup_world=CUP_WORLD, start_xy=None, mouth_z=.054, wide_geometry=False):
+    def __init__(self, offsets, axes, limits, shoulder, cup_world=CUP_WORLD, start_xy=None, mouth_z=.054,
+                 wide_geometry=False, *, lip_height=LIP):
         self.cup_world = np.asarray(cup_world)
         self.start_xy = start_xy
         self.mouth_z = mouth_z
         self.wide_geometry = wide_geometry
+        self.lip_height = lip_height
         self.offsets = np.asarray(offsets)
         self.axes = np.eye(3)[['XYZ'.index(a) for a in axes]]
         self.limits = np.radians(limits).T
@@ -38,9 +41,9 @@ class ArmPath:
     def solve(self, angle, lift=1., retreat=0.):
         if self.wide_geometry:
             from pour_wide_geometry import calibrated_pose
-            base, rot = calibrated_pose(angle, lift, self.start_xy, self.mouth_z)
+            base, rot = calibrated_pose(angle, lift, self.start_xy, self.mouth_z, lip_height=self.lip_height)
         else:
-            base, rot = pose(angle, lift, self.start_xy, self.mouth_z)
+            base, rot = pose(angle, lift, self.start_xy, self.mouth_z, lip_height=self.lip_height)
             base[2] += .018*lift*(1-ease(angle/60))
         target = self.cup_world + FRAME @ (base + rot @ [0.,0.,GRASP_Z]) - [retreat,0.,0.]
         orientation = FRAME @ rot @ FRAME.T @ WRIST
@@ -68,7 +71,8 @@ def build_path(stage, spec, include_planner=False):
                     [j.GetAxisAttr().Get() for j in joints],
                     [(j.GetLowerLimitAttr().Get(),j.GetUpperLimitAttr().Get()) for j in joints],
                     lift.GetLocalPos0Attr().Get(), spec.get('cup_world',CUP_WORLD),
-                    spec.get('source_xy'),spec.get('mouth_z',.054),wide_geometry=spec.get('protocol') in (17,18))
+                    spec.get('source_xy'),spec.get('mouth_z',.054),wide_geometry=spec.get('protocol') in (17,18),
+                    lip_height=profile_for(spec)[-1][0])
     nominal=ArmPath(planner.offsets,[j.GetAxisAttr().Get() for j in joints],
                     [(j.GetLowerLimitAttr().Get(),j.GetUpperLimitAttr().Get()) for j in joints],
                     lift.GetLocalPos0Attr().Get())
@@ -199,6 +203,16 @@ class RobotPour(Pour):
                       ['gripper_r_joint'+str(i) for i in range(1,5)],
             cup_frame_world=self.cup_world.tolist(), cup_frame_rotation=FRAME.tolist())
         if support_contact is not None:self.scene_evidence['bottle_support_contact']=support_contact
+        if self.bottle_geometry is not None:
+            mass = UsdPhysics.MassAPI(self.bottle_prim)
+            authored = dict(mass_kg=float(mass.GetMassAttr().Get()),
+                            center_of_mass_m=list(mass.GetCenterOfMassAttr().Get()),
+                            diagonal_inertia_kg_m2=list(mass.GetDiagonalInertiaAttr().Get()))
+            for key, value in authored.items():
+                if not np.allclose(value, self.bottle_geometry[key], rtol=1e-6, atol=1e-12):
+                    raise RuntimeError(f"Authored bottle {key} does not match the declared fixture")
+            self.scene_evidence.update(bottle_mass_kg=authored['mass_kg'], bottle_geometry=self.bottle_geometry,
+                                       bottle_authored_mass_properties=authored)
         if 'calibration_hold_angle_deg' in spec:
             self.scene_evidence.update(bottle_kinematic=True,
                 calibration_pose_scope='Authored stationary occlusion fixture; never autonomous grasp evidence')
@@ -355,16 +369,16 @@ class RobotPour(Pour):
         self.last_observation=row
         local=(p-self.cup_world) @ FRAME
         if self.spec.get('record_particle_diagnostics'):
-            from bottle_pour import vessel_mask,BOTTLE
-            outside=~(vessel_mask(local,self.cup_profile)|vessel_mask((local-self.base)@self.rotation,BOTTLE))
+            from bottle_pour import vessel_mask
+            outside=~(vessel_mask(local,self.cup_profile)|vessel_mask((local-self.base)@self.rotation,self.bottle_profile))
             ids=np.flatnonzero(outside)
             row['diagnostic_outside_particles']=[dict(index=int(i),origin='impact_seed' if self.spec.get('impact_state_seed') else 'bottle' if i<self.initial_bottle_count else 'cup',
                 xyz_cup_frame_m=local[i].tolist(),velocity_m_s=(v[i]@FRAME).tolist()) for i in ids[:32]]
             row['diagnostic_outside_count']=len(ids)
         if self.spec.get('record_surface_diagnostics'):
-            from bottle_pour import vessel_mask,BOTTLE
+            from bottle_pour import vessel_mask
             from pour_perception_geometry import upper_surface
-            mask=vessel_mask(local,self.cup_profile)&~vessel_mask((local-self.base)@self.rotation,BOTTLE)
+            mask=vessel_mask(local,self.cup_profile)&~vessel_mask((local-self.base)@self.rotation,self.bottle_profile)
             surface=upper_surface(local[mask],self.cup_profile,self.spec['spacing'])
             row['surface_column_diagnostic']=surface
             row['cup_column_height_fraction']=surface['height_fraction']

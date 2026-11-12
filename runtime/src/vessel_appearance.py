@@ -28,7 +28,7 @@ def band(stage, vessel, profile, low, high, material):
     UsdShade.MaterialBindingAPI.Apply(mesh.GetPrim()).Bind(material)
 
 
-def apply(stage, frosted=True, variant='A'):
+def apply(stage, frosted=True, variant='A', *, bottle_profile=None):
     preset = PRESETS[variant]
     from bottle_pour import BOTTLE, CUP
     marker = UsdShade.Material.Define(stage, '/World/VesselBandMaterial')
@@ -55,7 +55,7 @@ def apply(stage, frosted=True, variant='A'):
             surface = UsdShade.Shader.Get(stage, path+'/Shader')
         material.CreateSurfaceOutput().ConnectToSource(surface.ConnectableAPI(), 'surface')
     for vessel, profile, low, high in (
-        ('/World/Bottle', BOTTLE, .068, .074),
+        ('/World/Bottle', BOTTLE if bottle_profile is None else bottle_profile, .068, .074),
         ('/World/Cup', CUP, .029, .031)):
         if not stage.GetPrimAtPath(vessel):
             continue

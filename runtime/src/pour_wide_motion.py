@@ -5,7 +5,7 @@ controller's own phase. No simulator object transform or particle state enters.
 The learned target initializes IK; this geometry correction is programmed.
 """
 import numpy as np
-from bottle_pour import GRASP_Z, ease
+from bottle_pour import GRASP_Z, LIP, ease
 from pour_wide_geometry import calibrated_pose
 from robot_pour import FRAME, WRIST
 
@@ -24,11 +24,12 @@ def late_mouth_offset(phase, amount):
     return amount*ease((phase-LATE_SHIFT_START_DEG)/(LATE_SHIFT_END_DEG-LATE_SHIFT_START_DEG))
 
 
-def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth_z, centered=False, late_mouth_shift_m=0.):
+def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth_z, centered=False,
+                   late_mouth_shift_m=0., *, lip_height=LIP):
     cup=np.r_[cup_xy,table_z]
     delta=np.asarray(source_xy)-np.asarray(cup_xy)
     initial=[delta[1],-delta[0]]
-    base,rotation=calibrated_pose(phase,1.,initial,mouth_z,centered=centered)
+    base,rotation=calibrated_pose(phase,1.,initial,mouth_z,centered=centered,lip_height=lip_height)
     base[0]+=late_mouth_offset(phase,late_mouth_shift_m)
     tcp=cup+FRAME@(base+rotation@np.array([0.,0.,GRASP_Z]))
     orientation=FRAME@rotation@FRAME.T@WRIST

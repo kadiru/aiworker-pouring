@@ -2,12 +2,10 @@
 import math
 from collections import deque
 import numpy as np
+from pour_bottle_geometry import BOTTLE, BASE_MASS, GRASP_Z, SIDES, WALL, declared_geometry, profile_for
 
 # Height and inner circumradius in metres. The bottle has one open mouth.
-BOTTLE = ((.004, .025), (.082, .025), (.107, .009), (.135, .009))
 CUP = ((.004, .020), (.038, .024))
-SIDES = 20
-GRASP_Z = .048
 START_X = -.115
 MOUTH_X = -.013
 MOUTH_Z = .054
@@ -45,22 +43,23 @@ def ease(x):
     return u*u*(3-2*u)
 
 
-def pose(angle, lift, start_xy=None, mouth_z=MOUTH_Z):
+def pose(angle, lift, start_xy=None, mouth_z=MOUTH_Z, *, lip_height=LIP):
     radians = math.radians(angle)
     sine, cosine = math.sin(radians), math.cos(radians)
     fraction = ease(angle / 70.)
     sx, sy = (START_X, 0.) if start_xy is None else start_xy
     mouth_x = sx + (MOUTH_X - sx)*fraction
     # Keep the bottom clear of the bench before placing the mouth just above the rim.
-    mouth_z = max(mouth_z, LIP*cosine + (.027*abs(sine) + .026)*lift)
-    base = np.array([mouth_x - LIP*sine, sy*(1-fraction), mouth_z - LIP*cosine])
+    mouth_z = max(mouth_z, lip_height*cosine + (.027*abs(sine) + .026)*lift)
+    base = np.array([mouth_x - lip_height*sine, sy*(1-fraction), mouth_z - lip_height*cosine])
     rotation = np.array([[cosine, 0., sine], [0., 1., 0.], [-sine, 0., cosine]])
     return base, rotation
 
 
 def initial_points(spec):
+    profile = profile_for(spec)
     spacing = spec['spacing']
-    radius = BOTTLE[0][1]*math.cos(math.pi/SIDES) - 2*spacing
+    radius = profile[0][1]*math.cos(math.pi/SIDES) - 2*spacing
     n = int(radius/spacing)
     cross = sorted(((i*spacing, j*spacing) for i in range(-n,n+1) for j in range(-n,n+1)
                     if (i*i+j*j)*spacing**2 < radius**2), key=lambda xy: xy[0]**2+xy[1]**2)
@@ -69,9 +68,9 @@ def initial_points(spec):
         if spec.get('calibration_only') and spec.get('calibration_motion') and not spec.get('policy_evaluation'):
             return np.empty((0,3),dtype=np.float32)
         raise ValueError('An empty initial bottle is supported only by authored motion calibration')
-    pts = np.array([[*cross[i%len(cross)], BOTTLE[0][0]+2*spacing+(i//len(cross))*spacing]
+    pts = np.array([[*cross[i%len(cross)], profile[0][0]+2*spacing+(i//len(cross))*spacing]
                     for i in range(count)], dtype=np.float32)
-    if pts[:,2].max() > BOTTLE[1][0] - spacing:
+    if pts[:,2].max() > profile[1][0] - spacing:
         raise ValueError('Initial fill exceeds bottle body')
     pts[:,0] += START_X
     return pts
@@ -111,7 +110,7 @@ def _collider(prim, convex=False):
     physicsUtils.add_physics_material_to_prim(prim.GetStage(), prim, Sdf.Path('/World/WetContact'))
 
 
-def _vessel(stage, path, profile, material, moving):
+def _vessel(stage, path, profile, material, moving, *, bottle_geometry=None):
     from pxr import UsdGeom, UsdShade, UsdPhysics, Gf
     root = UsdGeom.Xform.Define(stage, path)
     position = root.AddTranslateOp()
@@ -120,10 +119,14 @@ def _vessel(stage, path, profile, material, moving):
     orientation.Set(Gf.Quatf(1., Gf.Vec3f(0.)))
     if moving:
         UsdPhysics.RigidBodyAPI.Apply(root.GetPrim()).CreateKinematicEnabledAttr(True)
-        UsdPhysics.MassAPI.Apply(root.GetPrim()).CreateMassAttr(.18)
+        mass = UsdPhysics.MassAPI.Apply(root.GetPrim())
+        mass.CreateMassAttr(BASE_MASS if bottle_geometry is None else bottle_geometry['mass_kg'])
+        if bottle_geometry is not None:
+            mass.CreateCenterOfMassAttr(Gf.Vec3f(*bottle_geometry['center_of_mass_m']))
+            mass.CreateDiagonalInertiaAttr(Gf.Vec3f(*bottle_geometry['diagonal_inertia_kg_m2']))
         UsdGeom.Xform.Define(stage, path+'/GraspFrame').AddTranslateOp().Set(Gf.Vec3d(0,0,GRASP_Z))
-        UsdGeom.Xform.Define(stage, path+'/MouthFrame').AddTranslateOp().Set(Gf.Vec3d(0,0,LIP))
-    thickness = .0024
+        UsdGeom.Xform.Define(stage, path+'/MouthFrame').AddTranslateOp().Set(Gf.Vec3d(0,0,profile[-1][0]))
+    thickness = WALL
     bottom = UsdGeom.Cylinder.Define(stage, path+'/Base')
     bottom.CreateRadiusAttr(profile[0][1]+thickness)
     bottom.CreateHeightAttr(profile[0][0])
@@ -165,7 +168,11 @@ class Pour:
         self.spec = spec
         self.cup_profile = cup_profile(spec)
         self.cup_geometry = cup_geometry(spec)
-        self.position, self.orientation = _vessel(stage,'/World/Bottle',BOTTLE,bottle_glass,True)
+        self.bottle_profile = profile_for(spec)
+        self.bottle_geometry = declared_geometry(spec) if spec.get('bottle_size_autonomy') else None
+        self.points = initial_points(spec)
+        self.position, self.orientation = _vessel(stage,'/World/Bottle',self.bottle_profile,bottle_glass,True,
+                                                   bottle_geometry=self.bottle_geometry)
         _vessel(stage,'/World/Cup',self.cup_profile,cup_glass,False)
         self.angle = 0.
         self.base, self.rotation = pose(0.,0.)
@@ -176,7 +183,6 @@ class Pour:
         self.last_signal = None
         self.source_history = deque(maxlen=4)
         self.phase = 'Settling initial fill'
-        self.points = initial_points(spec)
 
     def drive(self, t):
         from pxr import Gf
@@ -204,7 +210,7 @@ class Pour:
         if not (len(p)==len(v)==len(self.points) and np.isfinite(p).all() and np.isfinite(v).all()):
             raise RuntimeError('Finite particle inventory lost during bottle pour')
         local = (p-self.base) @ self.rotation
-        source = vessel_mask(local,BOTTLE)
+        source = vessel_mask(local,self.bottle_profile)
         profile = self.cup_profile
         cup = vessel_mask(p,profile) & ~source
         outside = ~(source | cup)

@@ -16,6 +16,7 @@ from pour_guard_vision import locate,plane_point,project,cup_crop,surface_featur
 from pour_guard_trajectory import target
 from pour_stop_sequence import TerminalPrimitive,path_at
 from validate_pour_recording import decode
+from pour_bottle_geometry import BOTTLE, GRASP_Z
 
 
 def ease(x):
@@ -72,6 +73,8 @@ class Actor:
             self.empty_detector=load_empty(self.saved)
         self.cup_model=CupEstimator().cuda().eval();self.cup_model.load_state_dict(self.saved['cup_model'])
         self.cal=self.saved['calibration'];self.profile=dict(self.saved['primitive']);self.threshold=self.saved['thresholds']
+        self.bottle_profile=tuple(tuple(ring) for ring in self.saved.get('bottle_geometry',{}).get('profile',BOTTLE))
+        self.bottle_lip=self.bottle_profile[-1][0]
         self.cup_cal=self.saved.get('cup_localization_calibration',self.cal)
         self.level_cal=self.saved.get('cup_detail_calibration',self.cal)
         self.cup_localization_image=None
@@ -142,15 +145,15 @@ class Actor:
             neck=np.asarray(accepted['source']['uv']);rim=np.asarray(accepted['cup']['uv'])
         elif self.source_score<self.threshold['source_localization_score'] or self.cup_score<self.threshold['cup_localization_score']:
             self.abort_time=t;self.stop_latched='localization_unconfirmed';self.home=q[:7].copy();return
-        base=bottle_base_from_neck(neck,self.cal);self.source_xy=base[:2]
+        base=bottle_base_from_neck(neck,self.cal,self.bottle_lip);self.source_xy=base[:2]
         self.cup_xy=plane_point(rim,self.cup_cal['table_z']+self.cup_cal.get('cup_geometry',{}).get('rim_z_m',.038),self.cup_cal)[:2]
-        self.initial_neck=neck;self.expected_lift_neck=project(base+[0,0,.135+.044],self.cal)
+        self.initial_neck=neck;self.expected_lift_neck=project(base+[0,0,self.bottle_lip+.044],self.cal)
         self.home=q[:7].copy()
         # The same known hardware geometry/IK branch as the demonstration planner.
         self.fk.q=np.array([-.25,-.45,-.15,-1.4,0.,.25,0.])
-        self.grasp=np.radians(self.fk.solve_pose(base+[0,0,.048],WRIST))
+        self.grasp=np.radians(self.fk.solve_pose(base+[0,0,GRASP_Z],WRIST))
         self.grasp_tcp=self.fk.fk(self.grasp)[0]
-        self.lift_path=np.array([np.radians(self.fk.solve_pose(base+[0,0,.048+z],WRIST)) for z in np.linspace(0,.044,9)])
+        self.lift_path=np.array([np.radians(self.fk.solve_pose(base+[0,0,GRASP_Z+z],WRIST)) for z in np.linspace(0,.044,9)])
         self.approach_path=np.asarray([self.home,self.grasp])
         if self.saved.get('approach_clearance_m'):
             from pour_workspace_path import clearance_approach
@@ -245,7 +248,7 @@ class Actor:
             from pour_side_return import SideTerminal
             try:
                 self.terminal=SideTerminal(self.history,t,profile,self.fk,self.cup_xy,
-                    self.cal['table_z'],self.saved['side_return'])
+                    self.cal['table_z'],self.saved['side_return'],bottle_profile=self.bottle_profile)
             except ValueError as error:
                 self.return_planning_error=str(error)
                 self.stop_latched=robot.reason='return_planning_failed'
@@ -458,7 +461,7 @@ class Actor:
                         try:
                             arm=project_target(self.fk,arm,self.source_xy,self.cup_xy,
                                 self.cal['table_z'],self.pour_phase,self.saved['pour_mouth_z'],
-                                late_mouth_shift_m=self.saved.get('late_mouth_shift_m',0.))
+                                late_mouth_shift_m=self.saved.get('late_mouth_shift_m',0.),lip_height=self.bottle_lip)
                         except ValueError:
                             self.latch('trajectory_unreachable',t,robot)
                             targets,phase=self.terminal.act(t)

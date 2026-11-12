@@ -6,37 +6,11 @@ and pickup checks remain required before using this proposal.
 """
 import hashlib
 import json
-import math
+import sys
 from pathlib import Path
-import numpy as np
 
-
-def moments(profile,thickness=.0024,sides=20,density=1.):
-    p=np.asarray(profile,dtype=float)
-    if p.ndim!=2 or p.shape[1]!=2 or len(p)<2 or not np.isfinite(p).all():raise ValueError('Invalid profile')
-    if not (p>0).all() or not (np.diff(p[:,0])>0).all() or thickness<=0 or density<=0 or sides<3:
-        raise ValueError('Invalid shell dimensions or density')
-    # Circular base, then regular-polygon annular sections. Radius varies
-    # linearly along each authored segment; three Gauss nodes integrate all
-    # degree-four volume/moment integrands exactly up to floating point.
-    z0,r0=p[0];R=r0+thickness
-    volume=math.pi*R*R*z0
-    first=volume*z0/2;second=volume*z0*z0/3
-    polar=volume*R*R/2
-    area_factor=sides*math.sin(2*math.pi/sides)/2
-    polar_factor=sides*math.sin(2*math.pi/sides)*(2+math.cos(2*math.pi/sides))/12
-    nodes,weights=np.polynomial.legendre.leggauss(3)
-    for (a,ra),(b,rb) in zip(p,p[1:]):
-        z=(a+b)/2+nodes*(b-a)/2;w=weights*(b-a)/2
-        r=ra+(rb-ra)*(z-a)/(b-a)
-        area=area_factor*((r+thickness)**2-r*r)
-        q=polar_factor*((r+thickness)**4-r**4)
-        volume+=float(w@area);first+=float(w@(area*z));second+=float(w@(area*z*z));polar+=float(w@q)
-    center=first/volume;mass=volume*density
-    transverse=density*(polar/2+second-volume*center*center)
-    inertia=[transverse,transverse,density*polar]
-    assert all(v>0 for v in inertia) and 0<center<p[-1,0]
-    return dict(volume_m3=volume,mass_kg=mass,center_of_mass_m=[0.,0.,center],diagonal_inertia_kg_m2=inertia)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"runtime/src"))
+from pour_bottle_geometry import moments
 
 
 def main():

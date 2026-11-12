@@ -110,4 +110,7 @@ def batch_specs(plan_path):
         assert spec["policy_evaluation"] and spec["policy_family"] == "visual_guard_hierarchy"
         assert not any(spec.get(k) for k in ("calibration_only", "calibration_motion", "calibration_fill",
                                             "expert_recovery", "replay_episode", "impact_state_seed"))
+        if spec.get("bottle_size_autonomy"):
+            from pour_bottle_geometry import declared_geometry
+            assert spec["declared_bottle_geometry"] == declared_geometry(spec)
     return manifest["cases"]

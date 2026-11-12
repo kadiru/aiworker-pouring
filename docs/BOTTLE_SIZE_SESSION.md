@@ -86,3 +86,34 @@ Storage readiness: the current 36 static plus 18 possible reserved perception fi
 
 
 November 10 storage update: the verified recording migration is complete. The new ext4 partition is mounted at `/mnt/robot-training`, with AIWorker recordings under `/mnt/robot-training/aiworker-pouring/outputs`. A persistent bind mount preserves all existing host/container recording paths. All 170,480 files were verified before the old duplicate was removed; both mounts and the container read were checked. The training partition has **96.70 GiB available**, so the **56.92 GiB capacity check now passes**. This does not accept the perception models or launch training. Run `python3 /home/kadir/aiworker-pouring-4070/tools/verify_robot_training_storage.py --minimum-free-gib 57` before any future collection, then verify GPU priority and all remaining gates. See `evidence/bottle-size-A/storage-post-migration-20261110.json`.
+
+## First autonomous bottle-size trials
+
+The guarded simulator trials use bottle heights of 124.875 and 145.125 mm,
+with outer body diameters of 54.8 and 52.3 mm. All four combinations use
+the 18 mm mouth, 48 mm grasp height, 2.4 mm wall, Material A and the same
+accepted standard-size cup. Each bottle starts with 80 nominal mL and each
+cup starts around half height. The trials target near-full stops.
+
+The declared profile drives the collision and visual meshes, initial
+particle grid, containment scoring, lip projection and sideways return.
+The shell model authors mass, center of mass and diagonal inertia, using
+the existing 180 g empty nominal bottle as its density reference. The
+simulator checks the authored values and scores contact and lift on a free
+rigid bottle. The actor uses RGB and measured joints for control. It
+projects the initial source search region onto the new lip plane and
+uses the retained visual templates, cup models and motion policy.
+
+The first [six-fixture plan](../evidence/bottle-size-A/autonomy-r0-plan.json)
+uses two nominal-width development pours followed by four fresh attempts
+covering both heights and widths. All six [geometry screens](../evidence/bottle-size-A/autonomy-r0-geometry.json)
+pass, including approach, lift, 48 outbound angles and six sampled starting
+angles for the sideways return. First sampled opposing fingertip contact
+is at 35° for nominal width and 37.5° for the narrower body.
+
+Both [nominal-width development pours](../evidence/bottle-size-A/autonomy-r0-development-results.json)
+passed on the first grasp. Both sustained bilateral contact through the
+measured pour, stopped near full and completed the sideways return and
+release with zero measured spill. The short and tall bottles finished
+at 94.03% and 94.60% of rim height, respectively. The frozen test batch
+requires both of these strict passes before it can start.

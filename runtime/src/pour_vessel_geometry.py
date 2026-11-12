@@ -1,7 +1,6 @@
 """Declared cup dimensions for the first size curriculum (metres).
 
-This is fixture/configuration information, not a visual size estimator. Bottle
-scaling is deliberately unsupported until grasp, mass and inertia are checked.
+This is fixture/configuration information, not a visual size estimator.
 """
 import math
 import numpy as np
@@ -13,9 +12,8 @@ def cup_profile(spec):
     d = float(spec.get('cup_diameter_scale', 1.))
     if not (math.isfinite(h) and math.isfinite(d) and .9 <= h <= 1.1 and .9 <= d <= 1.1):
         raise ValueError('Cup curriculum permits independent height/diameter scales in [0.9, 1.1]')
-    for key in ('bottle_height_scale', 'bottle_diameter_scale', 'bottle_neck_scale'):
-        if spec.get(key, 1.) != 1.:
-            raise ValueError('Bottle scaling requires a separately validated grasp/physics curriculum')
+    from pour_bottle_geometry import profile_for
+    profile_for(spec)
     # Keep the physical base thickness constant; vary usable internal height.
     bottom = CUP[0][0]
     return tuple((z if h == 1. else bottom + (z-bottom)*h, r*d) for z, r in CUP)

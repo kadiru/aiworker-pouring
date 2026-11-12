@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
-from bottle_pour import CUP, CAPACITY_ML, vessel_mask
+from bottle_pour import CUP, CAPACITY_ML, START_X, initial_points, pose, vessel_mask
+from pour_bottle_geometry import BOTTLE, declared_geometry, profile_for
 from pour_vessel_geometry import cup_profile, cup_geometry, initial_cup_points, capacity_ml,settled_cup_points
 from pour_source_watchdog import SourceWatchdog, DEFAULT
 
@@ -35,6 +36,33 @@ class SizeTests(unittest.TestCase):
         originals={tuple(v) for v in seed}
         self.assertTrue(all(tuple(v) in originals for v in points))
         with self.assertRaises(ValueError):settled_cup_points(dict(spec,cup_initial_ml=40.),seed)
+
+
+    def test_bottle_shapes_preserve_grasp_and_mouth_and_contain_inventory(self):
+        for height in (.925, 1.075):
+            for width in (.95, 1.):
+                spec = dict(bottle_height_scale=height, bottle_diameter_scale=width,
+                            bottle_size_autonomy=True, bottle=True, robot=True, policy_evaluation=True,
+                            size_autonomy_prefill=True, spacing=.0018, initial_ml=80.)
+                profile = profile_for(spec)
+                geometry = declared_geometry(spec)
+                self.assertAlmostEqual(profile[-1][0], .135*height)
+                self.assertEqual(profile[-1][1], BOTTLE[-1][1])
+                self.assertEqual(geometry['grasp_height_m'], .048)
+                self.assertAlmostEqual(geometry['outer_body_diameter_m'], .05*width+.0048)
+                self.assertTrue(all(i > 0 for i in geometry['diagonal_inertia_kg_m2']))
+                points = initial_points(spec)
+                points[:,0] -= START_X
+                self.assertTrue(vessel_mask(points, profile).all())
+                base, rotation = pose(90., 1., mouth_z=.054, lip_height=profile[-1][0])
+                np.testing.assert_allclose(base + rotation@[0.,0.,profile[-1][0]], [-.013,0.,.054])
+
+    def test_bottle_geometry_requires_the_sealed_fixture_contract(self):
+        self.assertEqual(profile_for({}), BOTTLE)
+        with self.assertRaises(ValueError):
+            profile_for(dict(bottle_height_scale=.925))
+        with self.assertRaises(ValueError):
+            profile_for(dict(bottle_size_autonomy=True, bottle_height_scale=.925, robot=True))
 
 
 class WatchdogTests(unittest.TestCase):

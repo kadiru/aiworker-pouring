@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 from PIL import Image
+from pour_bottle_geometry import BOTTLE
 
 
 def project(world,cal):
@@ -16,9 +17,9 @@ def plane_point(uv,z,cal):
     return T[:3,3]+ray*((z-T[2,3])/ray[2])
 
 
-def bottle_base_from_neck(uv,cal):
-    neck=plane_point(uv,cal['table_z']+.135,cal)
-    return neck-np.array([0.,0.,.135])
+def bottle_base_from_neck(uv,cal,lip_height=BOTTLE[-1][0]):
+    neck=plane_point(uv,cal['table_z']+lip_height,cal)
+    return neck-np.array([0.,0.,lip_height])
 
 
 def cup_crop(rgb,xy,cal):

@@ -96,6 +96,14 @@ def rows_from_disk(output, cases, plan):
                     and x["agreement"] for x in calibrated),
                 max_correction=max(x["rgb_settle_correction"] for x in calibrated))
         extra=[]
+        if scene.get("bottle_size_autonomy"):
+            recorded=read(folder/"metrics.json")["scene"]
+            row["bottle_geometry"]=recorded["bottle_geometry"]
+            row["bottle_authored_mass_properties"]=recorded["bottle_authored_mass_properties"]
+            if recorded["bottle_geometry"] != scene["declared_bottle_geometry"]:
+                extra.append("recorded_bottle_geometry_mismatch")
+            if recorded["bottle_kinematic"] or not recorded["bottle_gravity_enabled"] or recorded["bottle_attachment_joints"]:
+                extra.append("bottle_was_not_free")
         if peak>=plan["maximum_sample_height"]:extra.append("headroom_exceeded")
         if not ordered or not side:extra.append("side_return_incomplete")
         if not perception or not perception["agreement"]:extra.append("sized_perception_stop_unconfirmed")
@@ -112,7 +120,8 @@ def main():
     parser.add_argument("--part",choices=("development","test"),required=True)
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
-    parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1"),default="sized-autonomy")
+    parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1","bottle-autonomy"),
+                        default="sized-autonomy")
     args=parser.parse_args()
     deadline_limit = 7200 if args.part == "development" else 14400
     assert args.label.replace("-","").isalnum() and 0 < args.seconds <= deadline_limit

@@ -264,7 +264,8 @@ def setup(spec):
             cube('Bench',(-.04,0,-.006),(.46,.29,.012),bench)
             bottle=Pour(stage,spec,bottle_glass,cup_glass)
         from vessel_appearance import apply as apply_vessel_appearance
-        apply_vessel_appearance(stage, True if spec.get('record_cameras') else vessels_frosted, variant='A')
+        apply_vessel_appearance(stage, True if spec.get('record_cameras') else vessels_frosted,
+                                variant='A', bottle_profile=bottle.bottle_profile)
         state['vessels_frosted'] = True if spec.get('record_cameras') else vessels_frosted
     else:
         receiver_orient=fountain_fixture(spec,dark,ceramic,glass,chrome)
@@ -374,6 +375,10 @@ def setup(spec):
             declared=cup_geometry(spec)
             assert actor.saved['calibration'].get('cup_geometry')==declared, 'Checkpoint does not support this declared cup geometry'
             assert actor.saved.get('size_curriculum_native_accepted'), 'Size-aware autonomous pouring requires calibration and clearance acceptance first'
+        if spec.get('bottle_size_autonomy') or 'bottle_geometry' in actor.saved:
+            assert BATCH and spec.get('bottle_size_autonomy'), 'Resized bottles require the sealed autonomy batch'
+            assert actor.saved.get('bottle_geometry')==bottle.bottle_geometry==spec['declared_bottle_geometry'], (
+                'Checkpoint does not support this declared bottle geometry')
     replay = None
     if spec.get('replay_episode'):
         import sys
