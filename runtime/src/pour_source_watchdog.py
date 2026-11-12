@@ -44,3 +44,17 @@ class SourceWatchdog:
 
 DEFAULT = dict(presence_min_tilt_deg=75.,lost_seconds=.35,
     ambiguous_empty_seconds=1.2,cap_timeout_seconds=8.,active_timeout_seconds=48.)
+
+
+class TallBottleEmptyGate:
+    """Confirm depletion before the cap using corroborated visual evidence."""
+
+    def __init__(self):
+        self.votes = 0
+
+    def update(self, *, held, level_ready, present, wrist_empty, scene_empty, tilt, flow_ml_s):
+        finite = all(math.isfinite(x) for x in (present,wrist_empty,scene_empty,tilt,flow_ml_s))
+        agrees = (finite and held and level_ready and present >= .7 and tilt >= 120.
+                  and wrist_empty >= .92 and scene_empty >= .98 and 0. <= flow_ml_s < 1.)
+        self.votes = self.votes + 1 if agrees else 0
+        return self.votes >= 10

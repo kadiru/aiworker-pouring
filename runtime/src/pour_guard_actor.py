@@ -107,9 +107,16 @@ class Actor:
         self.localization_start=None;self.localization_history={"source":[],"cup":[]};self.localization_check=None
         self.approach_check=None;self.abort_path=None
         self.source_watchdog=None
+        self.tall_empty_gate=None
         if self.saved.get('source_watchdog'):
             from pour_source_watchdog import SourceWatchdog
             self.source_watchdog=SourceWatchdog(self.saved['source_watchdog'])
+        if self.saved.get('tall_empty_confirmation'):
+            from pour_source_watchdog import TallBottleEmptyGate
+            assert self.bottle_lip >= .14 and self.sized_perception is not None
+            assert self.empty_detector is not None and self.presence_detector is not None
+            assert self.saved.get('source_frame_normalization') in ('raw_and_cup_aligned_v1','cup_aligned_v2')
+            self.tall_empty_gate=TallBottleEmptyGate()
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
@@ -362,6 +369,12 @@ class Actor:
                 slow=slow_empty_evidence(self.threshold,self.pour_phase,cap,tilt,None if self.cap_start is None else t-self.cap_start,
                     held_gripper(q,gap),present,empty,flow*self.cup_volume_scale)
             self.slow_empty_votes=self.slow_empty_votes+1 if slow else 0
+            tall_empty=False
+            if self.tall_empty_gate is not None and self.stop_latched is None:
+                tall_empty=self.tall_empty_gate.update(
+                    held=held, level_ready=(len(self.level_history)>=9 and measured['agreement']),
+                    present=present,wrist_empty=empty,scene_empty=empty_views['raw_empty'],
+                    tilt=tilt,flow_ml_s=flow*self.cup_volume_scale)
             recovery=None
             if self.source_watchdog is not None and self.stop_latched is None:
                 recovery=self.source_watchdog.update(t,
@@ -370,7 +383,7 @@ class Actor:
             if self.stop_latched is None:
                 if self.sized_perception is not None and self.invalid_cup_since is not None and t-self.invalid_cup_since>=.75 and self.fill_mode not in ('brake','settle'):
                     self.latch('cup_tracking_lost',t,robot)
-                elif self.empty_votes>=12 or (slow and self.slow_empty_votes>=self.threshold['slow_empty_votes']):self.latch('bottle_empty',t,robot)
+                elif tall_empty or self.empty_votes>=12 or (slow and self.slow_empty_votes>=self.threshold['slow_empty_votes']):self.latch('bottle_empty',t,robot)
                 elif self.source_watchdog is not None:
                     if recovery:self.latch(recovery,t,robot)
                 elif self.lost_votes>=8:self.latch('source_tracking_lost',t,robot)
@@ -489,6 +502,7 @@ class Actor:
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,
             slow_empty_votes=self.slow_empty_votes,cap_dwell_seconds=None if self.cap_start is None else t-self.cap_start,
+            tall_empty_votes=None if self.tall_empty_gate is None else self.tall_empty_gate.votes,
             own_pour_phase_deg=self.pour_phase,fill_mode=self.fill_mode,pause_count=self.pause_count,trim_goal=self.trim_goal,
             trim_cap_deg=self.trim_cap,
             delta_clamped=bool(clamped),done_probability=float(self.done_votes>=10)))

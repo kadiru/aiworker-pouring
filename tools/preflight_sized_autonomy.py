@@ -12,7 +12,7 @@ import torch
 ROOT = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
 parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "bottle-autonomy",
-                                       "bottle-empty-autonomy", "mixed-vessel-autonomy"),
+                                       "bottle-empty-autonomy", "mixed-vessel-autonomy", "tall-empty-r1"),
                     default="sized-autonomy")
 STUDY = ROOT/parser.parse_args().study
 sys.path[:0] = [str(STUDY/"src"), "/workspace/learning/A-finish-20261106-v1/staged", "/workspace"]

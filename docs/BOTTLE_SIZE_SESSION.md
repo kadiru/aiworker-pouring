@@ -192,3 +192,49 @@ python3 run_isolated_perception_job.py --helper prepare_mixed_vessel_autonomy.py
 python3 run_isolated_perception_job.py --helper preflight_mixed_vessel_autonomy.py --label mixed-r0-geometry --seconds 900 -- --study mixed-vessel-autonomy
 python3 run_mixed_vessel_autonomy.py --study mixed-vessel-autonomy --part development --label mixed-vessel-r0 --seconds 3600
 ```
+
+## Tall-bottle empty confirmation and placement coverage
+
+In the three prior tall-bottle empty recordings, the wrist estimate often
+fell below 0.97 after depletion. The controller therefore waited for its
+maximum-tilt fallback. The added tall-bottle gate requires ten consecutive
+20 Hz frames with an agreeing, tracked cup, measured grip and source
+presence, at least 120° measured tilt, wrist empty score at least 0.92,
+the existing scene model's empty score at least 0.98, and visually
+estimated flow below 1 nominal mL/s. It uses camera and joint observations
+at runtime. Particle inventory is used for offline measurement.
+
+The [replay](../evidence/bottle-size-A/tall-r1-empty-replay.json) predicts
+0.35–0.95 seconds after measured depletion, compared with 4.80–5.75 seconds
+for the original stops, with zero source inventory at each candidate
+stop. Three recorded tall-bottle near-full pours produced no new empty
+confirmation. These are consumed recordings. The live gate is tested
+with a separate tall, narrow bottle verification and six fresh fixture
+combinations predeclared before that verification. All seven fixtures
+passed the [sampled clearance check](../evidence/bottle-size-A/tall-r1-geometry.json).
+Forty-five native CPU checks passed. There was no weight retraining.
+
+The six [sealed test fixtures](../evidence/bottle-size-A/tall-r1-plan.json)
+cross the four bottle geometries with six cup sizes and six table layouts.
+Three target near-full and three target empty. The cup placement spans
+29 mm in world X and 51 mm in Y. The tall, narrow verification must
+pass the full task with zero loss and confirm empty within two seconds
+of the first zero-source sample before the fresh batch can start.
+
+The [live verification](../evidence/bottle-size-A/tall-r1-development-results.json)
+confirmed empty after 1.45 seconds in the tall, narrow fixture, compared
+with 5.75 seconds in the original same-geometry and same-placement recording.
+The new gate had all ten votes at the latch. The bottle contained zero
+particles at the stop and at the end. The grasp, sideways return, release
+and strict zero-spill checks all passed.
+
+From a clean copy of the same Ubuntu study, stage the candidate source
+under `tall-empty-r1/src`. Stage `preflight_sized_autonomy.py` and
+`run_sized_autonomy.py` under the helper names below.
+
+```sh
+python3 run_isolated_perception_job.py --helper prepare_tall_empty_autonomy.py --label tall-r1-prepare --seconds 300
+python3 run_isolated_perception_job.py --helper preflight_tall_empty_r1.py --label tall-r1-geometry --seconds 1100 -- --study tall-empty-r1
+python3 run_tall_empty_r1.py --study tall-empty-r1 --part development --label tall-empty-verify-r1 --seconds 2600
+python3 run_tall_empty_r1.py --study tall-empty-r1 --part test --label tall-empty-test-r1 --seconds 9000
+```

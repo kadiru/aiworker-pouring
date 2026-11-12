@@ -96,6 +96,16 @@ def rows_from_disk(output, cases, plan):
                     and x["agreement"] for x in calibrated),
                 max_correction=max(x["rgb_settle_correction"] for x in calibrated))
         extra=[]
+        if scene["expected_stop"]=="bottle_empty" and plan.get("empty_confirmation_replay_sha256"):
+            zero_time=next((x["t"] for x in samples if x["bottle_ml"]==0.),None)
+            stop_sample=min(samples,key=lambda x:abs(x["t"]-stop["t"])) if stop else None
+            row["first_zero_source_s"]=zero_time
+            row["empty_confirmation_lag_s"]=(round(stop["t"]-zero_time,6)
+                if stop and zero_time is not None and row["stop_reason"]=="bottle_empty" else None)
+            row["source_at_stop_ml"]=stop_sample["bottle_ml"] if stop_sample else None
+            row["tall_empty_votes_at_stop"]=stop.get("tall_empty_votes") if stop else None
+            if row["source_at_stop_ml"]!=0. or row["source_remaining_ml"]!=0.:
+                extra.append("source_not_depleted_at_stop")
         if scene.get("bottle_size_autonomy"):
             recorded=read(folder/"metrics.json")["scene"]
             row["bottle_geometry"]=recorded["bottle_geometry"]
@@ -121,7 +131,7 @@ def main():
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
     parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1","bottle-autonomy",
-                                          "bottle-empty-autonomy","mixed-vessel-autonomy"),
+                                          "bottle-empty-autonomy","mixed-vessel-autonomy","tall-empty-r1"),
                         default="sized-autonomy")
     args=parser.parse_args()
     deadline_limit = 7200 if args.part == "development" else 14400
@@ -153,6 +163,9 @@ def run(args,original,gpu_query,before):
         assert dev["plan_sha256"]==sha(study/"plan.json") and dev["completed"]==len(plan["development"])
         required = "strict_pass" if plan.get("development_requires_strict_zero") else "within_particle_tolerance"
         assert all(r[required] for r in dev["cases"]), "Development verification failed"
+        if "development_empty_lag_limit_s" in plan:
+            assert all(0. <= r["empty_confirmation_lag_s"] <= plan["development_empty_lag_limit_s"]
+                       for r in dev["cases"]), "Tall-bottle latency verification failed"
     assert all(sha(native(p))==h for p,h in plan["checkpoints"].items())
     for old in OUTPUT.glob("*/*/*SA_A_*/parameters.json"):
         assert read(old)["name"] not in candidates,"Trial ID already used"
@@ -169,6 +182,11 @@ def run(args,original,gpu_query,before):
     for name,digest in plan.get("prerequisite_reports",{}).items():
         assert sha(native(name))==digest
         files[name]=digest
+    if "empty_confirmation_replay_sha256" in plan:
+        replay=study/"empty-replay.json"
+        digest=plan["empty_confirmation_replay_sha256"]
+        assert sha(replay)==digest
+        files[sandbox(replay)]=digest
     files.update({"/workspace/src/"+name:h for name,h in geometry["sources"].items()})
     for selection_name in ("followup-selection.json","component-selection.json"):
         for name,digest in read(ROOT/selection_name)["frozen_files"].items():
