@@ -262,3 +262,106 @@ python3 run_isolated_perception_job.py --helper preflight_tall_empty_r1.py --lab
 python3 run_tall_empty_r1.py --study tall-empty-r1 --part development --label tall-empty-verify-r1 --seconds 2600
 python3 run_tall_empty_r1.py --study tall-empty-r1 --part test --label tall-empty-test-r1 --seconds 9000
 ```
+
+## Mixed-layout localization and stop repairs
+
+The earlier six mixed trials supplied four development failures. A single
+bad cup frame had permanently rejected an otherwise consistent rim track.
+The new controller starts a fresh confirmation window after an initial
+failure, within the two-second localization deadline. Confirmation
+requires eight agreeing detections. The archived rim recovered at frame
+10 with 0.25 mm error, and the 40 synthetic erased-cup frames stayed
+unconfirmed.
+
+Six recorded tall-bottle necks supplied a bank of signed, clipped
+gradient templates. The locator starts with the original position
+estimate. The new bank corroborates bottle presence and supplies a neck
+position when the original score falls below its threshold. Across three
+archived episodes excluded from template fitting, including the failed
+grasp fixture, consensus error stayed below 0.17 mm. All 108 synthetic
+erased-bottle frames were below the new presence floor. Each live grasp
+still requires the established multiframe localization and hold checks.
+
+Bounded least squares fitted one 3.12-point RGB height correction from
+31 recorded frames for the 1.10×-height, 0.90×-diameter cup. It applies
+only during the coarse pour at 115° commanded tilt or higher and tapers
+to zero outside the midfill band. The controller uses the unadjusted
+estimate for braking and a 3.5-point RGB/color agreement gate. On the next 81
+frames from the same episode, the maximum RGB/color gap fell from 4.65
+to 1.53 points. The stop-time gap fell from 4.19 to 1.08 points.
+
+The short bottle's wrist score had voted empty with 48 particles still
+inside. It now uses the existing maximum-tilt drain confirmation with
+24 consecutive hold, visibility, low-flow and empty-evidence frames
+after reaching the cap. Runtime decisions use RGB and measured
+joints. Independent simulated fill, contact and particle inventory
+supply training labels and evaluation measurements.
+
+Copy `tall-empty-r1/src` into `layout-repair-r2/src` under
+`/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1`.
+Overlay the revised actor, vision, sized-perception and controller test
+sources there. Stage `prepare_layout_repair.py` and copy the standard
+preflight and runner under the helper names below. The fit reads the
+archived native HDF5 recordings and earlier sealed checkpoints from
+the same study. This first plan required all four development fixtures
+to pass strict scoring before it would admit the six fresh layouts.
+
+```sh
+python3 run_isolated_perception_job.py --helper prepare_layout_repair.py --label layout-r2-prepare-final --seconds 1200
+python3 run_isolated_perception_job.py --helper preflight_layout_repair_r2.py --label layout-r2-geometry --seconds 2200 -- --study layout-repair-r2
+python3 run_layout_repair_r2.py --study layout-repair-r2 --part development --label layout-repair-dev-r2 --seconds 6500
+python3 run_layout_repair_r2.py --study layout-repair-r2 --part test --label layout-repair-test-r2 --seconds 11500
+```
+
+The short, narrow development bottle emptied completely. Two final
+droplets crossed the far rim while the bottle was still tipping at
+about 127°, 2.8 seconds before the return. The next candidate sets the
+mouth back by 8 mm in the pour direction, with a smooth ramp from 123°
+to 126°. This applies only to that short, narrow bottle checkpoint.
+The runner requires the short-bottle verification to pass the original
+grasp, exact depletion, perception, and return checks. It admits up to
+five lost particles for this development gate, and reports strict
+zero-loss performance separately. The six reserved fixture IDs and
+positions carry forward.
+
+Copy `layout-repair-r2/src` to `layout-repair-r3/src` and overlay the
+final actor, motion, and controller test sources. Stage the final
+preflight and runner under the helper names below.
+
+```sh
+python3 run_isolated_perception_job.py --helper prepare_layout_tail.py --label layout-r3-prepare --seconds 600
+python3 run_isolated_perception_job.py --helper preflight_layout_repair_r3.py --label layout-r3-geometry --seconds 1800 -- --study layout-repair-r3
+python3 run_layout_repair_r3.py --study layout-repair-r3 --part development --label layout-repair-dev-r3 --seconds 2200
+python3 run_layout_repair_r3.py --study layout-repair-r3 --part test --label layout-repair-test-r3 --seconds 11500
+```
+
+The [first live development batch](../evidence/bottle-size-A/layout-r2-development-results.json)
+passed 3/4 under strict scoring and 4/4 within the five-particle
+tolerance. The [short-bottle verification](../evidence/bottle-size-A/layout-r3-development-results.json)
+then passed with zero measured spill and zero source particles at the
+stop and set-down. Seven final geometry screens and 50 focused CPU
+controller checks passed.
+
+All six [fresh autonomous trials](../evidence/bottle-size-A/layout-r3-test-results.json)
+passed strict scoring with zero measured loss. The tests used four
+bottle geometries, six cup sizes and six new placements in the same
+layout family. The cup positions spanned 23 mm in world X and 46 mm in
+world Y. Each test grasped on the first attempt and returned the
+bottle to the table. Near-full tests ended at 92.16–94.87% of rim
+height. Empty tests had zero source inventory at the stop and set-down.
+
+| Fresh fixture | Stop | Final rim height | Depletion to stop |
+|---|---|---:|---:|
+| 00, tall nominal-width bottle | Empty | 68.12% | 1.85 s |
+| 01, tall narrow bottle | Near full | 94.87% | |
+| 02, tall narrow bottle | Empty | 69.89% | 5.85 s |
+| 03, short nominal-width bottle | Near full | 94.05% | |
+| 04, short narrow bottle | Empty | 58.91% | 2.80 s |
+| 05, tall nominal-width bottle | Near full | 92.16% | |
+
+The tall, narrow-cup empty fixture had a calibrated stop-time
+RGB/color gap of 0.80 points. The raw gap on that frame was 3.92
+points. Fixture 05 used the neck fallback at localization. The
+[closure audit](../evidence/bottle-size-A/layout-r3-completion.json)
+verifies the native recordings, frozen sources and checkpoints, and
+the 4070-only container limits. The fresh batch took 93.6 minutes.

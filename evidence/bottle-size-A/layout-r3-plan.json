@@ -1,0 +1,1155 @@
+{
+  "parent_sha256": "17717db90c9921aebba4f4ac67aded15927e7f07805a9b90406703bbafcb4428",
+  "perception_selection_sha256": "2a862bd8eceb2153c55e58356cf93025247b83f54faebf278449ac424d73946e",
+  "perception_test_sha256": "286e94bab3cb8a4ad105e7be59faf0f8fbab2a65f2b588b2f30fd7c727b00572",
+  "controller_scope": "Verify the short bottle's final-drop alignment, then run the six reserved layouts",
+  "primary": "Verified grasp and correct near-full stop with zero measured particle loss",
+  "final_height_min": 0.9,
+  "maximum_sample_height": 0.98,
+  "provisional_particle_limit": 5,
+  "development_requires_strict_zero": false,
+  "settled_rgb_calibration": {
+    "receipt_sha256": "44c741c01dccc6241a7639f92b7f65efcb5df951c2697a97446dbdac58a24e02",
+    "cup_size": [
+      0.9,
+      1.0
+    ],
+    "agreement_limit": 0.035
+  },
+  "empty_confirmation_replay_sha256": "54758daa60dbc10ff98d1e2401a9544e1dbb32ae0e405507ff04a102af6eafc4",
+  "prerequisite_reports": {
+    "/workspace/learning/A-scale-dynamic-20261109-v1/bottle-empty-autonomy/development-results.json": "b8fd1af4340125d1cec20d8c61bf2f54335f84db5c6bd4d3b0c2d6062a4c07cd",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/mixed-vessel-autonomy/development-results.json": "a3f8acb3225dacd8c4bafd0a0b25a1a16afed4c74c0039e192bc77c0e7c3b0c2",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/bottle-autonomy/test-results.json": "31e5df0a0b4c5cbfe00ee1048d50176abed0f1074ab454faa2ad928b4e5929a2",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/bottle-autonomy/development-results.json": "4b6605166418a5edf828f2bca7471f16a57c7a4812d9744b28645efdf1d34f88",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/tall-empty-r1/test-results.json": "9847df6607b1b75d0f9b4392a0d84420fae7548997b828e64dc820bdc2079324",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/development-results.json": "a6761d425c8336a7952480e5a03454ed1dbc49fd68dac4df713d4e0c9f47c01e",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/plan.json": "32c28dce0680a44d3b2f567391a77d40d1081e02c3f62b50e3093ad87f61f574"
+  },
+  "layout_repair": true,
+  "development": [
+    {
+      "protocol": 18,
+      "spacing": 0.0018,
+      "viscosity": 0.0,
+      "cohesion": 0.01,
+      "surface_tension": 0.0,
+      "friction": 0.0,
+      "adhesion": 0.0,
+      "damping": 0.0,
+      "vorticity": 0.0,
+      "iterations": 32,
+      "neighbors": 96,
+      "dt": 0.0025,
+      "contact_ratio": 1.0,
+      "flow_ml_s": 25.0,
+      "height": 0.2,
+      "flow_seconds": 3.0,
+      "settle_seconds": 3.0,
+      "offset_x": 0.025,
+      "seed": 2611124104,
+      "surface_distance": 0.75,
+      "grid_spacing": 0.5,
+      "smoothing": 0.5,
+      "mesh_passes": 2,
+      "opacity": 1.0,
+      "roughness": 0.22,
+      "collide": true,
+      "wall_friction": 0.0,
+      "slosh_speed": 0.0,
+      "slosh_time": 3.5,
+      "name": "SA_A_layout_r3_development_04_empty",
+      "appearance": "default",
+      "bottle": true,
+      "initial_ml": 28.0,
+      "hinge": false,
+      "obstacles": false,
+      "max_seconds": 60.0,
+      "stop_teacher_version": 2,
+      "brim_nominal_ml": 88.08800000000002,
+      "target_fraction": 0.9,
+      "return_flow_seconds": 0.28,
+      "robot": true,
+      "record_cameras": true,
+      "control_period": 0.05,
+      "cup_initial_ml": 16.895304,
+      "cup_world": [
+        0.476,
+        -0.182,
+        1.04
+      ],
+      "source_xy": [
+        -0.108,
+        -0.008
+      ],
+      "expected_stop": "bottle_empty",
+      "gentle": true,
+      "mouth_z": 0.056,
+      "study_split": "development",
+      "image_encoding": "jpeg95",
+      "save_particle_trajectory": false,
+      "save_scene": false,
+      "policy_evaluation": true,
+      "expert_recovery": false,
+      "policy_family": "visual_guard_hierarchy",
+      "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r3/short-narrow.pt",
+      "grasp_deadline": 14.0,
+      "goal_definition": "surface_height_or_source_empty",
+      "isosurface_max_subgrids": 32768,
+      "isosurface_max_vertices": 524288,
+      "isosurface_max_triangles": 1048576,
+      "vessel_appearance": "A",
+      "layout_label": "Family 1",
+      "layout_index": 0,
+      "record_overview": false,
+      "candidate_index": 0,
+      "swapped": false,
+      "layout_family": 0,
+      "task_camera_focal_m": 0.03,
+      "approach_clearance_m": 0.07,
+      "pair_index": 0,
+      "record_cup_detail": true,
+      "parent_layout_family": "FN30_A_test_00",
+      "development_round": 1,
+      "cup_detail_resolution": 1024,
+      "cup_detail_focal_m": 0.03,
+      "record_surface_diagnostics": true,
+      "record_particle_diagnostics": true,
+      "trajectory_stride": 1,
+      "trajectory_start_s": 18.0,
+      "parent_fixture": "PV_A_development_r1_04",
+      "record_sleep_diagnostics": true,
+      "bottle_support_friction": {
+        "static": 0.4,
+        "dynamic": 0.3
+      },
+      "cup_height_scale": 1.0,
+      "cup_diameter_scale": 1.1,
+      "declared_cup_geometry": {
+        "bottom_z_m": 0.004,
+        "rim_z_m": 0.038,
+        "rim_radius_m": 0.026400000000000003,
+        "profile": [
+          [
+            0.004,
+            0.022000000000000002
+          ],
+          [
+            0.038,
+            0.026400000000000003
+          ]
+        ],
+        "capacity_geometric_ml": 61.70022840113419,
+        "legacy_brim_nominal_ml": 88.08800000000002,
+        "source": "declared_fixture_geometry_not_visual_estimation"
+      },
+      "calibration_particle_seed": "/workspace/learning/A-scale-20261109-v1/seeds/SC_A_jet_r2_03-settled.npz",
+      "calibration_particle_seed_sha256": "5c2af7db2408ad0617d814a5d4e46974147461cad610fa1cc583ce9b5326473b",
+      "calibration_initial_height": 0.26,
+      "size_autonomy_prefill": true,
+      "bottle_size_autonomy": true,
+      "bottle_height_scale": 0.925,
+      "bottle_diameter_scale": 0.95,
+      "declared_bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.07954107142857143,
+            0.02375
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 156.583332016131,
+        "volume_m3": 4.574732755002206e-05,
+        "mass_kg": 0.16231456799978544,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04565712122925255
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00024284858212267937,
+          0.00024284858212267937,
+          7.973372322706042e-05
+        ]
+      }
+    }
+  ],
+  "test": [
+    {
+      "protocol": 18,
+      "spacing": 0.0018,
+      "viscosity": 0.0,
+      "cohesion": 0.01,
+      "surface_tension": 0.0,
+      "friction": 0.0,
+      "adhesion": 0.0,
+      "damping": 0.0,
+      "vorticity": 0.0,
+      "iterations": 32,
+      "neighbors": 96,
+      "dt": 0.0025,
+      "contact_ratio": 1.0,
+      "flow_ml_s": 25.0,
+      "height": 0.2,
+      "flow_seconds": 3.0,
+      "settle_seconds": 3.0,
+      "offset_x": 0.025,
+      "seed": 2611123200,
+      "surface_distance": 0.75,
+      "grid_spacing": 0.5,
+      "smoothing": 0.5,
+      "mesh_passes": 2,
+      "opacity": 1.0,
+      "roughness": 0.22,
+      "collide": true,
+      "wall_friction": 0.0,
+      "slosh_speed": 0.0,
+      "slosh_time": 3.5,
+      "name": "SA_A_layout_r2_test_00_empty",
+      "appearance": "default",
+      "bottle": true,
+      "initial_ml": 28.0,
+      "hinge": false,
+      "obstacles": false,
+      "max_seconds": 60.0,
+      "stop_teacher_version": 2,
+      "brim_nominal_ml": 65.52,
+      "target_fraction": 0.9,
+      "return_flow_seconds": 0.28,
+      "robot": true,
+      "record_cameras": true,
+      "control_period": 0.05,
+      "cup_initial_ml": 11.594016,
+      "cup_world": [
+        0.483,
+        -0.15,
+        1.04
+      ],
+      "source_xy": [
+        -0.118,
+        -0.008
+      ],
+      "expected_stop": "bottle_empty",
+      "gentle": true,
+      "mouth_z": 0.054,
+      "study_split": "test",
+      "image_encoding": "jpeg95",
+      "save_particle_trajectory": false,
+      "save_scene": false,
+      "policy_evaluation": true,
+      "expert_recovery": false,
+      "policy_family": "visual_guard_hierarchy",
+      "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-00.pt",
+      "grasp_deadline": 14.0,
+      "goal_definition": "surface_height_or_source_empty",
+      "isosurface_max_subgrids": 32768,
+      "isosurface_max_vertices": 524288,
+      "isosurface_max_triangles": 1048576,
+      "vessel_appearance": "A",
+      "layout_label": "Family 1",
+      "layout_index": 0,
+      "record_overview": false,
+      "candidate_index": 0,
+      "swapped": false,
+      "layout_family": 0,
+      "task_camera_focal_m": 0.03,
+      "approach_clearance_m": 0.07,
+      "pair_index": 0,
+      "record_cup_detail": true,
+      "parent_layout_family": "FN30_A_test_00",
+      "development_round": 1,
+      "cup_detail_resolution": 1024,
+      "cup_detail_focal_m": 0.03,
+      "record_surface_diagnostics": true,
+      "record_particle_diagnostics": true,
+      "trajectory_stride": 1,
+      "trajectory_start_s": 18.0,
+      "parent_fixture": "PV_A_development_r1_04",
+      "record_sleep_diagnostics": true,
+      "bottle_support_friction": {
+        "static": 0.4,
+        "dynamic": 0.3
+      },
+      "cup_height_scale": 0.9,
+      "cup_diameter_scale": 1.0,
+      "declared_cup_geometry": {
+        "bottom_z_m": 0.004,
+        "rim_z_m": 0.034600000000000006,
+        "rim_radius_m": 0.024,
+        "profile": [
+          [
+            0.004,
+            0.02
+          ],
+          [
+            0.034600000000000006,
+            0.024
+          ]
+        ],
+        "capacity_geometric_ml": 45.892731868612195,
+        "legacy_brim_nominal_ml": 65.52,
+        "source": "declared_fixture_geometry_not_visual_estimation"
+      },
+      "calibration_particle_seed": "/workspace/learning/A-scale-20261109-v1/seeds/SC_A_jet_r2_00-settled.npz",
+      "calibration_particle_seed_sha256": "ed4da484bbe5b34531c8630713c1721df6759e0f09db0953eb46a6b074f1f91e",
+      "calibration_initial_height": 0.26,
+      "size_autonomy_prefill": true,
+      "bottle_size_autonomy": true,
+      "bottle_height_scale": 1.075,
+      "bottle_diameter_scale": 1.0,
+      "declared_bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.08445892857142857,
+            0.025
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 190.85940598255002,
+        "volume_m3": 5.327637052203442e-05,
+        "mass_kg": 0.18902811440569825,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052079918149506146
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00036052029053487797,
+          0.00036052029053487797,
+          0.00010011463708220823
+        ]
+      }
+    },
+    {
+      "protocol": 18,
+      "spacing": 0.0018,
+      "viscosity": 0.0,
+      "cohesion": 0.01,
+      "surface_tension": 0.0,
+      "friction": 0.0,
+      "adhesion": 0.0,
+      "damping": 0.0,
+      "vorticity": 0.0,
+      "iterations": 32,
+      "neighbors": 96,
+      "dt": 0.0025,
+      "contact_ratio": 1.0,
+      "flow_ml_s": 25.0,
+      "height": 0.2,
+      "flow_seconds": 3.0,
+      "settle_seconds": 3.0,
+      "offset_x": 0.025,
+      "seed": 2611123201,
+      "surface_distance": 0.75,
+      "grid_spacing": 0.5,
+      "smoothing": 0.5,
+      "mesh_passes": 2,
+      "opacity": 1.0,
+      "roughness": 0.22,
+      "collide": true,
+      "wall_friction": 0.0,
+      "slosh_speed": 0.0,
+      "slosh_time": 3.5,
+      "name": "SA_A_layout_r2_test_01_full",
+      "appearance": "default",
+      "bottle": true,
+      "initial_ml": 80.0,
+      "hinge": false,
+      "obstacles": false,
+      "max_seconds": 60.0,
+      "stop_teacher_version": 2,
+      "brim_nominal_ml": 58.96800000000001,
+      "target_fraction": 0.9,
+      "return_flow_seconds": 0.28,
+      "robot": true,
+      "record_cameras": true,
+      "control_period": 0.05,
+      "cup_initial_ml": 26.646407999999997,
+      "cup_world": [
+        0.499,
+        -0.19,
+        1.04
+      ],
+      "source_xy": [
+        -0.107,
+        0.003
+      ],
+      "expected_stop": "cup_near_full",
+      "gentle": true,
+      "mouth_z": 0.054,
+      "study_split": "test",
+      "image_encoding": "jpeg95",
+      "save_particle_trajectory": false,
+      "save_scene": false,
+      "policy_evaluation": true,
+      "expert_recovery": false,
+      "policy_family": "visual_guard_hierarchy",
+      "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-01.pt",
+      "grasp_deadline": 14.0,
+      "goal_definition": "surface_height_or_source_empty",
+      "isosurface_max_subgrids": 32768,
+      "isosurface_max_vertices": 524288,
+      "isosurface_max_triangles": 1048576,
+      "vessel_appearance": "A",
+      "layout_label": "Family 1",
+      "layout_index": 0,
+      "record_overview": false,
+      "candidate_index": 0,
+      "swapped": false,
+      "layout_family": 0,
+      "task_camera_focal_m": 0.03,
+      "approach_clearance_m": 0.07,
+      "pair_index": 0,
+      "record_cup_detail": true,
+      "parent_layout_family": "FN30_A_test_00",
+      "development_round": 1,
+      "cup_detail_resolution": 1024,
+      "cup_detail_focal_m": 0.03,
+      "record_surface_diagnostics": true,
+      "record_particle_diagnostics": true,
+      "trajectory_stride": 1,
+      "trajectory_start_s": 18.0,
+      "parent_fixture": "PV_A_development_r1_04",
+      "record_sleep_diagnostics": true,
+      "bottle_support_friction": {
+        "static": 0.4,
+        "dynamic": 0.3
+      },
+      "cup_height_scale": 1.0,
+      "cup_diameter_scale": 0.9,
+      "declared_cup_geometry": {
+        "bottom_z_m": 0.004,
+        "rim_z_m": 0.038,
+        "rim_radius_m": 0.0216,
+        "profile": [
+          [
+            0.004,
+            0.018000000000000002
+          ],
+          [
+            0.038,
+            0.0216
+          ]
+        ],
+        "capacity_geometric_ml": 41.30345868175098,
+        "legacy_brim_nominal_ml": 58.96800000000001,
+        "source": "declared_fixture_geometry_not_visual_estimation"
+      },
+      "calibration_particle_seed": "/workspace/learning/A-scale-20261109-v1/seeds/SC_A_jet_r2_02-settled.npz",
+      "calibration_particle_seed_sha256": "fc17930e44a514d52dcf1f1553bf6905a8a6fb4e7a7853d40712ffc7fa2f502c",
+      "calibration_initial_height": 0.55,
+      "size_autonomy_prefill": true,
+      "bottle_size_autonomy": true,
+      "bottle_height_scale": 1.075,
+      "bottle_diameter_scale": 0.95,
+      "declared_bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.08445892857142857,
+            0.02375
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 173.58059658346102,
+        "volume_m3": 5.0678132940859206e-05,
+        "mass_kg": 0.17980939425011924,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052922813597575426
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00034124187850504073,
+          0.00034124187850504073,
+          8.654807638570074e-05
+        ]
+      }
+    },
+    {
+      "protocol": 18,
+      "spacing": 0.0018,
+      "viscosity": 0.0,
+      "cohesion": 0.01,
+      "surface_tension": 0.0,
+      "friction": 0.0,
+      "adhesion": 0.0,
+      "damping": 0.0,
+      "vorticity": 0.0,
+      "iterations": 32,
+      "neighbors": 96,
+      "dt": 0.0025,
+      "contact_ratio": 1.0,
+      "flow_ml_s": 25.0,
+      "height": 0.2,
+      "flow_seconds": 3.0,
+      "settle_seconds": 3.0,
+      "offset_x": 0.025,
+      "seed": 2611123202,
+      "surface_distance": 0.75,
+      "grid_spacing": 0.5,
+      "smoothing": 0.5,
+      "mesh_passes": 2,
+      "opacity": 1.0,
+      "roughness": 0.22,
+      "collide": true,
+      "wall_friction": 0.0,
+      "slosh_speed": 0.0,
+      "slosh_time": 3.5,
+      "name": "SA_A_layout_r2_test_02_empty",
+      "appearance": "default",
+      "bottle": true,
+      "initial_ml": 28.0,
+      "hinge": false,
+      "obstacles": false,
+      "max_seconds": 60.0,
+      "stop_teacher_version": 2,
+      "brim_nominal_ml": 64.8648,
+      "target_fraction": 0.9,
+      "return_flow_seconds": 0.28,
+      "robot": true,
+      "record_cameras": true,
+      "control_period": 0.05,
+      "cup_initial_ml": 12.276359999999999,
+      "cup_world": [
+        0.488,
+        -0.184,
+        1.04
+      ],
+      "source_xy": [
+        -0.117,
+        0.007
+      ],
+      "expected_stop": "bottle_empty",
+      "gentle": true,
+      "mouth_z": 0.061000000000000006,
+      "study_split": "test",
+      "image_encoding": "jpeg95",
+      "save_particle_trajectory": false,
+      "save_scene": false,
+      "policy_evaluation": true,
+      "expert_recovery": false,
+      "policy_family": "visual_guard_hierarchy",
+      "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-02.pt",
+      "grasp_deadline": 14.0,
+      "goal_definition": "surface_height_or_source_empty",
+      "isosurface_max_subgrids": 32768,
+      "isosurface_max_vertices": 524288,
+      "isosurface_max_triangles": 1048576,
+      "vessel_appearance": "A",
+      "layout_label": "Family 1",
+      "layout_index": 0,
+      "record_overview": false,
+      "candidate_index": 0,
+      "swapped": false,
+      "layout_family": 0,
+      "task_camera_focal_m": 0.03,
+      "approach_clearance_m": 0.07,
+      "pair_index": 0,
+      "record_cup_detail": true,
+      "parent_layout_family": "FN30_A_test_00",
+      "development_round": 1,
+      "cup_detail_resolution": 1024,
+      "cup_detail_focal_m": 0.03,
+      "record_surface_diagnostics": true,
+      "record_particle_diagnostics": true,
+      "trajectory_stride": 1,
+      "trajectory_start_s": 18.0,
+      "parent_fixture": "PV_A_development_r1_04",
+      "record_sleep_diagnostics": true,
+      "bottle_support_friction": {
+        "static": 0.4,
+        "dynamic": 0.3
+      },
+      "cup_height_scale": 1.1,
+      "cup_diameter_scale": 0.9,
+      "declared_cup_geometry": {
+        "bottom_z_m": 0.004,
+        "rim_z_m": 0.041400000000000006,
+        "rim_radius_m": 0.0216,
+        "profile": [
+          [
+            0.004,
+            0.018000000000000002
+          ],
+          [
+            0.041400000000000006,
+            0.0216
+          ]
+        ],
+        "capacity_geometric_ml": 45.43380454992607,
+        "legacy_brim_nominal_ml": 64.8648,
+        "source": "declared_fixture_geometry_not_visual_estimation"
+      },
+      "calibration_particle_seed": "/workspace/learning/A-scale-20261109-v1/seeds/SC_A_jet_r2_04-settled.npz",
+      "calibration_particle_seed_sha256": "5069ec31b708a22cad0ca2c92ae3b6163dfdd244aa5c8875b376947eb5a73559",
+      "calibration_initial_height": 0.26,
+      "size_autonomy_prefill": true,
+      "bottle_size_autonomy": true,
+      "bottle_height_scale": 1.075,
+      "bottle_diameter_scale": 0.95,
+      "declared_bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.08445892857142857,
+            0.02375
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 173.58059658346102,
+        "volume_m3": 5.0678132940859206e-05,
+        "mass_kg": 0.17980939425011924,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052922813597575426
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00034124187850504073,
+          0.00034124187850504073,
+          8.654807638570074e-05
+        ]
+      }
+    },
+    {
+      "protocol": 18,
+      "spacing": 0.0018,
+      "viscosity": 0.0,
+      "cohesion": 0.01,
+      "surface_tension": 0.0,
+      "friction": 0.0,
+      "adhesion": 0.0,
+      "damping": 0.0,
+      "vorticity": 0.0,
+      "iterations": 32,
+      "neighbors": 96,
+      "dt": 0.0025,
+      "contact_ratio": 1.0,
+      "flow_ml_s": 25.0,
+      "height": 0.2,
+      "flow_seconds": 3.0,
+      "settle_seconds": 3.0,
+      "offset_x": 0.025,
+      "seed": 2611123203,
+      "surface_distance": 0.75,
+      "grid_spacing": 0.5,
+      "smoothing": 0.5,
+      "mesh_passes": 2,
+      "opacity": 1.0,
+      "roughness": 0.22,
+      "collide": true,
+      "wall_friction": 0.0,
+      "slosh_speed": 0.0,
+      "slosh_time": 3.5,
+      "name": "SA_A_layout_r2_test_03_full",
+      "appearance": "default",
+      "bottle": true,
+      "initial_ml": 80.0,
+      "hinge": false,
+      "obstacles": false,
+      "max_seconds": 60.0,
+      "stop_teacher_version": 2,
+      "brim_nominal_ml": 96.89680000000001,
+      "target_fraction": 0.9,
+      "return_flow_seconds": 0.28,
+      "robot": true,
+      "record_cameras": true,
+      "control_period": 0.05,
+      "cup_initial_ml": 44.393184,
+      "cup_world": [
+        0.502,
+        -0.163,
+        1.04
+      ],
+      "source_xy": [
+        -0.123,
+        -0.011
+      ],
+      "expected_stop": "cup_near_full",
+      "gentle": true,
+      "mouth_z": 0.063,
+      "study_split": "test",
+      "image_encoding": "jpeg95",
+      "save_particle_trajectory": false,
+      "save_scene": false,
+      "policy_evaluation": true,
+      "expert_recovery": false,
+      "policy_family": "visual_guard_hierarchy",
+      "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-03.pt",
+      "grasp_deadline": 14.0,
+      "goal_definition": "surface_height_or_source_empty",
+      "isosurface_max_subgrids": 32768,
+      "isosurface_max_vertices": 524288,
+      "isosurface_max_triangles": 1048576,
+      "vessel_appearance": "A",
+      "layout_label": "Family 1",
+      "layout_index": 0,
+      "record_overview": false,
+      "candidate_index": 0,
+      "swapped": false,
+      "layout_family": 0,
+      "task_camera_focal_m": 0.03,
+      "approach_clearance_m": 0.07,
+      "pair_index": 0,
+      "record_cup_detail": true,
+      "parent_layout_family": "FN30_A_test_00",
+      "development_round": 1,
+      "cup_detail_resolution": 1024,
+      "cup_detail_focal_m": 0.03,
+      "record_surface_diagnostics": true,
+      "record_particle_diagnostics": true,
+      "trajectory_stride": 1,
+      "trajectory_start_s": 18.0,
+      "parent_fixture": "PV_A_development_r1_04",
+      "record_sleep_diagnostics": true,
+      "bottle_support_friction": {
+        "static": 0.4,
+        "dynamic": 0.3
+      },
+      "cup_height_scale": 1.1,
+      "cup_diameter_scale": 1.1,
+      "declared_cup_geometry": {
+        "bottom_z_m": 0.004,
+        "rim_z_m": 0.041400000000000006,
+        "rim_radius_m": 0.026400000000000003,
+        "profile": [
+          [
+            0.004,
+            0.022000000000000002
+          ],
+          [
+            0.041400000000000006,
+            0.026400000000000003
+          ]
+        ],
+        "capacity_geometric_ml": 67.8702512412476,
+        "legacy_brim_nominal_ml": 96.89680000000001,
+        "source": "declared_fixture_geometry_not_visual_estimation"
+      },
+      "calibration_particle_seed": "/workspace/learning/A-scale-20261109-v1/seeds/SC_A_jet_r1_02-settled.npz",
+      "calibration_particle_seed_sha256": "95b8b01e51ae84eda8c8e1c2b450eab02084e7d942157a649028e2ec9378f70b",
+      "calibration_initial_height": 0.55,
+      "size_autonomy_prefill": true,
+      "bottle_size_autonomy": true,
+      "bottle_height_scale": 0.925,
+      "bottle_diameter_scale": 1.0,
+      "declared_bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.07954107142857143,
+            0.025
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 172.398311358384,
+        "volume_m3": 4.818733739375607e-05,
+        "mass_kg": 0.17097188559430185,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.044950793132329386
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138597258596,
+          0.0002584138597258596,
+          9.237205145147004e-05
+        ]
+      }
+    },
+    {
+      "protocol": 18,
+      "spacing": 0.0018,
+      "viscosity": 0.0,
+      "cohesion": 0.01,
+      "surface_tension": 0.0,
+      "friction": 0.0,
+      "adhesion": 0.0,
+      "damping": 0.0,
+      "vorticity": 0.0,
+      "iterations": 32,
+      "neighbors": 96,
+      "dt": 0.0025,
+      "contact_ratio": 1.0,
+      "flow_ml_s": 25.0,
+      "height": 0.2,
+      "flow_seconds": 3.0,
+      "settle_seconds": 3.0,
+      "offset_x": 0.025,
+      "seed": 2611123204,
+      "surface_distance": 0.75,
+      "grid_spacing": 0.5,
+      "smoothing": 0.5,
+      "mesh_passes": 2,
+      "opacity": 1.0,
+      "roughness": 0.22,
+      "collide": true,
+      "wall_friction": 0.0,
+      "slosh_speed": 0.0,
+      "slosh_time": 3.5,
+      "name": "SA_A_layout_r2_test_04_empty",
+      "appearance": "default",
+      "bottle": true,
+      "initial_ml": 28.0,
+      "hinge": false,
+      "obstacles": false,
+      "max_seconds": 60.0,
+      "stop_teacher_version": 2,
+      "brim_nominal_ml": 88.08800000000002,
+      "target_fraction": 0.9,
+      "return_flow_seconds": 0.28,
+      "robot": true,
+      "record_cameras": true,
+      "control_period": 0.05,
+      "cup_initial_ml": 16.895304,
+      "cup_world": [
+        0.479,
+        -0.18,
+        1.04
+      ],
+      "source_xy": [
+        -0.11,
+        -0.005
+      ],
+      "expected_stop": "bottle_empty",
+      "gentle": true,
+      "mouth_z": 0.056,
+      "study_split": "test",
+      "image_encoding": "jpeg95",
+      "save_particle_trajectory": false,
+      "save_scene": false,
+      "policy_evaluation": true,
+      "expert_recovery": false,
+      "policy_family": "visual_guard_hierarchy",
+      "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r3/short-narrow.pt",
+      "grasp_deadline": 14.0,
+      "goal_definition": "surface_height_or_source_empty",
+      "isosurface_max_subgrids": 32768,
+      "isosurface_max_vertices": 524288,
+      "isosurface_max_triangles": 1048576,
+      "vessel_appearance": "A",
+      "layout_label": "Family 1",
+      "layout_index": 0,
+      "record_overview": false,
+      "candidate_index": 0,
+      "swapped": false,
+      "layout_family": 0,
+      "task_camera_focal_m": 0.03,
+      "approach_clearance_m": 0.07,
+      "pair_index": 0,
+      "record_cup_detail": true,
+      "parent_layout_family": "FN30_A_test_00",
+      "development_round": 1,
+      "cup_detail_resolution": 1024,
+      "cup_detail_focal_m": 0.03,
+      "record_surface_diagnostics": true,
+      "record_particle_diagnostics": true,
+      "trajectory_stride": 1,
+      "trajectory_start_s": 18.0,
+      "parent_fixture": "PV_A_development_r1_04",
+      "record_sleep_diagnostics": true,
+      "bottle_support_friction": {
+        "static": 0.4,
+        "dynamic": 0.3
+      },
+      "cup_height_scale": 1.0,
+      "cup_diameter_scale": 1.1,
+      "declared_cup_geometry": {
+        "bottom_z_m": 0.004,
+        "rim_z_m": 0.038,
+        "rim_radius_m": 0.026400000000000003,
+        "profile": [
+          [
+            0.004,
+            0.022000000000000002
+          ],
+          [
+            0.038,
+            0.026400000000000003
+          ]
+        ],
+        "capacity_geometric_ml": 61.70022840113419,
+        "legacy_brim_nominal_ml": 88.08800000000002,
+        "source": "declared_fixture_geometry_not_visual_estimation"
+      },
+      "calibration_particle_seed": "/workspace/learning/A-scale-20261109-v1/seeds/SC_A_jet_r2_03-settled.npz",
+      "calibration_particle_seed_sha256": "5c2af7db2408ad0617d814a5d4e46974147461cad610fa1cc583ce9b5326473b",
+      "calibration_initial_height": 0.26,
+      "size_autonomy_prefill": true,
+      "bottle_size_autonomy": true,
+      "bottle_height_scale": 0.925,
+      "bottle_diameter_scale": 0.95,
+      "declared_bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.07954107142857143,
+            0.02375
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 156.583332016131,
+        "volume_m3": 4.574732755002206e-05,
+        "mass_kg": 0.16231456799978544,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04565712122925255
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00024284858212267937,
+          0.00024284858212267937,
+          7.973372322706042e-05
+        ]
+      }
+    },
+    {
+      "protocol": 18,
+      "spacing": 0.0018,
+      "viscosity": 0.0,
+      "cohesion": 0.01,
+      "surface_tension": 0.0,
+      "friction": 0.0,
+      "adhesion": 0.0,
+      "damping": 0.0,
+      "vorticity": 0.0,
+      "iterations": 32,
+      "neighbors": 96,
+      "dt": 0.0025,
+      "contact_ratio": 1.0,
+      "flow_ml_s": 25.0,
+      "height": 0.2,
+      "flow_seconds": 3.0,
+      "settle_seconds": 3.0,
+      "offset_x": 0.025,
+      "seed": 2611123205,
+      "surface_distance": 0.75,
+      "grid_spacing": 0.5,
+      "smoothing": 0.5,
+      "mesh_passes": 2,
+      "opacity": 1.0,
+      "roughness": 0.22,
+      "collide": true,
+      "wall_friction": 0.0,
+      "slosh_speed": 0.0,
+      "slosh_time": 3.5,
+      "name": "SA_A_layout_r2_test_05_full",
+      "appearance": "default",
+      "bottle": true,
+      "initial_ml": 80.0,
+      "hinge": false,
+      "obstacles": false,
+      "max_seconds": 60.0,
+      "stop_teacher_version": 2,
+      "brim_nominal_ml": 79.27920000000002,
+      "target_fraction": 0.9,
+      "return_flow_seconds": 0.28,
+      "robot": true,
+      "record_cameras": true,
+      "control_period": 0.05,
+      "cup_initial_ml": 35.989272,
+      "cup_world": [
+        0.495,
+        -0.144,
+        1.04
+      ],
+      "source_xy": [
+        -0.118,
+        0.004
+      ],
+      "expected_stop": "cup_near_full",
+      "gentle": true,
+      "mouth_z": 0.056,
+      "study_split": "test",
+      "image_encoding": "jpeg95",
+      "save_particle_trajectory": false,
+      "save_scene": false,
+      "policy_evaluation": true,
+      "expert_recovery": false,
+      "policy_family": "visual_guard_hierarchy",
+      "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-05.pt",
+      "grasp_deadline": 14.0,
+      "goal_definition": "surface_height_or_source_empty",
+      "isosurface_max_subgrids": 32768,
+      "isosurface_max_vertices": 524288,
+      "isosurface_max_triangles": 1048576,
+      "vessel_appearance": "A",
+      "layout_label": "Family 1",
+      "layout_index": 0,
+      "record_overview": false,
+      "candidate_index": 0,
+      "swapped": false,
+      "layout_family": 0,
+      "task_camera_focal_m": 0.03,
+      "approach_clearance_m": 0.07,
+      "pair_index": 0,
+      "record_cup_detail": true,
+      "parent_layout_family": "FN30_A_test_00",
+      "development_round": 1,
+      "cup_detail_resolution": 1024,
+      "cup_detail_focal_m": 0.03,
+      "record_surface_diagnostics": true,
+      "record_particle_diagnostics": true,
+      "trajectory_stride": 1,
+      "trajectory_start_s": 18.0,
+      "parent_fixture": "PV_A_development_r1_04",
+      "record_sleep_diagnostics": true,
+      "bottle_support_friction": {
+        "static": 0.4,
+        "dynamic": 0.3
+      },
+      "cup_height_scale": 0.9,
+      "cup_diameter_scale": 1.1,
+      "declared_cup_geometry": {
+        "bottom_z_m": 0.004,
+        "rim_z_m": 0.034600000000000006,
+        "rim_radius_m": 0.026400000000000003,
+        "profile": [
+          [
+            0.004,
+            0.022000000000000002
+          ],
+          [
+            0.034600000000000006,
+            0.026400000000000003
+          ]
+        ],
+        "capacity_geometric_ml": 55.53020556102077,
+        "legacy_brim_nominal_ml": 79.27920000000002,
+        "source": "declared_fixture_geometry_not_visual_estimation"
+      },
+      "calibration_particle_seed": "/workspace/learning/A-scale-20261109-v1/seeds/SC_A_jet_r2_01-settled.npz",
+      "calibration_particle_seed_sha256": "b5ab1218d6ac9d885ab8c47857e5bb04f81ea04cb8708491e9d0e5fd5b5c061d",
+      "calibration_initial_height": 0.55,
+      "size_autonomy_prefill": true,
+      "bottle_size_autonomy": true,
+      "bottle_height_scale": 1.075,
+      "bottle_diameter_scale": 1.0,
+      "declared_bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.08445892857142857,
+            0.025
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 190.85940598255002,
+        "volume_m3": 5.327637052203442e-05,
+        "mass_kg": 0.18902811440569825,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052079918149506146
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00036052029053487797,
+          0.00036052029053487797,
+          0.00010011463708220823
+        ]
+      }
+    }
+  ],
+  "checkpoints": {
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-00.pt": "419856e7aad967e217cecf7459119f939e8e5860788e7963dacd96787ce5af61",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-01.pt": "edb81767ae4f17446210d15fede00ecb3af24bf12127f41f68bfe65a1235044c",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-02.pt": "48bc4b443697a380520c1197b1526c76ecd53cd4d91cf85d5f9f69c326459ee4",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-03.pt": "7e92081504cd9f6224d6e79e3fa9c8f942e1204b12b566f383839e4d43f9c800",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r2/mixed-05.pt": "4cfa3ad020cd7af9a7f7ae5476913ad9ef03232270205a00e518415b698843b4",
+    "/workspace/learning/A-scale-dynamic-20261109-v1/layout-repair-r3/short-narrow.pt": "c2921211e6d35034c3d571970cc28ca9014db9c368480edb46faeb4fb777d100"
+  }
+}

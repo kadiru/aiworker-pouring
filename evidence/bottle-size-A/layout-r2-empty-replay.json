@@ -1,0 +1,164 @@
+{
+  "source_localization": {
+    "method": "Signed clipped RGB-gradient correlation against labeled neck templates",
+    "fallback_threshold": 0.5,
+    "presence_floor": 0.33,
+    "bounds": [
+      97,
+      126,
+      167,
+      165
+    ],
+    "source_mask_box": [
+      10,
+      7,
+      38,
+      39
+    ],
+    "gradient_clip": 0.04,
+    "fit_episodes": 6,
+    "replay_episodes": 3,
+    "cases": [
+      {
+        "name": "SA_A_tall_empty_test_r1_00_empty",
+        "split": "template_fit",
+        "recording_sha256": "24b7706ebe154c24932e8de3ce05db39a5e579427bc29d96a23057d902a6756a",
+        "frames": 12,
+        "consensus_error_mm": 0.40679785866891244,
+        "fallback_frames": 2,
+        "max_erased_neck_score": 0.26687490940093994,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_tall_empty_test_r1_01_full",
+        "split": "template_fit",
+        "recording_sha256": "7f305912d8ace8ff43db9207f6a9646be5e95d78d8f131285222bd734dc2bdec",
+        "frames": 12,
+        "consensus_error_mm": 0.20488433371539858,
+        "fallback_frames": 0,
+        "max_erased_neck_score": 0.2931849956512451,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_tall_empty_test_r1_02_empty",
+        "split": "template_fit",
+        "recording_sha256": "4411dca7726d12fd525a7445eb1b0fa64e12fcf921de29a03e8b190035e7965d",
+        "frames": 12,
+        "consensus_error_mm": 0.7223243192238472,
+        "fallback_frames": 0,
+        "max_erased_neck_score": 0.31001317501068115,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_tall_empty_test_r1_05_full",
+        "split": "archive_replay",
+        "recording_sha256": "61d5ea2fffd48eb7a6470b4d001091f06191e14c7318ff7cd22c3364f46c537d",
+        "frames": 12,
+        "consensus_error_mm": 0.11891204780523854,
+        "fallback_frames": 12,
+        "max_erased_neck_score": 0.3241049349308014,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_mixed_development_r0_empty",
+        "split": "template_fit",
+        "recording_sha256": "53649f259e5f620e5780510cc1bcfec38f2f27be35e158e6c795691d3601e2e4",
+        "frames": 12,
+        "consensus_error_mm": 0.18209587885907427,
+        "fallback_frames": 0,
+        "max_erased_neck_score": 0.24419410526752472,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_bottle_test_r0_tall_nominal",
+        "split": "archive_replay",
+        "recording_sha256": "4a17f1f0f85c713e5694f2af52941e2ebf809b28d2352bbbf2294e7492e7c08d",
+        "frames": 12,
+        "consensus_error_mm": 0.15948724558397187,
+        "fallback_frames": 0,
+        "max_erased_neck_score": 0.2870723307132721,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_bottle_test_r0_tall_narrow",
+        "split": "template_fit",
+        "recording_sha256": "ca5957116318b04d4d1a5f9465c40efcfdd934780d18610429e996d5910ba5e9",
+        "frames": 12,
+        "consensus_error_mm": 0.04585328023607526,
+        "fallback_frames": 0,
+        "max_erased_neck_score": 0.28261032700538635,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_bottle_empty_r0_tall_nominal",
+        "split": "template_fit",
+        "recording_sha256": "6db077f8bd4d939eb1122d5f07d670866505bd121ba8b35dd8c5b5d95b871743",
+        "frames": 12,
+        "consensus_error_mm": 0.25072285121403237,
+        "fallback_frames": 0,
+        "max_erased_neck_score": 0.28387147188186646,
+        "erased_confirmed": false
+      },
+      {
+        "name": "SA_A_bottle_empty_r0_tall_narrow",
+        "split": "archive_replay",
+        "recording_sha256": "6e8ccf0301454ab78961d79f60419ea75799ce1df5eb982ad2c94a9140511b5c",
+        "frames": 12,
+        "consensus_error_mm": 0.1673758262914139,
+        "fallback_frames": 0,
+        "max_erased_neck_score": 0.2741405963897705,
+        "erased_confirmed": false
+      }
+    ]
+  },
+  "cup_localization": {
+    "name": "SA_A_tall_empty_test_r1_01_full",
+    "recording_sha256": "7f305912d8ace8ff43db9207f6a9646be5e95d78d8f131285222bd734dc2bdec",
+    "frames": 40,
+    "first_recovered_frame": 10,
+    "consensus_error_mm": 0.24932858833295846,
+    "initial_failure_frame": 2,
+    "valid_frames_after_recovery": 30,
+    "accepted_erased_frames": 0,
+    "erased_challenge": "Synthetic cup-area mask"
+  },
+  "midfill_level": {
+    "name": "SA_A_tall_empty_test_r1_02_empty",
+    "bias": 0.031152930080608595,
+    "knots": [
+      0.65,
+      0.7,
+      0.75,
+      0.82
+    ],
+    "method": "Bounded least squares against measured rim-height fraction",
+    "recording_sha256": "4411dca7726d12fd525a7445eb1b0fa64e12fcf921de29a03e8b190035e7965d",
+    "decisions_sha256": "dd6085324654819b41dad07e63c9ede65584a48971ac0f97dd7d3e65a3f49127",
+    "samples_sha256": "4df1bb78e5726928e748f4ab686638b86d75fb9183704640007bd503de403a80",
+    "fit": {
+      "frames": 31,
+      "mae_before": 0.031152930080608595,
+      "mae_after": 0.0005119858196238004,
+      "max_gap_before": 0.04776969468178005,
+      "max_gap_after": 0.016616764601171452,
+      "last_gap_before": 0.04661844522453518,
+      "last_gap_after": 0.015465515143926578
+    },
+    "later_same_episode_replay": {
+      "frames": 81,
+      "mae_before": 0.02953901216141722,
+      "mae_after": 0.002060165832680297,
+      "max_gap_before": 0.04645550456702063,
+      "max_gap_after": 0.015302574486412035,
+      "last_gap_before": 0.041946526144385765,
+      "last_gap_after": 0.010793596063777167
+    }
+  },
+  "short_empty": {
+    "name": "SA_A_tall_empty_test_r1_04_empty",
+    "remaining_at_stop_ml": 0.27993599999999996,
+    "remaining_after_return_ml": 0.14579999999999999,
+    "verification": "Wet development uses the existing cap and flow dwell",
+    "recording_sha256": "13ce20321d15eb6348464898f5a89c88811fba2d55540ffedb3dcf7edaf3e166"
+  }
+}

@@ -17,20 +17,23 @@ LATE_SHIFT_START_DEG=116.
 LATE_SHIFT_END_DEG=122.
 
 
-def late_mouth_offset(phase, amount):
-    """Opt-in smooth lip shift toward cup center for the last emptying drops."""
+def late_mouth_offset(phase, amount, *, tail_setback_m=0.):
+    """Advance the mouth into the cup, then set it back for the final drops."""
     if not np.isfinite(amount) or not 0. <= amount <= .010:
         raise ValueError('Late mouth shift must be finite and between 0 and 10 mm')
-    return amount*ease((phase-LATE_SHIFT_START_DEG)/(LATE_SHIFT_END_DEG-LATE_SHIFT_START_DEG))
+    if not np.isfinite(tail_setback_m) or not 0. <= tail_setback_m <= .010:
+        raise ValueError('Tail setback must be finite and between 0 and 10 mm')
+    advance = amount*ease((phase-LATE_SHIFT_START_DEG)/(LATE_SHIFT_END_DEG-LATE_SHIFT_START_DEG))
+    return advance - tail_setback_m*ease((phase-123.)/3.)
 
 
 def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth_z, centered=False,
-                   late_mouth_shift_m=0., *, lip_height=LIP):
+                   late_mouth_shift_m=0., *, lip_height=LIP, tail_setback_m=0.):
     cup=np.r_[cup_xy,table_z]
     delta=np.asarray(source_xy)-np.asarray(cup_xy)
     initial=[delta[1],-delta[0]]
     base,rotation=calibrated_pose(phase,1.,initial,mouth_z,centered=centered,lip_height=lip_height)
-    base[0]+=late_mouth_offset(phase,late_mouth_shift_m)
+    base[0]+=late_mouth_offset(phase,late_mouth_shift_m,tail_setback_m=tail_setback_m)
     tcp=cup+FRAME@(base+rotation@np.array([0.,0.,GRASP_Z]))
     orientation=FRAME@rotation@FRAME.T@WRIST
     planner.q=np.clip(np.asarray(prediction),planner.limits[0]+1e-7,planner.limits[1]-1e-7)

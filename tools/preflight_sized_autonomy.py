@@ -12,7 +12,8 @@ import torch
 ROOT = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
 parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "bottle-autonomy",
-                                       "bottle-empty-autonomy", "mixed-vessel-autonomy", "tall-empty-r1"),
+                                       "bottle-empty-autonomy", "mixed-vessel-autonomy", "tall-empty-r1",
+                                       "layout-repair-r2", "layout-repair-r3"),
                     default="sized-autonomy")
 STUDY = ROOT/parser.parse_args().study
 sys.path[:0] = [str(STUDY/"src"), "/workspace/learning/A-finish-20261106-v1/staged", "/workspace"]
@@ -100,12 +101,15 @@ def scan(stage, spec, saved, opened, closed):
         check("lift",joint,closed,True)
     profile=saved["pour_primitive"]
     phases=sorted(set(np.arange(0.,132.,3.).tolist()+[60.,80.,90.,100.,110.,131.]))
+    if saved.get("tail_setback_m"):
+        phases = sorted(set(phases) | {124., 125.})
     projected={}
     for phase in phases:
         projected[phase]=project_target(arm,target(profile,lift[-1],cup[:2],phase),
                                        source[:2],cup[:2],cup[2],phase,saved["pour_mouth_z"],
                                        late_mouth_shift_m=saved["late_mouth_shift_m"],
-                                       lip_height=bottle_profile[-1][0])
+                                       lip_height=bottle_profile[-1][0],
+                                       tail_setback_m=saved.get("tail_setback_m",0.))
         check("pour "+str(phase),projected[phase],closed,True)
     returns=[]
     for phase in (60.,80.,90.,100.,110.,131.):

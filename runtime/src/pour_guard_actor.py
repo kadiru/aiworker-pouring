@@ -12,7 +12,7 @@ from pour_stop_actor import Actor as Hardware
 from pour_stop_models import LiquidDetector
 from pour_stop_data import crops
 from pour_guard_models import CupEstimator
-from pour_guard_vision import locate,plane_point,project,cup_crop,surface_features,bottle_base_from_neck
+from pour_guard_vision import locate,locate_initial_source,plane_point,project,cup_crop,surface_features,bottle_base_from_neck
 from pour_guard_trajectory import target
 from pour_stop_sequence import TerminalPrimitive,path_at
 from validate_pour_recording import decode
@@ -48,6 +48,16 @@ def slow_empty_evidence(threshold,phase,cap,tilt,cap_age,held,present,empty,flow
     return bool(cap_age is not None and cap_age>=threshold['empty_cap_dwell_seconds'] and
         phase>=cap-.25 and tilt>=cap-3. and held and present>=.7 and
         empty>=threshold['slow_empty_probability'] and flow_ml_s<threshold['slow_empty_max_flow_ml_s'])
+
+
+def empty_confirmation(threshold, ordinary_votes, slow_votes, slow, tall, require_drain):
+    if tall:
+        return 'tall_visual'
+    if ordinary_votes >= 12 and not require_drain:
+        return 'ordinary_visual'
+    if slow and slow_votes >= threshold['slow_empty_votes']:
+        return 'drain_dwell'
+    return None
 
 
 def early_return_profile(profile,minimum_seconds):
@@ -108,6 +118,11 @@ class Actor:
         self.approach_check=None;self.abort_path=None
         self.source_watchdog=None
         self.tall_empty_gate=None
+        self.source_localization_method=None
+        self.empty_confirmation_method=None
+        self.short_empty_requires_drain=self.saved.get('short_empty_requires_drain',False)
+        if self.short_empty_requires_drain:
+            assert self.bottle_lip < .14 and 'slow_empty_probability' in self.threshold
         if self.saved.get('source_watchdog'):
             from pour_source_watchdog import SourceWatchdog
             self.source_watchdog=SourceWatchdog(self.saved['source_watchdog'])
@@ -124,7 +139,7 @@ class Actor:
             self.attempt+=1;self.confirm_votes=0;self.visual_votes=[];self.physical_votes=0
             self.localization_start=t;self.home=q[:7].copy()
             self.localization_history={'source':[],'cup':[]}
-        neck,self.source_score=locate(task,self.saved['source_bank'])
+        neck,self.source_score,self.source_localization_method=locate_initial_source(task,self.saved)
         if self.sized_perception is None:
             rim,self.cup_score=locate(task if self.cup_localization_image is None else self.cup_localization_image,self.saved['cup_bank'])
         else:
@@ -310,7 +325,8 @@ class Actor:
                     self.settled_history.append((t,settled_prediction))
             elif self.terminal is None:
                 self.cup_perception_diagnostic=self.sized_perception.level(
-                    level_image,self.cup_xy,settling=self.fill_mode=='settle')
+                    level_image,self.cup_xy,settling=self.fill_mode=='settle',
+                    draining=self.fill_mode=='coarse' and self.pour_phase>=115.)
                 measured=self.cup_perception_diagnostic
                 level_valid=measured['valid']
                 if level_valid:
@@ -381,9 +397,13 @@ class Actor:
                     held=held_gripper(q,self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']),
                     present=present,empty=empty,tilt=tilt,phase=self.pour_phase,cap=cap,flow_ml_s=flow*self.cup_volume_scale)
             if self.stop_latched is None:
+                empty_method=empty_confirmation(self.threshold,self.empty_votes,self.slow_empty_votes,
+                    slow,tall_empty,self.short_empty_requires_drain)
                 if self.sized_perception is not None and self.invalid_cup_since is not None and t-self.invalid_cup_since>=.75 and self.fill_mode not in ('brake','settle'):
                     self.latch('cup_tracking_lost',t,robot)
-                elif tall_empty or self.empty_votes>=12 or (slow and self.slow_empty_votes>=self.threshold['slow_empty_votes']):self.latch('bottle_empty',t,robot)
+                elif empty_method:
+                    self.empty_confirmation_method=empty_method
+                    self.latch('bottle_empty',t,robot)
                 elif self.source_watchdog is not None:
                     if recovery:self.latch(recovery,t,robot)
                 elif self.lost_votes>=8:self.latch('source_tracking_lost',t,robot)
@@ -474,7 +494,8 @@ class Actor:
                         try:
                             arm=project_target(self.fk,arm,self.source_xy,self.cup_xy,
                                 self.cal['table_z'],self.pour_phase,self.saved['pour_mouth_z'],
-                                late_mouth_shift_m=self.saved.get('late_mouth_shift_m',0.),lip_height=self.bottle_lip)
+                                late_mouth_shift_m=self.saved.get('late_mouth_shift_m',0.),lip_height=self.bottle_lip,
+                                tail_setback_m=self.saved.get('tail_setback_m',0.))
                         except ValueError:
                             self.latch('trajectory_unreachable',t,robot)
                             targets,phase=self.terminal.act(t)
@@ -499,6 +520,7 @@ class Actor:
             source_presence_model='wrist_presence_cnn' if self.presence_detector is not None else 'legacy_source_fusion',
             sized_cup_perception=self.cup_perception_diagnostic,
             settled_prediction=settled_prediction,empty_views=empty_views,source_localization_score=getattr(self,'source_score',None),cup_localization_score=getattr(self,'cup_score',None),
+            source_localization_method=self.source_localization_method,empty_confirmation_method=self.empty_confirmation_method,
             visual_flow_fraction_s=flow,empty_probability=empty,source_present_probability=present,estimated_tilt_from_joints=tilt,
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,
             slow_empty_votes=self.slow_empty_votes,cap_dwell_seconds=None if self.cap_start is None else t-self.cap_start,

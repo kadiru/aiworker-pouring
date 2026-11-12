@@ -142,6 +142,20 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
     return uv,float(field[y,x])
 
 
+def locate_initial_source(image, saved, device='cuda'):
+    point, score = locate(image, saved['source_bank'], device=device)
+    threshold = saved['thresholds']['source_localization_score']
+    fallback = saved.get('source_initial_fallback')
+    if fallback is None:
+        return point, score, 'primary'
+    candidate, candidate_score = locate(image, fallback['bank'], device=device)
+    if candidate_score < fallback['presence_floor']:
+        return point, 0., 'neck_unconfirmed'
+    if score < threshold and candidate_score >= fallback['threshold']:
+        return candidate, min(1., threshold + candidate_score - fallback['threshold']), 'neck_fallback'
+    return point, score, 'primary'
+
+
 def surface_features(image):
     a=image.float()/255.;r,g,b=a.unbind(-1)
     mask=((r>1.4*g+.025)&(r>1.2*b+.02)).float()

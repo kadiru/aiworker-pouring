@@ -10,11 +10,12 @@ from pour_guard_vision import cup_crop
 
 
 SETTLED_RGB_KNOTS = (.755, .795, .835, .890)
+MIDFILL_RGB_KNOTS = (.65, .70, .75, .82)
 MAX_SETTLED_RGB_BIAS = .035
 
 
-def settled_rgb_weight(value):
-    return float(np.interp(value, SETTLED_RGB_KNOTS, (0., 1., 1., 0.)))
+def settled_rgb_weight(value, knots=SETTLED_RGB_KNOTS):
+    return float(np.interp(value, knots, (0., 1., 1., 0.)))
 
 
 def sha(path):
@@ -35,22 +36,30 @@ class SizedCupPerception:
         self.models = config["models"]
         self.filters = {k: LevelFilter(v) for k, v in config["filters"].items()}
         self.agreement_limit = config["agreement_limit"]
+        self.retry_initial_cup = config.get("retry_initial_cup", False)
         self.settled_rgb_calibration = config.get("settled_rgb_calibration")
-        if self.settled_rgb_calibration is not None:
-            calibration = self.settled_rgb_calibration
+        self.midfill_rgb_calibration = config.get("midfill_rgb_calibration")
+        if self.settled_rgb_calibration and self.midfill_rgb_calibration:
+            raise ValueError("Only one RGB calibration may be applied to a cup geometry")
+        calibration = self.settled_rgb_calibration or self.midfill_rgb_calibration
+        if calibration is not None:
             if (calibration["geometry"] != geometry
                     or not 0. <= calibration["bias"] <= MAX_SETTLED_RGB_BIAS):
-                raise ValueError("Settled RGB calibration does not match the declared cup or bias bounds")
+                raise ValueError("RGB calibration does not match the declared cup or bias bounds")
         self.track_result = None
 
     def track(self, image):
+        if self.retry_initial_cup and self.tracker.failed and self.tracker.anchor is None:
+            # Restart consensus within the actor's original localization deadline.
+            self.tracker.history.clear()
+            self.tracker.failed = False
         if self.tracker.failed:
             self.track_result = dict(valid=False, reason="initial_reference_rejected", uv=None, score=0.)
         else:
             self.track_result = self.tracker.update(image)
         return self.track_result
 
-    def level(self, image, xy, *, settling=False):
+    def level(self, image, xy, *, settling=False, draining=False):
         from perception_followup import predict_level
         raw, filtered = {}, {}
         track = self.track_result
@@ -68,6 +77,11 @@ class SizedCupPerception:
         if valid and settling and self.settled_rgb_calibration is not None:
             correction = self.settled_rgb_calibration["bias"] * settled_rgb_weight(filtered["rgb"])
             diagnostic.update(guard_filtered=filtered.copy(), rgb_settle_correction=correction)
+            filtered["rgb"] -= correction
+        if valid and draining and self.midfill_rgb_calibration is not None:
+            correction = self.midfill_rgb_calibration["bias"] * settled_rgb_weight(
+                filtered["rgb"], MIDFILL_RGB_KNOTS)
+            diagnostic.update(guard_filtered=filtered.copy(), rgb_midfill_correction=correction)
             filtered["rgb"] -= correction
         difference = abs(filtered["rgb"] - filtered["color"]) if valid else None
         return dict(track_valid=track["valid"], track_reason=track["reason"],

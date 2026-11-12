@@ -84,6 +84,12 @@ def rows_from_disk(output, cases, plan):
                    peak_height=peak, measured_loss_particles=particles,
                    ordered_return=ordered,side_return=side,perception_at_stop=perception,
                    recording_bytes=record.stat().st_size,recording_sha256=sha(record))
+        if plan.get("layout_repair"):
+            grasp = next((x for x in decisions if x.get("cup_xy") is not None), None)
+            row["source_localization_method"] = grasp.get("source_localization_method") if grasp else None
+            row["neck_fallback_frames"] = sum(x.get("source_localization_method") == "neck_fallback"
+                                               for x in decisions if x.get("cup_xy") is None)
+            row["empty_confirmation_method"] = stop.get("empty_confirmation_method") if stop else None
         calibrated = [x["sized_cup_perception"] for x in decisions
                       if not x["stop_latched"]
                       and (x.get("sized_cup_perception") or {}).get("rgb_settle_correction", 0.) > 0.]
@@ -131,7 +137,8 @@ def main():
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
     parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1","bottle-autonomy",
-                                          "bottle-empty-autonomy","mixed-vessel-autonomy","tall-empty-r1"),
+                                          "bottle-empty-autonomy","mixed-vessel-autonomy","tall-empty-r1",
+                                          "layout-repair-r2","layout-repair-r3"),
                         default="sized-autonomy")
     args=parser.parse_args()
     deadline_limit = 7200 if args.part == "development" else 14400
