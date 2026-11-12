@@ -93,3 +93,17 @@ settled at 92.33% of rim height, peaked at 92.46% and measured zero particle
 loss. The correction brought 36 of 98 affected settled frames back within
 the agreement limit. At the near-full stop, the gap was 0.21 percentage
 points. The bottle completed the ordered side return and release.
+
+All [nine fresh simulated pours](../evidence/sized-autonomy-A/r1-test-results.json)
+passed the strict task criteria with zero measured particle loss. The
+short standard-diameter cup stopped at 95.31% of rim height and its
+RGB/color gap was 0.62 percentage points. The correction brought 16
+settled frames back within the agreement limit during that attempt.
+Final cup heights ranged from 92.21% to 95.58%. The largest sampled
+height was 95.94%, below the 98% limit. All nine grasped and completed
+the ordered side return and release.
+
+The [completion audit](../evidence/sized-autonomy-A/r1-completion.json)
+checks the recorded fixture specifications, selected weights, container
+limits and preservation of the original runtime. Both test containers
+exited normally. The fresh batch took 123 minutes.
