@@ -139,9 +139,10 @@ def main():
         assert read(wrist)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(wrist.relative_to(HOST))]==sha(wrist)
         report["wrist_fit_sha256"]=sha(wrist)
         if STUDY.name=="wide-mixed-r7b":
-            path=STUDY/"cup-anchor-replay.json"
-            assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
-            report["cup_anchor_replay_sha256"]=sha(path)
+            for file in ("cup-anchor-replay.json","high-fill-replay.json"):
+                path=STUDY/file
+                assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
+                report[file.removesuffix(".json").replace("-","_")+"_sha256"]=sha(path)
     with (STUDY/"completion.json").open("x") as file:
         json.dump(report,file,indent=2,allow_nan=False)
         file.write("\n")

@@ -646,6 +646,14 @@ The 30 reserved fixture IDs, positions and seeds are the same in both plans.
 [Anchor replay](../evidence/bottle-size-A/wide-mixed-r7b-cup-anchor-replay.json),
 [revised plan](../evidence/bottle-size-A/wide-mixed-r7b-plan.json).
 
+A second targeted repeat reached 86.55% of rim height and abstained after
+the RGB estimate rose above the first correction window. The extended
+settled-only fit uses 180 labeled frames across four recordings. It reduces
+the last-six gap on that repeat from 4.24 to 0.92 percentage points and
+preserves the archived near-full stop. The moving-pour calibration and
+uncorrected near-rim guard keep their prior bounds. See the
+[higher-fill replay](../evidence/bottle-size-A/wide-mixed-r7b-high-fill-replay.json).
+
 Copy `wide-mixed-r7/src` to `wide-mixed-r7b/src` and overlay the updated
 `pour_cup_outline.py`. With the first development recording available,
 stage `revise_wide_mixed_r7.py` in the native study root. Run the following
@@ -653,6 +661,7 @@ serially after the first development batch has released the 4070.
 
 ```sh
 python3 run_isolated_perception_job.py --helper revise_wide_mixed_r7.py --label wide-r7b-rim --seconds 300
+python3 run_isolated_perception_job.py --helper extend_wide_mixed_r7_settling.py --label wide-r7b-level --seconds 300
 python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r7b-geometry --seconds 3600 -- --study wide-mixed-r7b --reuse-study wide-mixed-r7
 python3 run_sized_autonomy.py --study wide-mixed-r7b --part development --label wide-r7b-dev --seconds 7200
 for shard in 1 2 3; do

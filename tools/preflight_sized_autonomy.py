@@ -186,7 +186,7 @@ def main():
         elif ARGS.reuse_study=="wide-mixed-r7":
             assert old_geometry["sources"].keys()==sources.keys()
             changed={name for name,digest in sources.items() if old_geometry["sources"][name]!=digest}
-            assert changed <= {"pour_cup_outline.py"}
+            assert changed <= {"pour_cup_outline.py","pour_size_autonomy.py"}
         else:
             assert old_geometry["sources"]==sources
         old_specs={s["name"]:s for s in old_plan["development"]+old_plan["test"]}
