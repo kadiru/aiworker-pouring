@@ -85,5 +85,14 @@ class OutlineCupTracker(VerifiedCupTracker):
         if refine and score >= self.artifact["threshold"]:
             candidate = refine_outline(image, point, self.artifact["calibration"], self.geometry)
             if candidate is not None:
+                # The decorative band can produce a second strong peak below
+                # the rim. Reject large jumps when the two learned scales
+                # already agree on the center.
+                limit = self.artifact.get("outline_jump_guard")
+                if limit is not None and np.linalg.norm(candidate-point) > limit["max_outline_jump_px"]:
+                    coarse, confidence = super().detect(image, refine=False)
+                    if (confidence >= self.artifact["threshold"]
+                            and np.linalg.norm(coarse-point) <= limit["max_neural_gap_px"]):
+                        return point, score
                 point, score = candidate, min(score,self.presence_score(image,candidate))
         return point, score

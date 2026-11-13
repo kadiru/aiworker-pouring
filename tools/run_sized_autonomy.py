@@ -147,7 +147,8 @@ def main():
                                           "bottle-empty-autonomy","mixed-vessel-autonomy","tall-empty-r1",
                                           "layout-repair-r2","layout-repair-r3","tall-aligned-r0",
                                           "wide-mixed-r0","wide-mixed-r1","wide-mixed-r2","wide-mixed-r3",
-                                          "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7"),
+                                          "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7",
+                                          "wide-mixed-r7b"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None

@@ -15,9 +15,10 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "bottle-empty-autonomy", "mixed-vessel-autonomy", "tall-empty-r1",
                                        "layout-repair-r2", "layout-repair-r3", "tall-aligned-r0",
                                        "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
-                                       "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7"),
+                                       "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7",
+                                       "wide-mixed-r7b"),
                     default="sized-autonomy")
-parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4"))
+parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4","wide-mixed-r7"))
 parser.add_argument("--resume-screen")
 ARGS = parser.parse_args()
 STUDY = ROOT/ARGS.study
@@ -182,6 +183,10 @@ def main():
             assert old_geometry["sources"].keys()==sources.keys()
             changed={name for name,digest in sources.items() if old_geometry["sources"][name]!=digest}
             assert changed <= {"pour_guard_actor.py","pour_source_watchdog.py","test_tall_bottle_empty.py"}
+        elif ARGS.reuse_study=="wide-mixed-r7":
+            assert old_geometry["sources"].keys()==sources.keys()
+            changed={name for name,digest in sources.items() if old_geometry["sources"][name]!=digest}
+            assert changed <= {"pour_cup_outline.py"}
         else:
             assert old_geometry["sources"]==sources
         old_specs={s["name"]:s for s in old_plan["development"]+old_plan["test"]}
@@ -208,7 +213,8 @@ def main():
         try:
             assert sha(spec["checkpoint"])==plan["checkpoints"][spec["checkpoint"]]
             name=spec["name"]
-            old=old_specs[name] if name in reusable else None
+            predecessor=plan.get("clearance_predecessors",{}).get(name,name) if ARGS.reuse_study=="wide-mixed-r7" else name
+            old=old_specs[predecessor] if predecessor in reusable else None
             same=old is not None and spec==old
             if old is not None and not same and ARGS.reuse_study=="wide-mixed-r4":
                 same=spec.keys()==old.keys() and all(spec[k]==old[k] for k in spec if k!="checkpoint")
@@ -219,12 +225,23 @@ def main():
                     same=all(a.get(k)==b.get(k) for k in ("pour_primitive","side_return","bottle_geometry",
                                                         "pour_mouth_z"))
                     same = same and outbound_mouth_options(a) == outbound_mouth_options(b)
+            if old is not None and ARGS.reuse_study=="wide-mixed-r7":
+                changed = {"checkpoint", "name"}
+                same = ({k:v for k,v in spec.items() if k not in changed}
+                        == {k:v for k,v in old.items() if k not in changed})
+                if same:
+                    assert sha(old["checkpoint"])==old_plan["checkpoints"][old["checkpoint"]]
+                    a=torch.load(old["checkpoint"],map_location="cpu",weights_only=False)
+                    b=torch.load(spec["checkpoint"],map_location="cpu",weights_only=False)
+                    same=all(a.get(k)==b.get(k) for k in ("pour_primitive","side_return","bottle_geometry",
+                                                        "pour_mouth_z"))
+                    same = same and outbound_mouth_options(a)==outbound_mouth_options(b)
             if name in resume:
                 row=resume[name]
             elif same:
                 if spec["checkpoint"]==old["checkpoint"]:
                     assert plan["checkpoints"][spec["checkpoint"]]==old_plan["checkpoints"][spec["checkpoint"]]
-                row=dict(reusable[name], reused_from=ARGS.reuse_study)
+                row=dict(reusable[predecessor], name=name, reused_from=ARGS.reuse_study)
             else:
                 saved=torch.load(spec["checkpoint"],map_location="cpu",weights_only=False)
                 row=scan(stage,spec,saved,opened,closed)

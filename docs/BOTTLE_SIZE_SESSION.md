@@ -632,3 +632,31 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r7
 ```
+
+The first targeted repeat localized and grasped the short bottle, then
+stopped low because the cup outline selected the decorative band and shifted
+the rim center by 9.53 mm. For the 1.00× height / 0.90× diameter cup, the
+revised tracker rejects an outline displacement above ten pixels when the
+coarse and fine neural estimates agree within six pixels and still pass
+presence verification. Across five full-resolution replays, the three
+control centers were unchanged, both failing centers improved to about 1 mm,
+and all 75 erased-cup frames rejected. On three saved frames from the live
+repeat, mean branch height error dropped from 7.11 to 1.28 percentage points.
+The 30 reserved fixture IDs, positions and seeds are the same in both plans.
+[Anchor replay](../evidence/bottle-size-A/wide-mixed-r7b-cup-anchor-replay.json),
+[revised plan](../evidence/bottle-size-A/wide-mixed-r7b-plan.json).
+
+Copy `wide-mixed-r7/src` to `wide-mixed-r7b/src` and overlay the updated
+`pour_cup_outline.py`. With the first development recording available,
+stage `revise_wide_mixed_r7.py` in the native study root. Run the following
+serially after the first development batch has released the 4070.
+
+```sh
+python3 run_isolated_perception_job.py --helper revise_wide_mixed_r7.py --label wide-r7b-rim --seconds 300
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r7b-geometry --seconds 3600 -- --study wide-mixed-r7b --reuse-study wide-mixed-r7
+python3 run_sized_autonomy.py --study wide-mixed-r7b --part development --label wide-r7b-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r7b --part test --shard "$shard" --seconds 12500 --label "wide-r7b-test-$shard" || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r7b
+```
