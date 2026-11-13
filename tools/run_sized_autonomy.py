@@ -147,7 +147,7 @@ def main():
                                           "bottle-empty-autonomy","mixed-vessel-autonomy","tall-empty-r1",
                                           "layout-repair-r2","layout-repair-r3","tall-aligned-r0",
                                           "wide-mixed-r0","wide-mixed-r1","wide-mixed-r2","wide-mixed-r3",
-                                          "wide-mixed-r4","wide-mixed-r5"),
+                                          "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
@@ -191,8 +191,12 @@ def run(args,original,gpu_query,before):
         required = "strict_pass" if plan.get("development_requires_strict_zero") else "within_particle_tolerance"
         assert all(r[required] for r in dev["cases"]), "Development verification failed"
         if "development_empty_lag_limit_s" in plan:
-            assert all(0. <= r["empty_confirmation_lag_s"] <= plan["development_empty_lag_limit_s"]
-                       for r in dev["cases"]), "Tall-bottle latency verification failed"
+            empty_cases={r["name"]:r for r in dev["cases"] if r["expected_stop"]=="bottle_empty"}
+            timing_names=plan.get("development_empty_lag_cases",list(empty_cases))
+            assert timing_names and all(name in empty_cases for name in timing_names)
+            assert all(empty_cases[name]["empty_confirmation_lag_s"] is not None and
+                       0. <= empty_cases[name]["empty_confirmation_lag_s"] <= plan["development_empty_lag_limit_s"]
+                       for name in timing_names), "Tall-bottle latency verification failed"
     assert all(sha(native(p))==h for p,h in plan["checkpoints"].items())
     for old in OUTPUT.glob("*/*/*SA_A_*/parameters.json"):
         assert read(old)["name"] not in candidates,"Trial ID already used"

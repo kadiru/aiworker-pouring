@@ -1,5 +1,6 @@
 """Audit the native recordings and merge the three frozen wide test shards."""
 from collections import defaultdict
+import argparse
 import datetime
 import hashlib
 import json
@@ -71,6 +72,10 @@ def group_totals(rows, key):
 
 
 def main():
+    global STUDY
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6"),default="wide-mixed-r5")
+    STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
     plan, geometry = read(plan_path), read(geometry_path)
     digest = sha(plan_path)
@@ -114,6 +119,14 @@ def main():
                   original_runtime_sources_verified=len(candidate["runtime_sources"]),
                   protected_parent_files_verified=len(candidate["protected_parent_files"]),
                   original_checkpoint_sha256=candidate["checkpoint_sha256"], gpu_at_closure=statuses)
+    if STUDY.name=="wide-mixed-r6":
+        report["development_cases"]=dev
+        report["controller_test_log_sha256"]=sha(STUDY/"controller-tests.log")
+        fit_study=ROOT/"wide-mixed-r6"
+        for file in ("neck-fusion.json","wrist-fit.json"):
+            assert read(fit_study/file)["passed"]
+        report["neck_fit_sha256"]=sha(fit_study/"neck-fusion.json")
+        report["wrist_fit_sha256"]=sha(fit_study/"wrist-fit.json")
     with (STUDY/"completion.json").open("x") as file:
         json.dump(report,file,indent=2,allow_nan=False)
         file.write("\n")

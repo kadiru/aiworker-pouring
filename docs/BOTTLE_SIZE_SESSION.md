@@ -489,3 +489,94 @@ fresh tall-bottle empty targets, five confirmed empty, with lags of
 and one physically emptied and returned after a progress timeout.
 The 5.80-second case stopped on the drain dwell and failed strict
 scoring because the two cup estimates disagreed at its stop.
+
+## Bottle localization and exact-empty retraining
+
+The previous wide benchmark supplied the seven pre-grasp failures and
+the two tall-bottle cases that took 5.80 s or timed out. The new neck
+detector uses a supervised task-camera heatmap to propose a pixel and
+a signed-gradient template bank to refine it. A proposal must score
+at least 0.65, its template match at least 0.68, and the two locations
+must agree within six pixels. The legacy locator covers frames that
+fall below these checks. Grasp initialization still uses temporal
+consensus. The fusion passed all 48 archived recordings, including
+the seven fitting cases that previously timed out. Their position
+errors ranged from 0.05 to 0.19 mm. The largest error across the
+archive was 1.17 mm. All 288 synthetic erased-bottle frames rejected
+the learned path. The initial standalone heatmap and the refined
+heatmap without the legacy locator both missed their acceptance gates.
+
+The wrist CNN was fine-tuned on 1,269 wrist crops from 16 episodes.
+Binary cross-entropy used an exact zero-particle label and balanced
+the weights by episode and class. The selected epoch was 35. The
+trained path requires eight consecutive 20 Hz frames at 0.82 or
+higher, a verified held source, at least 120° of measured tilt,
+tracked cup history, estimated flow below 1.25 nominal mL/s and a
+cup-level upper estimate below 85%. The existing camera-confirmation
+paths remain available. The archived replay found 0.30 s for both
+target cases and zero premature latches across 18 episodes. Ground
+truth labels the training examples and scores the replay. The
+controller reads RGB, encoder signals and fixed camera calibration.
+
+A separate 32-frame calibration addresses the short standard-diameter
+cup in its late coarse-pour phase. Its later 85 recorded frames show
+maximum RGB/color disagreement falling from 4.86 to 2.18 percentage
+points. Two vessel combinations use an 8 mm late mouth setback after
+the preceding tests recorded rim-crossing droplets.
+
+The fresh fixtures use the previous 15 wide position pairs, with
+independent 1.2–2.8 mm offsets per endpoint coordinate and new episode
+seeds. They retain the exact normal/swapped pairing, nine cup sizes and
+four bottle geometries. The targeted development cases cover the two
+slow or missed stops, a prior localization failure, and a prior spill.
+The test release requires all four development cases within the
+five-particle tolerance and the two targeted empty stops within 2 s.
+Every fresh trial is scored against zero measured loss.
+
+From the native study root, copy `wide-mixed-r5/src` to
+`wide-mixed-r6/src` and overlay the revised actor, vision, size
+perception, source watchdog and test files. Use the existing 4070-only
+launcher and stage the checked-in helpers under the names below.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r6.py --label wide-r6-fit --seconds 5300
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r6.py --label wide-r6-prepare --seconds 700
+python3 run_isolated_perception_job.py --helper preflight_wide_mixed_r6.py --label wide-r6-geometry --seconds 4000 -- --study wide-mixed-r6
+python3 run_wide_mixed_r6.py --study wide-mixed-r6 --part development --label wide-r6-dev --seconds 6500
+for shard in 1 2 3; do
+    python3 run_wide_mixed_r6.py --study wide-mixed-r6 --part test --shard "$shard" --label "wide-r6-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r6
+```
+
+The [development results](../evidence/bottle-size-A/wide-mixed-r6-development-results.json)
+pass all four cases with zero measured loss. The two targeted empty
+stops confirm 0.35 s and 0.70 s after zero source inventory. The
+former localization failure grasps with the heatmap and finishes at
+92.73% of rim height. The prior spill fixture empties cleanly with
+the mouth setback. All 34 geometry and 54 controller checks pass.
+Two scans agreed on their first 30 checks before a near-tangent
+linear program returned an indeterminate numerical status. The
+resumed screen verified the remaining four cases by translating and
+scaling the constraints and minimizing their common slack.
+
+The [fresh benchmark and checksum audit](../evidence/bottle-size-A/wide-mixed-r6-completion.json)
+cover all 30 autonomous trials, scored once using the frozen candidate.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Zero measured spill |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 11 | 14 | 13 |
+| Swapped | 15 | 12 | 14 | 15 |
+| Near-full target | 15 | 13 | 14 | 15 |
+| Empty target | 15 | 10 | 14 | 13 |
+| All trials | 30 | 23 | 28 | 28 |
+
+The zero-spill column includes two pre-grasp rejections. The 28
+verified grasps completed the ordered return, and 26 of those pours
+measured zero spill. Two coarse pours lost two particles each before
+the empty latch. All seven fresh tall-bottle empty targets reached zero
+source inventory and confirmed in 0.25–0.70 s, with median 0.35 s.
+Two of those seven incurred the measured spill and another failed the
+cup-agreement scoring check. The remaining failures were two bottle
+localization rejections and two level-unconfirmed stops, one underfilled
+near-full target and one short bottle with 0.338 nominal mL remaining.

@@ -46,6 +46,24 @@ DEFAULT = dict(presence_min_tilt_deg=75.,lost_seconds=.35,
     ambiguous_empty_seconds=1.2,cap_timeout_seconds=8.,active_timeout_seconds=48.)
 
 
+class TrainedEmptyGate:
+    """Consecutive exact-empty wrist predictions corroborated by a low-flow cup."""
+
+    def __init__(self, config):
+        self.config = config
+        self.votes = 0
+
+    def update(self, *, held, present, tilt, flow_ml_s, cup_ready, upper_level, probability):
+        values = (present,tilt,flow_ml_s,upper_level,probability)
+        c = self.config
+        ready = (held and cup_ready and all(math.isfinite(x) for x in values)
+                 and present >= .7 and tilt >= c['tilt']
+                 and 0. <= flow_ml_s < c['flow'] and upper_level < .85
+                 and probability >= c['probability'])
+        self.votes = self.votes+1 if ready else 0
+        return self.votes >= c['votes']
+
+
 class TallBottleEmptyGate:
     """Confirm depletion before the cap using corroborated visual evidence."""
 

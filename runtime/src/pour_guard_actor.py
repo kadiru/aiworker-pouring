@@ -118,6 +118,15 @@ class Actor:
         self.approach_check=None;self.abort_path=None
         self.source_watchdog=None
         self.tall_empty_gate=None
+        self.trained_empty_gate=None
+        self.trained_empty_detector=None
+        if 'trained_empty_confirmation' in self.saved:
+            from pour_source_watchdog import TrainedEmptyGate
+            from pour_wide_empty import EmptyWrist
+            trained=self.saved['trained_empty_confirmation']
+            self.trained_empty_gate=TrainedEmptyGate(trained['gate'])
+            self.trained_empty_detector=EmptyWrist().cuda().eval()
+            self.trained_empty_detector.load_state_dict(trained['state'])
         self.source_localization_method=None
         self.empty_confirmation_method=None
         self.short_empty_requires_drain=self.saved.get('short_empty_requires_drain',False)
@@ -390,6 +399,15 @@ class Actor:
                     held_gripper(q,gap),present,empty,flow*self.cup_volume_scale)
             self.slow_empty_votes=self.slow_empty_votes+1 if slow else 0
             tall_empty=False
+            trained_empty=False
+            if self.trained_empty_gate is not None and self.stop_latched is None:
+                from pour_wide_empty import wrist_crop
+                image=wrist_crop(wrist,self.saved['trained_empty_confirmation']['roi'])
+                probability=float(self.trained_empty_detector(torch.as_tensor(image,device='cuda')[None]).sigmoid()[0])
+                empty_views=dict(empty_views or {},trained_wrist_empty=probability)
+                trained_empty=self.trained_empty_gate.update(held=held,present=present,tilt=tilt,
+                    flow_ml_s=flow*self.cup_volume_scale,cup_ready=len(self.level_history)>=9,
+                    upper_level=level_upper if level_upper is not None else float('nan'),probability=probability)
             if self.tall_empty_gate is not None and self.stop_latched is None:
                 tall_empty=self.tall_empty_gate.update(
                     held=held, level_ready=(len(self.level_history)>=9 and measured['agreement']),
@@ -401,8 +419,9 @@ class Actor:
                     held=held_gripper(q,self.saved['pour_primitive']['grasp_closure']['min_deficit_rad']),
                     present=present,empty=empty,tilt=tilt,phase=self.pour_phase,cap=cap,flow_ml_s=flow*self.cup_volume_scale)
             if self.stop_latched is None:
-                empty_method=empty_confirmation(self.threshold,self.empty_votes,self.slow_empty_votes,
-                    slow,tall_empty,self.short_empty_requires_drain)
+                empty_method=('trained_wrist' if trained_empty else
+                    empty_confirmation(self.threshold,self.empty_votes,self.slow_empty_votes,
+                                       slow,tall_empty,self.short_empty_requires_drain))
                 if self.sized_perception is not None and self.invalid_cup_since is not None and t-self.invalid_cup_since>=.75 and self.fill_mode not in ('brake','settle'):
                     self.latch('cup_tracking_lost',t,robot)
                 elif empty_method:

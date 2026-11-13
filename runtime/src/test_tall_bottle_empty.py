@@ -1,6 +1,6 @@
 import unittest
 
-from pour_source_watchdog import TallBottleEmptyGate
+from pour_source_watchdog import TallBottleEmptyGate, TrainedEmptyGate
 
 
 class TallBottleEmptyTests(unittest.TestCase):
@@ -43,6 +43,20 @@ class TallBottleEmptyTests(unittest.TestCase):
         self.assertTrue(gate.update(**values))
         self.assertFalse(gate.update(**dict(values, aligned_empty=float("nan"))))
         self.assertFalse(TallBottleEmptyGate().update(**values))
+
+    def test_trained_empty_requires_a_stable_nonfull_cup_and_held_bottle(self):
+        gate = TrainedEmptyGate(dict(tilt=120., flow=1.25, probability=.9, votes=8))
+        evidence = dict(held=True,present=.99,tilt=122.,flow_ml_s=.6,cup_ready=True,
+                        upper_level=.78,probability=.95)
+        for change in (dict(held=False),dict(cup_ready=False),dict(upper_level=.85),
+                       dict(flow_ml_s=1.25),dict(probability=float("nan"))):
+            for _ in range(7):
+                self.assertFalse(gate.update(**evidence))
+            self.assertFalse(gate.update(**dict(evidence,**change)))
+            self.assertEqual(gate.votes,0)
+        for _ in range(7):
+            self.assertFalse(gate.update(**evidence))
+        self.assertTrue(gate.update(**evidence))
 
     def test_wrist_and_cup_needs_its_own_fourteen_votes(self):
         values = dict(self.evidence, wrist_empty=.95, scene_empty=.1, aligned_empty=0.)

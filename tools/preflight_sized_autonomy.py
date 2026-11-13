@@ -15,13 +15,14 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "bottle-empty-autonomy", "mixed-vessel-autonomy", "tall-empty-r1",
                                        "layout-repair-r2", "layout-repair-r3", "tall-aligned-r0",
                                        "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
-                                       "wide-mixed-r4", "wide-mixed-r5"),
+                                       "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6"),
                     default="sized-autonomy")
 parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4"))
+parser.add_argument("--resume-screen")
 ARGS = parser.parse_args()
 STUDY = ROOT/ARGS.study
 sys.path[:0] = [str(STUDY/"src"), "/workspace/learning/A-finish-20261106-v1/staged", "/workspace"]
-from preflight_finish_study import geometry, intersections, object_hits, vessel
+from preflight_finish_study import geometry, intersections, transforms, vessel
 from bottle_pour import GRASP_Z, WALL, initial_points
 from pour_bottle_geometry import declared_geometry, profile_for
 from pour_guard_trajectory import target
@@ -44,6 +45,38 @@ def bottle_shell(arm, joint, local):
     tcp, wrist = arm.fk(joint)
     rotation = wrist @ WRIST.T
     return (local - [0.,0.,GRASP_Z]) @ rotation.T + tcp
+
+
+def halfspace_overlap(a,b):
+    args=dict(A_ub=a,b_ub=b,bounds=[(None,None)]*3)
+    result=linprog(np.zeros(3),method="highs",**args)
+    if result.status not in (0,2):
+        # Translating to the hull neighborhood and minimizing a common
+        # constraint slack avoids the zero-objective feasibility degeneracy.
+        origin=np.linalg.lstsq(a,b,rcond=None)[0]
+        shifted=1000*(b-a@origin)
+        result=linprog([0.,0.,0.,1.], A_ub=np.c_[a,-np.ones(len(b))],b_ub=shifted,
+                       bounds=[(None,None)]*3+[(0.,None)],method="highs-ipm")
+        assert result.success,result.message
+        return result.x[3]<=1e-6
+    assert result.status in (0,2),result.message
+    return result.success
+
+
+def object_hits(planner, meshes, joint, shape):
+    points, planes=shape
+    poses=transforms(planner,joint)
+    hits=[]
+    for index,name,local,equations in meshes:
+        origin,rotation=poses[index]
+        world=local@rotation.T+origin
+        if not (np.minimum(world.max(0),points.max(0))>np.maximum(world.min(0),points.min(0))+1e-7).all():
+            continue
+        normals=equations[:,:3]@rotation.T
+        if halfspace_overlap(np.vstack((normals,planes[:,:3])),
+                             np.r_[-equations[:,3]+normals@origin,-planes[:,3]]):
+            hits.append(name)
+    return hits
 
 
 def scan(stage, spec, saved, opened, closed):
@@ -85,10 +118,7 @@ def scan(stage, spec, saved, opened, closed):
             points, cup_planes = cup_shape
             if np.all(np.minimum(shell.max(0),points.max(0)) >= np.maximum(shell.min(0),points.min(0))):
                 planes = np.vstack((ConvexHull(shell).equations, cup_planes))
-                overlap = linprog(np.zeros(3), A_ub=planes[:, :3], b_ub=-planes[:, 3],
-                                  bounds=[(None,None)]*3, method="highs")
-                assert overlap.status in (0,2), overlap.message
-                if overlap.success:
+                if halfspace_overlap(planes[:,:3],-planes[:,3]):
                     failures.append(label+": bottle/cup")
             if shell[:,2].min()<cup[2]-.002:
                 failures.append(label+": bottle/bench")
@@ -165,6 +195,15 @@ def main():
         hull=ConvexHull(vertices)
         closed.append((6,variants[0][i][1],vertices[hull.vertices],hull.equations))
     cases=[]
+    resume={}
+    if ARGS.resume_screen:
+        previous=Path(ARGS.resume_screen)
+        saved_resume=json.loads(previous.read_text())
+        assert saved_resume["plan_sha256"]==sha(plan_path) and saved_resume["sources"]==sources
+        resume={r["name"]:r for r in saved_resume["cases"]}
+    progress=STUDY/"geometry-progress.jsonl"
+    with progress.open("x") as file:
+        file.write(json.dumps(dict(plan_sha256=sha(plan_path),sources=sources))+"\n")
     for spec in plan["development"]+plan["test"]:
         try:
             assert sha(spec["checkpoint"])==plan["checkpoints"][spec["checkpoint"]]
@@ -179,7 +218,9 @@ def main():
                     b=torch.load(spec["checkpoint"],map_location="cpu",weights_only=False)
                     same=all(a.get(k)==b.get(k) for k in ("pour_primitive","side_return","bottle_geometry",
                                                         "pour_mouth_z","late_mouth_shift_m","tail_setback_m"))
-            if same:
+            if name in resume:
+                row=resume[name]
+            elif same:
                 if spec["checkpoint"]==old["checkpoint"]:
                     assert plan["checkpoints"][spec["checkpoint"]]==old_plan["checkpoints"][spec["checkpoint"]]
                 row=dict(reusable[name], reused_from=ARGS.reuse_study)
@@ -189,6 +230,8 @@ def main():
         except ValueError as error:
             row=dict(name=spec["name"],passed=False,failures=[str(error)])
         cases.append(row)
+        with progress.open("a") as file:
+            file.write(json.dumps(row)+"\n")
         print(json.dumps(row),flush=True)
     result=dict(passed=all(r["passed"] for r in cases),cases=cases,plan_sha256=sha(plan_path),
                 sources=sources,

@@ -43,10 +43,9 @@ class SizedCupPerception:
         self.retry_initial_cup = config.get("retry_initial_cup", False)
         self.settled_rgb_calibration = config.get("settled_rgb_calibration")
         self.midfill_rgb_calibration = config.get("midfill_rgb_calibration")
-        if self.settled_rgb_calibration and self.midfill_rgb_calibration:
-            raise ValueError("Only one RGB calibration may be applied to a cup geometry")
-        calibration = self.settled_rgb_calibration or self.midfill_rgb_calibration
-        if calibration is not None:
+        for calibration in (self.settled_rgb_calibration, self.midfill_rgb_calibration):
+            if calibration is None:
+                continue
             if (calibration["geometry"] != geometry
                     or not 0. <= calibration["bias"] <= MAX_SETTLED_RGB_BIAS):
                 raise ValueError("RGB calibration does not match the declared cup or bias bounds")
@@ -82,7 +81,7 @@ class SizedCupPerception:
             correction = self.settled_rgb_calibration["bias"] * settled_rgb_weight(filtered["rgb"])
             diagnostic.update(guard_filtered=filtered.copy(), rgb_settle_correction=correction)
             filtered["rgb"] -= correction
-        if valid and draining and self.midfill_rgb_calibration is not None:
+        elif valid and draining and self.midfill_rgb_calibration is not None:
             correction = self.midfill_rgb_calibration["bias"] * settled_rgb_weight(
                 filtered["rgb"], MIDFILL_RGB_KNOTS)
             diagnostic.update(guard_filtered=filtered.copy(), rgb_midfill_correction=correction)
