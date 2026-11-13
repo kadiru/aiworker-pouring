@@ -15,7 +15,7 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "bottle-empty-autonomy", "mixed-vessel-autonomy", "tall-empty-r1",
                                        "layout-repair-r2", "layout-repair-r3", "tall-aligned-r0",
                                        "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
-                                       "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6"),
+                                       "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7"),
                     default="sized-autonomy")
 parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4"))
 parser.add_argument("--resume-screen")
@@ -29,7 +29,7 @@ from pour_guard_trajectory import target
 from pour_side_return import paths
 from pour_size_autonomy import sha
 from pour_vessel_geometry import cup_profile
-from pour_wide_motion import project_target
+from pour_wide_motion import outbound_mouth_options, project_target
 from robot_pour import FINGERS, FRAME, WRIST, build_path
 from wide_gripper_geometry import finger_meshes
 
@@ -135,15 +135,15 @@ def scan(stage, spec, saved, opened, closed):
         check("lift",joint,closed,True)
     profile=saved["pour_primitive"]
     phases=sorted(set(np.arange(0.,132.,3.).tolist()+[60.,80.,90.,100.,110.,131.]))
-    if saved.get("tail_setback_m"):
-        phases = sorted(set(phases) | {124., 125.})
+    mouth = outbound_mouth_options(saved)
+    if mouth["tail_setback_m"] or mouth["tail_drop_m"]:
+        start, end = mouth["tail_window_deg"]
+        phases = sorted(set(phases) | set(np.linspace(start, end, 5)))
     projected={}
     for phase in phases:
         projected[phase]=project_target(arm,target(profile,lift[-1],cup[:2],phase),
                                        source[:2],cup[:2],cup[2],phase,saved["pour_mouth_z"],
-                                       late_mouth_shift_m=saved["late_mouth_shift_m"],
-                                       lip_height=bottle_profile[-1][0],
-                                       tail_setback_m=saved.get("tail_setback_m",0.))
+                                       lip_height=bottle_profile[-1][0],**mouth)
         check("pour "+str(phase),projected[phase],closed,True)
     returns=[]
     for phase in (60.,80.,90.,100.,110.,131.):
@@ -217,7 +217,8 @@ def main():
                     a=torch.load(old["checkpoint"],map_location="cpu",weights_only=False)
                     b=torch.load(spec["checkpoint"],map_location="cpu",weights_only=False)
                     same=all(a.get(k)==b.get(k) for k in ("pour_primitive","side_return","bottle_geometry",
-                                                        "pour_mouth_z","late_mouth_shift_m","tail_setback_m"))
+                                                        "pour_mouth_z"))
+                    same = same and outbound_mouth_options(a) == outbound_mouth_options(b)
             if name in resume:
                 row=resume[name]
             elif same:

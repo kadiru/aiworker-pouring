@@ -580,3 +580,55 @@ Two of those seven incurred the measured spill and another failed the
 cup-agreement scoring check. The remaining failures were two bottle
 localization rejections and two level-unconfirmed stops, one underfilled
 near-full target and one short bottle with 0.338 nominal mL remaining.
+
+## Wide-layout bottle, level and spill repair
+
+The preceding 30-trial run exposed two short-bottle detections whose signed
+gradient scores were too weak for eight-vote localization. One legacy match
+also placed the neck more than 110 pixels away. The RTX 4070 fine-tuned the
+neck heatmap with 297 labeled and synthetic-erasure images from 27 consumed
+episodes. Seven other episodes were held out of this fine-tune. The runtime
+still requires a proposal score of 0.70, a signed-gradient match of 0.71, at
+most six pixels between them and the existing temporal consensus. The new
+bank has 140 templates. On 34 native and 18 translated replays, the maximum
+consensus error was 1.51 mm. The two repair cases had 20/20 heatmap matches
+each and native errors of 0.10 and 0.24 mm. The learned path accepted none of
+the 680 synthetic erased frames. See the
+[localization replay](../evidence/bottle-size-A/wide-mixed-r7-neck-fusion.json).
+
+The RGB height calibration minimizes weighted squared error against
+timestamp-matched particle-surface height. It fits a bounded amplitude for a
+piecewise-linear correction by cup size and phase. The three fits use 545
+training frames and 577 replay frames from consumed recordings, with the final
+six frames held out of each fit. The stop gaps fell from 4.69 to 1.34, 4.87
+to 1.52 and 5.45 to 2.89 percentage points on the three repair cases. The
+color branch, cup tracker, 3.5-point agreement requirement and near-rim
+uncorrected guard are unchanged. The exact-empty wrist checkpoint is carried
+forward from the previous run. See the
+[level replay](../evidence/bottle-size-A/wide-mixed-r7-level-fit.json).
+
+The two tall-bottle spills began with far-side rim rebounds during coarse
+pouring. Their affected bottle/cup geometries use a smooth 9 mm mouth setback
+and 4 mm lowering from 115° to 119°. The controller and the geometry screen
+share the same pose settings. The [sealed plan](../evidence/bottle-size-A/wide-mixed-r7-plan.json)
+declares seven targeted development repeats and 30 new fixtures, with
+independently shifted endpoints and fresh simulation seeds. The test fixtures
+span nine cup sizes and four bottle sizes in 15 exact normal/swapped pairs.
+
+From the native study root, copy `wide-mixed-r6/src` to `wide-mixed-r7/src`
+and overlay the changed runtime source and test files. Stage
+`fit_wide_mixed_r7.py`, `prepare_wide_mixed_r7.py`,
+`preflight_sized_autonomy.py`, `run_sized_autonomy.py`, and
+`close_wide_mixed_autonomy.py` in the study root. The fit also imports
+the existing `fit_wide_mixed_r6.py`.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r7.py --label wide-r7-fit --seconds 4200
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r7.py --label wide-r7-prepare --seconds 300
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r7-geometry --seconds 4600 -- --study wide-mixed-r7
+python3 run_sized_autonomy.py --study wide-mixed-r7 --part development --label wide-r7-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r7 --part test --shard "$shard" --label "wide-r7-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r7
+```

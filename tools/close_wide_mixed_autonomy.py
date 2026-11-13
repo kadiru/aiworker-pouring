@@ -74,7 +74,7 @@ def group_totals(rows, key):
 def main():
     global STUDY
     parser=argparse.ArgumentParser()
-    parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6"),default="wide-mixed-r5")
+    parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7"),default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
     plan, geometry = read(plan_path), read(geometry_path)
@@ -127,6 +127,16 @@ def main():
             assert read(fit_study/file)["passed"]
         report["neck_fit_sha256"]=sha(fit_study/"neck-fusion.json")
         report["wrist_fit_sha256"]=sha(fit_study/"wrist-fit.json")
+    if STUDY.name=="wide-mixed-r7":
+        report["development_cases"]=dev
+        report["controller_test_log_sha256"]=sha(STUDY/"controller-tests.log")
+        for file in ("neck-fusion.json","level-fit.json"):
+            path=STUDY/file
+            assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
+            report[file.removesuffix(".json").replace("-","_")+"_sha256"]=sha(path)
+        wrist=ROOT/"wide-mixed-r6"/"wrist-fit.json"
+        assert read(wrist)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(wrist.relative_to(HOST))]==sha(wrist)
+        report["wrist_fit_sha256"]=sha(wrist)
     with (STUDY/"completion.json").open("x") as file:
         json.dump(report,file,indent=2,allow_nan=False)
         file.write("\n")

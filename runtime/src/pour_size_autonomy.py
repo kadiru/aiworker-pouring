@@ -18,6 +18,20 @@ def settled_rgb_weight(value, knots=SETTLED_RGB_KNOTS):
     return float(np.interp(value, knots, (0., 1., 1., 0.)))
 
 
+def validate_rgb_calibration(calibration, geometry):
+    knots = np.asarray(calibration["knots"])
+    bias = calibration["bias"]
+    if (calibration["geometry"] != geometry or knots.shape != (4,)
+            or not np.isfinite(knots).all() or not 0. <= knots[0] < knots[-1] <= .9
+            or not np.all(np.diff(knots) > 0.) or not 0. <= bias <= MAX_SETTLED_RGB_BIAS
+            or bias >= knots[1] - knots[0]):
+        raise ValueError("Invalid size-specific RGB height calibration")
+
+
+def calibrated_rgb_height(value, calibration):
+    return value - calibration["bias"] * settled_rgb_weight(value, calibration["knots"])
+
+
 def sha(path):
     with Path(path).open("rb") as f:
         digest = hashlib.sha256()
@@ -43,6 +57,11 @@ class SizedCupPerception:
         self.retry_initial_cup = config.get("retry_initial_cup", False)
         self.settled_rgb_calibration = config.get("settled_rgb_calibration")
         self.midfill_rgb_calibration = config.get("midfill_rgb_calibration")
+        self.rgb_height_calibration = config.get("rgb_height_calibration", {})
+        if self.rgb_height_calibration.keys() - {"settling", "draining"}:
+            raise ValueError("Unsupported RGB height calibration phase")
+        for calibration in self.rgb_height_calibration.values():
+            validate_rgb_calibration(calibration, geometry)
         for calibration in (self.settled_rgb_calibration, self.midfill_rgb_calibration):
             if calibration is None:
                 continue
@@ -77,7 +96,16 @@ class SizedCupPerception:
             filtered[branch] = float(updated) if np.isfinite(updated) else None
         valid = all(v is not None for v in filtered.values())
         diagnostic = {}
-        if valid and settling and self.settled_rgb_calibration is not None:
+        phase = "settling" if settling else "draining" if draining else None
+        calibration = self.rgb_height_calibration.get(phase)
+        if valid and calibration is not None:
+            diagnostic["guard_filtered"] = filtered.copy()
+            diagnostic["calibrated_brake_level"] = max(
+                calibrated_rgb_height(max(filtered["rgb"], raw["rgb"]), calibration),
+                filtered["color"], raw["color"])
+            filtered["rgb"] = calibrated_rgb_height(filtered["rgb"], calibration)
+            diagnostic["rgb_height_phase"] = phase
+        elif valid and settling and self.settled_rgb_calibration is not None:
             correction = self.settled_rgb_calibration["bias"] * settled_rgb_weight(filtered["rgb"])
             diagnostic.update(guard_filtered=filtered.copy(), rgb_settle_correction=correction)
             filtered["rgb"] -= correction

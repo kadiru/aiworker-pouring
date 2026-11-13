@@ -102,6 +102,8 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
     if expected_uv is not None:
         x0,y0=np.floor(np.asarray(expected_uv)-12).astype(int);x1,y1=np.ceil(np.asarray(expected_uv)+12).astype(int)
     startx=max(0,x0+dx);starty=max(0,y0+dy);endx=min(384,x1+dx+w);endy=min(384,y1+dy+h)
+    if endx-startx<w or endy-starty<h:
+        return np.asarray(expected_uv), 0.
     region=feat[:,:,starty:endy,startx:endx]
     numerator=F.conv2d(region,kernels)
     norm=F.conv2d(region.square(),mask.square()).clamp(min=1e-10).sqrt()

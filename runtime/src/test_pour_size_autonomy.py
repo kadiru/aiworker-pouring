@@ -5,14 +5,26 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 
+import numpy as np
+import torch
+
 from pour_guard_actor import empty_confirmation
-from pour_guard_vision import locate_initial_source
+from pour_guard_vision import locate, locate_initial_source
 from pour_size_autonomy import (MAX_SETTLED_RGB_BIAS, MIDFILL_RGB_KNOTS, SizedCupPerception,
-                                batch_specs, settled_pair, settled_rgb_weight, sha)
+                                batch_specs, calibrated_rgb_height, settled_pair, settled_rgb_weight,
+                                sha, validate_rgb_calibration)
 from pour_wide_motion import late_mouth_offset
 
 
 class SizedStopTests(unittest.TestCase):
+    def test_offscreen_neck_proposal_returns_zero_confidence(self):
+        bank = dict(kernels=torch.zeros((1,2,64,48)), mask=torch.ones((1,2,64,48)),
+                    offset=(-24,-12), bounds=(24,24,360,360))
+        point, score = locate(np.zeros((384,384,3),dtype=np.uint8), bank, device="cpu",
+                              expected_uv=[1.,1.])
+        self.assertEqual(point.tolist(),[1.,1.])
+        self.assertEqual(score,0.)
+
     def test_failed_cup_consensus_retries_before_establishing_an_anchor(self):
         cup = SizedCupPerception.__new__(SizedCupPerception)
         cup.retry_initial_cup = True
@@ -71,6 +83,22 @@ class SizedStopTests(unittest.TestCase):
         self.assertEqual(settled_rgb_weight(.64, MIDFILL_RGB_KNOTS), 0.)
         self.assertEqual(settled_rgb_weight(.725, MIDFILL_RGB_KNOTS), 1.)
         self.assertEqual(settled_rgb_weight(.925, MIDFILL_RGB_KNOTS), 0.)
+
+    def test_bounded_rgb_height_correction_preserves_high_level_guard(self):
+        geometry = {"rim_z_m": .0342}
+        calibration = dict(geometry=geometry,knots=[.739,.787,.850,.9],bias=.031)
+        validate_rgb_calibration(calibration,geometry)
+        for level in (.7,.9,.925):
+            self.assertEqual(calibrated_rgb_height(level,calibration),level)
+        self.assertAlmostEqual(calibrated_rgb_height(.815,calibration),.784)
+        with self.assertRaises(ValueError):
+            validate_rgb_calibration(dict(calibration,knots=[.76,.78,.85,.9]),geometry)
+
+    def test_tall_tail_moves_before_the_observed_rebound(self):
+        config = dict(tail_setback_m=.009,tail_window_deg=(115.,119.))
+        self.assertEqual(late_mouth_offset(114.,.008,**config),0.)
+        self.assertLess(late_mouth_offset(119.,.008,**config),0.)
+        self.assertAlmostEqual(late_mouth_offset(122.,.008,**config),-.001)
 
     def test_settled_rgb_correction_is_monotone_and_keeps_full_readings(self):
         readings = [i / 1000 for i in range(1001)]

@@ -504,7 +504,13 @@ class Actor:
                     feedback=settled_prediction if self.fill_mode=='trim' and settled_prediction is not None else self.filtered
                     if level_upper is not None and self.pour_phase>80.:
                         if self.fill_mode=='coarse':
-                            feedback=max(feedback,level_upper)
+                            # A calibrated mid-fill RGB spike can trigger an
+                            # early brake. Keep the uncorrected upper guard near
+                            # the rim and for every other phase.
+                            calibrated = (measured.get('calibrated_brake_level') if
+                                          self.sized_perception is not None else None)
+                            feedback=(calibrated if calibrated is not None and level_upper<.90
+                                      else max(feedback,level_upper))
                         else:
                             timed_brake=timed_brake or (self.pour_phase>=90. and level_upper>=.945)
                     if timed_brake or (use_level_for_pour and level_valid and eligible and feedback>.60
@@ -514,12 +520,11 @@ class Actor:
                 else:
                     arm=target(self.saved['pour_primitive'],self.qlift,self.cup_xy,self.pour_phase)
                     if self.saved.get('project_pour_kinematics'):
-                        from pour_wide_motion import project_target
+                        from pour_wide_motion import outbound_mouth_options, project_target
                         try:
                             arm=project_target(self.fk,arm,self.source_xy,self.cup_xy,
                                 self.cal['table_z'],self.pour_phase,self.saved['pour_mouth_z'],
-                                late_mouth_shift_m=self.saved.get('late_mouth_shift_m',0.),lip_height=self.bottle_lip,
-                                tail_setback_m=self.saved.get('tail_setback_m',0.))
+                                lip_height=self.bottle_lip,**outbound_mouth_options(self.saved))
                         except ValueError:
                             self.latch('trajectory_unreachable',t,robot)
                             targets,phase=self.terminal.act(t)
