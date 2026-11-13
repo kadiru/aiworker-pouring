@@ -669,3 +669,12 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r7b
 ```
+
+The initial [seven live repeats](../evidence/bottle-size-A/wide-mixed-r7-development-results.json)
+all had zero particle loss and five strict passes. The
+[revised seven repeats](../evidence/bottle-size-A/wide-mixed-r7b-development-results.json)
+all met the strict task criteria with zero measured particle loss. The two
+previously missed short bottles completed a 74.05%-rim empty-target pour
+and a 95.58%-rim near-full pour. The corrected tall near-full repeat finished
+at 90.68% of rim height. The two prior spill fixtures fully emptied, with
+zero measured loss across both rounds.
