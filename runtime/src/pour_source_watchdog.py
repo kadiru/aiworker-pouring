@@ -49,12 +49,30 @@ DEFAULT = dict(presence_min_tilt_deg=75.,lost_seconds=.35,
 class TallBottleEmptyGate:
     """Confirm depletion before the cap using corroborated visual evidence."""
 
-    def __init__(self):
+    def __init__(self, use_aligned_scene=False, use_wrist_and_cup=False):
         self.votes = 0
+        self.wrist_votes = 0
+        self.use_aligned_scene = use_aligned_scene
+        self.use_wrist_and_cup = use_wrist_and_cup
+        self.scene_view = None
 
-    def update(self, *, held, level_ready, present, wrist_empty, scene_empty, tilt, flow_ml_s):
-        finite = all(math.isfinite(x) for x in (present,wrist_empty,scene_empty,tilt,flow_ml_s))
-        agrees = (finite and held and level_ready and present >= .7 and tilt >= 120.
-                  and wrist_empty >= .92 and scene_empty >= .98 and 0. <= flow_ml_s < 1.)
-        self.votes = self.votes + 1 if agrees else 0
-        return self.votes >= 10
+    def update(self, *, held, level_ready, present, wrist_empty, scene_empty, tilt, flow_ml_s,
+               aligned_empty=float("nan")):
+        finite = all(math.isfinite(x) for x in (present,wrist_empty,tilt,flow_ml_s))
+        ready = (finite and held and level_ready and present >= .7 and tilt >= 120.
+                 and 0. <= flow_ml_s < 1.)
+        self.scene_view = None
+        raw_valid = math.isfinite(scene_empty)
+        if ready and raw_valid and wrist_empty >= .92 and scene_empty >= .98:
+            self.scene_view = "raw"
+        elif (ready and raw_valid and self.use_aligned_scene and wrist_empty >= .90 and scene_empty >= .65
+              and math.isfinite(aligned_empty) and aligned_empty >= .84):
+            self.scene_view = "cup_aligned"
+        self.votes = self.votes + 1 if self.scene_view else 0
+        self.wrist_votes = self.wrist_votes + 1 if self.use_wrist_and_cup and ready and wrist_empty >= .94 else 0
+        if self.votes >= 10:
+            return True
+        if self.wrist_votes >= 14:
+            self.scene_view = "wrist_and_cup"
+            return True
+        return False

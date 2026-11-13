@@ -13,9 +13,13 @@ ROOT = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
 parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "bottle-autonomy",
                                        "bottle-empty-autonomy", "mixed-vessel-autonomy", "tall-empty-r1",
-                                       "layout-repair-r2", "layout-repair-r3"),
+                                       "layout-repair-r2", "layout-repair-r3", "tall-aligned-r0",
+                                       "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
+                                       "wide-mixed-r4", "wide-mixed-r5"),
                     default="sized-autonomy")
-STUDY = ROOT/parser.parse_args().study
+parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4"))
+ARGS = parser.parse_args()
+STUDY = ROOT/ARGS.study
 sys.path[:0] = [str(STUDY/"src"), "/workspace/learning/A-finish-20261106-v1/staged", "/workspace"]
 from preflight_finish_study import geometry, intersections, object_hits, vessel
 from bottle_pour import GRASP_Z, WALL, initial_points
@@ -135,6 +139,23 @@ def main():
     torch.set_num_threads(1)
     plan_path=STUDY/"plan.json"
     plan=json.loads(plan_path.read_text())
+    sources={p.name:sha(p) for p in sorted((STUDY/"src").glob("*.py"))}
+    reusable={}
+    if ARGS.reuse_study:
+        previous=ROOT/ARGS.reuse_study
+        previous_plan_path=previous/"plan.json"
+        previous_geometry_path=previous/"geometry.json"
+        old_plan=json.loads(previous_plan_path.read_text())
+        old_geometry=json.loads(previous_geometry_path.read_text())
+        assert old_geometry["plan_sha256"]==sha(previous_plan_path)
+        if ARGS.reuse_study=="wide-mixed-r4":
+            assert old_geometry["sources"].keys()==sources.keys()
+            changed={name for name,digest in sources.items() if old_geometry["sources"][name]!=digest}
+            assert changed <= {"pour_guard_actor.py","pour_source_watchdog.py","test_tall_bottle_empty.py"}
+        else:
+            assert old_geometry["sources"]==sources
+        old_specs={s["name"]:s for s in old_plan["development"]+old_plan["test"]}
+        reusable={r["name"]:r for r in old_geometry["cases"] if r["passed"]}
     stage,_,base=geometry()
     opened=base+finger_meshes(stage,[0.,0.,0.,0.])
     variants=[finger_meshes(stage,v) for v in ((.64,.75,.64,.75),(.75,.95,.75,.95),(.64,.95,.64,.95),(.75,.75,.75,.75))]
@@ -147,14 +168,30 @@ def main():
     for spec in plan["development"]+plan["test"]:
         try:
             assert sha(spec["checkpoint"])==plan["checkpoints"][spec["checkpoint"]]
-            saved=torch.load(spec["checkpoint"],map_location="cpu",weights_only=False)
-            row=scan(stage,spec,saved,opened,closed)
+            name=spec["name"]
+            old=old_specs[name] if name in reusable else None
+            same=old is not None and spec==old
+            if old is not None and not same and ARGS.reuse_study=="wide-mixed-r4":
+                same=spec.keys()==old.keys() and all(spec[k]==old[k] for k in spec if k!="checkpoint")
+                if same:
+                    assert sha(old["checkpoint"])==old_plan["checkpoints"][old["checkpoint"]]
+                    a=torch.load(old["checkpoint"],map_location="cpu",weights_only=False)
+                    b=torch.load(spec["checkpoint"],map_location="cpu",weights_only=False)
+                    same=all(a.get(k)==b.get(k) for k in ("pour_primitive","side_return","bottle_geometry",
+                                                        "pour_mouth_z","late_mouth_shift_m","tail_setback_m"))
+            if same:
+                if spec["checkpoint"]==old["checkpoint"]:
+                    assert plan["checkpoints"][spec["checkpoint"]]==old_plan["checkpoints"][spec["checkpoint"]]
+                row=dict(reusable[name], reused_from=ARGS.reuse_study)
+            else:
+                saved=torch.load(spec["checkpoint"],map_location="cpu",weights_only=False)
+                row=scan(stage,spec,saved,opened,closed)
         except ValueError as error:
             row=dict(name=spec["name"],passed=False,failures=[str(error)])
         cases.append(row)
         print(json.dumps(row),flush=True)
     result=dict(passed=all(r["passed"] for r in cases),cases=cases,plan_sha256=sha(plan_path),
-                sources={p.name:sha(p) for p in sorted((STUDY/"src").glob("*.py"))},
+                sources=sources,
                 scope="Sampled robot, gripper and held-bottle clearance with actual cup geometry")
     with (STUDY/"geometry.json").open("x") as f:
         json.dump(result,f,indent=2)

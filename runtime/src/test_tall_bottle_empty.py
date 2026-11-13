@@ -30,6 +30,32 @@ class TallBottleEmptyTests(unittest.TestCase):
         for _ in range(10):
             self.assertFalse(gate.update(**dict(self.evidence, flow_ml_s=float("nan"))))
 
+    def test_aligned_confirmation_needs_raw_support_and_consecutive_wrist_evidence(self):
+        values = dict(self.evidence, wrist_empty=.91, scene_empty=.7, aligned_empty=.9)
+        gate = TallBottleEmptyGate(use_aligned_scene=True)
+        for _ in range(9):
+            self.assertFalse(gate.update(**values))
+        self.assertEqual(gate.scene_view, "cup_aligned")
+        self.assertFalse(gate.update(**dict(values, scene_empty=.649)))
+        self.assertEqual(gate.votes, 0)
+        for _ in range(9):
+            self.assertFalse(gate.update(**values))
+        self.assertTrue(gate.update(**values))
+        self.assertFalse(gate.update(**dict(values, aligned_empty=float("nan"))))
+        self.assertFalse(TallBottleEmptyGate().update(**values))
+
+    def test_wrist_and_cup_needs_its_own_fourteen_votes(self):
+        values = dict(self.evidence, wrist_empty=.95, scene_empty=.1, aligned_empty=0.)
+        gate = TallBottleEmptyGate(use_aligned_scene=True, use_wrist_and_cup=True)
+        for _ in range(13):
+            self.assertFalse(gate.update(**values))
+        self.assertFalse(gate.update(**dict(values, level_ready=False)))
+        for _ in range(13):
+            self.assertFalse(gate.update(**values))
+        self.assertTrue(gate.update(**values))
+        self.assertEqual(gate.scene_view, "wrist_and_cup")
+        self.assertEqual(gate.votes, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -42,6 +42,17 @@ class SizedStopTests(unittest.TestCase):
             self.assertEqual((point, method), (alternate, "neck_fallback"))
             self.assertAlmostEqual(score, .72)
 
+    def test_narrow_presence_check_preserves_a_wide_primary_detection(self):
+        checkpoint = dict(source_bank={}, thresholds=dict(source_localization_score=.65),
+                          source_initial_fallback=dict(bank=dict(bounds=[90, 120, 170, 170]),
+                                                       threshold=.5, presence_floor=.33,
+                                                       presence_bounds_only=True))
+        outside, inside = [210., 145.], [120., 135.]
+        with patch("pour_guard_vision.locate", side_effect=[(outside, .71), (inside, .21)]):
+            self.assertEqual(locate_initial_source(None, checkpoint), (outside, .71, "primary"))
+        with patch("pour_guard_vision.locate", side_effect=[(inside, .71), (inside, .21)]):
+            self.assertEqual(locate_initial_source(None, checkpoint), (inside, 0., "neck_unconfirmed"))
+
     def test_short_empty_requires_consecutive_drain_evidence(self):
         threshold = dict(slow_empty_votes=24)
         self.assertIsNone(empty_confirmation(threshold, 40, 23, True, False, True))

@@ -149,7 +149,9 @@ def locate_initial_source(image, saved, device='cuda'):
     if fallback is None:
         return point, score, 'primary'
     candidate, candidate_score = locate(image, fallback['bank'], device=device)
-    if candidate_score < fallback['presence_floor']:
+    x0, y0, x1, y1 = fallback['bank'].get('bounds', (0, 0, 383, 383))
+    supported = not fallback.get('presence_bounds_only') or (x0 <= point[0] <= x1 and y0 <= point[1] <= y1)
+    if supported and candidate_score < fallback['presence_floor']:
         return point, 0., 'neck_unconfirmed'
     if score < threshold and candidate_score >= fallback['threshold']:
         return candidate, min(1., threshold + candidate_score - fallback['threshold']), 'neck_fallback'

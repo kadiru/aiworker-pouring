@@ -1,0 +1,2921 @@
+{
+  "part": "test",
+  "plan_sha256": "4929e9bb3c08a3b3c296a9f39dc6a58ac3bfab05fe86e8a12e6aa3ab8da6a723",
+  "planned": 10,
+  "completed": 10,
+  "strict_passes": 7,
+  "tolerance_passes": 7,
+  "cases": [
+    {
+      "name": "SA_A_wide_mixed_r1_test_00_normal",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/001-SA_A_wide_mixed_r1_test_00_normal-152379",
+      "expected_stop": "cup_near_full",
+      "checkpoint_sha256": "aee7f9c7a2da3b62314f6dad62ec5a7f83fe0a150785388a3518ef5620073520",
+      "source_initial_ml": 80.0,
+      "cup_initial_ml": 23.683752000000002,
+      "cup_world": [
+        0.4875307719090599,
+        -0.16336278019146544,
+        1.04
+      ],
+      "source_xy": [
+        -0.11367139106653829,
+        -0.0026185266748910974
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 1.0,
+      "delivered_to_cup_ml": 23.415479999999995,
+      "cup_final_ml": 47.09923199999999,
+      "cup_surface_height_fraction": 0.9453101493174719,
+      "cup_nominal_inventory_fraction": 0.8874725274725273,
+      "source_remaining_ml": 56.582063999999995,
+      "stop_reason": "cup_near_full",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": false,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 35.405,
+      "wall_seconds": 818.27,
+      "stop_prediction": {
+        "t": 27.454999998775474,
+        "mode": "Returning upright",
+        "stop_latched": "cup_near_full",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.489866469780037,
+          -0.27683874598856817
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            147.68580594024803,
+            117.61539994786955
+          ],
+          "expected_uv": [
+            142.60131466874512,
+            116.61000440989451
+          ],
+          "score": 0.5764870643615723,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.042210014886619796
+        },
+        "localization_consensus": {
+          "elapsed": 0.3500000000000003,
+          "cup": {
+            "uv": [
+              610.4443435668945,
+              421.3313501146105
+            ]
+          },
+          "source": {
+            "uv": [
+              144.5066949691985,
+              164.54225668804304
+            ],
+            "votes": 8,
+            "anchor_score": 0.7085997462272644,
+            "median_score": 0.6799681782722473
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.0016626682855340955,
+          "arrived": true,
+          "elapsed": 2.049999999999959
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": null,
+          "active_age_s": 23.150000000004844
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "right",
+          "placement_xy": [
+            0.48727389772420443,
+            -0.3437867375493048
+          ],
+          "cup_xy": [
+            0.48727389772420443,
+            -0.16378673754930478
+          ],
+          "offset_m": 0.18,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.07138493365683729,
+          "minimum_carried_bottom_above_rim_m": 0.011999999999999969,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.48727389772420443,
+          -0.16378673754930478
+        ],
+        "cup_predicted_fraction": 0.9536390900302955,
+        "surface_geometry_fraction": 0.9583554482064279,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.9533749112656105,
+            "color": 0.9583554482064279
+          },
+          "filtered": {
+            "rgb": 0.9536390900302955,
+            "color": 0.9583554482064279
+          },
+          "valid": true,
+          "disagreement": 0.0047163581761324735,
+          "agreement": true
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 0.010919525288045406,
+          "raw_present": 0.9955469369888306,
+          "aligned_empty": 0.020378001034259796,
+          "aligned_present": 0.8146436214447021,
+          "fused_present": 0.9955469369888306,
+          "encoder_hold": true,
+          "wrist_crop_empty": 2.8611228231056884e-07,
+          "wrist_present": 0.9999639987945557
+        },
+        "source_localization_score": 0.6796190142631531,
+        "cup_localization_score": 0.9943996071815491,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": null,
+        "visual_flow_fraction_s": 0.005719796892018255,
+        "empty_probability": 2.8611228231056884e-07,
+        "source_present_probability": 0.9999639987945557,
+        "estimated_tilt_from_joints": 80.0052878353636,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": null,
+        "tall_empty_wrist_votes": null,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 80.0,
+        "fill_mode": "settle",
+        "pause_count": 6,
+        "trim_goal": 0.9236992248651505,
+        "trim_cap_deg": 97.625,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        0.9,
+        0.9
+      ],
+      "peak_height": 0.9475755738277047,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "right",
+        "placement_xy": [
+          0.48727389772420443,
+          -0.3437867375493048
+        ],
+        "cup_xy": [
+          0.48727389772420443,
+          -0.16378673754930478
+        ],
+        "offset_m": 0.18,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.07138493365683729,
+        "minimum_carried_bottom_above_rim_m": 0.011999999999999969,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.9533749112656105,
+          "color": 0.9583554482064279
+        },
+        "filtered": {
+          "rgb": 0.9536390900302955,
+          "color": 0.9583554482064279
+        },
+        "valid": true,
+        "disagreement": 0.0047163581761324735,
+        "agreement": true
+      },
+      "recording_bytes": 213823464,
+      "recording_sha256": "f0cdb5a678a4f91e991ab61a299f346d573b7cf50e17a1f01288775a6e9d0a43",
+      "layout_family": 0,
+      "pair_index": 0,
+      "swapped": false,
+      "bottle_size": [
+        0.925,
+        1.0
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.07954107142857143,
+            0.025
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 172.398311358384,
+        "volume_m3": 4.818733739375607e-05,
+        "mass_kg": 0.17097188559430185,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.044950793132329386
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138597258596,
+          0.0002584138597258596,
+          9.237205145147004e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.17097188532352448,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04495079442858696
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138710517436,
+          0.0002584138710517436,
+          9.237205085810274e-05
+        ]
+      },
+      "failure_reasons": [],
+      "strict_pass": true,
+      "within_particle_tolerance": true
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_00_swap",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/002-SA_A_wide_mixed_r1_test_00_swap-536622",
+      "expected_stop": "bottle_empty",
+      "checkpoint_sha256": "aee7f9c7a2da3b62314f6dad62ec5a7f83fe0a150785388a3518ef5620073520",
+      "source_initial_ml": 28.0,
+      "cup_initial_ml": 9.296208,
+      "cup_world": [
+        0.490149298583951,
+        -0.2770341712580037,
+        1.04
+      ],
+      "source_xy": [
+        0.11367139106653829,
+        0.0026185266748910974
+      ],
+      "grasp_verified": false,
+      "visual_grasp_confirmed": false,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 0.0,
+      "delivered_to_cup_ml": 0.0,
+      "cup_final_ml": 9.296208,
+      "cup_surface_height_fraction": 0.22374354624280623,
+      "cup_nominal_inventory_fraction": 0.17516483516483514,
+      "source_remaining_ml": 27.999432,
+      "stop_reason": "localization_unconfirmed",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": false,
+      "surface_goal_zero_spill_success": false,
+      "legacy_inventory_zero_spill_success": false,
+      "teacher_fallback": false,
+      "gates": [
+        "wrong_stop_condition",
+        "residual_bottle",
+        "grip_not_sustained"
+      ],
+      "sim_seconds": 3.155,
+      "wall_seconds": 61.45,
+      "stop_prediction": {
+        "t": 2.1049999987706207,
+        "mode": "Aborting unconfirmed grasp",
+        "stop_latched": "localization_unconfirmed",
+        "grasp_stage": "initialize",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": false,
+        "confirmation_votes": 0,
+        "source_xy": null,
+        "grasp_check": null,
+        "localization_consensus": {
+          "elapsed": 2.0499999999999665,
+          "cup": {
+            "uv": [
+              396.1343290540907,
+              522.0222786797417
+            ]
+          },
+          "source": null
+        },
+        "approach_tracking": null,
+        "source_watchdog": {},
+        "return_planning_error": null,
+        "side_return_plan": null,
+        "cup_xy": null,
+        "cup_predicted_fraction": 0.0,
+        "surface_geometry_fraction": 0.0,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": null,
+        "settled_prediction": null,
+        "empty_views": null,
+        "source_localization_score": 0.6233607530593872,
+        "cup_localization_score": 1.0,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": null,
+        "visual_flow_fraction_s": 0.0,
+        "empty_probability": 0.0,
+        "source_present_probability": 0.0,
+        "estimated_tilt_from_joints": 0.0,
+        "physical_confirmation_votes": 0,
+        "visual_confirmation_window": [],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": null,
+        "tall_empty_wrist_votes": null,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 0.0,
+        "fill_mode": "coarse",
+        "pause_count": 0,
+        "trim_goal": null,
+        "trim_cap_deg": 95.0,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        0.9,
+        0.9
+      ],
+      "peak_height": 0.22602969602821582,
+      "measured_loss_particles": 0,
+      "ordered_return": false,
+      "side_return": null,
+      "perception_at_stop": null,
+      "recording_bytes": 17126203,
+      "recording_sha256": "8464029ea653eedfe3ade611fc0b9339208803df1be6f8d88da4b6f75034fe5d",
+      "layout_family": 0,
+      "pair_index": 0,
+      "swapped": true,
+      "bottle_size": [
+        0.925,
+        1.0
+      ],
+      "source_localization_method": null,
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": null,
+      "first_zero_source_s": null,
+      "empty_confirmation_lag_s": null,
+      "source_at_stop_ml": 27.999432,
+      "tall_empty_votes_at_stop": null,
+      "tall_empty_wrist_votes_at_stop": null,
+      "tall_empty_view_at_stop": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.07954107142857143,
+            0.025
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 172.398311358384,
+        "volume_m3": 4.818733739375607e-05,
+        "mass_kg": 0.17097188559430185,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.044950793132329386
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138597258596,
+          0.0002584138597258596,
+          9.237205145147004e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.17097188532352448,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04495079442858696
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138710517436,
+          0.0002584138710517436,
+          9.237205085810274e-05
+        ]
+      },
+      "failure_reasons": [
+        "grasp_unconfirmed",
+        "grip_not_sustained",
+        "insufficient_transfer",
+        "localization_unconfirmed",
+        "return_incomplete",
+        "source_not_empty",
+        "wrong_stop_condition",
+        "residual_bottle",
+        "source_not_depleted_at_stop",
+        "side_return_incomplete",
+        "sized_perception_stop_unconfirmed"
+      ],
+      "strict_pass": false,
+      "within_particle_tolerance": false
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_01_normal",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/003-SA_A_wide_mixed_r1_test_01_normal-711302",
+      "expected_stop": "bottle_empty",
+      "checkpoint_sha256": "74ce4cc5d93f0addc416f79b075bfb7bc34e95c04029aa38fb4932cefc78911b",
+      "source_initial_ml": 28.0,
+      "cup_initial_ml": 11.594016,
+      "cup_world": [
+        0.5348525722316841,
+        -0.11749228624401316,
+        1.04
+      ],
+      "source_xy": [
+        -0.19244292067112795,
+        0.08275515547861034
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 0.9557344064386318,
+      "delivered_to_cup_ml": 27.999431999999995,
+      "cup_final_ml": 39.593447999999995,
+      "cup_surface_height_fraction": 0.6828574191511055,
+      "cup_nominal_inventory_fraction": 0.6042956043956044,
+      "source_remaining_ml": 0.0,
+      "stop_reason": "bottle_empty",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": true,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 35.905,
+      "wall_seconds": 798.83,
+      "stop_prediction": {
+        "t": 27.95499999877573,
+        "mode": "Returning upright",
+        "stop_latched": "bottle_empty",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.4512934720833907,
+          -0.3096295120821356
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            84.80917827062004,
+            93.87762752750307
+          ],
+          "expected_uv": [
+            82.81064429187407,
+            91.27523114427277
+          ],
+          "score": 0.7442373633384705,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.04224384418265337
+        },
+        "localization_consensus": {
+          "elapsed": 0.3500000000000003,
+          "cup": {
+            "uv": [
+              774.6359227498372,
+              424.7833599514431
+            ]
+          },
+          "source": {
+            "uv": [
+              87.04795291639647,
+              140.48329868020153
+            ],
+            "votes": 8,
+            "anchor_score": 0.769646406173706,
+            "median_score": 0.7591661214828491
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.001506429026500028,
+          "arrived": true,
+          "elapsed": 2.049999999999959
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": 1.6000000000008185,
+          "active_age_s": 23.6500000000051
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "right",
+          "placement_xy": [
+            0.5341561123405352,
+            -0.2970352170309513
+          ],
+          "cup_xy": [
+            0.5341561123405352,
+            -0.11703521703095132
+          ],
+          "offset_m": 0.18,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.06363046620129775,
+          "minimum_carried_bottom_above_rim_m": 0.01303603162332552,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.5341561123405352,
+          -0.11703521703095132
+        ],
+        "cup_predicted_fraction": 0.7098907776570357,
+        "surface_geometry_fraction": 0.6699899601262522,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.7098907776570357,
+            "color": 0.66877465299399
+          },
+          "filtered": {
+            "rgb": 0.7098907776570357,
+            "color": 0.6699899601262522
+          },
+          "valid": true,
+          "disagreement": 0.03990081753078345,
+          "agreement": false
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 0.014532608911395073,
+          "raw_present": 0.19876618683338165,
+          "aligned_empty": 0.022441372275352478,
+          "aligned_present": 0.9990721940994263,
+          "fused_present": 0.9990721940994263,
+          "encoder_hold": true,
+          "wrist_crop_empty": 0.9368616938591003,
+          "wrist_present": 1.0
+        },
+        "source_localization_score": 0.7570802569389343,
+        "cup_localization_score": 0.9899133443832397,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": "drain_dwell",
+        "visual_flow_fraction_s": 0.003314136156804167,
+        "empty_probability": 0.9368616938591003,
+        "source_present_probability": 1.0,
+        "estimated_tilt_from_joints": 131.06198969200688,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 24,
+        "cap_dwell_seconds": 1.6000000000008185,
+        "tall_empty_votes": 0,
+        "tall_empty_wrist_votes": 0,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 131.0,
+        "fill_mode": "coarse",
+        "pause_count": 0,
+        "trim_goal": null,
+        "trim_cap_deg": 95.0,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        0.9,
+        1.0
+      ],
+      "peak_height": 0.6850238142449858,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "right",
+        "placement_xy": [
+          0.5341561123405352,
+          -0.2970352170309513
+        ],
+        "cup_xy": [
+          0.5341561123405352,
+          -0.11703521703095132
+        ],
+        "offset_m": 0.18,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.06363046620129775,
+        "minimum_carried_bottom_above_rim_m": 0.01303603162332552,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.7098907776570357,
+          "color": 0.66877465299399
+        },
+        "filtered": {
+          "rgb": 0.7098907776570357,
+          "color": 0.6699899601262522
+        },
+        "valid": true,
+        "disagreement": 0.03990081753078345,
+        "agreement": false
+      },
+      "recording_bytes": 222382951,
+      "recording_sha256": "789f3ff29d40cfd523b59ea1aba0825614d4a33377ccdd3b5ee4dd6312b8676c",
+      "layout_family": 1,
+      "pair_index": 1,
+      "swapped": false,
+      "bottle_size": [
+        1.075,
+        0.95
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": "drain_dwell",
+      "first_zero_source_s": 22.155,
+      "empty_confirmation_lag_s": 5.8,
+      "source_at_stop_ml": 0.0,
+      "tall_empty_votes_at_stop": 0,
+      "tall_empty_wrist_votes_at_stop": 0,
+      "tall_empty_view_at_stop": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.08445892857142857,
+            0.02375
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 173.58059658346102,
+        "volume_m3": 5.0678132940859206e-05,
+        "mass_kg": 0.17980939425011924,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052922813597575426
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00034124187850504073,
+          0.00034124187850504073,
+          8.654807638570074e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.17980939149856567,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.0529228150844574
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00034124188823625445,
+          0.00034124188823625445,
+          8.654807606944814e-05
+        ]
+      },
+      "failure_reasons": [
+        "sized_perception_stop_unconfirmed"
+      ],
+      "strict_pass": false,
+      "within_particle_tolerance": false
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_01_swap",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/004-SA_A_wide_mixed_r1_test_01_swap-814250",
+      "expected_stop": "cup_near_full",
+      "checkpoint_sha256": "74ce4cc5d93f0addc416f79b075bfb7bc34e95c04029aa38fb4932cefc78911b",
+      "source_initial_ml": 80.0,
+      "cup_initial_ml": 29.241647999999998,
+      "cup_world": [
+        0.4520974167530738,
+        -0.3099352069151411,
+        1.04
+      ],
+      "source_xy": [
+        0.19244292067112795,
+        -0.08275515547861034
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 1.0,
+      "delivered_to_cup_ml": 29.591567999999995,
+      "cup_final_ml": 58.83321599999999,
+      "cup_surface_height_fraction": 0.9523126237532656,
+      "cup_nominal_inventory_fraction": 0.897942857142857,
+      "source_remaining_ml": 50.405975999999995,
+      "stop_reason": "cup_near_full",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0058319999999999995,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": false,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 39.705,
+      "wall_seconds": 912.95,
+      "stop_prediction": {
+        "t": 31.754999998777674,
+        "mode": "Returning upright",
+        "stop_latched": "cup_near_full",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.5356246763451908,
+          -0.11816556247802151
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            303.0413296046473,
+            75.81849014530283
+          ],
+          "expected_uv": [
+            302.8586990305661,
+            72.95925693027422
+          ],
+          "score": 0.8248369693756104,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.04197892567311157
+        },
+        "localization_consensus": {
+          "elapsed": 0.3500000000000003,
+          "cup": {
+            "uv": [
+              259.1720097859701,
+              513.4176415337456
+            ]
+          },
+          "source": {
+            "uv": [
+              299.0375702151533,
+              117.29732066814036
+            ],
+            "votes": 8,
+            "anchor_score": 0.7911401987075806,
+            "median_score": 0.7694959044456482
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.002323870173595347,
+          "arrived": true,
+          "elapsed": 2.049999999999959
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": null,
+          "active_age_s": 27.450000000007044
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "left",
+          "placement_xy": [
+            0.4515646928361045,
+            -0.12980732530210276
+          ],
+          "cup_xy": [
+            0.4515646928361045,
+            -0.30980732530210275
+          ],
+          "offset_m": 0.18,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.07157689486475305,
+          "minimum_carried_bottom_above_rim_m": 0.011999999999999969,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.4515646928361045,
+          -0.30980732530210275
+        ],
+        "cup_predicted_fraction": 0.9529471798056737,
+        "surface_geometry_fraction": 0.9518970298644285,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.9527833689525488,
+            "color": 0.9518970298644285
+          },
+          "filtered": {
+            "rgb": 0.9529471798056737,
+            "color": 0.9518970298644285
+          },
+          "valid": true,
+          "disagreement": 0.0010501499412451931,
+          "agreement": true,
+          "guard_filtered": {
+            "rgb": 0.9529471798056737,
+            "color": 0.9518970298644285
+          },
+          "rgb_settle_correction": 0.0
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 0.001825100276619196,
+          "raw_present": 0.8078901171684265,
+          "aligned_empty": 1.6079713560657183e-08,
+          "aligned_present": 0.05895256623625755,
+          "fused_present": 0.8078901171684265,
+          "encoder_hold": true,
+          "wrist_crop_empty": 5.563968841215683e-09,
+          "wrist_present": 0.9999988079071045
+        },
+        "source_localization_score": 0.7742103338241577,
+        "cup_localization_score": 0.9934784173965454,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": null,
+        "visual_flow_fraction_s": 0.0025543514533195775,
+        "empty_probability": 5.563968841215683e-09,
+        "source_present_probability": 0.9999988079071045,
+        "estimated_tilt_from_joints": 79.91713416341658,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": 0,
+        "tall_empty_wrist_votes": 0,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 80.0,
+        "fill_mode": "settle",
+        "pause_count": 8,
+        "trim_goal": 0.9299362142697596,
+        "trim_cap_deg": 98.0,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        0.9,
+        1.0
+      ],
+      "peak_height": 0.9564373820435753,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "left",
+        "placement_xy": [
+          0.4515646928361045,
+          -0.12980732530210276
+        ],
+        "cup_xy": [
+          0.4515646928361045,
+          -0.30980732530210275
+        ],
+        "offset_m": 0.18,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.07157689486475305,
+        "minimum_carried_bottom_above_rim_m": 0.011999999999999969,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.9527833689525488,
+          "color": 0.9518970298644285
+        },
+        "filtered": {
+          "rgb": 0.9529471798056737,
+          "color": 0.9518970298644285
+        },
+        "valid": true,
+        "disagreement": 0.0010501499412451931,
+        "agreement": true,
+        "guard_filtered": {
+          "rgb": 0.9529471798056737,
+          "color": 0.9518970298644285
+        },
+        "rgb_settle_correction": 0.0
+      },
+      "recording_bytes": 213419468,
+      "recording_sha256": "9f231ce51c75a0b03d535f85401f1fd09e2d5bd2b1b4b42a120aa2445433e2cd",
+      "layout_family": 1,
+      "pair_index": 1,
+      "swapped": true,
+      "bottle_size": [
+        1.075,
+        0.95
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": null,
+      "settled_rgb_adjustment": {
+        "frames": 122,
+        "restored_agreement_frames": 25,
+        "max_correction": 0.03245966687016563
+      },
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.08445892857142857,
+            0.02375
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 173.58059658346102,
+        "volume_m3": 5.0678132940859206e-05,
+        "mass_kg": 0.17980939425011924,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052922813597575426
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00034124187850504073,
+          0.00034124187850504073,
+          8.654807638570074e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.17980939149856567,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.0529228150844574
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00034124188823625445,
+          0.00034124188823625445,
+          8.654807606944814e-05
+        ]
+      },
+      "failure_reasons": [],
+      "strict_pass": true,
+      "within_particle_tolerance": true
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_02_normal",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/005-SA_A_wide_mixed_r1_test_02_normal-794685",
+      "expected_stop": "cup_near_full",
+      "checkpoint_sha256": "960a7d3a4b9ce437bd041c92d0802cdd046afe48165fc87461cbb4ca9f199faa",
+      "source_initial_ml": 80.0,
+      "cup_initial_ml": 35.989272,
+      "cup_world": [
+        0.42981717122052243,
+        -0.11148803295382698,
+        1.04
+      ],
+      "source_xy": [
+        -0.20063567015014805,
+        -0.12357629223496502
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 1.0,
+      "delivered_to_cup_ml": 34.30965599999999,
+      "cup_final_ml": 70.29892799999999,
+      "cup_surface_height_fraction": 0.9382444082521911,
+      "cup_nominal_inventory_fraction": 0.8867260012714555,
+      "source_remaining_ml": 45.687887999999994,
+      "stop_reason": "cup_near_full",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.011663999999999999,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": false,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 43.055,
+      "wall_seconds": 996.16,
+      "stop_prediction": {
+        "t": 35.10499999877498,
+        "mode": "Returning upright",
+        "stop_latched": "cup_near_full",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.55343301424707,
+          -0.3124478653087194
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            157.16815955189074,
+            156.72271140337347
+          ],
+          "expected_uv": [
+            157.51860029419157,
+            145.8184652481388
+          ],
+          "score": 0.7277088761329651,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.0420970704048782
+        },
+        "localization_consensus": {
+          "elapsed": 0.4500000000000003,
+          "cup": {
+            "uv": [
+              599.7023425632053,
+              341.36934195624457
+            ]
+          },
+          "source": {
+            "uv": [
+              159.05087095441957,
+              199.7425143927809
+            ],
+            "votes": 10,
+            "anchor_score": 0.7175166010856628,
+            "median_score": 0.7031497955322266
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.0019365870070660249,
+          "arrived": true,
+          "elapsed": 2.0499999999999567
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": null,
+          "active_age_s": 30.700000000004337
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "right",
+          "placement_xy": [
+            0.42957179089081177,
+            -0.291456890596732
+          ],
+          "cup_xy": [
+            0.42957179089081177,
+            -0.11145689059673203
+          ],
+          "offset_m": 0.18,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.06552068249720833,
+          "minimum_carried_bottom_above_rim_m": 0.011999999999999969,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.42957179089081177,
+          -0.11145689059673203
+        ],
+        "cup_predicted_fraction": 0.9489958110789223,
+        "surface_geometry_fraction": 0.9471941708558852,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.9490766464859295,
+            "color": 0.9482157670750415
+          },
+          "filtered": {
+            "rgb": 0.9489958110789223,
+            "color": 0.9471941708558852
+          },
+          "valid": true,
+          "disagreement": 0.001801640223037082,
+          "agreement": true
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 0.9904261231422424,
+          "raw_present": 0.9849461317062378,
+          "aligned_empty": 0.0168877225369215,
+          "aligned_present": 0.8037062287330627,
+          "fused_present": 0.9849461317062378,
+          "encoder_hold": true,
+          "wrist_crop_empty": 2.6218933157906577e-07,
+          "wrist_present": 0.9998917579650879
+        },
+        "source_localization_score": 0.7172243595123291,
+        "cup_localization_score": 0.9471367001533508,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": null,
+        "visual_flow_fraction_s": 0.001543049577174364,
+        "empty_probability": 2.6218933157906577e-07,
+        "source_present_probability": 0.9998917579650879,
+        "estimated_tilt_from_joints": 80.0296481019679,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": null,
+        "tall_empty_wrist_votes": null,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 80.0,
+        "fill_mode": "settle",
+        "pause_count": 9,
+        "trim_goal": 0.9145210443589729,
+        "trim_cap_deg": 98.5,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        0.9,
+        1.1
+      ],
+      "peak_height": 0.9427805359846612,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "right",
+        "placement_xy": [
+          0.42957179089081177,
+          -0.291456890596732
+        ],
+        "cup_xy": [
+          0.42957179089081177,
+          -0.11145689059673203
+        ],
+        "offset_m": 0.18,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.06552068249720833,
+        "minimum_carried_bottom_above_rim_m": 0.011999999999999969,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.9490766464859295,
+          "color": 0.9482157670750415
+        },
+        "filtered": {
+          "rgb": 0.9489958110789223,
+          "color": 0.9471941708558852
+        },
+        "valid": true,
+        "disagreement": 0.001801640223037082,
+        "agreement": true
+      },
+      "recording_bytes": 243916996,
+      "recording_sha256": "1fbfb1b9e7e7d26868db7db36bd37708ade63747cbf46a64fa48677042a174b8",
+      "layout_family": 2,
+      "pair_index": 2,
+      "swapped": false,
+      "bottle_size": [
+        0.925,
+        0.95
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.07954107142857143,
+            0.02375
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 156.583332016131,
+        "volume_m3": 4.574732755002206e-05,
+        "mass_kg": 0.16231456799978544,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04565712122925255
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00024284858212267937,
+          0.00024284858212267937,
+          7.973372322706042e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.16231456398963928,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.045657120645046234
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00024284857499878854,
+          0.00024284857499878854,
+          7.973371975822374e-05
+        ]
+      },
+      "failure_reasons": [],
+      "strict_pass": true,
+      "within_particle_tolerance": true
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_02_swap",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/006-SA_A_wide_mixed_r1_test_02_swap-183799",
+      "expected_stop": "bottle_empty",
+      "checkpoint_sha256": "960a7d3a4b9ce437bd041c92d0802cdd046afe48165fc87461cbb4ca9f199faa",
+      "source_initial_ml": 28.0,
+      "cup_initial_ml": 13.897656,
+      "cup_world": [
+        0.5533934634554875,
+        -0.312123703103975,
+        1.04
+      ],
+      "source_xy": [
+        0.20063567015014805,
+        0.12357629223496502
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 0.9634888438133874,
+      "delivered_to_cup_ml": 27.999432,
+      "cup_final_ml": 41.897088,
+      "cup_surface_height_fraction": 0.6072967083625532,
+      "cup_nominal_inventory_fraction": 0.5284751612024338,
+      "source_remaining_ml": 0.0,
+      "stop_reason": "bottle_empty",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": true,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 35.705,
+      "wall_seconds": 775.6,
+      "stop_prediction": {
+        "t": 27.754999998775627,
+        "mode": "Returning upright",
+        "stop_latched": "bottle_empty",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.4305616586839444,
+          -0.11186299627571161
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            229.83058355006503,
+            71.87818478552764
+          ],
+          "expected_uv": [
+            227.77861383206033,
+            74.20905723552899
+          ],
+          "score": 0.681228756904602,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.042502654752222924
+        },
+        "localization_consensus": {
+          "elapsed": 0.3500000000000003,
+          "cup": {
+            "uv": [
+              426.90915213690863,
+              639.6325293646919
+            ]
+          },
+          "source": {
+            "uv": [
+              226.70788493714485,
+              112.66723216703929
+            ],
+            "votes": 8,
+            "anchor_score": 0.6587456464767456,
+            "median_score": 0.6404823064804077
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.0021740938435251406,
+          "arrived": true,
+          "elapsed": 2.049999999999959
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": 1.4000000000007162,
+          "active_age_s": 23.450000000004998
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "left",
+          "placement_xy": [
+            0.552612832470992,
+            -0.13443532363325766
+          ],
+          "cup_xy": [
+            0.552612832470992,
+            -0.31443532363325766
+          ],
+          "offset_m": 0.18,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.05649300444612593,
+          "minimum_carried_bottom_above_rim_m": 0.015102924459333658,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.552612832470992,
+          -0.31443532363325766
+        ],
+        "cup_predicted_fraction": 0.6423694039677199,
+        "surface_geometry_fraction": 0.6547357109049414,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.6425801398294164,
+            "color": 0.6547357109049414
+          },
+          "filtered": {
+            "rgb": 0.6423694039677199,
+            "color": 0.6547357109049414
+          },
+          "valid": true,
+          "disagreement": 0.012366306937221516,
+          "agreement": true
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 0.41467559337615967,
+          "raw_present": 0.9993707537651062,
+          "aligned_empty": 0.002242634305730462,
+          "aligned_present": 0.9947234392166138,
+          "fused_present": 0.9993707537651062,
+          "encoder_hold": true,
+          "wrist_crop_empty": 0.9994316697120667,
+          "wrist_present": 1.0
+        },
+        "source_localization_score": 0.6536365747451782,
+        "cup_localization_score": 0.935008704662323,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": "drain_dwell",
+        "visual_flow_fraction_s": 0.0006136921372775402,
+        "empty_probability": 0.9994316697120667,
+        "source_present_probability": 1.0,
+        "estimated_tilt_from_joints": 130.92870804869887,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 24,
+        "cap_dwell_seconds": 1.4000000000007162,
+        "tall_empty_votes": null,
+        "tall_empty_wrist_votes": null,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 131.0,
+        "fill_mode": "coarse",
+        "pause_count": 0,
+        "trim_goal": null,
+        "trim_cap_deg": 95.0,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        0.9,
+        1.1
+      ],
+      "peak_height": 0.6090779327878754,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "left",
+        "placement_xy": [
+          0.552612832470992,
+          -0.13443532363325766
+        ],
+        "cup_xy": [
+          0.552612832470992,
+          -0.31443532363325766
+        ],
+        "offset_m": 0.18,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.05649300444612593,
+        "minimum_carried_bottom_above_rim_m": 0.015102924459333658,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.6425801398294164,
+          "color": 0.6547357109049414
+        },
+        "filtered": {
+          "rgb": 0.6423694039677199,
+          "color": 0.6547357109049414
+        },
+        "valid": true,
+        "disagreement": 0.012366306937221516,
+        "agreement": true
+      },
+      "recording_bytes": 219705132,
+      "recording_sha256": "d27179022c2448dabeeafc0b23997cacb344125cf4841a40f9cbd66a65424f63",
+      "layout_family": 2,
+      "pair_index": 2,
+      "swapped": true,
+      "bottle_size": [
+        0.925,
+        0.95
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": "drain_dwell",
+      "first_zero_source_s": 25.005,
+      "empty_confirmation_lag_s": 2.75,
+      "source_at_stop_ml": 0.0,
+      "tall_empty_votes_at_stop": null,
+      "tall_empty_wrist_votes_at_stop": null,
+      "tall_empty_view_at_stop": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.02375
+          ],
+          [
+            0.07954107142857143,
+            0.02375
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0523,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 156.583332016131,
+        "volume_m3": 4.574732755002206e-05,
+        "mass_kg": 0.16231456799978544,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04565712122925255
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00024284858212267937,
+          0.00024284858212267937,
+          7.973372322706042e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.16231456398963928,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.045657120645046234
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00024284857499878854,
+          0.00024284857499878854,
+          7.973371975822374e-05
+        ]
+      },
+      "failure_reasons": [],
+      "strict_pass": true,
+      "within_particle_tolerance": true
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_03_normal",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/007-SA_A_wide_mixed_r1_test_03_normal-532420",
+      "expected_stop": "bottle_empty",
+      "checkpoint_sha256": "a4b92776a3370b1caba6b834e75e7618ae3a47d6a190ac760b8077be36c02c98",
+      "source_initial_ml": 28.0,
+      "cup_initial_ml": 11.13912,
+      "cup_world": [
+        0.5824886061717517,
+        -0.17104520803074938,
+        1.04
+      ],
+      "source_xy": [
+        -0.11778531962605263,
+        0.011242834170526295
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 1.0,
+      "delivered_to_cup_ml": 27.999432,
+      "cup_final_ml": 39.138552,
+      "cup_surface_height_fraction": 0.7405402562197505,
+      "cup_nominal_inventory_fraction": 0.6637252747252745,
+      "source_remaining_ml": 0.0,
+      "stop_reason": "bottle_empty",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": true,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 31.355,
+      "wall_seconds": 683.2,
+      "stop_prediction": {
+        "t": 23.454999998773427,
+        "mode": "Returning upright",
+        "stop_latched": "bottle_empty",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.5709297721181039,
+          -0.2887639716771433
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            199.27178515218017,
+            121.59250489591392
+          ],
+          "expected_uv": [
+            197.5299866301397,
+            117.96222540181168
+          ],
+          "score": 0.7223440408706665,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.04175635714292847
+        },
+        "localization_consensus": {
+          "elapsed": 0.3500000000000003,
+          "cup": {
+            "uv": [
+              784.9471901787651,
+              508.9424230787489
+            ]
+          },
+          "source": {
+            "uv": [
+              197.28081096338826,
+              173.89550344032045
+            ],
+            "votes": 8,
+            "anchor_score": 0.7674826383590698,
+            "median_score": 0.7608992159366608
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.0020305812961853194,
+          "arrived": true,
+          "elapsed": 2.049999999999959
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": null,
+          "active_age_s": 19.150000000002798
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "right",
+          "placement_xy": [
+            0.5819487232092322,
+            -0.3511009066107956
+          ],
+          "cup_xy": [
+            0.5819487232092322,
+            -0.17110090661079563
+          ],
+          "offset_m": 0.18,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.056440591076289515,
+          "minimum_carried_bottom_above_rim_m": 0.012000000000000045,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.5819487232092322,
+          -0.17110090661079563
+        ],
+        "cup_predicted_fraction": 0.7470950178262752,
+        "surface_geometry_fraction": 0.7314025908206403,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.7473347683268876,
+            "color": 0.7323250475751043
+          },
+          "filtered": {
+            "rgb": 0.7470950178262752,
+            "color": 0.7314025908206403
+          },
+          "valid": true,
+          "disagreement": 0.01569242700563489,
+          "agreement": true
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 0.7846986055374146,
+          "raw_present": 0.9981440305709839,
+          "aligned_empty": 0.9703581929206848,
+          "aligned_present": 0.9992092847824097,
+          "fused_present": 0.9992092847824097,
+          "encoder_hold": true,
+          "wrist_crop_empty": 0.9734365344047546,
+          "wrist_present": 1.0
+        },
+        "source_localization_score": 0.7640203833580017,
+        "cup_localization_score": 0.9978371262550354,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": "tall_visual",
+        "visual_flow_fraction_s": 0.0,
+        "empty_probability": 0.9734365344047546,
+        "source_present_probability": 1.0,
+        "estimated_tilt_from_joints": 123.47853654065261,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": 10,
+        "tall_empty_wrist_votes": 10,
+        "tall_empty_view": "cup_aligned",
+        "own_pour_phase_deg": 123.5,
+        "fill_mode": "coarse",
+        "pause_count": 0,
+        "trim_goal": null,
+        "trim_cap_deg": 95.0,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        1.0,
+        0.9
+      ],
+      "peak_height": 0.7417605035445259,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "right",
+        "placement_xy": [
+          0.5819487232092322,
+          -0.3511009066107956
+        ],
+        "cup_xy": [
+          0.5819487232092322,
+          -0.17110090661079563
+        ],
+        "offset_m": 0.18,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.056440591076289515,
+        "minimum_carried_bottom_above_rim_m": 0.012000000000000045,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.7473347683268876,
+          "color": 0.7323250475751043
+        },
+        "filtered": {
+          "rgb": 0.7470950178262752,
+          "color": 0.7314025908206403
+        },
+        "valid": true,
+        "disagreement": 0.01569242700563489,
+        "agreement": true
+      },
+      "recording_bytes": 205737145,
+      "recording_sha256": "3312bb20764d80528b9458ed77c682a1b04e7a8da62aedbb0cfc8a608fb68ac0",
+      "layout_family": 3,
+      "pair_index": 3,
+      "swapped": false,
+      "bottle_size": [
+        1.075,
+        1.0
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": "tall_visual",
+      "first_zero_source_s": 22.905,
+      "empty_confirmation_lag_s": 0.55,
+      "source_at_stop_ml": 0.0,
+      "tall_empty_votes_at_stop": 10,
+      "tall_empty_wrist_votes_at_stop": 10,
+      "tall_empty_view_at_stop": "cup_aligned",
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.08445892857142857,
+            0.025
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 190.85940598255002,
+        "volume_m3": 5.327637052203442e-05,
+        "mass_kg": 0.18902811440569825,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052079918149506146
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00036052029053487797,
+          0.00036052029053487797,
+          0.00010011463708220823
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.18902811408042908,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.05207991972565651
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0003605202946346253,
+          0.0003605202946346253,
+          0.00010011463746195659
+        ]
+      },
+      "failure_reasons": [],
+      "strict_pass": true,
+      "within_particle_tolerance": true
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_03_swap",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/008-SA_A_wide_mixed_r1_test_03_swap-977089",
+      "expected_stop": "cup_near_full",
+      "checkpoint_sha256": "a4b92776a3370b1caba6b834e75e7618ae3a47d6a190ac760b8077be36c02c98",
+      "source_initial_ml": 80.0,
+      "cup_initial_ml": 26.646407999999997,
+      "cup_world": [
+        0.5712457720012254,
+        -0.288830527656802,
+        1.04
+      ],
+      "source_xy": [
+        0.11778531962605263,
+        -0.011242834170526295
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 1.0,
+      "delivered_to_cup_ml": 24.768503999999997,
+      "cup_final_ml": 51.414911999999994,
+      "cup_surface_height_fraction": 0.931329833058749,
+      "cup_nominal_inventory_fraction": 0.8719120879120876,
+      "source_remaining_ml": 55.22904,
+      "stop_reason": "cup_near_full",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": false,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 33.055,
+      "wall_seconds": 748.72,
+      "stop_prediction": {
+        "t": 25.154999998774297,
+        "mode": "Returning upright",
+        "stop_latched": "cup_near_full",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.5826922328854813,
+          -0.17153886058891488
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            310.80301557019254,
+            97.755504150671
+          ],
+          "expected_uv": [
+            309.2603059430601,
+            92.37691453279209
+          ],
+          "score": 0.7866905331611633,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.041710012871551516
+        },
+        "localization_consensus": {
+          "elapsed": 0.3500000000000003,
+          "cup": {
+            "uv": [
+              526.756243387858,
+              624.4060651991102
+            ]
+          },
+          "source": {
+            "uv": [
+              304.6793340679983,
+              141.87126517268132
+            ],
+            "votes": 8,
+            "anchor_score": 0.7612175941467285,
+            "median_score": 0.7442058324813843
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.0022895398035853824,
+          "arrived": true,
+          "elapsed": 2.049999999999959
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": null,
+          "active_age_s": 20.850000000003668
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "left",
+          "placement_xy": [
+            0.5714468146987152,
+            -0.10860608175356029
+          ],
+          "cup_xy": [
+            0.5714468146987152,
+            -0.2886060817535603
+          ],
+          "offset_m": 0.18,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.09228330978713473,
+          "minimum_carried_bottom_above_rim_m": 0.011999999999999823,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.5714468146987152,
+          -0.2886060817535603
+        ],
+        "cup_predicted_fraction": 0.9271169653692629,
+        "surface_geometry_fraction": 0.927067885262621,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.9264908656484643,
+            "color": 0.9268505773596384
+          },
+          "filtered": {
+            "rgb": 0.9271169653692629,
+            "color": 0.927067885262621
+          },
+          "valid": true,
+          "disagreement": 4.908010664195217e-05,
+          "agreement": true
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 0.9350935220718384,
+          "raw_present": 0.9954237341880798,
+          "aligned_empty": 0.00045538818812929094,
+          "aligned_present": 0.9999876022338867,
+          "fused_present": 0.9999876022338867,
+          "encoder_hold": true,
+          "wrist_crop_empty": 6.8503940298114685e-09,
+          "wrist_present": 0.9999988079071045
+        },
+        "source_localization_score": 0.7421516180038452,
+        "cup_localization_score": 0.9783092737197876,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": null,
+        "visual_flow_fraction_s": 0.0,
+        "empty_probability": 6.8503940298114685e-09,
+        "source_present_probability": 0.9999988079071045,
+        "estimated_tilt_from_joints": 79.9485506174473,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": 0,
+        "tall_empty_wrist_votes": 0,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 80.0,
+        "fill_mode": "settle",
+        "pause_count": 5,
+        "trim_goal": 0.9076611472609412,
+        "trim_cap_deg": 98.0,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        1.0,
+        0.9
+      ],
+      "peak_height": 0.9333582317127888,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "left",
+        "placement_xy": [
+          0.5714468146987152,
+          -0.10860608175356029
+        ],
+        "cup_xy": [
+          0.5714468146987152,
+          -0.2886060817535603
+        ],
+        "offset_m": 0.18,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.09228330978713473,
+        "minimum_carried_bottom_above_rim_m": 0.011999999999999823,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.9264908656484643,
+          "color": 0.9268505773596384
+        },
+        "filtered": {
+          "rgb": 0.9271169653692629,
+          "color": 0.927067885262621
+        },
+        "valid": true,
+        "disagreement": 4.908010664195217e-05,
+        "agreement": true
+      },
+      "recording_bytes": 210905285,
+      "recording_sha256": "266ac16ecfd2d84196ad7d5ccff7c373da6dba857f3227fc58df8b1373118ac5",
+      "layout_family": 3,
+      "pair_index": 3,
+      "swapped": true,
+      "bottle_size": [
+        1.075,
+        1.0
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.08445892857142857,
+            0.025
+          ],
+          [
+            0.113075,
+            0.009
+          ],
+          [
+            0.145125,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.145125,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 190.85940598255002,
+        "volume_m3": 5.327637052203442e-05,
+        "mass_kg": 0.18902811440569825,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.052079918149506146
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.00036052029053487797,
+          0.00036052029053487797,
+          0.00010011463708220823
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.18902811408042908,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.05207991972565651
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0003605202946346253,
+          0.0003605202946346253,
+          0.00010011463746195659
+        ]
+      },
+      "failure_reasons": [],
+      "strict_pass": true,
+      "within_particle_tolerance": true
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_04_normal",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/009-SA_A_wide_mixed_r1_test_04_normal-859594",
+      "expected_stop": "cup_near_full",
+      "checkpoint_sha256": "c1dd7d5e74c09f6c5ce61ba3f3274447d3842d7fa91804d69fb486c5169b1581",
+      "source_initial_ml": 80.0,
+      "cup_initial_ml": 33.079103999999994,
+      "cup_world": [
+        0.594704182895809,
+        -0.2176803426365847,
+        1.04
+      ],
+      "source_xy": [
+        -0.13431296563510453,
+        0.07871504556054476
+      ],
+      "grasp_verified": true,
+      "visual_grasp_confirmed": true,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 1.0,
+      "delivered_to_cup_ml": 30.489696000000002,
+      "cup_final_ml": 63.568799999999996,
+      "cup_surface_height_fraction": 0.9305161244728973,
+      "cup_nominal_inventory_fraction": 0.8731978021978022,
+      "source_remaining_ml": 49.507847999999996,
+      "stop_reason": "cup_near_full",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": true,
+      "surface_goal_zero_spill_success": true,
+      "legacy_inventory_zero_spill_success": false,
+      "teacher_fallback": false,
+      "gates": [],
+      "sim_seconds": 34.255,
+      "wall_seconds": 796.21,
+      "stop_prediction": {
+        "t": 26.304999998774885,
+        "mode": "Returning upright",
+        "stop_latched": "cup_near_full",
+        "grasp_stage": "ready",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": true,
+        "confirmation_votes": 6,
+        "source_xy": [
+          0.5159102677057811,
+          -0.35186203603115096
+        ],
+        "grasp_check": {
+          "neck_uv": [
+            84.77038538706846,
+            148.33083950429872
+          ],
+          "expected_uv": [
+            83.57013503680166,
+            145.32934216863973
+          ],
+          "score": 0.7435169816017151,
+          "moved": true,
+          "follows": true,
+          "follow_radius_px": 15.692052258949532,
+          "finger_obstruction": true,
+          "arm_lift_m": 0.04209670099280993
+        },
+        "localization_consensus": {
+          "elapsed": 0.4999999999999992,
+          "cup": {
+            "uv": [
+              727.4566065470377,
+              571.0987748040093
+            ]
+          },
+          "source": {
+            "uv": [
+              88.3779104822758,
+              199.15658976438291
+            ],
+            "votes": 11,
+            "anchor_score": 0.7278271913528442,
+            "median_score": 0.7163523435592651
+          }
+        },
+        "approach_tracking": {
+          "max_joint_error_rad": 0.0017853966234781388,
+          "arrived": true,
+          "elapsed": 2.0499999999999567
+        },
+        "source_watchdog": {
+          "visual_presence_eligible": true,
+          "encoder_hold": true,
+          "lost_age_s": null,
+          "ambiguous_empty_age_s": null,
+          "cap_age_s": null,
+          "active_age_s": 21.850000000004236
+        },
+        "return_planning_error": null,
+        "side_return_plan": {
+          "side": "right",
+          "placement_xy": [
+            0.5945194468784565,
+            -0.38267863998061225
+          ],
+          "cup_xy": [
+            0.5945194468784565,
+            -0.2176786399806122
+          ],
+          "offset_m": 0.16500000000000004,
+          "simultaneous_uprighting": true,
+          "upright_seconds": 2.4,
+          "early_lift_arc": true,
+          "max_planned_joint_step_rad": 0.08653881839742272,
+          "minimum_carried_bottom_above_rim_m": 0.011999999999999823,
+          "rejected_candidates": []
+        },
+        "cup_xy": [
+          0.5945194468784565,
+          -0.2176786399806122
+        ],
+        "cup_predicted_fraction": 0.9314784955662976,
+        "surface_geometry_fraction": 0.9348297510764624,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": {
+          "track_valid": true,
+          "track_reason": "tracked",
+          "raw": {
+            "rgb": 0.9312234046071746,
+            "color": 0.9338167384948811
+          },
+          "filtered": {
+            "rgb": 0.9314784955662976,
+            "color": 0.9348297510764624
+          },
+          "valid": true,
+          "disagreement": 0.0033512555101647967,
+          "agreement": true
+        },
+        "settled_prediction": null,
+        "empty_views": {
+          "raw_empty": 4.77318025104978e-08,
+          "raw_present": 0.999907374382019,
+          "aligned_empty": 0.00011115963570773602,
+          "aligned_present": 0.9999932050704956,
+          "fused_present": 0.9999932050704956,
+          "encoder_hold": true,
+          "wrist_crop_empty": 5.058806777924474e-07,
+          "wrist_present": 0.9998706579208374
+        },
+        "source_localization_score": 0.7161992788314819,
+        "cup_localization_score": 0.8641445636749268,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": null,
+        "visual_flow_fraction_s": 0.0012803473884807441,
+        "empty_probability": 5.058806777924474e-07,
+        "source_present_probability": 0.9998706579208374,
+        "estimated_tilt_from_joints": 80.02941865100757,
+        "physical_confirmation_votes": 6,
+        "visual_confirmation_window": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": null,
+        "tall_empty_wrist_votes": null,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 80.0,
+        "fill_mode": "settle",
+        "pause_count": 5,
+        "trim_goal": 0.9230598757259618,
+        "trim_cap_deg": 98.875,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        1.0,
+        1.0
+      ],
+      "peak_height": 0.9322539329528796,
+      "measured_loss_particles": 0,
+      "ordered_return": true,
+      "side_return": {
+        "side": "right",
+        "placement_xy": [
+          0.5945194468784565,
+          -0.38267863998061225
+        ],
+        "cup_xy": [
+          0.5945194468784565,
+          -0.2176786399806122
+        ],
+        "offset_m": 0.16500000000000004,
+        "simultaneous_uprighting": true,
+        "upright_seconds": 2.4,
+        "early_lift_arc": true,
+        "max_planned_joint_step_rad": 0.08653881839742272,
+        "minimum_carried_bottom_above_rim_m": 0.011999999999999823,
+        "rejected_candidates": []
+      },
+      "perception_at_stop": {
+        "track_valid": true,
+        "track_reason": "tracked",
+        "raw": {
+          "rgb": 0.9312234046071746,
+          "color": 0.9338167384948811
+        },
+        "filtered": {
+          "rgb": 0.9314784955662976,
+          "color": 0.9348297510764624
+        },
+        "valid": true,
+        "disagreement": 0.0033512555101647967,
+        "agreement": true
+      },
+      "recording_bytes": 221767050,
+      "recording_sha256": "e6138bc75b62f8ffe7a7e4211350f778138e33598e69ff7079d6a365bdd4834b",
+      "layout_family": 4,
+      "pair_index": 4,
+      "swapped": false,
+      "bottle_size": [
+        0.925,
+        1.0
+      ],
+      "source_localization_method": "primary",
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.07954107142857143,
+            0.025
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 172.398311358384,
+        "volume_m3": 4.818733739375607e-05,
+        "mass_kg": 0.17097188559430185,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.044950793132329386
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138597258596,
+          0.0002584138597258596,
+          9.237205145147004e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.17097188532352448,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04495079442858696
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138710517436,
+          0.0002584138710517436,
+          9.237205085810274e-05
+        ]
+      },
+      "failure_reasons": [],
+      "strict_pass": true,
+      "within_particle_tolerance": true
+    },
+    {
+      "name": "SA_A_wide_mixed_r1_test_04_swap",
+      "status": "complete",
+      "path": "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1/20261112T204229Z/010-SA_A_wide_mixed_r1_test_04_swap-937328",
+      "expected_stop": "bottle_empty",
+      "checkpoint_sha256": "c1dd7d5e74c09f6c5ce61ba3f3274447d3842d7fa91804d69fb486c5169b1581",
+      "source_initial_ml": 28.0,
+      "cup_initial_ml": 13.565232,
+      "cup_world": [
+        0.5159891373352642,
+        -0.35199330827168923,
+        1.04
+      ],
+      "source_xy": [
+        0.13431296563510453,
+        -0.07871504556054476
+      ],
+      "grasp_verified": false,
+      "visual_grasp_confirmed": false,
+      "grasp_attempts": 1,
+      "sustained_grasp_fraction": 0.0,
+      "delivered_to_cup_ml": 0.0,
+      "cup_final_ml": 13.565231999999998,
+      "cup_surface_height_fraction": 0.24664586151347334,
+      "cup_nominal_inventory_fraction": 0.18633560439560437,
+      "source_remaining_ml": 27.999432,
+      "stop_reason": "localization_unconfirmed",
+      "final_outside_ml": 0.0,
+      "ever_below_worktop_ml": 0.0,
+      "peak_nonairborne_outside_ml": 0.0,
+      "zero_spill": true,
+      "policy_completed": true,
+      "completed_return_release_sequence": false,
+      "surface_goal_zero_spill_success": false,
+      "legacy_inventory_zero_spill_success": false,
+      "teacher_fallback": false,
+      "gates": [
+        "wrong_stop_condition",
+        "residual_bottle",
+        "grip_not_sustained"
+      ],
+      "sim_seconds": 3.155,
+      "wall_seconds": 61.9,
+      "stop_prediction": {
+        "t": 2.1049999987706207,
+        "mode": "Aborting unconfirmed grasp",
+        "stop_latched": "localization_unconfirmed",
+        "grasp_stage": "initialize",
+        "grasp_attempt": 1,
+        "visual_grasp_confirmed": false,
+        "confirmation_votes": 0,
+        "source_xy": null,
+        "grasp_check": null,
+        "localization_consensus": {
+          "elapsed": 2.0499999999999665,
+          "cup": {
+            "uv": [
+              261.528332180447,
+              628.45742670695
+            ]
+          },
+          "source": null
+        },
+        "approach_tracking": null,
+        "source_watchdog": {},
+        "return_planning_error": null,
+        "side_return_plan": null,
+        "cup_xy": null,
+        "cup_predicted_fraction": 0.0,
+        "surface_geometry_fraction": 0.0,
+        "cup_level_camera": "cup_detail",
+        "source_presence_model": "wrist_presence_cnn",
+        "sized_cup_perception": null,
+        "settled_prediction": null,
+        "empty_views": null,
+        "source_localization_score": 0.6242358684539795,
+        "cup_localization_score": 1.0,
+        "source_localization_method": "primary",
+        "empty_confirmation_method": null,
+        "visual_flow_fraction_s": 0.0,
+        "empty_probability": 0.0,
+        "source_present_probability": 0.0,
+        "estimated_tilt_from_joints": 0.0,
+        "physical_confirmation_votes": 0,
+        "visual_confirmation_window": [],
+        "slow_empty_votes": 0,
+        "cap_dwell_seconds": null,
+        "tall_empty_votes": null,
+        "tall_empty_wrist_votes": null,
+        "tall_empty_view": null,
+        "own_pour_phase_deg": 0.0,
+        "fill_mode": "coarse",
+        "pause_count": 0,
+        "trim_goal": null,
+        "trim_cap_deg": 95.0,
+        "delta_clamped": false,
+        "done_probability": 0.0
+      },
+      "cup_size": [
+        1.0,
+        1.0
+      ],
+      "peak_height": 0.2476196261013245,
+      "measured_loss_particles": 0,
+      "ordered_return": false,
+      "side_return": null,
+      "perception_at_stop": null,
+      "recording_bytes": 18012323,
+      "recording_sha256": "5c659f541cf44bfe3d8d6fcf78ad9e4fbbb1d3f0882ae0a05a7b8fe6fb20e75f",
+      "layout_family": 4,
+      "pair_index": 4,
+      "swapped": true,
+      "bottle_size": [
+        0.925,
+        1.0
+      ],
+      "source_localization_method": null,
+      "neck_fallback_frames": 0,
+      "empty_confirmation_method": null,
+      "first_zero_source_s": null,
+      "empty_confirmation_lag_s": null,
+      "source_at_stop_ml": 27.999432,
+      "tall_empty_votes_at_stop": null,
+      "tall_empty_wrist_votes_at_stop": null,
+      "tall_empty_view_at_stop": null,
+      "bottle_geometry": {
+        "profile": [
+          [
+            0.004,
+            0.025
+          ],
+          [
+            0.07954107142857143,
+            0.025
+          ],
+          [
+            0.100925,
+            0.009
+          ],
+          [
+            0.12487500000000001,
+            0.009
+          ]
+        ],
+        "lip_height_m": 0.12487500000000001,
+        "outer_body_diameter_m": 0.0548,
+        "grasp_height_m": 0.048,
+        "capacity_geometric_ml": 172.398311358384,
+        "volume_m3": 4.818733739375607e-05,
+        "mass_kg": 0.17097188559430185,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.044950793132329386
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138597258596,
+          0.0002584138597258596,
+          9.237205145147004e-05
+        ]
+      },
+      "bottle_authored_mass_properties": {
+        "mass_kg": 0.17097188532352448,
+        "center_of_mass_m": [
+          0.0,
+          0.0,
+          0.04495079442858696
+        ],
+        "diagonal_inertia_kg_m2": [
+          0.0002584138710517436,
+          0.0002584138710517436,
+          9.237205085810274e-05
+        ]
+      },
+      "failure_reasons": [
+        "grasp_unconfirmed",
+        "grip_not_sustained",
+        "insufficient_transfer",
+        "localization_unconfirmed",
+        "return_incomplete",
+        "source_not_empty",
+        "wrong_stop_condition",
+        "residual_bottle",
+        "source_not_depleted_at_stop",
+        "side_return_incomplete",
+        "sized_perception_stop_unconfirmed"
+      ],
+      "strict_pass": false,
+      "within_particle_tolerance": false
+    }
+  ],
+  "runtime": {
+    "container": "5b14d64f1995be09a9b1274d9ec62fb7ca89af6f04ea92ec404b299ec8911322",
+    "started_utc": "2026-11-12T20:42:29.563531+00:00",
+    "gpu_before": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 1427036, 1058 MiB",
+    "limits": {
+      "Binds": [
+        "/home/kadir/aiworker-pouring-4070/outputs/size-autonomy/wide-mixed-test-r5-1:/workspace/outputs/size-autonomy/wide-mixed-test-r5-1:rw",
+        "/home/kadir/isaac-sim:/isaac-sim:ro",
+        "/home/kadir/aiworker-pouring-4070/cache:/root/.cache:rw",
+        "/home/kadir/aiworker-pouring-4070/kit-cache51:/isaac-sim/kit/cache:rw",
+        "/home/kadir/aiworker-pouring-4070/kit-data51:/isaac-sim/kit/data:rw",
+        "/home/kadir/aiworker-pouring-4070:/workspace:ro",
+        "/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1/wide-mixed-r5/src:/workspace/src:ro"
+      ],
+      "ContainerIDFile": "",
+      "LogConfig": {
+        "Type": "json-file",
+        "Config": {}
+      },
+      "NetworkMode": "none",
+      "PortBindings": {},
+      "RestartPolicy": {
+        "Name": "no",
+        "MaximumRetryCount": 0
+      },
+      "AutoRemove": false,
+      "VolumeDriver": "",
+      "VolumesFrom": null,
+      "ConsoleSize": [
+        0,
+        0
+      ],
+      "CapAdd": null,
+      "CapDrop": null,
+      "CgroupnsMode": "private",
+      "Dns": null,
+      "DnsOptions": [],
+      "DnsSearch": [],
+      "ExtraHosts": null,
+      "GroupAdd": null,
+      "IpcMode": "private",
+      "Cgroup": "",
+      "Links": null,
+      "OomScoreAdj": 0,
+      "PidMode": "",
+      "Privileged": false,
+      "PublishAllPorts": false,
+      "ReadonlyRootfs": false,
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "UTSMode": "",
+      "UsernsMode": "",
+      "ShmSize": 1073741824,
+      "Runtime": "runc",
+      "Isolation": "",
+      "CpuShares": 256,
+      "Memory": 17179869184,
+      "NanoCpus": 4000000000,
+      "CgroupParent": "",
+      "BlkioWeight": 0,
+      "BlkioWeightDevice": [],
+      "BlkioDeviceReadBps": [],
+      "BlkioDeviceWriteBps": [],
+      "BlkioDeviceReadIOps": [],
+      "BlkioDeviceWriteIOps": [],
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpuRealtimePeriod": 0,
+      "CpuRealtimeRuntime": 0,
+      "CpusetCpus": "16-23",
+      "CpusetMems": "",
+      "Devices": [],
+      "DeviceCgroupRules": null,
+      "DeviceRequests": [
+        {
+          "Driver": "",
+          "Count": 0,
+          "DeviceIDs": [
+            "GPU-cde23916-c5fa-f18e-a343-127f732cc2f6"
+          ],
+          "Capabilities": [
+            [
+              "gpu"
+            ]
+          ],
+          "Options": {}
+        }
+      ],
+      "MemoryReservation": 0,
+      "MemorySwap": 17179869184,
+      "MemorySwappiness": null,
+      "OomKillDisable": false,
+      "PidsLimit": 512,
+      "Ulimits": null,
+      "CpuCount": 0,
+      "CpuPercent": 0,
+      "IOMaximumIOps": 0,
+      "IOMaximumBandwidth": 0,
+      "MaskedPaths": [
+        "/proc/acpi",
+        "/proc/asound",
+        "/proc/interrupts",
+        "/proc/kcore",
+        "/proc/keys",
+        "/proc/latency_stats",
+        "/proc/sched_debug",
+        "/proc/scsi",
+        "/proc/timer_list",
+        "/proc/timer_stats",
+        "/sys/devices/virtual/powercap",
+        "/sys/firmware",
+        "/sys/devices/system/cpu/cpu0/thermal_throttle",
+        "/sys/devices/system/cpu/cpu1/thermal_throttle",
+        "/sys/devices/system/cpu/cpu2/thermal_throttle",
+        "/sys/devices/system/cpu/cpu3/thermal_throttle",
+        "/sys/devices/system/cpu/cpu4/thermal_throttle",
+        "/sys/devices/system/cpu/cpu5/thermal_throttle",
+        "/sys/devices/system/cpu/cpu6/thermal_throttle",
+        "/sys/devices/system/cpu/cpu7/thermal_throttle",
+        "/sys/devices/system/cpu/cpu8/thermal_throttle",
+        "/sys/devices/system/cpu/cpu9/thermal_throttle",
+        "/sys/devices/system/cpu/cpu10/thermal_throttle",
+        "/sys/devices/system/cpu/cpu11/thermal_throttle",
+        "/sys/devices/system/cpu/cpu12/thermal_throttle",
+        "/sys/devices/system/cpu/cpu13/thermal_throttle",
+        "/sys/devices/system/cpu/cpu14/thermal_throttle",
+        "/sys/devices/system/cpu/cpu15/thermal_throttle",
+        "/sys/devices/system/cpu/cpu16/thermal_throttle",
+        "/sys/devices/system/cpu/cpu17/thermal_throttle",
+        "/sys/devices/system/cpu/cpu18/thermal_throttle",
+        "/sys/devices/system/cpu/cpu19/thermal_throttle",
+        "/sys/devices/system/cpu/cpu20/thermal_throttle",
+        "/sys/devices/system/cpu/cpu21/thermal_throttle",
+        "/sys/devices/system/cpu/cpu22/thermal_throttle",
+        "/sys/devices/system/cpu/cpu23/thermal_throttle",
+        "/sys/devices/system/cpu/cpu24/thermal_throttle",
+        "/sys/devices/system/cpu/cpu25/thermal_throttle",
+        "/sys/devices/system/cpu/cpu26/thermal_throttle",
+        "/sys/devices/system/cpu/cpu27/thermal_throttle",
+        "/sys/devices/system/cpu/cpu28/thermal_throttle",
+        "/sys/devices/system/cpu/cpu29/thermal_throttle",
+        "/sys/devices/system/cpu/cpu30/thermal_throttle",
+        "/sys/devices/system/cpu/cpu31/thermal_throttle"
+      ],
+      "ReadonlyPaths": [
+        "/proc/bus",
+        "/proc/fs",
+        "/proc/irq",
+        "/proc/sys",
+        "/proc/sysrq-trigger"
+      ]
+    },
+    "batch_sha256": "6a532a1ffebb1bc10a9d9f0f84939054cf5bc1f00ecfbf4ea0433f71bddbcbfd",
+    "plan_sha256": "4929e9bb3c08a3b3c296a9f39dc6a58ac3bfab05fe86e8a12e6aa3ab8da6a723",
+    "state": {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 0,
+      "ExitCode": 0,
+      "Error": "",
+      "StartedAt": "2026-11-12T20:42:29.597495066Z",
+      "FinishedAt": "2026-11-12T22:34:58.381342772Z",
+      "Health": {
+        "Status": "unhealthy",
+        "FailingStreak": 219,
+        "Log": [
+          {
+            "Start": "2026-11-12T14:32:36.356613989-08:00",
+            "End": "2026-11-12T14:32:36.386772281-08:00",
+            "ExitCode": 1,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-12T14:33:06.387671862-08:00",
+            "End": "2026-11-12T14:33:06.419140355-08:00",
+            "ExitCode": 1,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-12T14:33:36.419908164-08:00",
+            "End": "2026-11-12T14:33:36.450182666-08:00",
+            "ExitCode": 1,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-12T14:34:06.450794288-08:00",
+            "End": "2026-11-12T14:34:06.481453713-08:00",
+            "ExitCode": 1,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-12T14:34:36.481901049-08:00",
+            "End": "2026-11-12T14:34:36.512332684-08:00",
+            "ExitCode": 1,
+            "Output": ""
+          }
+        ]
+      }
+    },
+    "stop_reason": null,
+    "gpu_after": "GPU-ab1950b0-01dd-0fab-407f-2d17936b27f4, 1427036, 1058 MiB",
+    "elapsed": 6750.050353613013
+  }
+}

@@ -44,6 +44,7 @@ def paths(planner,current,home,cup_xy,table_z,config,*,bottle_profile=BOTTLE):
     place_s=float(config.get('place_seconds',1.8));retreat_s=float(config.get('retreat_seconds',2.6))
     assert 1.8<=duration<=4 and 1.5<=place_s<=3 and 2<=retreat_s<=4
     rim_z=float(config.get('rim_z_m', .038))
+    early_lift=config.get('early_lift_arc',False)
     current=np.asarray(current);tcp,r0=planner.fk(current)
     # At upright the TCP orientation is WRIST; its relative rotation is the
     # physical vessel rotation. This is the same fixed calibration as pouring.
@@ -59,7 +60,8 @@ def paths(planner,current,home,cup_xy,table_z,config,*,bottle_profile=BOTTLE):
             for t in np.arange(.05,duration+.0001,.05):
                 u=ease(t/duration);r=orientation(u).as_matrix();br=r@WRIST.T
                 base=(1-u)*b0+u*end
-                base[2]+=.025*np.sin(np.pi*u)**2
+                arc_progress=t/duration if early_lift else u
+                base[2]+=.025*np.sin(np.pi*arc_progress)**2
                 # Conservative swept vessel lower bound over receiving rim.
                 lower=float((shell@br.T)[:,2].min())
                 base[2]=max(base[2],table_z+rim_z+.012-lower)
@@ -75,12 +77,21 @@ def paths(planner,current,home,cup_xy,table_z,config,*,bottle_profile=BOTTLE):
             # Bound planned 20Hz joint commands before accepting a candidate.
             from pour_stop_sequence import path_at
             peak=float(np.abs(np.diff(result,axis=0)).max())
+            if peak>.095 and config.get('retime_upright'):
+                # Stretch the same piecewise linear path to bound every 20 Hz
+                # step, including the initial rise from the measured pose.
+                stretch=peak/.094
+                if duration*stretch>4.:
+                    raise ValueError('Measured upright path would require more than 4 seconds')
+                times=np.asarray(times)*stretch
+                peak/=stretch
             for path,seconds in ((place,place_s),(retreat,retreat_s)):
                 q=np.array([path_at(path,ease(t/seconds)) for t in np.arange(0,seconds+.0001,.05)])
                 peak=max(peak,float(np.abs(np.diff(q,axis=0)).max()))
             if peak>.095:raise ValueError(f'Planned step {peak:.5f} exceeds .095 rad')
             info=dict(side=choice['side'],placement_xy=choice['xy'].tolist(),cup_xy=list(cup_xy),
-                offset_m=choice['offset_m'],simultaneous_uprighting=True,upright_seconds=duration,
+                offset_m=choice['offset_m'],simultaneous_uprighting=True,upright_seconds=float(times[-1]),
+                early_lift_arc=early_lift,
                 max_planned_joint_step_rad=peak,minimum_carried_bottom_above_rim_m=min_margin,
                 rejected_candidates=attempts)
             return np.asarray(times),result,place,retreat,info

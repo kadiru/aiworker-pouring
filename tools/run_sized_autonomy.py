@@ -84,6 +84,10 @@ def rows_from_disk(output, cases, plan):
                    peak_height=peak, measured_loss_particles=particles,
                    ordered_return=ordered,side_return=side,perception_at_stop=perception,
                    recording_bytes=record.stat().st_size,recording_sha256=sha(record))
+        if "test_shards" in plan:
+            row.update(layout_family=scene["layout_family"], pair_index=scene["pair_index"],
+                       swapped=scene["swapped"], bottle_size=[scene["bottle_height_scale"],
+                                                            scene["bottle_diameter_scale"]])
         if plan.get("layout_repair"):
             grasp = next((x for x in decisions if x.get("cup_xy") is not None), None)
             row["source_localization_method"] = grasp.get("source_localization_method") if grasp else None
@@ -110,6 +114,8 @@ def rows_from_disk(output, cases, plan):
                 if stop and zero_time is not None and row["stop_reason"]=="bottle_empty" else None)
             row["source_at_stop_ml"]=stop_sample["bottle_ml"] if stop_sample else None
             row["tall_empty_votes_at_stop"]=stop.get("tall_empty_votes") if stop else None
+            row["tall_empty_wrist_votes_at_stop"]=stop.get("tall_empty_wrist_votes") if stop else None
+            row["tall_empty_view_at_stop"]=stop.get("tall_empty_view") if stop else None
             if row["source_at_stop_ml"]!=0. or row["source_remaining_ml"]!=0.:
                 extra.append("source_not_depleted_at_stop")
         if scene.get("bottle_size_autonomy"):
@@ -136,11 +142,15 @@ def main():
     parser.add_argument("--part",choices=("development","test"),required=True)
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
+    parser.add_argument("--shard",type=int)
     parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1","bottle-autonomy",
                                           "bottle-empty-autonomy","mixed-vessel-autonomy","tall-empty-r1",
-                                          "layout-repair-r2","layout-repair-r3"),
+                                          "layout-repair-r2","layout-repair-r3","tall-aligned-r0",
+                                          "wide-mixed-r0","wide-mixed-r1","wide-mixed-r2","wide-mixed-r3",
+                                          "wide-mixed-r4","wide-mixed-r5"),
                         default="sized-autonomy")
     args=parser.parse_args()
+    assert args.part=="test" or args.shard is None
     deadline_limit = 7200 if args.part == "development" else 14400
     assert args.label.replace("-","").isalnum() and 0 < args.seconds <= deadline_limit
     with (ROOT/"isolated-job.lock").open("a") as lock:
@@ -164,6 +174,16 @@ def run(args,original,gpu_query,before):
     assert sha(ROOT/"followup-selection.json")==plan["perception_selection_sha256"]
     assert sha(ROOT/"followup-fresh.json")==plan["perception_test_sha256"]
     candidates={s["name"]:s for s in plan[args.part]}
+    result_name=args.part
+    if args.part=="test" and "test_shards" in plan:
+        shards=plan["test_shards"]
+        names=[name for shard in shards for name in shard]
+        assert len(names)==len(set(names)) and set(names)==candidates.keys()
+        assert args.shard is not None and 1<=args.shard<=len(shards)
+        candidates={name:candidates[name] for name in shards[args.shard-1]}
+        result_name=f"test-{args.shard:02d}"
+    else:
+        assert args.shard is None
     assert candidates.keys() <= {r["name"] for r in geometry["cases"] if r["passed"]}
     if args.part=="test":
         dev=read(study/"development-results.json")
@@ -278,7 +298,7 @@ def run(args,original,gpu_query,before):
                 strict_passes=sum(r["strict_pass"] for r in completed),
                 tolerance_passes=sum(r["within_particle_tolerance"] for r in completed),
                 cases=[rows.get(n,dict(name=n,status="unstarted")) for n in candidates],runtime=witness)
-    save(study/(args.part+"-results.json"),report)
+    save(study/(result_name+"-results.json"),report)
     print(json.dumps({k:report[k] for k in ("part","planned","completed","strict_passes","tolerance_passes")}),flush=True)
     assert stop is None and len(completed)==len(candidates) and "AUTONOMY_BATCH_COMPLETE" in log.stdout
 

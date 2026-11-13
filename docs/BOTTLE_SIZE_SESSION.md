@@ -365,3 +365,127 @@ points. Fixture 05 used the neck fallback at localization. The
 [closure audit](../evidence/bottle-size-A/layout-r3-completion.json)
 verifies the native recordings, frozen sources and checkpoints, and
 the 4070-only container limits. The fresh batch took 93.6 minutes.
+
+## Tall-bottle timing and wider swapped layouts
+
+The late tall-bottle run waited for the raw scene score to reach 0.98.
+The revised gate can also accumulate ten consecutive votes when the
+cup-aligned scene score reaches 0.84, the raw score reaches 0.65, and
+the wrist score reaches 0.90. Each vote also requires encoder hold,
+confirmed source presence, a tracked cup with agreeing level estimates,
+at least 120° measured tilt, and estimated flow below 1 nominal mL/s.
+The raw-scene confirmation path uses its original 0.98 scene and 0.92
+wrist thresholds.
+
+The archived replay covers nine tall-bottle empty pours and seven
+near-full pours. It predicts 0.95 s for the earlier 5.85 s stop, with
+zero source inventory at each predicted empty stop and zero false
+empty stops on the near-full cases. In a live repeat with a new seed,
+the gate confirmed empty after 0.95 s with zero particles in the
+bottle at the stop and set-down. Two droplets escaped during the pour,
+0.60 s before the stop. The development criterion admits five lost
+particles. Strict evaluation scores zero measured loss.
+
+The wider matrix pairs two exactly reversed vessel positions per
+layout. It crosses five table-layout families, nine known cup sizes,
+four known bottle geometries, and fifteen trials for each stop goal.
+The positions start from the prior wide-layout families with
+independently shifted endpoints and fresh episode seeds. Each pair
+shares vessel sizes and reverses the physical positions. The paired
+scenes target opposite stop conditions. The two orientations are scored
+separately in the results. Motion and perception use camera observations,
+joint measurements, stored calibration and declared vessel geometry.
+The side return rises earlier during the same sideways uprighting motion.
+This cleared a finger-to-rim overlap found during geometry screening.
+One far-edge pair still had an overlap with its original wider cup.
+It uses the smaller 0.90× height and 0.90× diameter cup and the short
+nominal-width bottle at both original endpoints. All nine cup sizes and
+all four bottle geometries remain represented. Both affected scenes are
+screened again. The other 32 screen results are reused after checking
+identical specs, checkpoints and runtime sources.
+
+The first wide development batch found two additional faults. A far-side
+near-full pour used a cup center 8.55 mm from the actual rim center and
+stopped at 73.19% of rim height. Fitting the visible rim, base and fixed
+Material A band near the neural proposal reduced that error to 0.56 mm.
+Across 28 archived recordings spanning all nine cup sizes, the largest
+corrected anchor error was 1.17 mm, and no synthetic missing-cup
+challenge confirmed a cup. At runtime, the camera image and known
+geometry supply the correction.
+
+In the other failure, an early bottle occlusion made the cup appear
+nearly full at 42° tilt. The revised controller starts using level
+feedback at 80°. The earliest observed physical outflow in 23 archived
+pours was 87.11°. Side return can stretch the same path when a measured
+starting pose would exceed the 0.095-rad step limit. The archive and
+both original failures are retained.
+
+The far swapped repeat then emptied physically while both scene
+classifiers stayed below threshold. The wide controller adds a separate
+confirmation path with fourteen consecutive frames at or above 0.94
+wrist probability. It also requires a measured grip, source presence,
+120° measured tilt, agreeing cup estimates and less than 1 nominal
+mL/s of visual flow. In archived replay, the two swapped stops would
+confirm after 0.70 s and 1.20 s. Every replayed latch occurs at zero
+source particles. The late spill in the farther repeat began 0.20 s
+after depletion, before the proposed empty confirmation.
+
+Run from the native study root
+`/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1`.
+Stage the timing runtime under `tall-aligned-r0/src`, based on the
+previous `layout-repair-r3/src`. Copy that runtime to
+`wide-mixed-r1/src` and apply the wide localization, return and test sources.
+Use separate copies of the preflight and runner as shown below.
+
+```sh
+python3 run_isolated_perception_job.py --helper prepare_tall_aligned_autonomy.py --label tall-aligned-prepare-r0 --seconds 500
+python3 run_isolated_perception_job.py --helper preflight_tall_aligned_r0.py --label tall-aligned-geometry-r0 --seconds 450 -- --study tall-aligned-r0
+python3 run_tall_aligned_r0.py --study tall-aligned-r0 --part development --label tall-aligned-dev-r0 --seconds 2000
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_autonomy.py --label wide-mixed-prepare-r1 --seconds 700
+python3 run_isolated_perception_job.py --helper preflight_wide_mixed_r1.py --label wide-mixed-geometry-r1 --seconds 3900 -- --study wide-mixed-r1
+cp -a wide-mixed-r1/src wide-mixed-r2/src
+python3 run_isolated_perception_job.py --helper revise_wide_mixed_clearance.py --label wide-mixed-prepare-r2 --seconds 700
+python3 run_isolated_perception_job.py --helper preflight_wide_mixed_r2.py --label wide-mixed-geometry-r2 --seconds 500 -- --study wide-mixed-r2 --reuse-study wide-mixed-r1
+python3 run_wide_mixed_r2.py --study wide-mixed-r2 --part development --label wide-mixed-dev-r2 --seconds 6500
+# Stage outline and sized-perception changes under wide-mixed-r3/src.
+python3 run_isolated_perception_job.py --helper check_wide_cup_outline.py --label wide-cup-outline-replay --seconds 1100
+# Copy the source and replay into wide-mixed-r4 and overlay the final actor and return.
+python3 run_isolated_perception_job.py --helper prepare_wide_outline_autonomy.py --label wide-mixed-prepare-r4 --seconds 700
+python3 run_isolated_perception_job.py --helper preflight_wide_mixed_r4.py --label wide-mixed-geometry-r4 --seconds 3900 -- --study wide-mixed-r4
+python3 run_wide_mixed_r4.py --study wide-mixed-r4 --part development --label wide-mixed-dev-r4 --seconds 6500
+# Copy wide-mixed-r4/src to wide-mixed-r5/src and apply the final stop-gate sources.
+python3 run_isolated_perception_job.py --helper prepare_wide_wrist_cup_autonomy.py --label wide-mixed-prepare-r5 --seconds 700
+python3 run_isolated_perception_job.py --helper preflight_wide_mixed_r5.py --label wide-mixed-geometry-r5 --seconds 500 -- --study wide-mixed-r5 --reuse-study wide-mixed-r4
+python3 run_wide_mixed_r5.py --study wide-mixed-r5 --part development --label wide-mixed-dev-r5 --seconds 2200
+for shard in 1 2 3; do
+    python3 run_wide_mixed_r5.py --study wide-mixed-r5 --part test --shard "$shard" --label "wide-mixed-test-r5-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py
+```
+
+The [farthest swapped live repeat](../evidence/bottle-size-A/wide-mixed-r5-development-results.json)
+confirmed empty in 1.20 s with zero source particles at stop and
+set-down, zero measured spill and bilateral grasp throughout the pour.
+The final candidate passed 53 focused controller checks and 31 geometry
+screens, including the 30 reserved layouts.
+
+The [final 30-trial audit](../evidence/bottle-size-A/wide-mixed-r5-completion.json)
+retains every outcome and the native recording hashes. All three
+serial batches exited normally after 5.53 hours total.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Zero measured spill |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 10 | 12 | 15 |
+| Swapped | 15 | 8 | 11 | 13 |
+| Near-full target | 15 | 12 | 13 | 15 |
+| Empty target | 15 | 6 | 10 | 13 |
+| All trials | 30 | 18 | 23 | 28 |
+
+The zero-spill column includes seven pre-grasp rejections. Across the
+23 actual pours, 21 measured zero loss and two lost two particles each.
+The seven rejected trials all failed bottle-neck consensus. Among seven
+fresh tall-bottle empty targets, five confirmed empty, with lags of
+0.40, 0.45, 0.55, 0.60 and 5.80 seconds. One rejected bottle localization,
+and one physically emptied and returned after a progress timeout.
+The 5.80-second case stopped on the drain dwell and failed strict
+scoring because the two cup estimates disagreed at its stop.

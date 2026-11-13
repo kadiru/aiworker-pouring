@@ -131,7 +131,9 @@ class Actor:
             assert self.bottle_lip >= .14 and self.sized_perception is not None
             assert self.empty_detector is not None and self.presence_detector is not None
             assert self.saved.get('source_frame_normalization') in ('raw_and_cup_aligned_v1','cup_aligned_v2')
-            self.tall_empty_gate=TallBottleEmptyGate()
+            self.tall_empty_gate=TallBottleEmptyGate(
+                use_aligned_scene=self.saved.get('tall_empty_aligned_confirmation',False),
+                use_wrist_and_cup=self.saved.get('tall_empty_wrist_cup_confirmation',False))
 
     def initialize_grasp(self,task,q,t,age):
         from robot_pour import WRIST
@@ -310,6 +312,7 @@ class Actor:
                 self.outbound.append((self.pour_phase,q[:7].copy()))
             level_valid=True
             level_upper=None
+            use_level_for_pour=not self.saved.get('preflow_occlusion_guard') or self.pour_phase>=80.
             if self.sized_perception is None:
                 normalized=cup_crop(level_image,self.cup_xy,self.level_cal);a=torch.as_tensor(normalized,device='cuda')[None]
                 cnn=float(self.cup_model(a)[0])+self.saved['cup_bias'];features,_,n=surface_features(a);mass=float(n[0])
@@ -334,7 +337,8 @@ class Actor:
                     geo=measured['filtered']['color']
                     self.filtered=max(measured.get('guard_filtered',measured['filtered']).values())
                     level_upper=max(self.filtered,*measured['raw'].values())
-                    self.level_history.append((t,geo,cnn,self.filtered))
+                    if use_level_for_pour:
+                        self.level_history.append((t,geo,cnn,self.filtered))
                     self.invalid_cup_since=None
                 else:
                     self.level_history.clear()
@@ -390,7 +394,7 @@ class Actor:
                 tall_empty=self.tall_empty_gate.update(
                     held=held, level_ready=(len(self.level_history)>=9 and measured['agreement']),
                     present=present,wrist_empty=empty,scene_empty=empty_views['raw_empty'],
-                    tilt=tilt,flow_ml_s=flow*self.cup_volume_scale)
+                    tilt=tilt,flow_ml_s=flow*self.cup_volume_scale,aligned_empty=empty_views['aligned_empty'])
             recovery=None
             if self.source_watchdog is not None and self.stop_latched is None:
                 recovery=self.source_watchdog.update(t,
@@ -461,7 +465,7 @@ class Actor:
                     else:rate=20. if self.pour_phase<self.peak_phase-2 else 2.
                     if self.fill_mode=='coarse' and self.filtered is not None and self.filtered>self.threshold.get('coarse_flow_min_level',1.) and flow*self.cup_volume_scale>self.threshold.get('coarse_flow_limit_ml_s',float('inf')):rate=0.
                     if self.filtered is not None and self.filtered>.65 and flow*self.cup_volume_scale>6. and not (self.fill_mode=='trim' and self.threshold.get('discrete_topup')):rate=0.
-                    if not level_valid:rate=0.
+                    if not level_valid and use_level_for_pour:rate=0.
                     self.pour_phase=min(movement['phase_cap_deg'],self.pour_phase+.05*rate)
                     if self.fill_mode=='trim':
                         self.pour_phase=min(self.trim_cap,self.pour_phase)
@@ -484,7 +488,8 @@ class Actor:
                             feedback=max(feedback,level_upper)
                         else:
                             timed_brake=timed_brake or (self.pour_phase>=90. and level_upper>=.945)
-                    if timed_brake or (level_valid and eligible and feedback>.60 and feedback+flow*self.threshold['runoff_seconds']>=goal):
+                    if timed_brake or (use_level_for_pour and level_valid and eligible and feedback>.60
+                                       and feedback+flow*self.threshold['runoff_seconds']>=goal):
                         self.fill_mode='brake';self.pause_count+=1;self.full_votes=0
                 if self.terminal is not None:targets,phase=self.terminal.act(t)
                 else:
@@ -525,6 +530,8 @@ class Actor:
             physical_confirmation_votes=self.physical_votes,visual_confirmation_window=self.visual_votes,
             slow_empty_votes=self.slow_empty_votes,cap_dwell_seconds=None if self.cap_start is None else t-self.cap_start,
             tall_empty_votes=None if self.tall_empty_gate is None else self.tall_empty_gate.votes,
+            tall_empty_wrist_votes=None if self.tall_empty_gate is None else self.tall_empty_gate.wrist_votes,
+            tall_empty_view=None if self.tall_empty_gate is None else self.tall_empty_gate.scene_view,
             own_pour_phase_deg=self.pour_phase,fill_mode=self.fill_mode,pause_count=self.pause_count,trim_goal=self.trim_goal,
             trim_cap_deg=self.trim_cap,
             delta_clamped=bool(clamped),done_probability=float(self.done_votes>=10)))

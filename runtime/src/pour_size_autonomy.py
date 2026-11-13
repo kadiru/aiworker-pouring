@@ -31,7 +31,11 @@ class SizedCupPerception:
         from perception_followup import LevelFilter, VerifiedCupTracker
         self.device = device
         self.geometry = geometry
-        self.tracker = VerifiedCupTracker(config["tracker"], geometry, device)
+        if config.get("outline_cup_localization"):
+            from pour_cup_outline import OutlineCupTracker
+            self.tracker = OutlineCupTracker(config["tracker"], geometry, device)
+        else:
+            self.tracker = VerifiedCupTracker(config["tracker"], geometry, device)
         self.cal = dict(config["tracker"]["calibration"], cup_geometry=geometry)
         self.models = config["models"]
         self.filters = {k: LevelFilter(v) for k, v in config["filters"].items()}
