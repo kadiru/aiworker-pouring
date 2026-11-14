@@ -757,3 +757,26 @@ The [five Isaac Sim development repeats](../evidence/bottle-size-A/wide-mixed-r8
 all passed with zero measured particle loss. The short, narrow bottle
 was grasped and fully emptied. The settling repair finished the near-full
 pour at 93.53% of rim height. The 30 new fixtures were released after these checks.
+
+The [30 fresh tests and recording audit](../evidence/bottle-size-A/wide-mixed-r8-completion.json)
+finished in 6.73 hours on the guarded RTX 4070.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Spill-free pours |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 14 | 15 | 14 |
+| Swapped | 15 | 12 | 15 | 13 |
+| Near-full target | 15 | 14 | 15 | 15 |
+| Empty target | 15 | 12 | 15 | 12 |
+| All trials | 30 | 26 | 30 | 27 |
+
+All four repoured spill layouts passed on fresh positions. The previously
+missed short, narrow bottle localized, grasped and emptied in development
+and fresh testing. Three coarse pours lost particles at 118.34°, 124.56°,
+and 126.94°. The remaining stop failure reached 91.40% of rim height and
+the 13-pause limit. The last RGB estimate was 92.30% and the color estimate
+was 93.37%; the trigger requires both settled branches to reach 92.5%.
+The 14 confirmed near-full stops finished at 91.49–95.40% of rim height.
+All seven tall-bottle empty targets confirmed in 0.30–0.45 s after exact
+depletion, with median 0.35 s. The audit verified all 30 recordings, 135
+original runtime sources and 2,284 protected files. The owned simulator
+exited and the 4070 was idle.
