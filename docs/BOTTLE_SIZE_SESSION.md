@@ -678,3 +678,31 @@ previously missed short bottles completed a 74.05%-rim empty-target pour
 and a 95.58%-rim near-full pour. The corrected tall near-full repeat finished
 at 90.68% of rim height. The two prior spill fixtures fully emptied, with
 zero measured loss across both rounds.
+
+The [30 fresh tests and recording audit](../evidence/bottle-size-A/wide-mixed-r7b-completion.json)
+finished in 6.55 hours on the guarded RTX 4070.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Spill-free pours |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 14 | 15 | 14 |
+| Swapped | 15 | 11 | 14 | 11 |
+| Near-full target | 15 | 14 | 15 | 14 |
+| Empty target | 15 | 11 | 14 | 11 |
+| All trials | 30 | 25 | 29 | 25 |
+
+Both previously missed short-bottle layouts and both previous tall-bottle
+spill layouts passed with zero particle loss at the newly shifted test
+positions. All 29 pours satisfied the RGB/color agreement requirement at
+stop. The largest difference was 2.77 percentage points. All 15 near-full
+targets finished at 90.99–95.59% of rim height. All seven tall-bottle empty
+targets reached zero source inventory, with confirmation in 0.20–0.60 s
+and median 0.30 s.
+
+A different short, narrow bottle in swapped layout 02 failed neck consensus.
+Sustained cup observations were available. Four completed pours lost two
+particles each. The first observed escape occurred during coarse pouring in
+03 normal, 10 swapped and 14 swapped, and during settling in 11 swapped.
+All 29 executed pours met the particle-tolerance score. Strict acceptance
+still requires zero measured loss. The audit verified all three test reports
+and recordings, the original checkpoint, 135 original sources and 2,284
+protected parent files. The owned simulator exited and the 4070 was idle.
