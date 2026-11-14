@@ -148,7 +148,7 @@ def main():
                                           "layout-repair-r2","layout-repair-r3","tall-aligned-r0",
                                           "wide-mixed-r0","wide-mixed-r1","wide-mixed-r2","wide-mixed-r3",
                                           "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7",
-                                          "wide-mixed-r7b"),
+                                          "wide-mixed-r7b","wide-mixed-r8"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
@@ -156,7 +156,20 @@ def main():
     assert args.label.replace("-","").isalnum() and 0 < args.seconds <= deadline_limit
     with (ROOT/"isolated-job.lock").open("a") as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        subprocess.run([sys.executable,str(HOST/"tools/verify_robot_training_storage.py"),"--minimum-free-gib","57"],check=True)
+        minimum_free_gib = 57.
+        if args.study == "wide-mixed-r8":
+            plan = read(ROOT/args.study/"plan.json")
+            # Bound storage by the actual batch and measured prior recording
+            # sizes. Keep the 10 GiB retained margin from the storage plan.
+            largest = plan["storage_recording_upper_bytes"]
+            if args.part == "development":
+                count = len(plan["development"])
+            else:
+                assert args.shard is not None and 1<=args.shard<=len(plan["test_shards"])
+                count = sum(len(s) for s in plan["test_shards"][args.shard-1:])
+            minimum_free_gib = 10. + count*largest/1024**3
+        subprocess.run([sys.executable,str(HOST/"tools/verify_robot_training_storage.py"),
+                        "--minimum-free-gib",str(minimum_free_gib)],check=True)
         original=json.loads(out("docker","inspect",ORIGINAL))[0]
         assert original["Id"]==ORIGINAL and not original["State"]["Running"]
         assert original["Config"]["Labels"]["owner"]=="aiworker-pouring"

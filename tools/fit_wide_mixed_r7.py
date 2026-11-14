@@ -1,4 +1,5 @@
 """Fine-tune a neck proposal and validate the full temporal RGB locator."""
+import argparse
 import hashlib
 from pathlib import Path
 import sys
@@ -20,14 +21,14 @@ from fit_wide_mixed_r6 import decode, erased, folder, h5py, read, save
 TARGETS = {"12_swap", "14_normal"}
 
 
-def rows():
+def rows(parent=PARENT, targets=TARGETS):
     trials = []
-    for source, cases in (("benchmark", read(PARENT / "completion.json")["test_cases"]),
-                          ("development", read(PARENT / "development-results.json")["cases"])):
+    for source, cases in (("benchmark", read(parent / "completion.json")["test_cases"]),
+                          ("development", read(parent / "development-results.json")["cases"])):
         for case in cases:
             path = folder(case)
             spec = read(path / "parameters.json")
-            target = source == "benchmark" and case["name"].split("_test_")[-1] in TARGETS
+            target = source == "benchmark" and case["name"].split("_test_")[-1] in targets
             validate = not target and source == "benchmark" and case["pair_index"] % 4 == 2
             record = path / "episode.hdf5"
             assert sha(record) == case["recording_sha256"]
@@ -125,17 +126,25 @@ def score_replay(rows, proposal_floor, refinement_floor):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8"), default="wide-mixed-r7")
+    args = parser.parse_args()
+    study = ROOT / args.study
+    is_r8 = args.study == "wide-mixed-r8"
+    parent = ROOT / "wide-mixed-r7b" if is_r8 else PARENT
+    source_fit = (ROOT / "wide-mixed-r7" if is_r8 else PARENT) / "neck-heatmap.pt"
+    seed = 26111308 if is_r8 else 26111307
     assert torch.cuda.device_count() == 1 and "4070" in torch.cuda.get_device_name(0)
     torch.set_num_threads(2)
-    torch.manual_seed(26111307)
-    rng = np.random.default_rng(26111307)
-    trials = rows()
+    torch.manual_seed(seed)
+    rng = np.random.default_rng(seed)
+    trials = rows(parent, {"02_swap"} if is_r8 else TARGETS)
     groups = list(replay_frames(trials))
     images, uv, present = dataset(trials)
     training = [r for r in trials if not r["validate"]]
     templates = [(r["frames"][i],r["uv"]) for r in training for i in
                  ((0, 3, 6, 9, 12, 15, 18) if r["target"] else (3, 12))]
-    base = torch.load(PARENT/"neck-heatmap.pt", map_location="cpu", weights_only=False)
+    base = torch.load(source_fit, map_location="cpu", weights_only=False)
     bank = make_bank(*zip(*templates), "source", aggregation="max",
                      gradient_clip=.04, source_mask_box=(10,7,38,39))
     bank["kernels"] = torch.cat((bank["kernels"], base["refinement"]["kernels"]))
@@ -191,12 +200,14 @@ def main():
     identity = hashlib.sha256(b"".join(t.numpy().tobytes() for t in state.values())).hexdigest()
     artifact = dict(proposal=dict(kind="cup_heatmap",state=state,identity=identity),refinement=bank,
                     **report["operating_point"])
-    dest = STUDY/"neck-heatmap.pt"
+    dest = study/"neck-heatmap.pt"
     torch.save(artifact,dest)
     report.update(passed=score[:3] == (0,0,0), checkpoint_sha256=sha(dest),
                   train_episodes=len(training), validation_episodes=len(trials)-len(training),
                   train_images=len(images), gradient_templates=len(bank["kernels"]))
-    save(STUDY/"neck-fusion.json",report)
+    if is_r8:
+        report.update(seed=seed, initialization_sha256=sha(source_fit))
+    save(study/"neck-fusion.json",report)
     assert report["passed"], score
 
 

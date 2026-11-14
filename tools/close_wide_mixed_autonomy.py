@@ -74,7 +74,7 @@ def group_totals(rows, key):
 def main():
     global STUDY
     parser=argparse.ArgumentParser()
-    parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b"),
+    parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b","wide-mixed-r8"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -143,6 +143,14 @@ def main():
                 path=STUDY/file
                 assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
                 report[file.removesuffix(".json").replace("-","_")+"_sha256"]=sha(path)
+    if STUDY.name=="wide-mixed-r8":
+        report["development_cases"]=dev
+        report["controller_test_log_sha256"]=sha(STUDY/"controller-tests.log")
+        for filename in ("neck-fusion.json","spill-trace.json"):
+            path=STUDY/filename
+            digest=sha(path)
+            assert plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==digest
+            report[filename.removesuffix(".json").replace("-","_")+"_sha256"]=digest
     with (STUDY/"completion.json").open("x") as file:
         json.dump(report,file,indent=2,allow_nan=False)
         file.write("\n")

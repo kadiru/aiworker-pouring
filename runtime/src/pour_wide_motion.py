@@ -38,19 +38,25 @@ def outbound_mouth_options(saved):
     return dict(late_mouth_shift_m=saved.get('late_mouth_shift_m',0.),
                 tail_setback_m=saved.get('tail_setback_m',0.),
                 tail_window_deg=saved.get('tail_window_deg',(123.,126.)),
-                tail_drop_m=saved.get('tail_drop_m',0.))
+                tail_drop_m=saved.get('tail_drop_m',0.),
+                low_tilt_drop_m=saved.get('low_tilt_drop_m',0.))
 
 
 def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth_z, centered=False,
                    late_mouth_shift_m=0., *, lip_height=LIP, tail_setback_m=0.,
-                   tail_window_deg=(123.,126.), tail_drop_m=0.):
+                   tail_window_deg=(123.,126.), tail_drop_m=0., low_tilt_drop_m=0.):
     cup=np.r_[cup_xy,table_z]
     delta=np.asarray(source_xy)-np.asarray(cup_xy)
     initial=[delta[1],-delta[0]]
     if not 0. <= tail_drop_m <= .006:
         raise ValueError('Late mouth lowering must be between 0 and 6 mm')
+    if not 0. <= low_tilt_drop_m <= .010:
+        raise ValueError('Low-tilt mouth lowering must be between 0 and 10 mm')
     height = mouth_z - tail_drop_m*tail_progress(phase, tail_window_deg)
+    # Lower the stream around the 80-degree settling pose and measured
+    # top-up range, then blend back into the normal coarse trajectory.
     base,rotation=calibrated_pose(phase,1.,initial,height,centered=centered,lip_height=lip_height)
+    base[2] -= low_tilt_drop_m*ease((phase-70.)/10.)*(1.-ease((phase-99.)/14.))
     base[0]+=late_mouth_offset(phase,late_mouth_shift_m,tail_setback_m=tail_setback_m,
                                tail_window_deg=tail_window_deg)
     tcp=cup+FRAME@(base+rotation@np.array([0.,0.,GRASP_Z]))

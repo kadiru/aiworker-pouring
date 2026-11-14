@@ -16,7 +16,7 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "layout-repair-r2", "layout-repair-r3", "tall-aligned-r0",
                                        "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
                                        "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7",
-                                       "wide-mixed-r7b"),
+                                       "wide-mixed-r7b", "wide-mixed-r8"),
                     default="sized-autonomy")
 parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4","wide-mixed-r7"))
 parser.add_argument("--resume-screen")
@@ -140,6 +140,8 @@ def scan(stage, spec, saved, opened, closed):
     if mouth["tail_setback_m"] or mouth["tail_drop_m"]:
         start, end = mouth["tail_window_deg"]
         phases = sorted(set(phases) | set(np.linspace(start, end, 5)))
+    if mouth["low_tilt_drop_m"]:
+        phases = sorted(set(phases) | {70., 75., 77.5, 82.5, 95., 99., 106., 113.})
     projected={}
     for phase in phases:
         projected[phase]=project_target(arm,target(profile,lift[-1],cup[:2],phase),

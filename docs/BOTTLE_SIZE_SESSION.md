@@ -706,3 +706,45 @@ All 29 executed pours met the particle-tolerance score. Strict acceptance
 still requires zero measured loss. The audit verified all three test reports
 and recordings, the original checkpoint, 135 original sources and 2,284
 protected parent files. The owned simulator exited and the 4070 was idle.
+
+## Short narrow bottle and rim-rebound repair
+
+The RTX 4070 fine-tuned the neck heatmap using 330 training images from
+30 consumed episodes, with seven held-out episodes. The missed short,
+narrow bottle passed all 20 native frames and both translated sequences,
+with 0.56–0.61 mm median-consensus position errors. Across 53 native and
+translated replays, the worst position error was 0.64 mm. All 740 erased
+frames rejected the learned neck path. The production acceptance rule
+still combines the heatmap, signed gradients and temporal consensus.
+[Replay report](../evidence/bottle-size-A/wide-mixed-r8-neck-fusion.json).
+
+All four lost pairs originated in the source bottle. Three rebounded out
+near 122–129° of coarse tilt and one rebounded out near 81° as the wrist
+settled after braking. Three vessel combinations now move the mouth back
+9–10 mm and lower it 4–6 mm during the late pour. The fourth lowers the
+mouth by up to 8 mm around settling and top-up angles. The planner uses
+the declared geometry and the controller's own tilt phase. Measured
+particles identify the repair and score the experiment offline.
+[Particle traces](../evidence/bottle-size-A/wide-mixed-r8-spill-trace.json).
+
+The [sealed plan](../evidence/bottle-size-A/wide-mixed-r8-plan.json) defines
+five live repeats and fresh positions and seeds for all 15 exact swap
+pairs. The recording-volume check retains 10 GiB and budgets three times
+the largest recent recording per remaining trial. The 57 GiB preflight
+for the earlier eight-hour collection schedule still applies to older
+study runners.
+
+Copy `wide-mixed-r7b/src` to `wide-mixed-r8/src` and overlay the changed
+`pour_wide_motion.py`. Stage the checked-in helpers and the existing
+`fit_wide_mixed_r6.py` in the native study root.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r7.py --label wide-r8-neck-fit --seconds 3600 -- --study wide-mixed-r8
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r8.py --label wide-r8-prepare --seconds 300
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r8-geometry --seconds 4500 -- --study wide-mixed-r8
+python3 run_sized_autonomy.py --study wide-mixed-r8 --part development --label wide-r8-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r8 --part test --shard "$shard" --label "wide-r8-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r8
+```
