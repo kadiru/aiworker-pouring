@@ -751,3 +751,9 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r8
 ```
+
+All 35 revised clearance screens and 56 native controller checks passed.
+The [five Isaac Sim development repeats](../evidence/bottle-size-A/wide-mixed-r8-development-results.json)
+all passed with zero measured particle loss. The short, narrow bottle
+was grasped and fully emptied. The settling repair finished the near-full
+pour at 93.53% of rim height. The 30 new fixtures were released after these checks.
