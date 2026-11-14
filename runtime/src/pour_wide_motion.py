@@ -53,10 +53,11 @@ def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth
     if not 0. <= low_tilt_drop_m <= .010:
         raise ValueError('Low-tilt mouth lowering must be between 0 and 10 mm')
     height = mouth_z - tail_drop_m*tail_progress(phase, tail_window_deg)
-    # Lower the stream around the 80-degree settling pose and measured
-    # top-up range, then blend back into the normal coarse trajectory.
+    # Lower the mouth at the settling pose while keeping clearance in the
+    # tighter reach above 84 degrees.
     base,rotation=calibrated_pose(phase,1.,initial,height,centered=centered,lip_height=lip_height)
-    base[2] -= low_tilt_drop_m*ease((phase-70.)/10.)*(1.-ease((phase-99.)/14.))
+    low_tilt = ease((phase-70.)/10.)*(1.-ease((phase-81.)/3.))
+    base[2] -= low_tilt_drop_m*low_tilt
     base[0]+=late_mouth_offset(phase,late_mouth_shift_m,tail_setback_m=tail_setback_m,
                                tail_window_deg=tail_window_deg)
     tcp=cup+FRAME@(base+rotation@np.array([0.,0.,GRASP_Z]))

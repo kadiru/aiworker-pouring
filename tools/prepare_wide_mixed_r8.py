@@ -20,7 +20,7 @@ LOCALIZATION = "02_swap"
 MOUTH_REPAIR = {
     "03_normal": dict(tail_setback_m=.009,tail_window_deg=(115.,119.),tail_drop_m=.004),
     "10_swap": dict(tail_setback_m=.010,tail_window_deg=(115.,120.),tail_drop_m=.005),
-    "11_swap": dict(low_tilt_drop_m=.008),
+    "11_swap": dict(low_tilt_drop_m=.004),
     "14_swap": dict(tail_setback_m=.010,tail_window_deg=(117.,124.),tail_drop_m=.006),
 }
 

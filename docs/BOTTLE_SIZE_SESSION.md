@@ -722,7 +722,10 @@ All four lost pairs originated in the source bottle. Three rebounded out
 near 122–129° of coarse tilt and one rebounded out near 81° as the wrist
 settled after braking. Three vessel combinations now move the mouth back
 9–10 mm and lower it 4–6 mm during the late pour. The fourth lowers the
-mouth by up to 8 mm around settling and top-up angles. The planner uses
+mouth by 4 mm at 80–81° with a smooth return to the prior height by
+84°. The original 8 mm lowering collided with the bench and cup in
+clearance checks. Smaller lowerings that extended to 87° also lost
+bench clearance. The planner uses
 the declared geometry and the controller's own tilt phase. Measured
 particles identify the repair and score the experiment offline.
 [Particle traces](../evidence/bottle-size-A/wide-mixed-r8-spill-trace.json).

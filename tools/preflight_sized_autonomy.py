@@ -141,7 +141,7 @@ def scan(stage, spec, saved, opened, closed):
         start, end = mouth["tail_window_deg"]
         phases = sorted(set(phases) | set(np.linspace(start, end, 5)))
     if mouth["low_tilt_drop_m"]:
-        phases = sorted(set(phases) | {70., 75., 77.5, 82.5, 95., 99., 106., 113.})
+        phases = sorted(set(phases) | {70., 75., 77.5, 82., 82.5, 83., 84.})
     projected={}
     for phase in phases:
         projected[phase]=project_target(arm,target(profile,lift[-1],cup[:2],phase),
