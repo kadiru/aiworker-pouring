@@ -148,7 +148,7 @@ def main():
                                           "layout-repair-r2","layout-repair-r3","tall-aligned-r0",
                                           "wide-mixed-r0","wide-mixed-r1","wide-mixed-r2","wide-mixed-r3",
                                           "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7",
-                                          "wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9"),
+                                          "wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
@@ -157,7 +157,7 @@ def main():
     with (ROOT/"isolated-job.lock").open("a") as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         minimum_free_gib = 57.
-        if args.study in ("wide-mixed-r8","wide-mixed-r9"):
+        if args.study in ("wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b"):
             plan = read(ROOT/args.study/"plan.json")
             # Bound storage by the actual batch and measured prior recording
             # sizes. Keep the 10 GiB retained margin from the storage plan.

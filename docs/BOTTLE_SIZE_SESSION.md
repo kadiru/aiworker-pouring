@@ -826,3 +826,30 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r9
 ```
+
+The [initial live repeats](../evidence/bottle-size-A/wide-mixed-r9-development-results.json)
+all had zero measured particle loss. The tall near-full repeat finished
+at 91.40% and confirmed the stop. A short-bottle empty repeat exposed a
+4.18-point RGB/color difference after the mouth motion changed. A second
+RTX 4070 fit used 152 timestamp-aligned training frames and 160 replay
+frames from two recordings of that vessel combination. The maximum
+gap over the final eight held-out frames fell from 4.19 to 1.01 points
+on the development recording. The correction is phase- and
+geometry-specific. Braking and empty detection still have access to the
+uncorrected upper level. [Color fit](../evidence/bottle-size-A/wide-mixed-r9b-draining-color-fit.json).
+
+The [revised plan](../evidence/bottle-size-A/wide-mixed-r9b-plan.json) keeps
+all 30 reserved IDs, poses and seeds. Copy the staged runtime to
+`wide-mixed-r9b/src`, overlay the updated `pour_size_autonomy.py` and
+stage `revise_wide_mixed_r9_color.py` at the native root. With the first
+development results saved, run the following in order.
+
+```sh
+python3 run_isolated_perception_job.py --helper revise_wide_mixed_r9_color.py --label wide-r9b-color-fit --seconds 600 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r9b-geometry --seconds 4500 --minimum-free-gib 12 -- --study wide-mixed-r9b --reuse-study wide-mixed-r9
+python3 run_sized_autonomy.py --study wide-mixed-r9b --part development --label wide-r9b-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r9b --part test --shard "$shard" --label "wide-r9b-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r9b
+```

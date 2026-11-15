@@ -58,6 +58,9 @@ class SizedCupPerception:
         self.retry_initial_cup = config.get("retry_initial_cup", False)
         self.settled_rgb_calibration = config.get("settled_rgb_calibration")
         self.midfill_rgb_calibration = config.get("midfill_rgb_calibration")
+        self.draining_color_calibration = config.get("draining_color_calibration")
+        if self.draining_color_calibration is not None:
+            validate_rgb_calibration(self.draining_color_calibration, geometry)
         self.rgb_height_calibration = config.get("rgb_height_calibration", {})
         if self.rgb_height_calibration.keys() - {"settling", "draining"}:
             raise ValueError("Unsupported RGB height calibration phase")
@@ -115,6 +118,10 @@ class SizedCupPerception:
                 filtered["rgb"], MIDFILL_RGB_KNOTS)
             diagnostic.update(guard_filtered=filtered.copy(), rgb_midfill_correction=correction)
             filtered["rgb"] -= correction
+        if valid and draining and self.draining_color_calibration is not None:
+            diagnostic.setdefault("guard_filtered", filtered.copy())
+            filtered["color"] = calibrated_rgb_height(filtered["color"], self.draining_color_calibration)
+            diagnostic["draining_color_correction"] = diagnostic["guard_filtered"]["color"] - filtered["color"]
         difference = abs(filtered["rgb"] - filtered["color"]) if valid else None
         return dict(track_valid=track["valid"], track_reason=track["reason"],
                     raw=raw, filtered=filtered, valid=valid,
