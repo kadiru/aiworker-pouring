@@ -27,14 +27,17 @@ def main():
     p.add_argument('--helper', required=True)
     p.add_argument('--label', required=True)
     p.add_argument('--seconds', type=int, default=3600)
+    p.add_argument('--minimum-free-gib', type=float, default=57)
     p.add_argument('arguments', nargs=argparse.REMAINDER)
     a=p.parse_args()
     assert Path(a.helper).name==a.helper and a.helper.endswith('.py')
     assert a.label.replace('-','').isalnum() and 0<a.seconds<=7200
+    assert a.minimum_free_gib>=10
     assert (STUDY/a.helper).is_file()
     with (STUDY/'isolated-job.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
-        subprocess.run([sys.executable,str(ROOT/'tools/verify_robot_training_storage.py'),'--minimum-free-gib','57'],check=True)
+        subprocess.run([sys.executable,str(ROOT/'tools/verify_robot_training_storage.py'),
+                        '--minimum-free-gib',str(a.minimum_free_gib)],check=True)
         sim=json.loads(out('docker','inspect',SIM))[0]
         assert sim['Id']==SIM and not sim['State']['Running']
         assert sim['Config']['Labels']['owner']=='aiworker-pouring'

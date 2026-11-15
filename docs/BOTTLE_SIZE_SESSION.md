@@ -780,3 +780,49 @@ All seven tall-bottle empty targets confirmed in 0.30–0.45 s after exact
 depletion, with median 0.35 s. The audit verified all 30 recordings, 135
 original runtime sources and 2,284 protected files. The owned simulator
 exited and the 4070 was idle.
+
+## Three coarse-pour spills and final-pulse confirmation
+
+The prior near-full trial reached 91.40% of measured rim height. The
+size-aware camera estimates agreed, but the corrected RGB branch
+remained slightly below its 92.5% stop threshold when the controller
+reached the 13-pulse limit. An RTX 4070 grid fit selected a 92.19%
+confirmation threshold for the 0.90× height / 0.90× diameter cup at
+that limit. The decision uses the lowest of three overlapping six-frame
+windows from the last eight settled RGB/color samples. Each must pass
+the existing stability and agreement checks. The usual 92.5% stop
+remains in force before the limit. In replay, the target's conservative
+estimate was 92.37% with a measured eight-frame minimum of 91.16%.
+Three training and eight archived validation episodes produced 97
+eligible windows. The new threshold accepted none below 90% measured
+height. [Fit and replay](../evidence/bottle-size-A/wide-mixed-r9-near-full-fit.json).
+
+The three spill traces started during coarse pouring at 118.34°, 124.56°,
+and 126.94°. The two short-bottle combinations use a 9–10 mm setback
+and 5–6 mm lowering before their prior losses. The tall-bottle and small
+cup use a 7 mm setback and 6 mm lowering from 113° to 117° to steer the
+stream farther inside the rim at first impact. The same motion options
+are checked against the table, arm and declared cup and bottle shapes.
+[Spill traces](../evidence/bottle-size-A/wide-mixed-r9-spill-trace.json).
+
+The [sealed plan](../evidence/bottle-size-A/wide-mixed-r9-plan.json) includes
+four targeted development pours and 30 fresh fixtures in 15 exact swap
+pairs. The stop fit and clearance helpers write only small study artifacts
+and use a 12 GiB mount preflight. The wet runner checks the recording
+budget for all remaining trials and retains the 10 GiB margin.
+
+Copy `wide-mixed-r8/src` to `wide-mixed-r9/src` and overlay the revised
+`pour_guard_actor.py`, `pour_size_autonomy.py` and test. Stage the
+updated launchers, the two study helpers and the existing r6 and r8
+helpers at the native study root.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r9_stop.py --label wide-r9-stop-fit --seconds 600 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r9.py --label wide-r9-prepare --seconds 300 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r9-geometry --seconds 4500 --minimum-free-gib 12 -- --study wide-mixed-r9
+python3 run_sized_autonomy.py --study wide-mixed-r9 --part development --label wide-r9-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r9 --part test --shard "$shard" --label "wide-r9-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r9
+```

@@ -11,12 +11,19 @@ import torch
 from pour_guard_actor import empty_confirmation
 from pour_guard_vision import locate, locate_initial_source
 from pour_size_autonomy import (MAX_SETTLED_RGB_BIAS, MIDFILL_RGB_KNOTS, SizedCupPerception,
-                                batch_specs, calibrated_rgb_height, settled_pair, settled_rgb_weight,
+                                batch_specs, calibrated_rgb_height, pulse_limit_level, settled_pair, settled_rgb_weight,
                                 sha, validate_rgb_calibration)
 from pour_wide_motion import late_mouth_offset
 
 
 class SizedStopTests(unittest.TestCase):
+    def test_pulse_limit_requires_three_stable_agreeing_windows(self):
+        pair = (.924,.933)
+        self.assertIsNone(pulse_limit_level([pair]*7,.035,.012))
+        self.assertEqual(pulse_limit_level([pair]*8,.035,.012),.924)
+        self.assertIsNone(pulse_limit_level([(.924,.97)]+[pair]*7,.035,.012))
+        self.assertIsNone(pulse_limit_level([pair]*7+[(None,None)],.035,.012))
+
     def test_offscreen_neck_proposal_returns_zero_confidence(self):
         bank = dict(kernels=torch.zeros((1,2,64,48)), mask=torch.ones((1,2,64,48)),
                     offset=(-24,-12), bounds=(24,24,360,360))

@@ -135,6 +135,17 @@ def settled_pair(samples, target, tolerance, stability):
     return low, stable and agree, stable and agree and low >= target
 
 
+def pulse_limit_level(samples, tolerance, stability):
+    """Return the lower height across three consecutive settled windows."""
+    if len(samples) < 8:
+        return None
+    recent = samples[-8:]
+    results = [settled_pair(recent[i:i+6], 1., tolerance, stability) for i in range(3)]
+    if all(stable for _,stable,_ in results):
+        return min(level for level,_,_ in results)
+    return None
+
+
 def seeded_prefill(spec):
     from pour_perception_geometry import calibration_seed_points
     assert spec["policy_evaluation"] and spec["size_autonomy_prefill"]

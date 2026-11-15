@@ -16,7 +16,7 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "layout-repair-r2", "layout-repair-r3", "tall-aligned-r0",
                                        "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
                                        "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7",
-                                       "wide-mixed-r7b", "wide-mixed-r8"),
+                                       "wide-mixed-r7b", "wide-mixed-r8", "wide-mixed-r9"),
                     default="sized-autonomy")
 parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4","wide-mixed-r7"))
 parser.add_argument("--resume-screen")

@@ -439,7 +439,7 @@ class Actor:
                 elif self.fill_mode=='settle':
                     self.pour_phase=80.
                     if t-self.pause_start>=self.threshold['settle_seconds']:
-                        last=[x for x in self.level_history if x[0]>=self.pause_start+.35][-6:]
+                        last=[x for x in self.level_history if x[0]>=self.pause_start+.35][-8:]
                         if self.sized_perception is not None:
                             from pour_size_autonomy import settled_pair
                             settled,stable,full=settled_pair(
@@ -447,6 +447,7 @@ class Actor:
                                 self.threshold['full_settled_target'],self.sized_perception.agreement_limit,
                                 self.threshold['settled_stability_std'])
                         else:
+                            last=last[-6:]
                             other=float(np.median([x[1] for x in last]))
                             if 'settled_regressor' in self.saved:
                                 from pour_settled_model import assess
@@ -458,13 +459,24 @@ class Actor:
                                 stable=np.std([x[2] for x in last])<.012
                                 full=settled>=self.threshold['full_settled_target'] and abs(other-settled)<.06 and stable and mass>1.
                         self.full_votes=self.full_votes+1 if full else 0
-                        if self.full_votes>=3:self.latch('cup_near_full',t,robot)
+                        pulse_limit = self.pause_count>=self.threshold.get('max_pauses',3)
+                        confirmed_at_limit = False
+                        limit_target = self.threshold.get('fitted_full_at_pulse_limit')
+                        if pulse_limit and limit_target is not None and level_valid and self.sized_perception is not None:
+                            from pour_size_autonomy import pulse_limit_level
+                            height = pulse_limit_level([(x[2],x[1]) for x in last],
+                                                       self.sized_perception.agreement_limit,
+                                                       self.threshold['settled_stability_std'])
+                            confirmed_at_limit = height is not None and height>=limit_target
+                            measured['pulse_limit_confirmation'] = dict(level=height, target=limit_target,
+                                                                        confirmed=confirmed_at_limit)
+                        if self.full_votes>=3 or confirmed_at_limit:self.latch('cup_near_full',t,robot)
                         elif self.sized_perception is not None and (settled is None or not stable):
                             if t-self.pause_start>2.5:self.latch('level_unconfirmed',t,robot)
                         elif not full and settled>=self.threshold['full_settled_target']:
                             if t-self.pause_start>2.5:self.latch('level_unconfirmed',t,robot)
                         elif not full and (stable or t-self.pause_start>1.6):
-                            if self.pause_count>=self.threshold.get('max_pauses',3):self.latch('fill_unconfirmed',t,robot)
+                            if pulse_limit:self.latch('fill_unconfirmed',t,robot)
                             else:
                                 self.fill_mode='trim'
                                 self.trim_goal=topup_goal(settled,self.threshold['full_settled_target'],self.threshold.get('trim_increment',.015))

@@ -29,11 +29,11 @@ def suffix(case):
     return case["name"].split("_test_")[-1]
 
 
-def measure_spill(case):
+def measure_spill(case, mouth_options):
     path = folder(case)
     samples = read(path/"samples.json")
     escaped = {p["index"] for p in samples[-1]["diagnostic_outside_particles"]}
-    assert len(escaped) == case["measured_loss_particles"] == 2
+    assert len(escaped) == case["measured_loss_particles"] > 0
     stop = next(f for f in read(path/"policy-decisions.json") if f["stop_latched"])
     points = []
     for row in samples:
@@ -47,7 +47,7 @@ def measure_spill(case):
     assert points and all(p["origin"] == "bottle" for p in points[0]["particles"])
     return dict(name=case["name"],recording_sha256=case["recording_sha256"],
                 cup_size=case["cup_size"],bottle_size=case["bottle_size"],
-                stop_time=stop["t"],observations=points,mouth_options=MOUTH_REPAIR[suffix(case)])
+                stop_time=stop["t"],observations=points,mouth_options=mouth_options)
 
 
 def main():
@@ -61,7 +61,8 @@ def main():
     failures = {suffix(r) for r in results if not r["strict_pass"]}
     assert failures == MOUTH_REPAIR.keys() | {LOCALIZATION}
     spill_path = STUDY/"spill-trace.json"
-    save(spill_path,dict(cases=[measure_spill(r) for r in results if suffix(r) in MOUTH_REPAIR]))
+    save(spill_path,dict(cases=[measure_spill(r,MOUTH_REPAIR[suffix(r)])
+                               for r in results if suffix(r) in MOUTH_REPAIR]))
     neck_report = STUDY/"neck-fusion.json"
     neck_path = STUDY/"neck-heatmap.pt"
     fit = read(neck_report)
