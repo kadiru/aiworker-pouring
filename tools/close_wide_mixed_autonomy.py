@@ -74,7 +74,7 @@ def group_totals(rows, key):
 def main():
     global STUDY
     parser=argparse.ArgumentParser()
-    parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b"),
+    parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -143,10 +143,10 @@ def main():
                 path=STUDY/file
                 assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
                 report[file.removesuffix(".json").replace("-","_")+"_sha256"]=sha(path)
-    if STUDY.name in ("wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b"):
+    if STUDY.name in ("wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10"):
         report["development_cases"]=dev
         report["controller_test_log_sha256"]=sha(STUDY/"controller-tests.log")
-        fit = "neck-fusion.json" if STUDY.name=="wide-mixed-r8" else "near-full-fit.json"
+        fit = "neck-fusion.json" if STUDY.name in ("wide-mixed-r8","wide-mixed-r10") else "near-full-fit.json"
         reports = (fit,"spill-trace.json")
         if STUDY.name=="wide-mixed-r9b":
             reports += ("draining-color-fit.json",)

@@ -885,3 +885,42 @@ late coarse pair escaped at 120.24° in normal 01. Normal 12 stopped
 before grasp after the bottle-neck score failed temporal consensus.
 The audit verified all 30 recordings, 135 original runtime sources and
 2,284 protected files. The 4070 was idle at closure.
+
+## Normal-layout bottle localization and two late-pour rebounds
+
+The RTX 4070 fine-tuned the RGB neck heatmap on 286 training images
+from 26 episodes. Eleven whole recordings were held out of this
+fine-tune, including three older localization regressions. The
+selected epoch used the existing 0.70 proposal score, 0.71 gradient
+score, six-pixel proposal/match limit and full temporal consensus.
+Normal layout 12 recovered all 20 native camera frames at 0.109 mm
+consensus error. Across 37 native and 24 translated replays, the
+largest error was 1.80 mm. The learned path rejected all 740 erased
+frames. [Neck replay](../evidence/bottle-size-A/wide-mixed-r10-neck-fusion.json).
+
+Both prior losses were bottle-origin droplets during coarse pouring.
+The tall, narrow bottle bounced droplets forward off the rim around
+120.24°. Its path now sets the mouth back 9 mm and lowers it 4 mm
+from 114° to 118°. The short, narrow bottle rebounded laterally at
+120.93°. Its path now sets the mouth back 7 mm and lowers it 6 mm
+from 114° to 119°. The camera and stop criteria carry forward from
+the previous checkpoint. [Particle traces](../evidence/bottle-size-A/wide-mixed-r10-spill-trace.json).
+
+The [sealed plan](../evidence/bottle-size-A/wide-mixed-r10-plan.json)
+defines five development pours, including two shifted spill checks,
+and fresh positions and seeds across 15 exact swap pairs.
+
+Copy `wide-mixed-r9b/src` to `wide-mixed-r10/src` and stage the updated
+launchers, `fit_wide_mixed_r7.py`, `prepare_wide_mixed_r10.py` and
+their existing r6/r8 imports in the native study root.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r7.py --label wide-r10-neck-fit --seconds 3600 --minimum-free-gib 12 -- --study wide-mixed-r10
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r10.py --label wide-r10-prepare --seconds 300 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r10-geometry --seconds 4500 --minimum-free-gib 12 -- --study wide-mixed-r10
+python3 run_sized_autonomy.py --study wide-mixed-r10 --part development --label wide-r10-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r10 --part test --shard "$shard" --label "wide-r10-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r10
+```

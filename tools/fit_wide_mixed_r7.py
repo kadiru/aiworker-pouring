@@ -21,15 +21,17 @@ from fit_wide_mixed_r6 import decode, erased, folder, h5py, read, save
 TARGETS = {"12_swap", "14_normal"}
 
 
-def rows(parent=PARENT, targets=TARGETS):
+def rows(parent=PARENT, targets=TARGETS, archive=()):
     trials = []
-    for source, cases in (("benchmark", read(parent / "completion.json")["test_cases"]),
-                          ("development", read(parent / "development-results.json")["cases"])):
+    sources = (("benchmark", read(parent / "completion.json")["test_cases"]),
+               ("development", read(parent / "development-results.json")["cases"]),
+               ("archive", archive))
+    for source, cases in sources:
         for case in cases:
             path = folder(case)
             spec = read(path / "parameters.json")
             target = source == "benchmark" and case["name"].split("_test_")[-1] in targets
-            validate = not target and source == "benchmark" and case["pair_index"] % 4 == 2
+            validate = source == "archive" or (not target and source == "benchmark" and case["pair_index"] % 4 == 2)
             record = path / "episode.hdf5"
             assert sha(record) == case["recording_sha256"]
             base = np.array(spec["cup_world"]) + [-spec["source_xy"][1], spec["source_xy"][0], 0.]
@@ -127,18 +129,28 @@ def score_replay(rows, proposal_floor, refinement_floor):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8"), default="wide-mixed-r7")
+    parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8","wide-mixed-r10"), default="wide-mixed-r7")
     args = parser.parse_args()
     study = ROOT / args.study
-    is_r8 = args.study == "wide-mixed-r8"
-    parent = ROOT / "wide-mixed-r7b" if is_r8 else PARENT
-    source_fit = (ROOT / "wide-mixed-r7" if is_r8 else PARENT) / "neck-heatmap.pt"
-    seed = 26111308 if is_r8 else 26111307
+    if args.study == "wide-mixed-r10":
+        parent, initialization = ROOT/"wide-mixed-r9b", ROOT/"wide-mixed-r8"
+        seed, targets = 26111510, {"12_normal"}
+    elif args.study == "wide-mixed-r8":
+        parent, initialization = ROOT/"wide-mixed-r7b", ROOT/"wide-mixed-r7"
+        seed, targets = 26111308, {"02_swap"}
+    else:
+        parent, initialization = PARENT, PARENT
+        seed, targets = 26111307, TARGETS
+    source_fit = initialization/"neck-heatmap.pt"
+    archive = []
+    if args.study == "wide-mixed-r10":
+        cases = read((ROOT/"wide-mixed-r7b")/"completion.json")["test_cases"]
+        archive = [c for c in cases if c["name"].endswith(("02_swap", "12_swap", "14_normal"))]
     assert torch.cuda.device_count() == 1 and "4070" in torch.cuda.get_device_name(0)
     torch.set_num_threads(2)
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
-    trials = rows(parent, {"02_swap"} if is_r8 else TARGETS)
+    trials = rows(parent, targets, archive)
     groups = list(replay_frames(trials))
     images, uv, present = dataset(trials)
     training = [r for r in trials if not r["validate"]]
@@ -205,7 +217,7 @@ def main():
     report.update(passed=score[:3] == (0,0,0), checkpoint_sha256=sha(dest),
                   train_episodes=len(training), validation_episodes=len(trials)-len(training),
                   train_images=len(images), gradient_templates=len(bank["kernels"]))
-    if is_r8:
+    if args.study != "wide-mixed-r7":
         report.update(seed=seed, initialization_sha256=sha(source_fit))
     save(study/"neck-fusion.json",report)
     assert report["passed"], score
