@@ -17,9 +17,10 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
                                        "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7",
                                        "wide-mixed-r7b", "wide-mixed-r8", "wide-mixed-r9", "wide-mixed-r9b",
-                                       "wide-mixed-r10"),
+                                       "wide-mixed-r10", "wide-mixed-r10b"),
                     default="sized-autonomy")
-parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4","wide-mixed-r7","wide-mixed-r9"))
+parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4","wide-mixed-r7","wide-mixed-r9",
+                                             "wide-mixed-r10"))
 parser.add_argument("--resume-screen")
 ARGS = parser.parse_args()
 STUDY = ROOT/ARGS.study
@@ -221,7 +222,7 @@ def main():
             assert sha(spec["checkpoint"])==plan["checkpoints"][spec["checkpoint"]]
             name=spec["name"]
             predecessor=(plan.get("clearance_predecessors",{}).get(name,name)
-                         if ARGS.reuse_study in ("wide-mixed-r7","wide-mixed-r9") else name)
+                         if ARGS.reuse_study in ("wide-mixed-r7","wide-mixed-r9","wide-mixed-r10") else name)
             old=old_specs[predecessor] if predecessor in reusable else None
             same=old is not None and spec==old
             if old is not None and not same and ARGS.reuse_study=="wide-mixed-r4":
@@ -233,7 +234,7 @@ def main():
                     same=all(a.get(k)==b.get(k) for k in ("pour_primitive","side_return","bottle_geometry",
                                                         "pour_mouth_z"))
                     same = same and outbound_mouth_options(a) == outbound_mouth_options(b)
-            if old is not None and ARGS.reuse_study in ("wide-mixed-r7","wide-mixed-r9"):
+            if old is not None and ARGS.reuse_study in ("wide-mixed-r7","wide-mixed-r9","wide-mixed-r10"):
                 changed = {"checkpoint", "name"}
                 same = ({k:v for k,v in spec.items() if k not in changed}
                         == {k:v for k,v in old.items() if k not in changed})

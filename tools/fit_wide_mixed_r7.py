@@ -21,16 +21,17 @@ from fit_wide_mixed_r6 import decode, erased, folder, h5py, read, save
 TARGETS = {"12_swap", "14_normal"}
 
 
-def rows(parent=PARENT, targets=TARGETS, archive=()):
+def rows(parent=PARENT, targets=TARGETS, archive=(), supplemental=()):
     trials = []
     sources = (("benchmark", read(parent / "completion.json")["test_cases"]),
                ("development", read(parent / "development-results.json")["cases"]),
-               ("archive", archive))
+               ("archive", archive), ("supplemental", supplemental))
     for source, cases in sources:
         for case in cases:
             path = folder(case)
             spec = read(path / "parameters.json")
-            target = source == "benchmark" and case["name"].split("_test_")[-1] in targets
+            target = source == "supplemental" or (
+                source == "benchmark" and case["name"].split("_test_")[-1] in targets)
             validate = source == "archive" or (not target and source == "benchmark" and case["pair_index"] % 4 == 2)
             record = path / "episode.hdf5"
             assert sha(record) == case["recording_sha256"]
@@ -41,7 +42,8 @@ def rows(parent=PARENT, targets=TARGETS, archive=()):
                 cal = dict(K=file["calibration/task/intrinsics"][:],
                            T=data["obs/task_world_T_camera"][0], table_z=base[2])
                 uv = project(base + [0., 0., lip], cal)
-                images = [decode(data["obs/task_image"][i], spec["image_encoding"]) for i in range(20)]
+                frames = 41 if target and supplemental else 20
+                images = [decode(data["obs/task_image"][i], spec["image_encoding"]) for i in range(frames)]
             trials.append(dict(name=case["name"], sha256=case["recording_sha256"],
                                frames=images, uv=uv, base=base, lip=lip, cal=cal,
                                target=target, validate=validate, checkpoint=spec["checkpoint"]))
@@ -53,7 +55,7 @@ def dataset(trials):
     for row in trials:
         if row["validate"]:
             continue
-        for i in (0, 3, 6, 9, 12, 15, 18):
+        for i in range(0,len(row["frames"]),3):
             images.append(row["frames"][i])
             uv.append(row["uv"])
             presence.append(True)
@@ -114,7 +116,12 @@ def score_replay(rows, proposal_floor, refinement_floor):
                       if h >= proposal_floor and m >= refinement_floor and d <= 6.
                       else (old.tolist(), s, method) if old is not None else ([0., 0.], 0., "erased")
                       for p, h, m, d, old, s, method in matches]
-        vote = consensus([(p,s) for p,s,_ in candidates], limit, settings)
+        observations = [(p,s) for p,s,_ in candidates]
+        if len(observations)==20:
+            vote = consensus(observations, limit, settings)
+        else:
+            vote = next((found for i in range(settings["votes"],len(observations)+1)
+                         if (found := consensus(observations[:i],limit,settings))),None)
         heat_frames = sum(m == "heatmap" for _,_,m in candidates)
         error = None
         if vote is not None and kind != "erased":
@@ -129,10 +136,11 @@ def score_replay(rows, proposal_floor, refinement_floor):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8","wide-mixed-r10"), default="wide-mixed-r7")
+    parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8","wide-mixed-r10","wide-mixed-r10b"),
+                        default="wide-mixed-r7")
     args = parser.parse_args()
     study = ROOT / args.study
-    if args.study == "wide-mixed-r10":
+    if args.study in ("wide-mixed-r10","wide-mixed-r10b"):
         parent, initialization = ROOT/"wide-mixed-r9b", ROOT/"wide-mixed-r8"
         seed, targets = 26111510, {"12_normal"}
     elif args.study == "wide-mixed-r8":
@@ -143,19 +151,24 @@ def main():
         seed, targets = 26111307, TARGETS
     source_fit = initialization/"neck-heatmap.pt"
     archive = []
-    if args.study == "wide-mixed-r10":
+    supplemental = []
+    if args.study in ("wide-mixed-r10","wide-mixed-r10b"):
         cases = read((ROOT/"wide-mixed-r7b")/"completion.json")["test_cases"]
         archive = [c for c in cases if c["name"].endswith(("02_swap", "12_swap", "14_normal"))]
+    if args.study == "wide-mixed-r10b":
+        cases = read((ROOT/"wide-mixed-r10")/"development-results.json")["cases"]
+        supplemental = [c for c in cases if c["name"].endswith("12_normal")]
+        assert len(supplemental)==1 and supplemental[0]["stop_reason"]=="localization_unconfirmed"
     assert torch.cuda.device_count() == 1 and "4070" in torch.cuda.get_device_name(0)
     torch.set_num_threads(2)
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
-    trials = rows(parent, targets, archive)
+    trials = rows(parent, targets, archive, supplemental)
     groups = list(replay_frames(trials))
     images, uv, present = dataset(trials)
     training = [r for r in trials if not r["validate"]]
     templates = [(r["frames"][i],r["uv"]) for r in training for i in
-                 ((0, 3, 6, 9, 12, 15, 18) if r["target"] else (3, 12))]
+                 (range(0,len(r["frames"]),3) if r["target"] else (3, 12))]
     base = torch.load(source_fit, map_location="cpu", weights_only=False)
     bank = make_bank(*zip(*templates), "source", aggregation="max",
                      gradient_clip=.04, source_mask_box=(10,7,38,39))

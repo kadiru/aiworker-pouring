@@ -924,3 +924,34 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r10
 ```
+
+The [first development batch](../evidence/bottle-size-A/wide-mixed-r10-development-results.json)
+verified both spill paths at both positions with zero measured loss.
+The new-seed normal-12 sequence still timed out at bottle consensus.
+A second 4070 fit added that recording, used 317 training images across
+27 episodes, and replayed the full 41-frame startup on both target
+recordings. Each target matched 41/41 frames across its native and
+two translated sequences, with consensus error at or below 0.23 mm.
+The fit retained 11 held-out episodes and accepted none of 802 erased
+frames. It uses the 0.70 proposal and 0.68 gradient gates for the short
+standard-width bottle, with the existing six-pixel agreement and
+temporal consensus. The first fit is retained for the other bottle
+sizes. [Full-startup replay](../evidence/bottle-size-A/wide-mixed-r10b-neck-fusion.json).
+
+Copy the staged runtime to `wide-mixed-r10b/src` and stage
+`revise_wide_mixed_r10_neck.py`. The
+[revised plan](../evidence/bottle-size-A/wide-mixed-r10b-plan.json)
+preserves all 30 fresh fixture IDs, poses and seeds. The revised
+geometry check reuses only hash-verified clearance results for
+identical geometry, motion and seed.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r7.py --label wide-r10b-neck-fit --seconds 3600 --minimum-free-gib 12 -- --study wide-mixed-r10b
+python3 run_isolated_perception_job.py --helper revise_wide_mixed_r10_neck.py --label wide-r10b-prepare --seconds 300 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r10b-geometry --seconds 4500 --minimum-free-gib 12 -- --study wide-mixed-r10b --reuse-study wide-mixed-r10
+python3 run_sized_autonomy.py --study wide-mixed-r10b --part development --label wide-r10b-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r10b --part test --shard "$shard" --label "wide-r10b-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r10b
+```
