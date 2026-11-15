@@ -955,3 +955,30 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r10b
 ```
+
+All five [revised development pours](../evidence/bottle-size-A/wide-mixed-r10b-development-results.json)
+passed with zero measured loss. Normal layout 12 grasped and stopped
+near full at 94.47%. Both spill repairs passed their original and
+shifted development positions. The 35 geometry and 57 controller checks
+passed.
+
+The [30 fresh trials and recording audit](../evidence/bottle-size-A/wide-mixed-r10b-completion.json)
+finished in 6.41 hours on the guarded RTX 4070.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Spill-free pours |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 13 | 13 | 13 |
+| Swapped | 15 | 12 | 15 | 12 |
+| Near-full target | 15 | 14 | 14 | 14 |
+| Empty target | 15 | 11 | 14 | 11 |
+| All trials | 30 | 25 | 28 | 25 |
+
+Both prior spill layouts passed at shifted positions with zero measured
+loss. Normal 12 grasped, filled to 93.05% of rim height, and stopped
+with zero measured loss. The benchmark had two other bottle-neck
+consensus timeouts, in normal 07 and 14. The cup confirmed in both.
+Three swapped empty-target pours lost particles during coarse pouring.
+Swapped 00 lost one at 107.31°, swapped 04 lost two at 128.10°, and
+swapped 06 lost two at 126.56°. All 28 verified grasps completed their
+ordered returns. The audit verified the 30 recordings, 135 original
+runtime sources and 2,284 protected files. The 4070 was idle at closure.
