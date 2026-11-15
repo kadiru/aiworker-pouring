@@ -853,3 +853,35 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r9b
 ```
+
+The [revised development runs](../evidence/bottle-size-A/wide-mixed-r9b-development-results.json)
+passed all four trials with zero measured spill. The short-bottle color
+gap at stop was 1.12 points. The near-full repeat confirmed at 91.09% of
+rim height. All 34 geometry and 57 controller checks passed.
+
+The [30 fresh tests and recording audit](../evidence/bottle-size-A/wide-mixed-r9b-completion.json)
+finished in 6.37 hours on the guarded RTX 4070.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Spill-free pours |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 13 | 14 | 13 |
+| Swapped | 15 | 14 | 15 | 14 |
+| Near-full target | 15 | 14 | 14 | 14 |
+| Empty target | 15 | 13 | 15 | 13 |
+| All trials | 30 | 27 | 29 | 27 |
+
+The previously unconfirmed near-full layout finished at 90.94% of rim
+height with zero spill and confirmed with the usual two-branch rule
+before the pulse limit. The fitted final-pulse rule was exercised in
+archive replay. The 14 confirmed near-full stops finished at
+90.94–95.74% and the maximum level-model gap at stop across all 29
+actual pours was 3.08 points. All seven tall-bottle empty targets
+reached zero source inventory and confirmed in 0.30–0.60 s.
+
+Both the tall bottle/small cup in normal 09 and the short bottle/narrow
+cup in swapped 12 poured cleanly. The shifted short, narrow bottle and
+wide cup in swapped 02 still lost two particles at 120.93°. A second
+late coarse pair escaped at 120.24° in normal 01. Normal 12 stopped
+before grasp after the bottle-neck score failed temporal consensus.
+The audit verified all 30 recordings, 135 original runtime sources and
+2,284 protected files. The 4070 was idle at closure.
