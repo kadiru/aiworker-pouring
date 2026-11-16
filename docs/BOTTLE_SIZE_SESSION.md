@@ -1026,3 +1026,30 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r11
 ```
+
+The [five targeted development trials](../evidence/bottle-size-A/wide-mixed-r11-development-results.json)
+passed with zero loss. The fallback supplied both previously missed
+bottle detections. Normal 07 emptied the bottle and normal 14 stopped
+near full at 95.26% of rim height. All 35 geometry tests and 58
+controller tests passed.
+
+The [30 fresh trials and audit](../evidence/bottle-size-A/wide-mixed-r11-completion.json)
+finished in 6.78 hours on the guarded RTX 4070.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Spill-free pours |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 14 | 15 | 14 |
+| Swapped | 15 | 15 | 15 | 15 |
+| Near-full target | 15 | 15 | 15 | 15 |
+| Empty target | 15 | 14 | 15 | 14 |
+| All trials | 30 | 29 | 30 | 29 |
+
+All five targeted layouts passed at their shifted positions. The
+fallback confirmed the bottle in normal 07. The incumbent detector
+confirmed normal 14, which filled to 93.26% of rim height. The only
+observed particle loss was in normal 01, during coarse pouring at
+112.11°. All 30 stopped for the expected condition and completed
+ordered side returns. Near-full results ranged from 91.14% to 95.76%
+of rim height. The audit verified all 30 recordings, 135 original
+runtime sources and 2,284 protected files. The RTX 4070 was idle and
+the RTX 4090 humanoid job was still active at closure.
