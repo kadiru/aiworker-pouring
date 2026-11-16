@@ -982,3 +982,47 @@ Swapped 00 lost one at 107.31°, swapped 04 lost two at 128.10°, and
 swapped 06 lost two at 126.56°. All 28 verified grasps completed their
 ordered returns. The audit verified the 30 recordings, 135 original
 runtime sources and 2,284 protected files. The 4070 was idle at closure.
+
+## Two bottle-neck timeouts and three swapped-layout spills
+
+The RTX 4070 fine-tuned a fallback neck detector on 349 training
+images from 29 episodes, with 13 whole recordings held out. The
+first fit missed an older normal-14 recording. The accepted fit
+included that earlier view and checked another archived normal-14
+recording as a holdout. It passed native and translated replay
+on both recorded target startups. The deployed controller checks
+the incumbent heatmap first and uses the retrained fallback for
+the two affected bottle shapes when the incumbent rejects.
+The production sequence passed 21 native and four translated
+replays with worst consensus error of 1.37 mm. On the two missed
+native views, the fallback provided 41 and 40 of 41 frames,
+respectively. The combined learned paths rejected all erased
+frames in the scoped replays. [Detector fit](../evidence/bottle-size-A/wide-mixed-r11-neck-fusion.json),
+[combined replay](../evidence/bottle-size-A/wide-mixed-r11-neck-cascade-replay.json).
+
+All three lost groups originated in the bottle during coarse pouring.
+Swapped 00 first observed the single droplet above the cup near
+107.31°, with the escape traced later at about 118°. Swapped 04 and
+06 lost paired droplets near 128.10° and 126.56°. Their geometry-specific
+mouth trajectories apply setbacks of 6, 9 and 10 mm and lowerings of
+4, 5 and 6 mm, respectively, before those loss angles.
+[Particle traces](../evidence/bottle-size-A/wide-mixed-r11-spill-trace.json).
+
+The [sealed plan](../evidence/bottle-size-A/wide-mixed-r11-plan.json)
+specifies five targeted development cases and 30 fresh trials across
+15 exact normal/swapped pairs. Copy `wide-mixed-r10b/src` to
+`wide-mixed-r11/src`, overlay the updated `pour_guard_vision.py` and
+its test, and stage the fit, preparation and launch helpers at the
+native study root. The prepare helper imports the existing r6, r8
+and r10 utilities and the updated neck fitting helper.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r7.py --label wide-r11-neck-fit --seconds 3600 --minimum-free-gib 12 -- --study wide-mixed-r11
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r11.py --label wide-r11-prepare --seconds 600 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r11-geometry --seconds 4500 --minimum-free-gib 12 -- --study wide-mixed-r11
+python3 run_sized_autonomy.py --study wide-mixed-r11 --part development --label wide-r11-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r11 --part test --shard "$shard" --label "wide-r11-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r11
+```

@@ -21,7 +21,7 @@ from fit_wide_mixed_r6 import decode, erased, folder, h5py, read, save
 TARGETS = {"12_swap", "14_normal"}
 
 
-def rows(parent=PARENT, targets=TARGETS, archive=(), supplemental=()):
+def rows(parent=PARENT, targets=TARGETS, archive=(), supplemental=(), *, full_startup=False):
     trials = []
     sources = (("benchmark", read(parent / "completion.json")["test_cases"]),
                ("development", read(parent / "development-results.json")["cases"]),
@@ -42,7 +42,7 @@ def rows(parent=PARENT, targets=TARGETS, archive=(), supplemental=()):
                 cal = dict(K=file["calibration/task/intrinsics"][:],
                            T=data["obs/task_world_T_camera"][0], table_z=base[2])
                 uv = project(base + [0., 0., lip], cal)
-                frames = 41 if target and supplemental else 20
+                frames = 41 if target and full_startup else 20
                 images = [decode(data["obs/task_image"][i], spec["image_encoding"]) for i in range(frames)]
             trials.append(dict(name=case["name"], sha256=case["recording_sha256"],
                                frames=images, uv=uv, base=base, lip=lip, cal=cal,
@@ -134,13 +134,27 @@ def score_replay(rows, proposal_floor, refinement_floor):
     return result
 
 
+def r11_archives():
+    archive = []
+    for previous, suffixes in (("wide-mixed-r9b",("07_normal","12_normal","14_normal")),
+                               ("wide-mixed-r8",("14_normal",)),
+                               ("wide-mixed-r7b",("02_swap","12_swap"))):
+        cases = read((ROOT/previous)/"completion.json")["test_cases"]
+        archive.extend(c for c in cases if c["name"].endswith(suffixes))
+    return archive
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8","wide-mixed-r10","wide-mixed-r10b"),
+    parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8","wide-mixed-r10","wide-mixed-r10b",
+                                             "wide-mixed-r11"),
                         default="wide-mixed-r7")
     args = parser.parse_args()
     study = ROOT / args.study
-    if args.study in ("wide-mixed-r10","wide-mixed-r10b"):
+    if args.study == "wide-mixed-r11":
+        parent, initialization = ROOT/"wide-mixed-r10b", ROOT/"wide-mixed-r10b"
+        seed, targets = 26111511, {"07_normal","14_normal"}
+    elif args.study in ("wide-mixed-r10","wide-mixed-r10b"):
         parent, initialization = ROOT/"wide-mixed-r9b", ROOT/"wide-mixed-r8"
         seed, targets = 26111510, {"12_normal"}
     elif args.study == "wide-mixed-r8":
@@ -159,11 +173,17 @@ def main():
         cases = read((ROOT/"wide-mixed-r10")/"development-results.json")["cases"]
         supplemental = [c for c in cases if c["name"].endswith("12_normal")]
         assert len(supplemental)==1 and supplemental[0]["stop_reason"]=="localization_unconfirmed"
+    if args.study == "wide-mixed-r11":
+        archive = r11_archives()
+        cases = read((ROOT/"wide-mixed-r7b")/"completion.json")["test_cases"]
+        supplemental = [c for c in cases if c["name"].endswith("14_normal")]
+        assert len(supplemental)==1 and supplemental[0]["grasp_verified"]
     assert torch.cuda.device_count() == 1 and "4070" in torch.cuda.get_device_name(0)
     torch.set_num_threads(2)
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
-    trials = rows(parent, targets, archive, supplemental)
+    trials = rows(parent, targets, archive, supplemental,
+                  full_startup=args.study in ("wide-mixed-r10b","wide-mixed-r11"))
     groups = list(replay_frames(trials))
     images, uv, present = dataset(trials)
     training = [r for r in trials if not r["validate"]]
@@ -230,6 +250,10 @@ def main():
     report.update(passed=score[:3] == (0,0,0), checkpoint_sha256=sha(dest),
                   train_episodes=len(training), validation_episodes=len(trials)-len(training),
                   train_images=len(images), gradient_templates=len(bank["kernels"]))
+    if args.study == "wide-mixed-r11":
+        # This fit supplies the fallback only. Deployment additionally
+        # validates the entire production locator, including the incumbent.
+        report.update(standalone_passed=report["passed"],passed=score[:2]==(0,0))
     if args.study != "wide-mixed-r7":
         report.update(seed=seed, initialization_sha256=sha(source_fit))
     save(study/"neck-fusion.json",report)

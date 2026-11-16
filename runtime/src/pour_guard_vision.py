@@ -145,17 +145,19 @@ def locate(image,bank,tracking=False,device='cuda',expected_uv=None):
 
 
 def locate_initial_source(image, saved, device='cuda'):
-    if 'source_heatmap' in saved:
+    threshold = saved['thresholds']['source_localization_score']
+    for key, method in (('source_heatmap','neck_heatmap'),
+                        ('source_heatmap_fallback','neck_heatmap_fallback')):
+        artifact = saved.get(key)
+        if artifact is None:
+            continue
         from pour_cup_locator import locate_cup
-        artifact = saved['source_heatmap']
         point, score = locate_cup(image, artifact['proposal'], device)
         if score >= artifact['proposal_floor']:
             candidate, match = locate(image, artifact['refinement'], device=device, expected_uv=point)
             if match >= artifact['refinement_floor'] and np.linalg.norm(point-candidate) <= artifact['max_refine_px']:
-                threshold = saved['thresholds']['source_localization_score']
-                return candidate, min(1.,threshold+min(score,match)*.20), 'neck_heatmap'
+                return candidate, min(1.,threshold+min(score,match)*.20), method
     point, score = locate(image, saved['source_bank'], device=device)
-    threshold = saved['thresholds']['source_localization_score']
     fallback = saved.get('source_initial_fallback')
     if fallback is None:
         return point, score, 'primary'

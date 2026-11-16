@@ -17,6 +17,22 @@ from pour_wide_motion import late_mouth_offset
 
 
 class SizedStopTests(unittest.TestCase):
+    def test_secondary_neck_model_runs_only_when_primary_heatmap_rejects(self):
+        point = np.array([175.,140.])
+        saved = dict(thresholds={"source_localization_score":.65},source_bank={},
+                     source_heatmap=dict(proposal={"name":"incumbent"},refinement={},
+                                         proposal_floor=.70,refinement_floor=.71,max_refine_px=6.),
+                     source_heatmap_fallback=dict(proposal={"name":"fallback"},refinement={},
+                                                  proposal_floor=.65,refinement_floor=.68,max_refine_px=6.))
+        with patch("pour_cup_locator.locate_cup", return_value=(point,.9)) as propose, \
+                patch("pour_guard_vision.locate", return_value=(point,.8)):
+            self.assertEqual(locate_initial_source(None,saved)[2],"neck_heatmap")
+            propose.assert_called_once()
+        with patch("pour_cup_locator.locate_cup", side_effect=[(point,.6),(point,.9)]) as propose, \
+                patch("pour_guard_vision.locate", return_value=(point,.8)):
+            self.assertEqual(locate_initial_source(None,saved)[2],"neck_heatmap_fallback")
+            self.assertEqual(propose.call_count,2)
+
     def test_pulse_limit_requires_three_stable_agreeing_windows(self):
         pair = (.924,.933)
         self.assertIsNone(pulse_limit_level([pair]*7,.035,.012))
