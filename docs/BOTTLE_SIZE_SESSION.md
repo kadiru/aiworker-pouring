@@ -1105,7 +1105,7 @@ geometry checks and 59 controller checks passed.
 After the first ten fresh tests completed, the host Docker service
 restarted during the second shard. The interrupted container exited
 with status 137. Trial 05 normal had already finished and its sealed
-recording contains a one-particle loss. Trial 05 swapped had a partial
+recording contains a two-particle loss. Trial 05 swapped had a partial
 recording. The guarded resume validated the original container, launch
 manifest, plan digests and GPU limits, recorded the interruption and
 kept the finished result. It reran the incomplete trial with the same
@@ -1117,3 +1117,26 @@ python3 run_sized_autonomy.py --study wide-mixed-r12 --part test --shard 2 --lab
 python3 run_sized_autonomy.py --study wide-mixed-r12 --part test --shard 3 --label wide-r12-test-3 --seconds 12500
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r12
 ```
+
+The [30 fresh trials and recording audit](../evidence/bottle-size-A/wide-mixed-r12-completion.json)
+accounted for 7.01 hours of simulator time across the original and
+resumed containers.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Spill-free pours |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 13 | 15 | 13 |
+| Swapped | 15 | 13 | 15 | 13 |
+| Near-full target | 15 | 15 | 15 | 15 |
+| Empty target | 15 | 11 | 15 | 11 |
+| All trials | 30 | 26 | 30 | 26 |
+
+Normal 01 reached zero source inventory and confirmed the stop
+0.40 s later, with zero spill. Swapped 01 reached 92.70% of rim
+height with zero spill. Four other empty-target pours lost two
+particles each during coarse pouring. The first observed losses
+were normal 05 at 119.74°, swapped 08 at 129.21°, swapped 10 at
+117.83°, and normal 11 at 121.25°. All 30 trials completed their
+intended stop and side return. The 15 near-full fills settled to
+91.60–94.94% of rim height. The audit verified the 30 recordings,
+135 original runtime sources and 2,284 protected files. The RTX
+4070 was idle and the recording volume had about 12 GiB free.
