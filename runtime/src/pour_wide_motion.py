@@ -29,7 +29,7 @@ def late_mouth_offset(phase, amount, *, tail_setback_m=0., tail_window_deg=(123.
 
 def tail_progress(phase, window):
     start, end = window
-    if not 110. <= start < end <= 130.:
+    if not 104. <= start < end <= 130.:
         raise ValueError('Invalid late-pour phase window')
     return ease((phase-start)/(end-start))
 

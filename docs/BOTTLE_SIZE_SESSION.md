@@ -1053,3 +1053,45 @@ ordered side returns. Near-full results ranged from 91.14% to 95.76%
 of rim height. The audit verified all 30 recordings, 135 original
 runtime sources and 2,284 protected files. The RTX 4070 was idle and
 the RTX 4090 humanoid job was still active at closure.
+
+## Earlier mouth adjustment for normal layout 01
+
+The last r11 failure was one bottle-origin particle in normal 01.
+At 112.11° it was outside the far rim with positive forward velocity.
+The RTX 4070 optimized the motion ramp using incoming particle
+positions and velocities sampled above the receiving rim. A gravity-only
+projection estimated the impact radius for 108 candidate paths and
+the incumbent. The objective penalized near-wall impact, rim crossings
+and unnecessary movement. Three archived pours supplied 6,323 fitting
+observations. Two complete held-out pours supplied 4,097 observations.
+The selected 6 mm setback and 4 mm lowering ramp spans 104–109°.
+Held-out 95th-percentile projected impact radii fell from 13.20–13.24 mm
+to 12.22–12.25 mm. This projection measures the incoming trajectory.
+Live Isaac Sim pours measure actual loss after impact and rebound.
+[Trajectory fit](../evidence/bottle-size-A/wide-mixed-r12-stream-fit.json),
+[escaped particle](../evidence/bottle-size-A/wide-mixed-r12-spill-trace.json).
+
+The [sealed plan](../evidence/bottle-size-A/wide-mixed-r12-plan.json)
+applies the motion update to the single affected cup/bottle geometry
+in both orientations. It keeps the r11 perception and stop models.
+Development covers the original normal pose, two independent normal
+offsets and the swapped counterpart. The 30 fresh tests span 15 exact
+swap pairs. The runner reserves twice the largest recent recording
+per remaining trial, plus 10 GiB of retained space. For 30 trials that
+is 26.15 GiB.
+
+Copy `wide-mixed-r11/src` to `wide-mixed-r12/src`, overlay the
+revised `pour_wide_motion.py` and `test_pour_size_autonomy.py`, and
+stage the fit, preparation and run helpers in the native root. The
+prepare helper imports the existing r6, r8 and r10 utilities.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r12_stream.py --label wide-r12-stream-fit --seconds 600 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r12.py --label wide-r12-prepare --seconds 300 --minimum-free-gib 12
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r12-geometry --seconds 4500 --minimum-free-gib 12 -- --study wide-mixed-r12
+python3 run_sized_autonomy.py --study wide-mixed-r12 --part development --label wide-r12-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study wide-mixed-r12 --part test --shard "$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r12
+```

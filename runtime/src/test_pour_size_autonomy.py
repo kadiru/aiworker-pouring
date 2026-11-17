@@ -123,6 +123,14 @@ class SizedStopTests(unittest.TestCase):
         self.assertLess(late_mouth_offset(119.,.008,**config),0.)
         self.assertAlmostEqual(late_mouth_offset(122.,.008,**config),-.001)
 
+    def test_early_stream_adjustment_ramps_after_the_start_of_pouring(self):
+        fit = dict(tail_setback_m=.006,tail_window_deg=(104.,109.))
+        self.assertEqual(late_mouth_offset(103.,.008,**fit),0.)
+        self.assertAlmostEqual(late_mouth_offset(106.5,.008,**fit),-.003)
+        self.assertAlmostEqual(late_mouth_offset(112.,.008,**fit),-.006)
+        with self.assertRaises(ValueError):
+            late_mouth_offset(109.,.008,tail_setback_m=.006,tail_window_deg=(103.,109.))
+
     def test_settled_rgb_correction_is_monotone_and_keeps_full_readings(self):
         readings = [i / 1000 for i in range(1001)]
         corrected = [x - MAX_SETTLED_RGB_BIAS * settled_rgb_weight(x) for x in readings]
