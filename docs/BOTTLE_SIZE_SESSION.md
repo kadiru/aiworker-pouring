@@ -1095,3 +1095,25 @@ for shard in 1 2 3; do
 done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r12
 ```
+
+All four [development pours](../evidence/bottle-size-A/wide-mixed-r12-development-results.json)
+passed with zero measured particle loss. The three normal pours
+emptied the bottle at the original and shifted positions. The swapped
+pour confirmed near full at 92.45% of rim height. All 34 sampled
+geometry checks and 59 controller checks passed.
+
+After the first ten fresh tests completed, the host Docker service
+restarted during the second shard. The interrupted container exited
+with status 137. Trial 05 normal had already finished and its sealed
+recording contains a one-particle loss. Trial 05 swapped had a partial
+recording. The guarded resume validated the original container, launch
+manifest, plan digests and GPU limits, recorded the interruption and
+kept the finished result. It reran the incomplete trial with the same
+fixture and seed and then ran the eight unstarted trials. The partial
+recording remains outside the scored results.
+
+```sh
+python3 run_sized_autonomy.py --study wide-mixed-r12 --part test --shard 2 --label wide-r12-test-2-resume --seconds 12500 --resume-interrupted wide-r12-test-2
+python3 run_sized_autonomy.py --study wide-mixed-r12 --part test --shard 3 --label wide-r12-test-3 --seconds 12500
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r12
+```

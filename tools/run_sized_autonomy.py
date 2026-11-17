@@ -137,12 +137,46 @@ def rows_from_disk(output, cases, plan):
     return rows
 
 
+def interrupted_shard(study, label, candidates, plan, files):
+    """Recover only a prior owned shard recorded against this exact manifest."""
+    batch=study/(label+"-batch.json")
+    before=read(study/(label+"-before.json"))
+    manifest=read(batch)
+    assert manifest==dict(run_authorized=True,cases=list(candidates.values()),files=files)
+    assert before["batch_sha256"]==sha(batch) and before["plan_sha256"]==sha(study/"plan.json")
+    cid=before["container"]
+    info=json.loads(out("docker","inspect",cid))[0]
+    assert info["Id"]==cid and info["Name"]=="/aiworker_sized_4070_"+label
+    assert info["Config"]["Labels"]["owner"]=="aiworker-pouring"
+    limits=info["HostConfig"]
+    assert all(limits[key]==before["limits"][key] for key in
+               ("DeviceRequests","NetworkMode","NanoCpus","CpusetCpus","CpuShares",
+                "Memory","MemorySwap","PidsLimit","RestartPolicy","SecurityOpt","Binds"))
+    state=info["State"]
+    assert not state["Running"] and state["ExitCode"] in (137,143) and not state["OOMKilled"]
+    output=OUTPUT/label
+    assert any(m["Destination"]==sandbox(output) and Path(m["Source"]).resolve()==output.resolve()
+               for m in info["Mounts"])
+    prior=rows_from_disk(output,candidates,plan)
+    completed={name:row for name,row in prior.items() if row["status"]=="complete"}
+    assert list(candidates)[:len(completed)]==[name for name in candidates if name in completed]
+    partial={p for p in output.glob("*/*SA_A_*/parameters.json") if read(p)["name"] not in completed}
+    assert len(partial)<=1 and all(read(p)["name"]==list(candidates)[len(completed)] for p in partial)
+    began,ended=[datetime.datetime.fromisoformat(state[k].split(".")[0])
+                 for k in ("StartedAt","FinishedAt")]
+    evidence=dict(before,state=state,output_folder=str(output),wall_seconds=(ended-began).total_seconds(),
+                  completed=list(completed),partial=[str(p.parent) for p in sorted(partial)])
+    print(json.dumps(dict(preserved_trials=list(completed),partial_trials=evidence["partial"])),flush=True)
+    return completed,partial,evidence
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--part",choices=("development","test"),required=True)
     parser.add_argument("--label",required=True)
     parser.add_argument("--seconds",type=int,default=6000)
     parser.add_argument("--shard",type=int)
+    parser.add_argument("--resume-interrupted",metavar="LABEL")
     parser.add_argument("--study",choices=("sized-autonomy","sized-autonomy-r1","bottle-autonomy",
                                           "bottle-empty-autonomy","mixed-vessel-autonomy","tall-empty-r1",
                                           "layout-repair-r2","layout-repair-r3","tall-aligned-r0",
@@ -153,6 +187,9 @@ def main():
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
+    if args.resume_interrupted:
+        assert args.part=="test" and args.shard is not None
+        assert args.resume_interrupted.replace("-","").isalnum() and args.resume_interrupted!=args.label
     deadline_limit = 7200 if args.part == "development" else 14400
     assert args.label.replace("-","").isalnum() and 0 < args.seconds <= deadline_limit
     with (ROOT/"isolated-job.lock").open("a") as lock:
@@ -213,11 +250,6 @@ def run(args,original,gpu_query,before):
                        0. <= empty_cases[name]["empty_confirmation_lag_s"] <= plan["development_empty_lag_limit_s"]
                        for name in timing_names), "Tall-bottle latency verification failed"
     assert all(sha(native(p))==h for p,h in plan["checkpoints"].items())
-    for old in OUTPUT.glob("*/*/*SA_A_*/parameters.json"):
-        assert read(old)["name"] not in candidates,"Trial ID already used"
-    output=OUTPUT/args.label
-    output.mkdir(parents=True,exist_ok=False)
-    batch=study/(args.label+"-batch.json")
     files={sandbox(study/"plan.json"):sha(study/"plan.json"),
            sandbox(study/"geometry.json"):sha(study/"geometry.json"),**plan["checkpoints"]}
     if "settled_rgb_calibration" in plan:
@@ -240,8 +272,19 @@ def run(args,original,gpu_query,before):
                 path=ROOT/name
                 assert sha(path)==digest
                 files[sandbox(path)]=digest
+    preserved,partial,interruption={},set(),None
+    if args.resume_interrupted:
+        preserved,partial,interruption=interrupted_shard(study,args.resume_interrupted,candidates,plan,files)
+    pending={name:spec for name,spec in candidates.items() if name not in preserved}
+    assert pending
+    for old in OUTPUT.glob("*/*/*SA_A_*/parameters.json"):
+        if read(old)["name"] in pending:
+            assert old in partial,"Trial ID already used"
+    output=OUTPUT/args.label
+    output.mkdir(parents=True,exist_ok=False)
+    batch=study/(args.label+"-batch.json")
     with batch.open("x") as f:
-        json.dump(dict(run_authorized=True,cases=list(candidates.values()),files=files),f,indent=2)
+        json.dump(dict(run_authorized=True,cases=list(pending.values()),files=files),f,indent=2)
     cmd=["docker","create","--name","aiworker_sized_4070_"+args.label,
          "--label","owner=aiworker-pouring","--label","purpose=sized-autonomous-pour","--restart","no",
          "--network","none","--gpus","device="+GPU,"--cpuset-cpus","16-23","--cpus","4","--cpu-shares","256",
@@ -311,12 +354,14 @@ def run(args,original,gpu_query,before):
         (study/(args.label+".log")).write_text(log.stdout+log.stderr)
         witness.update(state=state,stop_reason=stop,gpu_after=out(*gpu_query),elapsed=time.monotonic()-started)
         save(study/(args.label+"-isolation.json"),witness)
-    rows=rows_from_disk(output,candidates,plan)
+    rows={**preserved,**rows_from_disk(output,pending,plan)}
     completed=[r for r in rows.values() if r["status"]=="complete"]
     report=dict(part=args.part,plan_sha256=sha(study/"plan.json"),planned=len(candidates),completed=len(completed),
                 strict_passes=sum(r["strict_pass"] for r in completed),
                 tolerance_passes=sum(r["within_particle_tolerance"] for r in completed),
                 cases=[rows.get(n,dict(name=n,status="unstarted")) for n in candidates],runtime=witness)
+    if interruption is not None:
+        report["interrupted_runtime"]=interruption
     save(study/(result_name+"-results.json"),report)
     print(json.dumps({k:report[k] for k in ("part","planned","completed","strict_passes","tolerance_passes")}),flush=True)
     assert stop is None and len(completed)==len(candidates) and "AUTONOMY_BATCH_COMPLETE" in log.stdout

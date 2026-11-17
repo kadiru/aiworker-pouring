@@ -50,9 +50,24 @@ def verify(path, plan_sha, names):
     for row in data["cases"]:
         recording = Path(row["path"]) / "episode.hdf5"
         assert sha(recording) == row["recording_sha256"] and recording.stat().st_size == row["recording_bytes"]
-    return data["cases"], dict(report_sha256=sha(path), container=runtime["container"],
-                              wall_seconds=runtime["elapsed"], gpu_before=runtime["gpu_before"],
-                              gpu_after=runtime["gpu_after"])
+    result=dict(report_sha256=sha(path), container=runtime["container"],
+                wall_seconds=runtime["elapsed"], gpu_before=runtime["gpu_before"],
+                gpu_after=runtime["gpu_after"])
+    if "interrupted_runtime" in data:
+        interrupted=data["interrupted_runtime"]
+        previous=interrupted["limits"]
+        assert interrupted["plan_sha256"]==plan_sha
+        assert interrupted["state"]["ExitCode"] in (137,143) and not interrupted["state"]["Running"]
+        assert previous["DeviceRequests"]==limits["DeviceRequests"] and previous["NetworkMode"]=="none"
+        assert all(previous[k]==limits[k] for k in ("NanoCpus","CpusetCpus","Memory","MemorySwap"))
+        assert not any(line.startswith(GPU) for line in interrupted["gpu_before"].splitlines())
+        preserved=interrupted["completed"]
+        assert preserved==names[:len(preserved)]
+        assert all(Path(row["path"]).is_relative_to(interrupted["output_folder"])
+                   for row in data["cases"] if row["name"] in preserved)
+        result["interrupted_runtime"]=interrupted
+        result["wall_seconds"]+=interrupted["wall_seconds"]
+    return data["cases"],result
 
 
 def totals(rows):
