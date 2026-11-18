@@ -1,13 +1,13 @@
 # Repository and external artifacts
 
-Repository: [kadiru/aiworker-pouring](https://github.com/kadiru/aiworker-pouring), private, default branch `main`.
+Repository: [kadiru/aiworker-pouring](https://github.com/kadiru/aiworker-pouring), public, default branch `main`.
 
 The initial commit captures the existing project as of November 3, 2026. Earlier work was saved as files, native recordings, checkpoints and rollback copies; it was not recorded as Git commits. Historical results are retained without inventing earlier commit history.
 
 ## Versioned here
 
 - Project source, launchers, GPU-priority guard, viewers and tests.
-- Configuration and operational documentation, including the actual limitations and failed tests.
+- Configuration, experiment notes and two illustrated slides in `docs/figures/` that show the pouring cycle and control architecture.
 - Small JSON/CSV reports, hashes, manifests and model-selection provenance from the learning studies.
 - The minimal MIT-licensed NVIDIA encoder API header required by the probe, with its notice retained. Downloaded vendor implementations/checkouts remain external.
 
