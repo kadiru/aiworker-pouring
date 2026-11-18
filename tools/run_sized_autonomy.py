@@ -215,6 +215,12 @@ def main():
             minimum_free_gib = 10. + count*largest/1024**3
             if study_local:
                 assert study.stat().st_dev != OUTPUT.stat().st_dev
+                if args.study == "wide-mixed-r14" and not use_shared:
+                    # Another job may consume system-disk space after the manifest freezes.
+                    # Only the recording destination changes. Both mounts keep their reserve.
+                    if shutil.disk_usage(study).free < 7*1024**3 + count*largest:
+                        use_shared = True
+                        output_root = OUTPUT
                 live_storage_floor = (3 if use_shared else 7)*1024**3
                 if use_shared:
                     minimum_free_gib = (live_storage_floor + count*largest)/1024**3

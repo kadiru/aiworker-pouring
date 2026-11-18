@@ -77,7 +77,7 @@ def main():
         if output_root.stat().st_dev != study.stat().st_dev:
             archive_root = HOST / "outputs/size-autonomy/recording-archives-r13b"
         if args.study == "wide-mixed-r14":
-            if args.shard is not None and args.shard % 2 == 0:
+            if args.part == "development" or args.shard % 2 == 0:
                 archive_root = Path("/data/aiworker-pouring/recording-archives-r14")
                 assert Path("/data").is_mount() and archive_root.resolve() == archive_root
                 if not (archive_root / (row["name"] + ".hdf5.zst")).exists():
