@@ -18,7 +18,7 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7",
                                        "wide-mixed-r7b", "wide-mixed-r8", "wide-mixed-r9", "wide-mixed-r9b",
                                        "wide-mixed-r10", "wide-mixed-r10b", "wide-mixed-r11", "wide-mixed-r12",
-                                       "wide-mixed-r13", "wide-mixed-r13b", "wide-mixed-r14"),
+                                       "wide-mixed-r13", "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15"),
                     default="sized-autonomy")
 parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4","wide-mixed-r7","wide-mixed-r9",
                                              "wide-mixed-r10"))
@@ -140,6 +140,9 @@ def scan(stage, spec, saved, opened, closed):
     profile=saved["pour_primitive"]
     phases=sorted(set(np.arange(0.,132.,3.).tolist()+[60.,80.,90.,100.,110.,131.]))
     mouth = outbound_mouth_options(saved)
+    if mouth.get("finish_mouth_pose"):
+        start, end = mouth["finish_mouth_pose"][:2]
+        phases = sorted(set(phases) | set(np.linspace(start, end, 9)))
     if mouth["tail_setback_m"] or mouth["tail_drop_m"]:
         start, end = mouth["tail_window_deg"]
         phases = sorted(set(phases) | set(np.linspace(start, end, 5)))

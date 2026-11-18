@@ -50,6 +50,13 @@ def recorded_stream(case, tilt_range, min_particles, include_advance, *, verifie
         old_x=setback*progress
         if include_advance:
             old_x-=late_mouth_offset(tilt,saved.get("late_mouth_shift_m",0.))
+        old_z = drop * progress
+        if saved.get("finish_mouth_pose") is not None:
+            start, end, final_offset, final_drop = saved["finish_mouth_pose"]
+            t = min(1., max(0., (tilt-start)/(end-start)))
+            weight = t*t*(3.-2.*t)
+            old_x += weight * (-final_offset-old_x)
+            old_z += weight * (final_drop-old_z)
         surface=bottom+(rim-bottom)*frame["cup_fill_fraction"]
         for particle in frame["diagnostic_outside_particles"]:
             index=particle["index"]
@@ -58,7 +65,7 @@ def recorded_stream(case, tilt_range, min_particles, include_advance, *, verifie
             if (index not in seen and particle["origin"]=="bottle" and abs(y)<.008
                     and -.033<x<.013 and rim+.0015<z<rim+.025 and vx>.12 and vz<-.05):
                 seen.add(index)
-                rows.append((tilt,x,y,z,vx,vy,vz,rim,surface,radius,old_x,drop*progress))
+                rows.append((tilt,x,y,z,vx,vy,vz,rim,surface,radius,old_x,old_z))
     assert len(rows)>=min_particles,(case["name"],len(rows))
     return case, spec, torch.tensor(rows,device="cuda",dtype=torch.float64)
 
@@ -72,9 +79,15 @@ def counterfactual(tilt,old_x,old_z,grid):
     start,end,setback,drop=grid[:, :4].T.unsqueeze(-1).unbind(0)
     progress=smooth_ramp(tilt,start,end)
     dx=old_x-setback*progress
-    if grid.shape[1]==5:
+    if grid.shape[1]>=5:
         dx=dx+grid[:,4,None]*smooth_ramp(tilt,116.,122.)
-    return dx,old_z-drop*progress
+    dz = old_z-drop*progress
+    if grid.shape[1]==9:
+        start, end, offset, down = grid[:, 5:].T.unsqueeze(-1).unbind(0)
+        blend = smooth_ramp(tilt, start, end)
+        dx += blend * (old_x + offset - dx)
+        dz += blend * (old_z - down - dz)
+    return dx,dz
 
 
 def evaluate(data,grid,focus=(108.,116.)):

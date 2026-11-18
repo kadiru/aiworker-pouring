@@ -34,7 +34,9 @@ def verify_recording_archive(row, record):
     external = Path("/data/aiworker-pouring/recording-archives-r14")
     dedicated = (archive.parent == external and archive.name == row["name"] + ".hdf5.zst"
                  and row["name"].startswith("SA_A_wide_mixed_r14_"))
-    assert (archive.is_relative_to(HOST) or dedicated) and archive.resolve() == archive and archive.is_file()
+    staged = (archive.parent == Path("/dev/shm/aiworker-pouring-r15") and
+              row["name"].startswith("SA_A_wide_mixed_r15_") and archive.name == row["name"] + ".hdf5.zst")
+    assert (archive.is_relative_to(HOST) or dedicated or staged) and archive.resolve() == archive and archive.is_file()
     assert sha(archive) == record["archive_sha256"]
     assert archive_identity(archive) == (row["recording_bytes"], row["recording_sha256"])
 
@@ -47,7 +49,7 @@ def save(path, value):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--study", choices=("wide-mixed-r13", "wide-mixed-r13b", "wide-mixed-r14"), required=True)
+    parser.add_argument("--study", choices=("wide-mixed-r13", "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15"), required=True)
     parser.add_argument("--part", choices=("development", "test"), required=True)
     parser.add_argument("--shard", type=int)
     parser.add_argument("--release-verified-originals", action="store_true")
@@ -67,6 +69,12 @@ def main():
     image = json.loads(out("docker", "inspect", ORIGINAL))[0]["Image"]
     manifest_path = study / (part + "-recording-archives.json")
     manifest = dict(report_sha256=sha(report_path), records=[], complete=False)
+    backup = {}
+    if args.study == "wide-mixed-r15" and args.release_verified_originals:
+        receipt = read(study / (part + "-mac-backup.json"))
+        assert receipt["report_sha256"] == manifest["report_sha256"]
+        backup = {item["name"]: item for item in receipt["records"]}
+        assert set(backup) == {row["name"] for row in report["cases"]}
     for row in report["cases"]:
         source = Path(row["path"]) / "episode.hdf5"
         assert source.is_relative_to(HOST) and source.parent.resolve() == source.parent
@@ -84,7 +92,13 @@ def main():
                     assert shutil.disk_usage("/data").free >= 3 * 1024**3 + row["recording_bytes"]
             elif output_root.stat().st_dev != study.stat().st_dev:
                 archive_root = HOST / "outputs/size-autonomy/recording-archives-r14"
-        archive_root.mkdir(parents=True, exist_ok=True)
+        if args.study == "wide-mixed-r15":
+            archive_root = Path("/dev/shm/aiworker-pouring-r15")
+            assert Path("/dev/shm").is_mount() and archive_root.resolve() == archive_root
+            memory_kib = int(next(line.split()[1] for line in Path("/proc/meminfo").read_text().splitlines()
+                                  if line.startswith("MemAvailable:")))
+            assert memory_kib * 1024 > 16 * 1024**3 + row["recording_bytes"], "Insufficient staging memory"
+        archive_root.mkdir(mode=0o700, parents=True, exist_ok=True)
         archive = archive_root / (row["name"] + ".hdf5.zst")
         if not archive.exists():
             assert source.stat().st_size == row["recording_bytes"] and sha(source) == row["recording_sha256"]
@@ -99,6 +113,12 @@ def main():
                       archive_bytes=archive.stat().st_size, archive_sha256=sha(archive),
                       original_released=False)
         verify_recording_archive(row, record)
+        if backup:
+            copy = backup[row["name"]]
+            for key in ("original_bytes", "original_sha256", "archive_bytes", "archive_sha256"):
+                assert copy[key] == record[key]
+            assert Path(copy["durable_mac_archive"]).name == archive.name
+            record["durable_mac_archive"] = copy["durable_mac_archive"]
         manifest["records"].append(record)
         save(manifest_path, manifest)
         if args.release_verified_originals and source.exists():

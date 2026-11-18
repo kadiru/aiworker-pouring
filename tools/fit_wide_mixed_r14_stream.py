@@ -46,9 +46,8 @@ def scores(case, dataset, split, before_after):
                 recording_sha256=case["recording_sha256"], objective=before_after.tolist())
 
 
-def coarse(target, evidence, archive):
-    layout = "01_normal"
-    span, focus = (108., 124.), (112., 121.)
+def coarse(target, evidence, archive, *, layout="01_normal", span=(108., 124.), focus=(112., 121.),
+           rebound_min_vz=.2, finish_mouth_pose=None):
     training = [archived_stream(s, layout, span, 100, True) for s in TRAIN]
     training.append(recorded_stream(target, span, 100, True, verified_archive=archive))
     testing = [archived_stream(s, layout, span, 100, True) for s in HOLDOUT]
@@ -58,15 +57,20 @@ def coarse(target, evidence, archive):
     geometry = spec["declared_cup_geometry"]
     events = []
     for observations in evidence["particles"].values():
-        bounce = next(p for p in observations if p["velocity"][2] > .2)
+        bounce = next(p for p in observations if p["velocity"][2] > rebound_min_vz)
         tilt = bounce["tilt"]
         old_x = -late_mouth_offset(tilt, base[4], tail_setback_m=base[2], tail_window_deg=base[:2])
         events.append([tilt, *bounce["xyz"], *bounce["velocity"], old_x, base[3]*tail_progress(tilt, base[:2])])
-    assert min(row[0] for row in events) < 115. and max(row[0] for row in events) > 119.
+    assert all(focus[0] <= row[0] <= focus[1] for row in events)
+    if layout == "01_normal":
+        assert min(row[0] for row in events) < 115. and max(row[0] for row in events) > 119.
     grid = torch.tensor([base, *[(base[0], base[1], back, down, advance)
                          for back, down, advance in product((.007, .008, .009, .010),
                                                            (.005, .006, .007, .008), (0., .002, .004, .006))]],
                         device="cuda", dtype=torch.float64)
+    if finish_mouth_pose is not None:
+        finish = grid.new_tensor(finish_mouth_pose).expand(len(grid), -1)
+        grid = torch.cat((grid, finish), dim=1)
     event = (torch.tensor(events, device="cuda", dtype=torch.float64).T,
              geometry["rim_z_m"], geometry["rim_radius_m"])
     ratios = rebound_at_rim(event, grid)
@@ -85,11 +89,13 @@ def coarse(target, evidence, archive):
     passed = (best > 0 and bool((ratios[best] < ratios[0]).all())
               and all(a["predicted_beyond_rim"][1] <= a["predicted_beyond_rim"][0] for a in audits)
               and all(a["impact_p95_ratio"][1] < .60 for a in audits if a["split"] == "holdout"))
-    start, end, back, drop, advance = grid[best].tolist()
+    start, end, back, drop, advance = grid[best,:5].tolist()
+    options = dict(tail_window_deg=[start, end], tail_setback_m=back, tail_drop_m=drop, late_mouth_shift_m=advance)
+    if finish_mouth_pose is not None:
+        options["finish_mouth_pose"] = list(finish_mouth_pose)
     return dict(passed=passed, checkpoint=spec["checkpoint"], candidates=len(grid),
                 rebound_rim_ratio=ratios[[0, best]].tolist(), cases=audits,
-                mouth_options=dict(tail_window_deg=[start, end], tail_setback_m=back,
-                                   tail_drop_m=drop, late_mouth_shift_m=advance))
+                mouth_options=options)
 
 
 def brake_data(case):
@@ -132,8 +138,7 @@ def brake_cost(data, grid, lip):
     return objective, impacts
 
 
-def brake(target):
-    layout = "00_normal"
+def brake(target, *, layout="00_normal", parent=PARENT.name):
     spec = read(folder(target) / "parameters.json")
     saved = torch.load(spec["checkpoint"], map_location="cpu", weights_only=False)
     assert saved["thresholds"]["brake_rate_deg_s"] == 45. and not saved.get("low_tilt_drop_m")
@@ -141,7 +146,7 @@ def brake(target):
                         device="cuda", dtype=torch.float64)
     lip = spec["declared_bottle_geometry"]["lip_height_m"]
     datasets = []
-    for split, studies in (("train", (*TRAIN, PARENT.name)), ("holdout", HOLDOUT)):
+    for split, studies in (("train", (*TRAIN, parent)), ("holdout", HOLDOUT)):
         for study in studies:
             case = sample(study, layout)
             datasets.append((split, case, brake_data(case)))

@@ -1347,3 +1347,29 @@ Normal 00 stopped at 92.85% of rim height. Normal 01 emptied the bottle. Both ha
 The ten RTX 4070 evaluation batches took 6.87 elapsed hours in total. The separate four-trial development batch took 53.2 minutes. Personal working time was unmeasured. The final audit checked the native identities of all 30 fresh recordings, 135 original runtime sources and 2,284 protected parent files. The 30 fresh recordings occupied 5.95 GiB before lossless compression and 2.71 GiB afterward. The 4070 was idle at closure. The independent 4090 container exited with code 1 at 13:44 UTC. Docker reported no OOM kill, and the cause was undetermined. This study used only the 4070 and issued no control commands to the 4090 job. All results are from Isaac Sim. [Final audit](../evidence/bottle-size-A/wide-mixed-r14-completion.json)
 
 To reproduce the failure evidence after closure, run `python3 audit_wide_mixed_failures.py wide-mixed-r14` from the Ubuntu study root.
+
+## Revision 15 · Coarse stream, braking and final-pause confirmation
+
+In the previous 30 fresh Isaac Sim pours, swapped 00 lost two particles at 122.95° and normal 10 lost two while braking at 83.97°. Normal 04 had zero spill and reached 91.61% of rim height. At its 13th and final settling pause the conservative visual estimate was 92.26%, below the 92.5% confirmation setting. [Prior failure traces](../evidence/bottle-size-A/wide-mixed-r14-fresh-failures.json)
+
+For each affected geometry the RTX 4070 fitted motion parameters on three archived trials and validated on three separate trials. The coarse fit compared 65 candidates using 1,454 training and 1,410 validation incoming-particle observations. It chose a 7 mm setback, 8 mm drop and zero late forward advance. The first geometry scan detected bench intersections at 129–131°. The revised fit restores the previous high-angle pose smoothly from 124° to 128°, ending at a net 2 mm forward offset and 4 mm drop. The braking fit compared 21 candidates using 1,573 training and 1,600 validation observations and selected a 5 mm low-angle drop and a finish rate of 32°/s. All 34 revised fixtures passed geometry preflight. [First geometry scan](../evidence/bottle-size-A/wide-mixed-r15-first-geometry.json) · [Final geometry](../evidence/bottle-size-A/wide-mixed-r15-geometry.json) · [Motion fit](../evidence/bottle-size-A/wide-mixed-r15-stream-fit.json)
+
+For normal 04, the 4070 fitted the existing final-pause confirmation rule to the lower of two visual level estimates over three consecutive stable windows. The fitted 91.88% cutoff applies only at the final allowed pause for this checkpoint. The ordinary 92.5% target and the simulator's independent 90% scoring threshold still apply. Six training and eight held-out trials contributed windows. The fitted rule accepted none of the six underfilled training windows or eight underfilled held-out windows. This experiment tuned motion and decision parameters with zero additional neural-training epochs. [Confirmation fit and replay](../evidence/bottle-size-A/wide-mixed-r15-near-full-fit.json)
+
+Each of the 15 wide fixtures has a matched swapped counterpart. The fresh set offsets each placement axis by 1.1–2.5 mm from its preceding wide fixture, and covers nine cup sizes and four bottle shapes. Seeds, positions and checkpoint hashes are frozen in the manifest. [Frozen manifest](../evidence/bottle-size-A/wide-mixed-r15-plan.json)
+
+### Reproduction on the Ubuntu workstation and Mac
+
+Start with the Ubuntu revision 14 study and archived inputs. Stage the updated repository helpers in the existing study root and copy the updated `runtime/src/pour_wide_motion.py` into a new `wide-mixed-r15/src` copied from revision 14. Generate `wide_mixed_r15_checks.py` by substituting the new study directory in the preceding revision's check driver.
+
+```sh
+cd /home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r15.py --label wide-r15-clearance-fit --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r15_checks.py --label wide-r15-clearance-checks --seconds 360 --minimum-free-gib 1
+cp wide-r15-clearance-checks/run.log wide-mixed-r15/controller-tests.log
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r15.py --label wide-r15-clearance-prepare --seconds 360 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r15-clearance-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r15
+python3 run_sized_autonomy.py --study wide-mixed-r15 --part development --label wide-r15-dev --seconds 7200
+```
+
+After development, run `python3 -u tools/run_wide_mixed_r15.py` from the Mac project checkout. It uses the configured `kfuUbuntu` SSH alias, checks each closed batch, and stores its durable zstd archives under ignored `data/wide-mixed-r15/`. An original is released only after the Mac verifies both compressed and decompressed SHA256 and byte counts. Ubuntu retains trial metadata and per-batch receipts. After closure, the runner releases only verified temporary archive copies from RAM. To run a later full archive audit on Ubuntu, first restage the Mac archives into the directory in each receipt.
