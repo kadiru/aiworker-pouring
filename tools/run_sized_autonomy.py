@@ -5,6 +5,7 @@ import fcntl
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import time
@@ -137,7 +138,7 @@ def rows_from_disk(output, cases, plan):
     return rows
 
 
-def interrupted_shard(study, label, candidates, plan, files):
+def interrupted_shard(study, output_root, label, candidates, plan, files):
     """Recover only a prior owned shard recorded against this exact manifest."""
     batch=study/(label+"-batch.json")
     before=read(study/(label+"-before.json"))
@@ -154,7 +155,7 @@ def interrupted_shard(study, label, candidates, plan, files):
                 "Memory","MemorySwap","PidsLimit","RestartPolicy","SecurityOpt","Binds"))
     state=info["State"]
     assert not state["Running"] and state["ExitCode"] in (137,143) and not state["OOMKilled"]
-    output=OUTPUT/label
+    output=output_root/label
     assert any(m["Destination"]==sandbox(output) and Path(m["Source"]).resolve()==output.resolve()
                for m in info["Mounts"])
     prior=rows_from_disk(output,candidates,plan)
@@ -183,7 +184,8 @@ def main():
                                           "wide-mixed-r0","wide-mixed-r1","wide-mixed-r2","wide-mixed-r3",
                                           "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7",
                                           "wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b",
-                                          "wide-mixed-r10","wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12"),
+                                          "wide-mixed-r10","wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12",
+                                          "wide-mixed-r13","wide-mixed-r13b"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
@@ -195,17 +197,31 @@ def main():
     with (ROOT/"isolated-job.lock").open("a") as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         minimum_free_gib = 57.
-        plan = read(ROOT/args.study/"plan.json")
+        study = ROOT/args.study
+        plan = read(study/"plan.json")
+        study_local = plan.get("study_local_recordings", False)
+        use_shared = args.shard in plan.get("shared_recording_shards", ())
+        output_root = study/"recordings" if study_local and not use_shared else OUTPUT
+        live_storage_floor = 0
         if "storage_recording_upper_bytes" in plan:
-            # Bound storage by the actual batch and measured prior recording
-            # sizes. Keep the 10 GiB retained margin from the storage plan.
+            # Estimate the active batch from measured native recording sizes.
             largest = plan["storage_recording_upper_bytes"]
             if args.part == "development":
                 count = len(plan["development"])
             else:
                 assert args.shard is not None and 1<=args.shard<=len(plan["test_shards"])
-                count = sum(len(s) for s in plan["test_shards"][args.shard-1:])
+                shards = plan["test_shards"]
+                count = len(shards[args.shard-1]) if study_local else sum(map(len, shards[args.shard-1:]))
             minimum_free_gib = 10. + count*largest/1024**3
+            if study_local:
+                assert study.stat().st_dev != OUTPUT.stat().st_dev
+                live_storage_floor = (3 if use_shared else 7)*1024**3
+                if use_shared:
+                    minimum_free_gib = (live_storage_floor + count*largest)/1024**3
+                else:
+                    assert output_root.resolve() == output_root
+                    assert shutil.disk_usage(study).free >= live_storage_floor + count*largest, "Study volume space"
+                    minimum_free_gib = 0.
         subprocess.run([sys.executable,str(HOST/"tools/verify_robot_training_storage.py"),
                         "--minimum-free-gib",str(minimum_free_gib)],check=True)
         original=json.loads(out("docker","inspect",ORIGINAL))[0]
@@ -214,10 +230,10 @@ def main():
         gpu_query=("nvidia-smi","--query-compute-apps=gpu_uuid,pid,used_memory","--format=csv,noheader")
         before=out(*gpu_query)
         assert not any(r.startswith(GPU) for r in before.splitlines()),"4070 occupied"
-        run(args,original,gpu_query,before)
+        run(args,original,gpu_query,before,output_root,live_storage_floor)
 
 
-def run(args,original,gpu_query,before):
+def run(args,original,gpu_query,before,output_root,live_storage_floor):
     study=ROOT/args.study
     plan=read(study/"plan.json")
     geometry=read(study/"geometry.json")
@@ -274,13 +290,13 @@ def run(args,original,gpu_query,before):
                 files[sandbox(path)]=digest
     preserved,partial,interruption={},set(),None
     if args.resume_interrupted:
-        preserved,partial,interruption=interrupted_shard(study,args.resume_interrupted,candidates,plan,files)
+        preserved,partial,interruption=interrupted_shard(study,output_root,args.resume_interrupted,candidates,plan,files)
     pending={name:spec for name,spec in candidates.items() if name not in preserved}
     assert pending
-    for old in OUTPUT.glob("*/*/*SA_A_*/parameters.json"):
+    for old in (p for root in (OUTPUT, study/"recordings") for p in root.glob("*/*/*SA_A_*/parameters.json")):
         if read(old)["name"] in pending:
             assert old in partial,"Trial ID already used"
-    output=OUTPUT/args.label
+    output=output_root/args.label
     output.mkdir(parents=True,exist_ok=False)
     batch=study/(args.label+"-batch.json")
     with batch.open("x") as f:
@@ -308,6 +324,9 @@ def run(args,original,gpu_query,before):
     info=json.loads(out("docker","inspect",cid))[0]
     witness=dict(container=cid,started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
                  gpu_before=before,limits=info["HostConfig"],batch_sha256=sha(batch),plan_sha256=sha(study/"plan.json"))
+    if live_storage_floor:
+        witness["storage"]=dict(output_root=str(output_root), minimum_free_bytes=live_storage_floor,
+                                free_before_bytes=shutil.disk_usage(output).free)
     save(study/(args.label+"-before.json"),witness)
     started=time.monotonic()
     stop=None
@@ -317,6 +336,9 @@ def run(args,original,gpu_query,before):
     try:
         out("docker","start",cid)
         while json.loads(out("docker","inspect",cid))[0]["State"]["Running"]:
+            if live_storage_floor and shutil.disk_usage(output).free < live_storage_floor:
+                stop="recording_volume_low_space"
+                break
             try:
                 gpu=out(*gpu_query)
                 own={int(x) for x in out("docker","top",cid,"-eo","pid").splitlines()[1:]}
@@ -353,6 +375,8 @@ def run(args,original,gpu_query,before):
         log=subprocess.run(["docker","logs",cid],capture_output=True,text=True,timeout=30)
         (study/(args.label+".log")).write_text(log.stdout+log.stderr)
         witness.update(state=state,stop_reason=stop,gpu_after=out(*gpu_query),elapsed=time.monotonic()-started)
+        if live_storage_floor:
+            witness["storage"]["free_after_bytes"]=shutil.disk_usage(output).free
         save(study/(args.label+"-isolation.json"),witness)
     rows={**preserved,**rows_from_disk(output,pending,plan)}
     completed=[r for r in rows.values() if r["status"]=="complete"]

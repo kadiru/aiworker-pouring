@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parent
 STUDY=ROOT/"wide-mixed-r12"
 sys.path.insert(0,str(STUDY/"src"))
 from pour_size_autonomy import sha
-from pour_wide_motion import tail_progress
+from pour_wide_motion import late_mouth_offset, tail_progress
 from fit_wide_mixed_r6 import folder,read,save
 
 SOURCE="01_normal"
@@ -17,8 +17,12 @@ TRAIN=("wide-mixed-r7b","wide-mixed-r9b","wide-mixed-r11")
 VALIDATE=("wide-mixed-r8","wide-mixed-r10b")
 
 
-def archived_stream(study):
-    case=next(r for r in read(ROOT/study/"completion.json")["test_cases"] if r["name"].endswith(SOURCE))
+def archived_stream(study, source=SOURCE, tilt_range=(104.,124.), min_particles=501, include_advance=False):
+    case=next(r for r in read(ROOT/study/"completion.json")["test_cases"] if r["name"].endswith(source))
+    return recorded_stream(case, tilt_range, min_particles, include_advance)
+
+
+def recorded_stream(case, tilt_range, min_particles, include_advance):
     path=folder(case)
     assert sha(path/"episode.hdf5")==case["recording_sha256"]
     spec=read(path/"parameters.json")
@@ -32,9 +36,12 @@ def archived_stream(study):
     rows=[]
     for frame in read(path/"samples.json"):
         tilt=frame["bottle_tilt_deg"]
-        if not 104.<=tilt<=124. or frame["stop_reason"]:
+        if not tilt_range[0]<=tilt<=tilt_range[1] or frame["stop_reason"]:
             continue
         progress=tail_progress(tilt,window)
+        old_x=setback*progress
+        if include_advance:
+            old_x-=late_mouth_offset(tilt,saved.get("late_mouth_shift_m",0.))
         surface=bottom+(rim-bottom)*frame["cup_fill_fraction"]
         for particle in frame["diagnostic_outside_particles"]:
             index=particle["index"]
@@ -43,19 +50,29 @@ def archived_stream(study):
             if (index not in seen and particle["origin"]=="bottle" and abs(y)<.008
                     and -.033<x<.013 and rim+.0015<z<rim+.025 and vx>.12 and vz<-.05):
                 seen.add(index)
-                rows.append((tilt,x,y,z,vx,vy,vz,rim,surface,radius,setback*progress,drop*progress))
-    assert len(rows)>500
+                rows.append((tilt,x,y,z,vx,vy,vz,rim,surface,radius,old_x,drop*progress))
+    assert len(rows)>=min_particles,(case["name"],len(rows))
     return case, spec, torch.tensor(rows,device="cuda",dtype=torch.float64)
 
 
-def evaluate(data,grid):
+def smooth_ramp(value, start, end):
+    fraction=((value-start)/(end-start)).clamp(0.,1.)
+    return fraction.square()*(3.-2.*fraction)
+
+
+def counterfactual(tilt,old_x,old_z,grid):
+    start,end,setback,drop=grid[:, :4].T.unsqueeze(-1).unbind(0)
+    progress=smooth_ramp(tilt,start,end)
+    dx=old_x-setback*progress
+    if grid.shape[1]==5:
+        dx=dx+grid[:,4,None]*smooth_ramp(tilt,116.,122.)
+    return dx,old_z-drop*progress
+
+
+def evaluate(data,grid,focus=(108.,116.)):
     """Approximate the incoming stream between observation and impact."""
     tilt,x,y,z,vx,vy,vz,rim,surface,radius,old_x,old_z=data.T[None].unbind(1)
-    start,end,setback,drop=grid.T.unsqueeze(-1).unbind(0)
-    u=((tilt-start)/(end-start)).clamp(0.,1.)
-    progress=u.square()*(3.-2.*u)
-    dx=old_x-setback*progress
-    dz=old_z-drop*progress
+    dx,dz=counterfactual(tilt,old_x,old_z,grid)
 
     def crossing(height):
         depth=(z+dz-height).clamp(min=0.)
@@ -66,7 +83,7 @@ def evaluate(data,grid):
     at_surface=crossing(surface)
     margin=at_surface/radius
     rim_ratio=at_rim/radius
-    weights=1.+((tilt>=108.) & (tilt<=116.)).to(data.dtype)
+    weights=1.+((tilt>=focus[0]) & (tilt<=focus[1])).to(data.dtype)
     # Penalize near-wall impacts and predicted rim crossings, with a
     # smaller motion cost to avoid unnecessary changes to the path.
     cost=(margin-.62).clamp(min=0.).square()+.12*margin.square()+2*(rim_ratio-.85).clamp(min=0.).square()

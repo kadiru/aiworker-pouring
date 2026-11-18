@@ -1140,3 +1140,176 @@ intended stop and side return. The 15 near-full fills settled to
 91.60–94.94% of rim height. The audit verified the 30 recordings,
 135 original runtime sources and 2,284 protected files. The RTX
 4070 was idle and the recording volume had about 12 GiB free.
+
+## Coarse-pour mouth paths for the four r12 spills
+
+Normal 05 and 11 and swapped 08 and 10 spilled two bottle-origin
+particles each during the coarse pour. The RTX 4070 fitted smooth
+tilt-dependent setback and drop ramps. The objective combines a
+gravity-only impact-radius projection over the incoming stream with
+a higher weight around each observed rebound angle. Three archived
+pours per geometry supplied 18,104 incoming-particle observations
+for fitting. Three other pours per geometry supplied 18,016
+observations for holdout. The predicted held-out impact loss
+decreased for each geometry, and no recording gained a predicted
+rim crossing. Actual splash and retention are scored in Isaac Sim.
+[Fit receipt](../evidence/bottle-size-A/wide-mixed-r13-stream-fit.json),
+[particle traces](../evidence/bottle-size-A/wide-mixed-r13-spill-trace.json).
+
+| Layout | Ramp (°) | Setback (mm) | Drop (mm) | Held-out objective reduction |
+|---|---:|---:|---:|---:|
+| Normal 05 | 106–113 | 6 | 3 | 49.5% |
+| Swapped 08 | 112–124 | 10 | 3 | 50.8% |
+| Swapped 10 | 106–119 | 4 | 3 | 4.4% |
+| Normal 11 | 108–121 | 10 | 5 | 27.4% |
+
+The [sealed plan](../evidence/bottle-size-A/wide-mixed-r13-plan.json)
+uses these settings for both orientations of each affected vessel
+pair with the existing perception and stop models. It sets aside four
+same-pose development pours and 30 fresh tests across 15 matched
+swap pairs. Both vessel positions shift by independently signed
+1.1–2.5 mm per world axis. Near-full and empty targets are each
+represented by 15 fresh trials.
+
+This round fits trajectory parameters from recorded particle positions
+and velocities on CUDA. The bottle geometry and commanded tilt index
+the runtime correction. The inherited behavior-cloning network and
+RGB perception weights supply the existing motion initialization
+and visual estimates. Their neural weights receive zero further
+training epochs in this round.
+
+Stage the two stream-fit helpers, the preparation script and the
+current launch, preflight and audit scripts from `tools/` in
+`/home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1`.
+Copy `wide-mixed-r12/src` to `wide-mixed-r13/src`. The fit reads from
+the migrated recording volume. The simulator writes native
+recordings to `wide-mixed-r13/recordings` on the separate Ubuntu
+root partition. The runner checks current-shard capacity and
+records its live free-space floor in each batch receipt. The initial
+development runs used a 9 GiB root-volume floor.
+
+```sh
+cd /home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1
+study=wide-mixed-r13
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r13_stream.py --label wide-r13-stream-fit --seconds 600 --minimum-free-gib 1
+sed 's/wide-mixed-r12/wide-mixed-r13/' wide_mixed_r12_checks.py > wide_mixed_r13_checks.py
+python3 run_isolated_perception_job.py --helper wide_mixed_r13_checks.py --label wide-r13-controller-tests --seconds 360 --minimum-free-gib 1
+cp wide-r13-controller-tests/run.log "$study/controller-tests.log"
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r13.py --label wide-r13-prepare --seconds 300 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r13-geometry --seconds 5400 --minimum-free-gib 1 -- --study "$study"
+python3 run_sized_autonomy.py --study "$study" --part development --label wide-r13-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study "$study" --part test --shard "$shard" --label "wide-r13-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study "$study"
+```
+
+The [first four development pours](../evidence/bottle-size-A/wide-mixed-r13-development-results.json)
+emptied their bottles, with three zero-spill passes. Normal 11
+lost two particles at 121.63° and the fresh trials stayed sealed.
+Those particles left in the incoming stream about 7.8 mm behind
+the cup center and rebounded forward and upward. The original
+late forward advance cancelled much of the fitted setback at
+that angle.
+
+The [4070 refinement](../evidence/bottle-size-A/wide-mixed-r13b-stream-fit.json)
+adds the traced outgoing rebound to the existing incoming stream
+fit. The final search required at least 5.5 mm more horizontal
+clearance and a projected rebound radius below 95% of the rim.
+The normal 11 checkpoint selected a 9 mm setback, 7 mm drop
+and 1 mm forward advance for about 6 mm more horizontal clearance
+at the rebound angle. The projected outgoing radius went from
+1.32 to 0.92 times the rim radius. Held-out incoming projections
+added no rim crossings, and the 95th-percentile radii stayed
+below 35% of the cup rim radius. The earlier refinement did not
+pass its holdout objective gate. [First refinement receipt](../evidence/bottle-size-A/wide-mixed-r13b-first-refinement.json).
+
+Copy the r13 runtime to `wide-mixed-r13b/src` and overlay
+`runtime/src/pour_wide_motion.py`, which admits up to 8 mm
+of late lowering for the geometry screen. Stage the refinement
+and preparation helpers alongside the earlier helpers.
+The two-second development empty-confirmation gate applies
+to the two tall bottle cases. The short bottles retain their
+existing confirmation and source-depletion checks. The second
+test shard uses the migrated recordings volume, with a 3 GiB
+live floor. The development batch and other test shards use
+the study volume. The final root-volume shard uses a 7 GiB live
+floor, with 384 MiB reserved per planned capture.
+
+```sh
+cd /home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1
+study=wide-mixed-r13b
+python3 run_isolated_perception_job.py --helper refine_wide_mixed_r13_stream.py --label wide-r13b-stream-refit --seconds 600 --minimum-free-gib 1
+sed 's/wide-mixed-r12/wide-mixed-r13b/' wide_mixed_r12_checks.py > wide_mixed_r13b_checks.py
+python3 run_isolated_perception_job.py --helper wide_mixed_r13b_checks.py --label wide-r13b-controller-tests --seconds 360 --minimum-free-gib 1
+cp wide-r13b-controller-tests/run.log "$study/controller-tests.log"
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r13b.py --label wide-r13b-prepare --seconds 300 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r13b-geometry --seconds 5400 --minimum-free-gib 1 -- --study "$study"
+python3 run_sized_autonomy.py --study "$study" --part development --label wide-r13b-dev --seconds 7200
+for shard in 1 2 3; do
+    python3 run_sized_autonomy.py --study "$study" --part test --shard "$shard" --label "wide-r13b-test-$shard" --seconds 12500 || break
+done
+python3 close_wide_mixed_autonomy.py --study "$study"
+```
+
+The repair's closed recordings are archived losslessly to conserve
+space. Each archive is decoded and matched to its original HDF5
+byte count and SHA256 before the original is released. The audit
+streams the archive again to verify the same native identity.
+The archived episodes retain every image and observation.
+
+```sh
+python3 compress_sized_recordings.py --study wide-mixed-r13b --part development --release-verified-originals
+python3 compress_sized_recordings.py --study wide-mixed-r13b --part test --shard 1 --release-verified-originals
+```
+
+Repeat archival for each closed test shard. Archive manifests are
+named `development-recording-archives.json` and
+`test-01-recording-archives.json` through
+`test-03-recording-archives.json`. Each entry gives the original
+path, byte count, SHA256 and archive path. To replay or refit a raw
+episode, restore that manifest entry first with
+`sudo zstd -d --keep -o "$original" "$archive"` and verify the
+recorded SHA256.
+
+After the final shard was archived, the earlier closure was retained
+as `pre-archive-completion.json`. The closure command ran again
+against every decompressed original identity. The
+[final audit](../evidence/bottle-size-A/wide-mixed-r13b-completion.json)
+verified all 30 fresh recordings, all four passing development
+recordings, 135 original runtime sources and 2,284 protected parent
+files. The fresh benchmark took 6.75 hours on the RTX 4070.
+All four targeted layouts passed their new shifted fixtures.
+The policy completed all 30 grasps, intended stops and ordered
+side returns. All 15 swapped trials measured zero loss.
+
+| Fresh evaluation | Trials | Strict passes | Verified grasps | Spill-free pours |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 13 | 15 | 13 |
+| Swapped | 15 | 15 | 15 | 15 |
+| Near-full target | 15 | 14 | 15 | 14 |
+| Empty target | 15 | 14 | 15 | 14 |
+| All trials | 30 | 28 | 30 | 28 |
+
+The 15 near-full cups finished at 91.11–95.37% of rim height.
+All seven tall empty targets confirmed within 0.60 s after
+measured depletion, with median 0.35 s. Normal 00 lost two
+particles while braking at 82.59°. Normal 01 lost four particles
+during coarse pouring at 113.99°. Their traces are retained for
+the next repair. [Normal 00 trace](../evidence/bottle-size-A/wide-mixed-r13b-00_normal-remaining-spill.json),
+[normal 01 trace](../evidence/bottle-size-A/wide-mixed-r13b-01_normal-remaining-spill.json).
+
+The four initial development recordings, four passing revised
+development recordings and 30 fresh recordings total 7.42 GiB
+of original HDF5 bytes. Their verified lossless archives occupy
+3.39 GiB, saving 4.03 GiB. The simulator containers exited normally.
+The RTX 4070 was idle at closure, and the separate RTX 4090
+job remained active. The final root and migrated recording
+volumes had 9.60 and 6.46 GiB free.
+
+```sh
+python3 compress_sized_recordings.py --study wide-mixed-r13b --part test --shard 3 --release-verified-originals
+mv -n wide-mixed-r13b/completion.json wide-mixed-r13b/pre-archive-completion.json
+test ! -e wide-mixed-r13b/completion.json
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r13b
+```

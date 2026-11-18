@@ -47,12 +47,31 @@ def verify(path, plan_sha, names):
     assert limits["NanoCpus"] == 4_000_000_000 and limits["CpusetCpus"] == "16-23"
     assert limits["Memory"] == limits["MemorySwap"] == 16*1024**3
     assert not any(line.startswith(GPU) for key in ("gpu_before","gpu_after") for line in runtime[key].splitlines())
+    archive_manifest=path.with_name(path.name.replace("-results.json","-recording-archives.json"))
+    archived={}
+    if archive_manifest.exists():
+        from compress_sized_recordings import verify_recording_archive
+        receipt=read(archive_manifest)
+        assert receipt["complete"] and receipt["report_sha256"]==sha(path)
+        archived={r["source"]:r for r in receipt["records"]}
+        assert len(archived)==len(data["cases"])
     for row in data["cases"]:
         recording = Path(row["path"]) / "episode.hdf5"
-        assert sha(recording) == row["recording_sha256"] and recording.stat().st_size == row["recording_bytes"]
+        if recording.is_file():
+            assert sha(recording) == row["recording_sha256"] and recording.stat().st_size == row["recording_bytes"]
+        else:
+            assert str(recording) in archived, "Missing native recording and verified archive"
+            verify_recording_archive(row,archived[str(recording)])
     result=dict(report_sha256=sha(path), container=runtime["container"],
                 wall_seconds=runtime["elapsed"], gpu_before=runtime["gpu_before"],
                 gpu_after=runtime["gpu_after"])
+    if "storage" in runtime:
+        storage=runtime["storage"]
+        assert all(Path(row["path"]).is_relative_to(storage["output_root"]) for row in data["cases"])
+        assert storage["free_after_bytes"] >= storage["minimum_free_bytes"]
+        result["storage"]=storage
+    if archived:
+        result["recording_archives"]=dict(manifest=str(archive_manifest),sha256=sha(archive_manifest),recordings=len(archived))
     if "interrupted_runtime" in data:
         interrupted=data["interrupted_runtime"]
         previous=interrupted["limits"]
@@ -91,7 +110,8 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b",
                                           "wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10",
-                                          "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12"),
+                                          "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12","wide-mixed-r13",
+                                          "wide-mixed-r13b"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -161,11 +181,12 @@ def main():
                 assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
                 report[file.removesuffix(".json").replace("-","_")+"_sha256"]=sha(path)
     if STUDY.name in ("wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10","wide-mixed-r10b",
-                      "wide-mixed-r11","wide-mixed-r12"):
+                      "wide-mixed-r11","wide-mixed-r12","wide-mixed-r13","wide-mixed-r13b"):
         report["development_cases"]=dev
         report["controller_test_log_sha256"]=sha(STUDY/"controller-tests.log")
-        if STUDY.name=="wide-mixed-r12":
+        if STUDY.name in ("wide-mixed-r12","wide-mixed-r13","wide-mixed-r13b"):
             fit = "stream-fit.json"
+            assert read(STUDY/fit)["passed"]
         else:
             fit = "near-full-fit.json" if STUDY.name in ("wide-mixed-r9","wide-mixed-r9b") else "neck-fusion.json"
         reports = (fit,"spill-trace.json")

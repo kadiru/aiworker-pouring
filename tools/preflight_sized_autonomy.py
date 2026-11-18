@@ -17,7 +17,8 @@ parser.add_argument("--study", choices=("sized-autonomy", "sized-autonomy-r1", "
                                        "wide-mixed-r0", "wide-mixed-r1", "wide-mixed-r2", "wide-mixed-r3",
                                        "wide-mixed-r4", "wide-mixed-r5", "wide-mixed-r6", "wide-mixed-r7",
                                        "wide-mixed-r7b", "wide-mixed-r8", "wide-mixed-r9", "wide-mixed-r9b",
-                                       "wide-mixed-r10", "wide-mixed-r10b", "wide-mixed-r11", "wide-mixed-r12"),
+                                       "wide-mixed-r10", "wide-mixed-r10b", "wide-mixed-r11", "wide-mixed-r12",
+                                       "wide-mixed-r13", "wide-mixed-r13b"),
                     default="sized-autonomy")
 parser.add_argument("--reuse-study", choices=("wide-mixed-r1","wide-mixed-r4","wide-mixed-r7","wide-mixed-r9",
                                              "wide-mixed-r10"))

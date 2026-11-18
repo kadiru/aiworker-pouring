@@ -15,6 +15,7 @@ TRANSFER_SECONDS=2.0
 RETURN_SECONDS=UPRIGHT_SECONDS+DRAIN_HOLD_SECONDS+TRANSFER_SECONDS
 LATE_SHIFT_START_DEG=116.
 LATE_SHIFT_END_DEG=122.
+MAX_TAIL_DROP_M=.008
 
 
 def late_mouth_offset(phase, amount, *, tail_setback_m=0., tail_window_deg=(123.,126.)):
@@ -48,8 +49,8 @@ def project_target(planner, prediction, source_xy, cup_xy, table_z, phase, mouth
     cup=np.r_[cup_xy,table_z]
     delta=np.asarray(source_xy)-np.asarray(cup_xy)
     initial=[delta[1],-delta[0]]
-    if not 0. <= tail_drop_m <= .006:
-        raise ValueError('Late mouth lowering must be between 0 and 6 mm')
+    if not 0. <= tail_drop_m <= MAX_TAIL_DROP_M:
+        raise ValueError('Late mouth lowering must be between 0 and 8 mm')
     if not 0. <= low_tilt_drop_m <= .010:
         raise ValueError('Low-tilt mouth lowering must be between 0 and 10 mm')
     height = mouth_z - tail_drop_m*tail_progress(phase, tail_window_deg)

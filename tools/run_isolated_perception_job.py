@@ -7,6 +7,7 @@ import argparse
 import datetime
 import fcntl
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -32,12 +33,16 @@ def main():
     a=p.parse_args()
     assert Path(a.helper).name==a.helper and a.helper.endswith('.py')
     assert a.label.replace('-','').isalnum() and 0<a.seconds<=7200
-    assert a.minimum_free_gib>=10
+    # The recording tree is mounted read-only in this launcher. Use the
+    # caller's budget for it and check headroom on the writable study volume.
+    assert a.minimum_free_gib>=0
     assert (STUDY/a.helper).is_file()
     with (STUDY/'isolated-job.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
         subprocess.run([sys.executable,str(ROOT/'tools/verify_robot_training_storage.py'),
                         '--minimum-free-gib',str(a.minimum_free_gib)],check=True)
+        if a.minimum_free_gib<10:
+            assert shutil.disk_usage(STUDY).free>=2*1024**3
         sim=json.loads(out('docker','inspect',SIM))[0]
         assert sim['Id']==SIM and not sim['State']['Running']
         assert sim['Config']['Labels']['owner']=='aiworker-pouring'

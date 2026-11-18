@@ -26,6 +26,7 @@ A strict pass requires a verified grasp, liquid transfer, the intended stop, zer
 | [Same four shapes, empty target](evidence/bottle-size-A/empty-r0-completion.json) | 4/4 | Each bottle stopped with zero source particles and zero measured spill. |
 | [Mixed layouts, revision 11](evidence/bottle-size-A/wide-mixed-r11-completion.json) | 29/30 | One particle escaped during coarse pouring. |
 | [Mixed layouts, revision 12, Nov. 17, 2026](evidence/bottle-size-A/wide-mixed-r12-completion.json) | 26/30 | All 30 completed the grasp, intended stop and return. All 15 near-full trials passed. Four empty-target trials each lost two particles. |
+| [Mixed layouts, revision 13b, Nov. 17, 2026](evidence/bottle-size-A/wide-mixed-r13b-completion.json) | 28/30 | All four prior spill layouts passed fresh. All 30 grasped, reached the intended stop and returned. Normal 00 lost two particles and normal 01 lost four. |
 
 The revision 12 change repaired the spill seen in revision 11. Fresh testing exposed spills in other layouts. Physical-robot transfer remains untested. [Bottle-size experiments and failure analysis](docs/BOTTLE_SIZE_SESSION.md) · [Dated experiment log](STATUS.md)
 
