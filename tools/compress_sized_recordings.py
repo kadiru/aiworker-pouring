@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import shutil
 
 from close_wide_mixed_autonomy import ROOT, HOST, ORIGINAL, out, read, sha
 
@@ -30,7 +31,10 @@ def verify_recording_archive(row, record):
     assert record["source"] == str(original)
     assert (record["original_bytes"], record["original_sha256"]) == (row["recording_bytes"], row["recording_sha256"])
     archive = Path(record["archive"])
-    assert archive.is_relative_to(HOST) and archive.is_file() and not archive.is_symlink()
+    external = Path("/data/aiworker-pouring/recording-archives-r14")
+    dedicated = (archive.parent == external and archive.name == row["name"] + ".hdf5.zst"
+                 and row["name"].startswith("SA_A_wide_mixed_r14_"))
+    assert (archive.is_relative_to(HOST) or dedicated) and archive.resolve() == archive and archive.is_file()
     assert sha(archive) == record["archive_sha256"]
     assert archive_identity(archive) == (row["recording_bytes"], row["recording_sha256"])
 
@@ -43,9 +47,9 @@ def save(path, value):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--study", choices=("wide-mixed-r13", "wide-mixed-r13b"), required=True)
+    parser.add_argument("--study", choices=("wide-mixed-r13", "wide-mixed-r13b", "wide-mixed-r14"), required=True)
     parser.add_argument("--part", choices=("development", "test"), required=True)
-    parser.add_argument("--shard", type=int, choices=(1, 2, 3))
+    parser.add_argument("--shard", type=int)
     parser.add_argument("--release-verified-originals", action="store_true")
     args = parser.parse_args()
     assert (args.part == "test") == (args.shard is not None)
@@ -72,7 +76,15 @@ def main():
         archive_root = study / "recording-archives"
         if output_root.stat().st_dev != study.stat().st_dev:
             archive_root = HOST / "outputs/size-autonomy/recording-archives-r13b"
-        archive_root.mkdir(exist_ok=True)
+        if args.study == "wide-mixed-r14":
+            if args.shard is not None and args.shard % 2 == 0:
+                archive_root = Path("/data/aiworker-pouring/recording-archives-r14")
+                assert Path("/data").is_mount() and archive_root.resolve() == archive_root
+                if not (archive_root / (row["name"] + ".hdf5.zst")).exists():
+                    assert shutil.disk_usage("/data").free >= 3 * 1024**3 + row["recording_bytes"]
+            elif output_root.stat().st_dev != study.stat().st_dev:
+                archive_root = HOST / "outputs/size-autonomy/recording-archives-r14"
+        archive_root.mkdir(parents=True, exist_ok=True)
         archive = archive_root / (row["name"] + ".hdf5.zst")
         if not archive.exists():
             assert source.stat().st_size == row["recording_bytes"] and sha(source) == row["recording_sha256"]

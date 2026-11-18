@@ -1,8 +1,10 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 17, 2026 (America/Los_Angeles).
+Updated: November 18, 2026 (America/Los_Angeles).
 
 For the illustrated pouring cycle, control architecture, study comparisons and a runnable offline example, start with the [project guide](README.md).
+
+The RTX 4070 fitted the terminal braking and coarse-pour trajectories from the six particles that escaped in the previous Isaac Sim benchmark. The archived fit passed on both geometries and all 59 controller tests passed. The next measurement is four development pours followed by the frozen 30-trial wide and swapped benchmark. [Trajectory fit](evidence/bottle-size-A/wide-mixed-r14-stream-fit.json) · [Method and commands](docs/BOTTLE_SIZE_SESSION.md)
 
 **All four targeted coarse-pour repairs passed fresh on the RTX 4070.** Normal 05 and 11 and swapped 08 and 10 passed with zero loss after CUDA trajectory-parameter fitting and four zero-spill development pours. The 30 fresh wide/swapped tests finished with **28/30 strict zero-spill passes**, **30/30 verified grasps, intended stops and ordered returns**, and **15/15 spill-free swapped trials**. Normal 00 lost two particles during braking at 82.59°, and normal 01 lost four during coarse pouring at 113.99°. The 15 near-full cups settled to **91.11–95.37%** of rim height. All seven tall empty targets confirmed within **0.60 s**, with median **0.35 s**. The 6.75-hour fresh benchmark passed its 30-recording audit and verified 135 original runtime sources and 2,284 protected files. The 4070 was idle at closure and the separate 4090 job remained active. This round fitted motion parameters with the existing neural weights. All 38 newly created development and fresh recordings were archived losslessly and reverified, saving **4.03 GiB**. The root and migrated recording volumes had about **9.60 and 6.46 GiB free** at closure. Next, use the two preserved remaining-spill traces to repair braking in normal 00 and coarse-pour rebound in normal 01. [Final audit](evidence/bottle-size-A/wide-mixed-r13b-completion.json), [passing development](evidence/bottle-size-A/wide-mixed-r13b-development-results.json), [normal 11 refinement](evidence/bottle-size-A/wide-mixed-r13b-stream-fit.json), [method and commands](docs/BOTTLE_SIZE_SESSION.md).
 

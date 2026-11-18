@@ -111,7 +111,7 @@ def main():
     parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b",
                                           "wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10",
                                           "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12","wide-mixed-r13",
-                                          "wide-mixed-r13b"),
+                                          "wide-mixed-r13b", "wide-mixed-r14"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -181,10 +181,10 @@ def main():
                 assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
                 report[file.removesuffix(".json").replace("-","_")+"_sha256"]=sha(path)
     if STUDY.name in ("wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10","wide-mixed-r10b",
-                      "wide-mixed-r11","wide-mixed-r12","wide-mixed-r13","wide-mixed-r13b"):
+                      "wide-mixed-r11","wide-mixed-r12","wide-mixed-r13","wide-mixed-r13b", "wide-mixed-r14"):
         report["development_cases"]=dev
         report["controller_test_log_sha256"]=sha(STUDY/"controller-tests.log")
-        if STUDY.name in ("wide-mixed-r12","wide-mixed-r13","wide-mixed-r13b"):
+        if STUDY.name in ("wide-mixed-r12","wide-mixed-r13","wide-mixed-r13b", "wide-mixed-r14"):
             fit = "stream-fit.json"
             assert read(STUDY/fit)["passed"]
         else:

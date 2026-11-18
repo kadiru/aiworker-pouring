@@ -433,7 +433,11 @@ class Actor:
             if self.terminal is not None:targets,phase=self.terminal.act(t)
             else:
                 if self.fill_mode=='brake':
-                    self.pour_phase=max(80.,self.pour_phase-self.threshold.get('brake_rate_deg_s',90.)*.05)
+                    rate = self.threshold.get('brake_rate_deg_s', 90.)
+                    finish = self.threshold.get('brake_finish_rate_deg_s', rate)
+                    fraction = np.clip((self.pour_phase - 82.) / 8., 0., 1.)
+                    rate = finish + (rate - finish) * fraction**2 * (3. - 2. * fraction)
+                    self.pour_phase = max(80., self.pour_phase - rate * .05)
                     if self.pour_phase<=80.:
                         self.fill_mode='settle';self.pause_start=t
                 elif self.fill_mode=='settle':

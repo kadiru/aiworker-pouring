@@ -22,9 +22,17 @@ def archived_stream(study, source=SOURCE, tilt_range=(104.,124.), min_particles=
     return recorded_stream(case, tilt_range, min_particles, include_advance)
 
 
-def recorded_stream(case, tilt_range, min_particles, include_advance):
+def recorded_stream(case, tilt_range, min_particles, include_advance, *, verified_archive=None):
     path=folder(case)
-    assert sha(path/"episode.hdf5")==case["recording_sha256"]
+    if verified_archive is None:
+        assert sha(path/"episode.hdf5")==case["recording_sha256"]
+    else:
+        assert verified_archive["source"] == str(Path(case["path"]) / "episode.hdf5")
+        assert verified_archive["original_sha256"] == case["recording_sha256"]
+        assert verified_archive["original_bytes"] == case["recording_bytes"]
+        from fit_wide_mixed_r6 import HOST
+        archive = Path("/workspace") / Path(verified_archive["archive"]).relative_to(HOST)
+        assert sha(archive) == verified_archive["archive_sha256"]
     spec=read(path/"parameters.json")
     geometry=spec["declared_cup_geometry"]
     rim,bottom,radius=(geometry[k] for k in ("rim_z_m","bottom_z_m","rim_radius_m"))

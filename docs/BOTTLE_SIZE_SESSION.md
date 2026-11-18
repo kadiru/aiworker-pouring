@@ -1313,3 +1313,23 @@ mv -n wide-mixed-r13b/completion.json wide-mixed-r13b/pre-archive-completion.jso
 test ! -e wide-mixed-r13b/completion.json
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r13b
 ```
+
+## November 18, 2026 · Terminal braking and coarse pouring
+
+The previous Isaac Sim benchmark lost two particles in normal 00 and four in normal 01. Tracing every final escaped particle identified two separate coarse-pour rebounds in normal 01, at approximately 114° and 119.5°. The first pair was already rebounding when it first appeared above the liquid. The second pair was falling at first observation and rebounded 50 ms later. [Particle traces](../evidence/bottle-size-A/wide-mixed-r14-spill-trace.json)
+
+The RTX 4070 compared 21 terminal-braking settings and 65 coarse-pour settings. For each geometry the fit used three archived training trials and three separate archived validation trials. Normal 00 used 1,094 training and 1,220 validation particle observations. Its fit selected a 5 mm low-angle mouth drop and a smooth braking taper from 45°/s above 90° to 36°/s below 82°. Normal 01 used 2,863 training and 3,313 validation observations. Its fit selected a 10 mm setback and 8 mm drop, applied over 104–109°, with the late forward advance set to zero. The fit reduced the projected rim-crossing distance of both observed coarse-pour rebounds. Even with the new parameters those projections remained outside the rim. Live pours measure the actual spill. Neural-training epochs this round were zero. [CUDA fit](../evidence/bottle-size-A/wide-mixed-r14-stream-fit.json)
+
+The frozen plan contains four development pours at the two original positions in each orientation and 30 fresh tests in 15 matched normal/swapped pairs. Fresh positions have independent 1.1–2.5 mm offsets on each axis relative to the corresponding previous wide fixture. Each pair exchanges the object positions. The simulation uses the existing nine cup sizes and four bottle shapes. Each native recording is archived losslessly, then verified against its original size and SHA256. The ten small test batches keep disk headroom on Ubuntu. Even-numbered batches store their verified archives in the project's directory on the mounted `/data` volume. [Frozen manifest](../evidence/bottle-size-A/wide-mixed-r14-plan.json)
+
+Use the existing Ubuntu study root and the same container image recorded in the preceding revision. Copy the r14 helpers and updated common runners from `tools/` to the study root before running these commands. Use a fresh study directory with no previous trial outputs.
+
+```sh
+cd /home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1
+mkdir wide-mixed-r14
+cp -a wide-mixed-r13b/src wide-mixed-r14/src
+# Copy the repository's runtime/src/pour_guard_actor.py to wide-mixed-r14/src/.
+sed 's/wide-mixed-r12/wide-mixed-r14/' wide_mixed_r12_checks.py > wide_mixed_r14_checks.py
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r14_stream.py --label wide-r14-stream-fit --seconds 600 --minimum-free-gib 1
+bash run_wide_mixed_r14.sh
+```

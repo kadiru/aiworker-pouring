@@ -185,7 +185,7 @@ def main():
                                           "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7",
                                           "wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b",
                                           "wide-mixed-r10","wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12",
-                                          "wide-mixed-r13","wide-mixed-r13b"),
+                                          "wide-mixed-r13","wide-mixed-r13b", "wide-mixed-r14"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
