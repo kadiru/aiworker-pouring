@@ -1373,3 +1373,17 @@ python3 run_sized_autonomy.py --study wide-mixed-r15 --part development --label 
 ```
 
 After development, run `python3 -u tools/run_wide_mixed_r15.py` from the Mac project checkout. It uses the configured `kfuUbuntu` SSH alias, checks each closed batch, and stores its durable zstd archives under ignored `data/wide-mixed-r15/`. An original is released only after the Mac verifies both compressed and decompressed SHA256 and byte counts. Ubuntu retains trial metadata and per-batch receipts. After closure, the runner releases only verified temporary archive copies from RAM. To run a later full archive audit on Ubuntu, first restage the Mac archives into the directory in each receipt.
+
+Four of four development pours passed and all 59 controller unit tests passed. The 30 fresh attempts completed on November 18 Pacific time (November 19 at 02:46:28 UTC). Their individual container wall times sum to 6.44 hours of evaluation. Personal working time was unmeasured. [Development results](../evidence/bottle-size-A/wide-mixed-r15-development-results.json) · [Final audit](../evidence/bottle-size-A/wide-mixed-r15-completion.json)
+
+| Fresh Isaac Sim evaluation | Attempts | Strict passes | Completed zero-spill pours | Stopped before grasp |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 14 | 14 | 1 |
+| Swapped | 15 | 15 | 15 | 0 |
+| Total | 30 | 29 | 29 | 1 |
+
+Swapped 00 emptied the bottle. Normal 10 stopped at 92.08% of rim height, and normal 04 at 93.81%. All three measured zero lost particles. All 15 empty targets passed. The 14 completed near-full pours finished at 91.17–95.42% of rim height. All seven tall-bottle empty stops confirmed within 0.60 s, with a 0.35 s median.
+
+Normal 02 transferred 0 mL. The bottle locator had 20 votes, while the cup locator had no consensus at 2.105 simulated seconds. The controller stopped before grasp. This explains why all 30 attempts recorded zero loss but only 29 count as successful pours. Next, replay its startup camera sequence and compare the missing cup consensus with nearby passing placements. [Failure diagnostics](../evidence/bottle-size-A/wide-mixed-r15-fresh-failures.json)
+
+The final recording audit checked 30 fresh and four development recordings, 135 original runtime sources and 2,284 protected files. The Mac runner verified each compressed archive against its original native bytes, then released Ubuntu staging RAM. The 4070 was idle at closure. The execution and monitoring scripts controlled only study-owned jobs. These results are entirely in simulation.

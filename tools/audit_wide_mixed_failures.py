@@ -24,12 +24,17 @@ def inspect_failure(case):
                 if observations is not None and len(observations) < 5:
                     observations.append(dict(t=row["t"], phase=row["phase"], tilt_deg=row["bottle_tilt_deg"],
                                              origin=p["origin"], xyz=p["xyz_cup_frame_m"], velocity=p["velocity_m_s"]))
-    return dict(name=case["name"], reasons=case["failure_reasons"], stop=stop["stop_latched"],
+    result = dict(name=case["name"], reasons=case["failure_reasons"], stop=stop["stop_latched"],
                 stop_time_s=stop["t"], pause_count=stop["pause_count"], visual_at_stop=stop["sized_cup_perception"],
                 measured_final_height_fraction=samples[-1]["cup_fill_fraction"], escaped_particles=traces,
                 recording_sha256=case["recording_sha256"],
                 sidecar_sha256={name:hashlib.sha256((folder/name).read_bytes()).hexdigest()
                                 for name in ("samples.json", "policy-decisions.json", "parameters.json")})
+    if stop["stop_latched"] == "localization_unconfirmed":
+        result["localization_at_stop"] = stop.get("localization_consensus")
+        result["grasp_verified"] = case["grasp_verified"]
+        result["delivered_to_cup_ml"] = case["delivered_to_cup_ml"]
+    return result
 
 
 def main():

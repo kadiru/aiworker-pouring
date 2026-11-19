@@ -28,6 +28,7 @@ A strict pass requires a verified grasp, liquid transfer, the intended stop, zer
 | [Mixed layouts, revision 12, Nov. 17, 2026](evidence/bottle-size-A/wide-mixed-r12-completion.json) | 26/30 | All 30 completed the grasp, intended stop and return. All 15 near-full trials passed. Four empty-target trials each lost two particles. |
 | [Mixed layouts, revision 13b, Nov. 17, 2026](evidence/bottle-size-A/wide-mixed-r13b-completion.json) | 28/30 | All four prior spill layouts passed fresh. All 30 grasped, reached the intended stop and returned. Normal 00 lost two particles and normal 01 lost four. |
 | [Mixed layouts, revision 14, Nov. 18, 2026](evidence/bottle-size-A/wide-mixed-r14-completion.json) | 27/30 | Both targeted layouts passed fresh. Across the batch, 28/30 were spill-free. Two trials lost two particles each, and one spill-free trial stopped with its fill unconfirmed. |
+| [Mixed layouts, revision 15, Nov. 18, 2026](evidence/bottle-size-A/wide-mixed-r15-completion.json) | 29/30 | All 29 completed pours were spill-free, including all 15 swapped layouts. Normal 02 stopped before grasp when the cup could not be localized. |
 
 The revision 12 change repaired the spill seen in revision 11. Fresh testing exposed spills in other layouts. Physical-robot transfer remains untested. [Bottle-size experiments and failure analysis](docs/BOTTLE_SIZE_SESSION.md) · [Dated experiment log](STATUS.md)
 
