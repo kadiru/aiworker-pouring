@@ -1413,3 +1413,15 @@ python3 run_sized_autonomy.py --study wide-mixed-r16 --part development --label 
 ```
 
 From the Mac project checkout, run `python3 -u tools/run_wide_mixed_r15.py --study wide-mixed-r16` after the targeted pour passes. This runs all 30 fresh tests and completes the Ubuntu and Mac recording audits. Durable native archives are under the Mac project's `data/wide-mixed-r16/` directory.
+
+The targeted normal 02 pour transferred 34.01 mL, stopped near-full at 93.54% and returned with zero loss. The fresh shifted normal 02 trial confirmed both vessels after 0.60 simulated seconds. Its cup estimate was 0.27 mm from the declared fixture position and its final height was 93.58%, again with zero loss. All 30 trials confirmed both vessels. The maximum fresh cup-position error was 1.72 mm. [Targeted pour](../evidence/bottle-size-A/wide-mixed-r16-development-results.json) · [Fresh startup audit](../evidence/bottle-size-A/wide-mixed-r16-fresh-startup.json)
+
+| Fresh Isaac Sim fixtures | Attempts | Both vessels localized | Actual pours | Strict zero-spill passes |
+|---|---:|---:|---:|---:|
+| Normal | 15 | 15 | 15 | 14 |
+| Swapped | 15 | 15 | 14 | 12 |
+| Total | 30 | 30 | 29 | 26 |
+
+All 29 transfers reached the intended stop and returned the bottle. Normal 05 lost one particle during coarse pouring at 109.60°. Swapped 10 and swapped 14 each lost two during coarse pouring at 127.07° and 128.22°, respectively. Swapped 05 recorded both vessel locations and a simulator-verified grasp, but the controller stopped after two attempts with `grasp_unconfirmed` and transferred 0 mL. The zero-loss count is 27/30 attempts, including that no-pour attempt. Of the actual pours, 26/29 had zero loss. Under the existing particle tolerance, 29/30 attempts passed. All seven tall-bottle empty targets confirmed depletion within 0.45 s. [Failure traces](../evidence/bottle-size-A/wide-mixed-r16-fresh-failures.json) · [Completion audit](../evidence/bottle-size-A/wide-mixed-r16-completion.json)
+
+The 15 RTX 4070 test batches took 6.60 elapsed hours in total. This was evaluation time, with zero neural-training epochs. Personal working time was unmeasured. The Mac verified all 31 native recordings, and Ubuntu released the temporary recording copies from RAM. For independent startup measurement after closure, run `python3 audit_startup_localization.py wide-mixed-r16` once from the Ubuntu study root. No real-robot trials were run.
