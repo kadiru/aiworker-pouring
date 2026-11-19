@@ -111,7 +111,7 @@ def main():
     parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b",
                                           "wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10",
                                           "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12","wide-mixed-r13",
-                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16"),
+                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -213,6 +213,16 @@ def main():
         report.update(cup_startup_replay_sha256=sha(replay), development_cases=dev,
                       frozen_checkpoints=len(plan["checkpoints"]),
                       controller_test_log_sha256=sha(STUDY/"controller-tests.log"))
+    if STUDY.name == "wide-mixed-r17":
+        parent = read(ROOT/"wide-mixed-r16/geometry.json")
+        assert parent["sources"] == geometry["sources"]
+        for filename in ("stream-fit.json", "frozen-localization.json"):
+            path = STUDY/filename
+            assert read(path)["passed"]
+            digest = sha(path)
+            assert plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))] == digest
+            report[filename.split(".")[0].replace("-","_")+"_sha256"] = digest
+        report.update(development_cases=dev, controller_test_log_sha256=sha(STUDY/"controller-tests.log"))
     with (STUDY/"completion.json").open("x") as file:
         json.dump(report,file,indent=2,allow_nan=False)
         file.write("\n")

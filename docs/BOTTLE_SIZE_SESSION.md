@@ -1425,3 +1425,22 @@ The targeted normal 02 pour transferred 34.01 mL, stopped near-full at 93.54% an
 All 29 transfers reached the intended stop and returned the bottle. Normal 05 lost one particle during coarse pouring at 109.60°. Swapped 10 and swapped 14 each lost two during coarse pouring at 127.07° and 128.22°, respectively. Swapped 05 recorded both vessel locations and a simulator-verified grasp, but the controller stopped after two attempts with `grasp_unconfirmed` and transferred 0 mL. The zero-loss count is 27/30 attempts, including that no-pour attempt. Of the actual pours, 26/29 had zero loss. Under the existing particle tolerance, 29/30 attempts passed. All seven tall-bottle empty targets confirmed depletion within 0.45 s. [Failure traces](../evidence/bottle-size-A/wide-mixed-r16-fresh-failures.json) · [Completion audit](../evidence/bottle-size-A/wide-mixed-r16-completion.json)
 
 The 15 RTX 4070 test batches took 6.60 elapsed hours in total. This was evaluation time, with zero neural-training epochs. Personal working time was unmeasured. The Mac verified all 31 native recordings, and Ubuntu released the temporary recording copies from RAM. For independent startup measurement after closure, run `python3 audit_startup_localization.py wide-mixed-r16` once from the Ubuntu study root. No real-robot trials were run.
+
+### Revision 17 grasp confirmation and coarse pouring
+
+The RTX 4070 fitted three geometry-specific mouth paths and a post-lift visual confirmation threshold. The candidates use the same 141 runtime files, all neural weights, both startup localizers and the same stop logic as revision 16. The post-lift check accepts a neck position within 16.44 pixels of the expected lifted neck, up from 15.69. It still needs six visual votes plus lifted-arm and obstructed-finger evidence. Both missed attempts confirmed on replay. All 51 single-evidence ablations rejected. The three mouth paths were fitted on nine archived Isaac Sim pours and checked on nine separate archived pours using a ballistic rebound proxy. Escaped-particle traces and simulator state are offline scoring inputs.
+
+The first collision screen found eight paths with hand/table intersections late in the tilt. Limiting terminal lowering to 2 mm for the two late rebounds produced a clean 34/34 geometry screen. All four original fixtures then passed the autonomous development gate with zero lost particles. The 30 reserved placements use 15 matched normal/swapped pairs with independent 1.1–2.5 mm perturbations of the predecessor layout, across nine cup and four bottle geometries.
+
+Reproduce from the Ubuntu study root with the parent recordings, checkpoints, licensed Isaac Sim assets and project launchers already installed. Copy the fitting, preparation, preflight, archive and closure helpers from this checkout. In a new study directory, copy revision 16's src directory intact. Copy the revision 16 Mac archives ending in 05_normal, 10_swap and 14_swap into the inputs directory. The fitter verifies their hashes against the parent evaluation receipts. Generate wide_mixed_r17_checks.py by substituting wide-mixed-r17 for wide-mixed-r16 in wide_mixed_r16_checks.py. Use unused job labels for each invocation.
+
+```sh
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r17.py --label wide-r17-fit-b --seconds 1800 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r17.py --label wide-r17-plan-b --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r17_checks.py --label wide-r17-checks --seconds 600 --minimum-free-gib 1
+cp wide-r17-checks/run.log wide-mixed-r17/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r17-geometry-b --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r17
+python3 run_sized_autonomy.py --study wide-mixed-r17 --part development --label wide-r17-dev --seconds 7200
+```
+
+From the Mac project checkout, run `.venv/bin/python -u tools/run_wide_mixed_r15.py --study wide-mixed-r17`. It checks development, runs the fresh pairs and verifies the decompressed native recording hash before releasing any Ubuntu original. After closure, run `python3 audit_startup_localization.py wide-mixed-r17` in the Ubuntu study root.

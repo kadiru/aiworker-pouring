@@ -185,7 +185,7 @@ def main():
                                           "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7",
                                           "wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b",
                                           "wide-mixed-r10","wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12",
-                                          "wide-mixed-r13","wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16"),
+                                          "wide-mixed-r13","wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
@@ -200,7 +200,7 @@ def main():
         study = ROOT/args.study
         plan = read(study/"plan.json")
         study_local = plan.get("study_local_recordings", False)
-        use_shared = args.study in ("wide-mixed-r15","wide-mixed-r16") or args.shard in plan.get("shared_recording_shards", ())
+        use_shared = args.study in ("wide-mixed-r15","wide-mixed-r16", "wide-mixed-r17") or args.shard in plan.get("shared_recording_shards", ())
         output_root = study/"recordings" if study_local and not use_shared else OUTPUT
         live_storage_floor = 0
         if "storage_recording_upper_bytes" in plan:
@@ -208,6 +208,7 @@ def main():
             largest = plan["storage_recording_upper_bytes"]
             if args.part == "development":
                 count = len(plan["development"])
+                largest = plan.get("development_recording_upper_bytes", largest)
             else:
                 assert args.shard is not None and 1<=args.shard<=len(plan["test_shards"])
                 shards = plan["test_shards"]
