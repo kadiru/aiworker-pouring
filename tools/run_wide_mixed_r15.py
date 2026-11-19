@@ -1,4 +1,5 @@
 """Run from the Mac project checkout after r15 development. Keep durable recordings on the Mac."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -34,7 +35,7 @@ def backup(part, arguments):
     checked = []
     for record in manifest["records"]:
         archive = Path(record["archive"])
-        assert str(archive.parent) == STAGING and archive.name.startswith("SA_A_wide_mixed_r15_")
+        assert str(archive.parent) == STAGING and archive.name.startswith("SA_A_" + STUDY.replace("-", "_") + "_")
         dest = DATA / archive.name
         if not dest.exists():
             temporary = dest.with_suffix(".partial")
@@ -73,16 +74,26 @@ def release_staging():
 import sys
 from close_wide_mixed_autonomy import sha
 p = Path(sys.argv[1])
-assert p.parent == Path('/dev/shm/aiworker-pouring-r15') and p.name.startswith('SA_A_wide_mixed_r15_')
+study = sys.argv[3]
+assert study in ('wide-mixed-r15', 'wide-mixed-r16')
+assert p.parent == Path('/dev/shm/aiworker-pouring-' + study.rsplit('-', 1)[1])
+assert p.name.startswith('SA_A_' + study.replace('-', '_') + '_')
 assert p.resolve() == p and p.name.endswith('.hdf5.zst')
 if p.exists():
     assert sha(p) == sys.argv[2]
     p.unlink()
 """
-            remote("python3", "-c", program, item["archive"], item["archive_sha256"])
+            remote("python3", "-c", program, item["archive"], item["archive_sha256"], STUDY)
 
 
 def main():
+    global STUDY, DATA, STAGING
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--study", choices=("wide-mixed-r15", "wide-mixed-r16"), default=STUDY)
+    STUDY = parser.parse_args().study
+    revision = STUDY.rsplit("-", 1)[1]
+    DATA = PROJECT / "data" / STUDY
+    STAGING = "/dev/shm/aiworker-pouring-" + revision
     DATA.mkdir(parents=True, exist_ok=True)
     dev = report("development-results.json")
     assert dev["planned"] == dev["completed"] and all(r["strict_pass"] for r in dev["cases"])
@@ -94,7 +105,7 @@ def main():
                         STUDY + "/" + part + "-results.json", capture=True).strip()
         if exists == "no":
             remote("python3", "run_sized_autonomy.py", "--study", STUDY, "--part", "test", "--shard", str(i),
-                   "--label", f"wide-r15-test-{i}", "--seconds", "7200")
+                   "--label", f"wide-{revision}-test-{i}", "--seconds", "7200")
         batch = report(part + "-results.json")
         assert [row["name"] for row in batch["cases"]] == names
         backup(part, ["--part", "test", "--shard", str(i)])

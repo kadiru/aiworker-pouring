@@ -34,8 +34,9 @@ def verify_recording_archive(row, record):
     external = Path("/data/aiworker-pouring/recording-archives-r14")
     dedicated = (archive.parent == external and archive.name == row["name"] + ".hdf5.zst"
                  and row["name"].startswith("SA_A_wide_mixed_r14_"))
-    staged = (archive.parent == Path("/dev/shm/aiworker-pouring-r15") and
-              row["name"].startswith("SA_A_wide_mixed_r15_") and archive.name == row["name"] + ".hdf5.zst")
+    staged = any(archive.parent == Path("/dev/shm/aiworker-pouring-" + revision)
+                 and row["name"].startswith("SA_A_wide_mixed_" + revision + "_")
+                 and archive.name == row["name"] + ".hdf5.zst" for revision in ("r15", "r16"))
     assert (archive.is_relative_to(HOST) or dedicated or staged) and archive.resolve() == archive and archive.is_file()
     assert sha(archive) == record["archive_sha256"]
     assert archive_identity(archive) == (row["recording_bytes"], row["recording_sha256"])
@@ -49,7 +50,7 @@ def save(path, value):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--study", choices=("wide-mixed-r13", "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15"), required=True)
+    parser.add_argument("--study", choices=("wide-mixed-r13", "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16"), required=True)
     parser.add_argument("--part", choices=("development", "test"), required=True)
     parser.add_argument("--shard", type=int)
     parser.add_argument("--release-verified-originals", action="store_true")
@@ -70,7 +71,7 @@ def main():
     manifest_path = study / (part + "-recording-archives.json")
     manifest = dict(report_sha256=sha(report_path), records=[], complete=False)
     backup = {}
-    if args.study == "wide-mixed-r15" and args.release_verified_originals:
+    if args.study in ("wide-mixed-r15","wide-mixed-r16") and args.release_verified_originals:
         receipt = read(study / (part + "-mac-backup.json"))
         assert receipt["report_sha256"] == manifest["report_sha256"]
         backup = {item["name"]: item for item in receipt["records"]}
@@ -92,8 +93,8 @@ def main():
                     assert shutil.disk_usage("/data").free >= 3 * 1024**3 + row["recording_bytes"]
             elif output_root.stat().st_dev != study.stat().st_dev:
                 archive_root = HOST / "outputs/size-autonomy/recording-archives-r14"
-        if args.study == "wide-mixed-r15":
-            archive_root = Path("/dev/shm/aiworker-pouring-r15")
+        if args.study in ("wide-mixed-r15","wide-mixed-r16"):
+            archive_root = Path("/dev/shm") / ("aiworker-pouring-" + args.study.rsplit("-", 1)[1])
             assert Path("/dev/shm").is_mount() and archive_root.resolve() == archive_root
             memory_kib = int(next(line.split()[1] for line in Path("/proc/meminfo").read_text().splitlines()
                                   if line.startswith("MemAvailable:")))

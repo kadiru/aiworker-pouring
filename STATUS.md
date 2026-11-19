@@ -1,8 +1,10 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 18, 2026 (America/Los_Angeles).
+Updated: November 19, 2026 (America/Los_Angeles).
 
 For the illustrated pouring cycle, control architecture, study comparisons and a runnable offline example, start with the [project guide](README.md).
+
+Startup cup localization now confirms the previous normal 02 recording within 0.22 mm. All 38 positive replay sequences and 64 synthetic missing-cup controls passed. All 14 checkpoints and the pouring controller are frozen at revision 15. The targeted normal 02 pour delivered 34.01 mL, confirmed near-full at 93.54% and returned with zero loss. The 30 fresh wide/swapped tests are underway. [Replay audit](evidence/bottle-size-A/wide-mixed-r16-cup-startup-replay.json)
 
 **All three targeted repairs passed fresh in Isaac Sim.** The RTX 4070 completed 30 frozen wide/swapped attempts with **29/30 strict passes**, up from 27/30. **All 29 actual pours had zero measured spill** and completed the intended stop and side return. Swapped 00 emptied the bottle, normal 10 braked and stopped at 92.08% of rim height, and normal 04 confirmed near-full at 93.81%. Normal 02 stopped before grasp at 2.105 simulated seconds. It had 20 bottle-location votes and no confirmed cup position. All 15 swapped trials passed. Fresh evaluation took 6.44 elapsed hours. All 34 development and test recordings were verified on the Mac. Next, replay the early camera frames from normal 02 to determine why the cup locator could not establish consensus. [Final audit](evidence/bottle-size-A/wide-mixed-r15-completion.json) · [Failed localization](evidence/bottle-size-A/wide-mixed-r15-fresh-failures.json) · [Method and commands](docs/BOTTLE_SIZE_SESSION.md)
 

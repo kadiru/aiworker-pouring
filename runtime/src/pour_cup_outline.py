@@ -80,16 +80,44 @@ def refine_outline(image, proposal, calibration, geometry):
 
 
 class OutlineCupTracker(VerifiedCupTracker):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.startup_frames = 0
+
+    def shifted_startup_score(self, image, point):
+        # Strided heatmaps can give a correct rim a weak peak at one pixel alignment.
+        # Both shifted views must pass presence and agree in original image coordinates.
+        threshold = self.artifact["threshold"]
+        radius = self.artifact["consensus"]["radius_px"]
+        if self.presence_score(image, point) < .90:
+            return 0.
+        width = image.shape[1]
+        padded = np.pad(image, ((0,0),(4,4),(0,0)), mode="edge")
+        scores = []
+        for offset in (-4, 4):
+            view = padded[:,4-offset:4-offset+width]
+            detected, score = super().detect(view, refine=True)
+            if not (score >= threshold and np.linalg.norm(detected - [offset,0] - point) <= radius):
+                return 0.
+            scores.append(score)
+        return min(scores)
+
     def detect(self, image, refine=True):
         point, score = super().detect(image, refine=refine)
+        if refine and self.anchor is None:
+            self.startup_frames += 1
+            if (self.startup_frames > 12 and
+                    self.artifact["consensus"]["score_floor"] <= score < self.artifact["threshold"]):
+                score = max(score, self.shifted_startup_score(image, point))
         if refine and score >= self.artifact["threshold"]:
             candidate = refine_outline(image, point, self.artifact["calibration"], self.geometry)
             if candidate is not None:
                 # The decorative band can produce a second strong peak below
                 # the rim. Reject large jumps when the two learned scales
                 # already agree on the center.
-                limit = self.artifact.get("outline_jump_guard")
-                if limit is not None and np.linalg.norm(candidate-point) > limit["max_outline_jump_px"]:
+                limit = self.artifact.get("outline_jump_guard",
+                                          {"max_outline_jump_px": 6., "max_neural_gap_px": 2.5})
+                if np.linalg.norm(candidate-point) > limit["max_outline_jump_px"]:
                     coarse, confidence = super().detect(image, refine=False)
                     if (confidence >= self.artifact["threshold"]
                             and np.linalg.norm(coarse-point) <= limit["max_neural_gap_px"]):

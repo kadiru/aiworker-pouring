@@ -1387,3 +1387,29 @@ Swapped 00 emptied the bottle. Normal 10 stopped at 92.08% of rim height, and no
 Normal 02 transferred 0 mL. The bottle locator had 20 votes, while the cup locator had no consensus at 2.105 simulated seconds. The controller stopped before grasp. This explains why all 30 attempts recorded zero loss but only 29 count as successful pours. Next, replay its startup camera sequence and compare the missing cup consensus with nearby passing placements. [Failure diagnostics](../evidence/bottle-size-A/wide-mixed-r15-fresh-failures.json)
 
 The final recording audit checked 30 fresh and four development recordings, 135 original runtime sources and 2,284 protected files. The Mac runner verified each compressed archive against its original native bytes, then released Ubuntu staging RAM. The 4070 was idle at closure. The execution and monitoring scripts controlled only study-owned jobs. These results are entirely in simulation.
+
+## Revision 16 · Startup cup localization
+
+Normal 02 stopped before grasp in revision 15. On its 42 recorded startup frames the detector initially selected a distractor, which the presence model rejected. From frame index 6 onward, the estimated rim was within roughly one pixel of the declared center, but the heatmap confidence stayed between 0.32 and 0.38, below the checkpoint's 0.397 threshold. Two nearby passing recordings from revisions 11 and 12 confirmed by frame indices 11 and 7. [Startup diagnostics](../evidence/bottle-size-A/wide-mixed-r16-startup-diagnosis.json)
+
+After 12 unconfirmed startup frames, a marginal proposal can now be checked against two additional pixel alignments of the same RGB image. Both views must pass the existing detector threshold, agree with the original rim within the existing 4-pixel consensus radius, and pass cup-presence verification. The original view must also pass a 0.90 presence check. The existing temporal vote, reference establishment and deadline still apply. Replay also exposed a pre-existing 2.74 mm error in swapped 07. When its coarse and fine rim estimates agreed within 2.5 pixels, the outline refinement shifted the rim by 7.07 pixels. A guard now rejects outline jumps above 6 pixels under that agreement condition for checkpoints without a separately tuned jump guard. Swapped 07 improved to 1.39 mm. [First replay](../evidence/bottle-size-A/wide-mixed-r16-shift-only-replay.json) · [Startup locator](../runtime/src/pour_cup_outline.py)
+
+The 4070 replayed 30 revision 15 trials and two nearby historical normal 02 trials. Six translated versions of the three normal 02 sequences brought the positive total to 38. All 38 confirmed within 2.5 mm. The maximum error was 1.391 mm. Normal 02 confirmed at frame index 19 with 0.216 mm error. Two synthetic cup-erasure controls per native sequence ran for the full 42-frame startup window, with zero acceptances across 64 sequences. The source-pinned comparison verified 140 unchanged runtime files and 14 unchanged checkpoints. The single edited runtime file implements startup cup localization. All neural weights, grasp, pour, braking, stop and return settings retain their revision 15 identities. [Replay audit](../evidence/bottle-size-A/wide-mixed-r16-cup-startup-replay.json)
+
+The targeted evaluation uses the original failed placement. The fresh evaluation uses 15 paired wide normal/swapped layouts across nine cup sizes and four bottle shapes. Each object shifts by 1.1–2.5 mm per table axis from its corresponding revision 15 position. The plan fixes seeds and positions before autonomous evaluation. Recordings use two-trial batches and byte-verified Mac backup. [Frozen fixtures](../evidence/bottle-size-A/wide-mixed-r16-plan.json)
+
+To reproduce, use the existing Ubuntu study root and the revision 15 checkpoints. Copy `wide-mixed-r15/src` into a new `wide-mixed-r16/src` and install the revised `pour_cup_outline.py` there. Stage the updated repository helpers in the study root. On the Mac, `.venv/bin/python tools/extract_r16_startup.py` extracts original JPEG bytes from the hashed revision 15 archives. Copy the resulting `data/wide-mixed-r16/startup.h5` to the Ubuntu study's `wide-mixed-r16/` directory. The two older recordings remain on Ubuntu at their original paths.
+
+```sh
+cd /home/kadir/aiworker-pouring-4070/learning/A-scale-dynamic-20261109-v1
+sed 's/wide-mixed-r15/wide-mixed-r16/' wide_mixed_r15_checks.py > wide_mixed_r16_checks.py
+python3 run_isolated_perception_job.py --helper diagnose_r16_startup.py --label wide-r16-diagnose --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper replay_r16_startup.py --label wide-r16-outline-replay --seconds 1800 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r16_checks.py --label wide-r16-checks --seconds 360 --minimum-free-gib 1
+cp wide-r16-checks/run.log wide-mixed-r16/controller-tests.log
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r16.py --label wide-r16-prepare --seconds 360 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r16-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r16
+python3 run_sized_autonomy.py --study wide-mixed-r16 --part development --label wide-r16-target --seconds 7200
+```
+
+From the Mac project checkout, run `python3 -u tools/run_wide_mixed_r15.py --study wide-mixed-r16` after the targeted pour passes. This runs all 30 fresh tests and completes the Ubuntu and Mac recording audits. Durable native archives are under the Mac project's `data/wide-mixed-r16/` directory.

@@ -111,7 +111,7 @@ def main():
     parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b",
                                           "wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10",
                                           "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12","wide-mixed-r13",
-                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15"),
+                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -201,6 +201,18 @@ def main():
             digest=sha(path)
             assert plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==digest
             report[filename.removesuffix(".json").replace("-","_")+"_sha256"]=digest
+    if STUDY.name == "wide-mixed-r16":
+        replay = STUDY/"cup-startup-replay.json"
+        proof = read(replay)
+        assert proof["passed"] and proof["frozen_checkpoints"] == plan["checkpoints"]
+        assert proof["locator_sha256"] == geometry["sources"]["pour_cup_outline.py"]
+        assert proof["changed_runtime_sources"] == ["pour_cup_outline.py"]
+        parent = read(ROOT/"wide-mixed-r15/geometry.json")["sources"]
+        assert parent.keys() == geometry["sources"].keys()
+        assert [n for n in parent if parent[n] != geometry["sources"][n]] == ["pour_cup_outline.py"]
+        report.update(cup_startup_replay_sha256=sha(replay), development_cases=dev,
+                      frozen_checkpoints=len(plan["checkpoints"]),
+                      controller_test_log_sha256=sha(STUDY/"controller-tests.log"))
     with (STUDY/"completion.json").open("x") as file:
         json.dump(report,file,indent=2,allow_nan=False)
         file.write("\n")
