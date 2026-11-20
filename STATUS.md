@@ -1,8 +1,10 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 19, 2026 (America/Los_Angeles).
+Updated: November 20, 2026 (America/Los_Angeles).
 
 For the illustrated pouring cycle, control architecture, study comparisons and a runnable offline example, start with the [project guide](README.md).
+
+**Both revision 18 development pours passed in Isaac Sim on the RTX 4070.** Swapped 02 emptied the bottle and normal 02 stopped near full at 93.71% of rim height. Both returned and released with zero measured particle loss. The single changed checkpoint field moves the bottle mouth 9 mm back and 2 mm lower between 124° and 127°. All 32 planned paths passed geometry screening. The 30 fresh poses were sealed before development. [Development results](evidence/bottle-size-A/wide-mixed-r18-development-results.json) · [Frozen controller checks](evidence/bottle-size-A/wide-mixed-r18-frozen-localization.json)
 
 **Revision 17 scored 29/30 strict zero-spill passes on fresh wide/swapped placements in Isaac Sim**, up from 26/30 on the preceding batch. All 30 localized both vessels, grasped the bottle, transferred liquid, reached the intended stop, and completed the return. All four targeted layouts passed both development and fresh testing. Fresh swapped 05 confirmed the first lift and stopped at 94.42% of rim height. Swapped 02 lost two particles during coarse pouring at 126.43°. Next, replay that rebound with localization and grasp confirmation frozen. The 15 fresh batches used 6.82 elapsed evaluation hours on the RTX 4070. All 34 native recordings were verified on the Mac. [Final audit](evidence/bottle-size-A/wide-mixed-r17-completion.json) · [Swapped 02 trace](evidence/bottle-size-A/wide-mixed-r17-fresh-failures.json) · [Frozen localization](evidence/bottle-size-A/wide-mixed-r17-frozen-localization.json)
 

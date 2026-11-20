@@ -111,7 +111,7 @@ def main():
     parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b",
                                           "wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10",
                                           "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12","wide-mixed-r13",
-                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17"),
+                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -213,8 +213,9 @@ def main():
         report.update(cup_startup_replay_sha256=sha(replay), development_cases=dev,
                       frozen_checkpoints=len(plan["checkpoints"]),
                       controller_test_log_sha256=sha(STUDY/"controller-tests.log"))
-    if STUDY.name == "wide-mixed-r17":
-        parent = read(ROOT/"wide-mixed-r16/geometry.json")
+    if STUDY.name in ("wide-mixed-r17", "wide-mixed-r18"):
+        parent_name = "wide-mixed-r17" if STUDY.name == "wide-mixed-r18" else "wide-mixed-r16"
+        parent = read(ROOT/parent_name/"geometry.json")
         assert parent["sources"] == geometry["sources"]
         for filename in ("stream-fit.json", "frozen-localization.json"):
             path = STUDY/filename

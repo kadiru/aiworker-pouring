@@ -75,14 +75,14 @@ def fit_grasp(target):
                 six_vote_window=window, ablation_controls=controls, cases=audits)
 
 
-def verified_record(target):
-    for manifest in sorted(PARENT.glob("test-*-recording-archives.json")):
+def verified_record(target, parent=PARENT, study=STUDY):
+    for manifest in sorted(parent.glob("test-*-recording-archives.json")):
         data = read(manifest)
         for entry in data["records"]:
             if Path(entry["source"]).parent != Path(target["path"]):
                 continue
             assert data["complete"] and data["report_sha256"] == sha(str(manifest).replace("recording-archives","results"))
-            p = STUDY/"inputs"/Path(entry["archive"]).name
+            p = study/"inputs"/Path(entry["archive"]).name
             return dict(entry, archive=str(HOST / p.relative_to("/workspace")))
     raise ValueError(target["name"])
 

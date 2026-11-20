@@ -1446,3 +1446,25 @@ python3 run_sized_autonomy.py --study wide-mixed-r17 --part development --label 
 From the Mac project checkout, run `.venv/bin/python -u tools/run_wide_mixed_r15.py --study wide-mixed-r17`. It checks development, runs the fresh pairs and verifies the decompressed native recording hash before releasing any Ubuntu original. After closure, run `python3 audit_startup_localization.py wide-mixed-r17` in the Ubuntu study root.
 
 The fresh run closed November 19 Pacific time with 29/30 strict zero-spill passes. All 30 transferred liquid, reached the intended stop and completed the return. Normal layouts passed 15/15 and swapped layouts 14/15. Near-full targets passed 15/15 and empty targets 14/15. Fresh swapped 05 confirmed the first lift and stopped at 94.42% of rim height. On the fresh empty targets, normal 05 and swapped 10 and 14 retained every particle. Swapped 02 lost two particles, both first seen outside the vessels at 24.705 simulated seconds and 126.43° during coarse pouring. All seven tall empty targets confirmed in 0.90 simulated seconds or less after depletion. Localization confirmed both vessels 30/30, with a maximum declared cup-position error of 2.40 mm. Fresh evaluation took 6.82 elapsed GPU-job hours. Personal effort was unmeasured. The 34 development and test recordings passed their native-content hash checks. [Completion](../evidence/bottle-size-A/wide-mixed-r17-completion.json) · [Localization](../evidence/bottle-size-A/wide-mixed-r17-fresh-startup.json) · [Particle traces](../evidence/bottle-size-A/wide-mixed-r17-fresh-failures.json)
+
+### Revision 18 late-tilt repair for swapped 02
+
+Two particles in revision 17 first appeared in flight at 126.43° and were next observed moving outward above the 26.4 mm rim radius. A CUDA grid search on the RTX 4070 evaluated 568 terminal poses including the incumbent. It used 1,264 incoming particle tracks in three archived pours, the two recorded exits, and 1,348 incoming tracks in three separate validation pours. The selection first required a projected radial clearance of 1.5 mm and minimized terminal displacement among candidates that achieved it. The chosen pose starts at 124° and finishes at 127°. Its offset changes from +1 to −8 mm and lowering from 6 to 8 mm. The projected rim ratio fell from 1.38 to 0.93 for both escaping particles. This ballistic approximation was tested with new Isaac Sim pours.
+
+One field changed in the shared 02 checkpoint. The other 13 checkpoints, all trained tensor values, grasp confirmation, localization and stop logic were frozen. All 32 paths passed geometry screening. The targeted swapped 02 and normal 02 pours each grasped, transferred liquid, reached the intended stop and completed return and release with zero measured spill. The normal near-full trial settled at 93.71% of rim height.
+
+Use the Ubuntu study root and the same Isaac Sim image, assets, source tree, isolated launcher and storage guard as revision 17. Stage the tracked helpers from this checkout and the verified Mac archive for revision 17 swapped 02 under the study inputs. In a new study directory run the following commands.
+
+```sh
+mkdir -p wide-mixed-r18/inputs
+cp -a wide-mixed-r17/src wide-mixed-r18/src
+sed s/wide-mixed-r17/wide-mixed-r18/ wide_mixed_r17_checks.py > wide_mixed_r18_checks.py
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r18.py --label wide-r18-fit --seconds 1800 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r18.py --label wide-r18-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r18_checks.py --label wide-r18-checks --seconds 600 --minimum-free-gib 1
+cp wide-r18-checks/run.log wide-mixed-r18/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r18-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r18
+python3 run_sized_autonomy.py --study wide-mixed-r18 --part development --label wide-r18-dev --seconds 7200
+```
+
+On the Mac, run `.venv/bin/python -u tools/run_wide_mixed_r15.py --study wide-mixed-r18` from the checkout after both targeted pours pass. The sealed evaluation uses one trial per recording batch to respect available storage and the live 3 GiB reserve. Run `python3 audit_startup_localization.py wide-mixed-r18` in the Ubuntu study root after closure.
