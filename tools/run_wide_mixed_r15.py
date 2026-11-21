@@ -75,7 +75,7 @@ import sys
 from close_wide_mixed_autonomy import sha
 p = Path(sys.argv[1])
 study = sys.argv[3]
-assert study in ('wide-mixed-r15', 'wide-mixed-r16', 'wide-mixed-r17', 'wide-mixed-r18')
+assert study in ('wide-mixed-r15', 'wide-mixed-r16', 'wide-mixed-r17', 'wide-mixed-r18', 'wide-mixed-r19')
 assert p.parent == Path('/dev/shm/aiworker-pouring-' + study.rsplit('-', 1)[1])
 assert p.name.startswith('SA_A_' + study.replace('-', '_') + '_')
 assert p.resolve() == p and p.name.endswith('.hdf5.zst')
@@ -89,7 +89,7 @@ if p.exists():
 def main():
     global STUDY, DATA, STAGING
     parser = argparse.ArgumentParser()
-    parser.add_argument("--study", choices=("wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18"), default=STUDY)
+    parser.add_argument("--study", choices=("wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18", "wide-mixed-r19"), default=STUDY)
     STUDY = parser.parse_args().study
     revision = STUDY.rsplit("-", 1)[1]
     DATA = PROJECT / "data" / STUDY

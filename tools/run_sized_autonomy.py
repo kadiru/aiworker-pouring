@@ -185,7 +185,7 @@ def main():
                                           "wide-mixed-r4","wide-mixed-r5","wide-mixed-r6","wide-mixed-r7",
                                           "wide-mixed-r7b","wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b",
                                           "wide-mixed-r10","wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12",
-                                          "wide-mixed-r13","wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18"),
+                                          "wide-mixed-r13","wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18", "wide-mixed-r19"),
                         default="sized-autonomy")
     args=parser.parse_args()
     assert args.part=="test" or args.shard is None
@@ -200,7 +200,7 @@ def main():
         study = ROOT/args.study
         plan = read(study/"plan.json")
         study_local = plan.get("study_local_recordings", False)
-        use_shared = args.study in ("wide-mixed-r15","wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18") or args.shard in plan.get("shared_recording_shards", ())
+        use_shared = args.study in ("wide-mixed-r15","wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18", "wide-mixed-r19") or args.shard in plan.get("shared_recording_shards", ())
         output_root = study/"recordings" if study_local and not use_shared else OUTPUT
         live_storage_floor = 0
         if "storage_recording_upper_bytes" in plan:
@@ -222,7 +222,14 @@ def main():
                     if shutil.disk_usage(study).free < 7*1024**3 + count*largest:
                         use_shared = True
                         output_root = OUTPUT
-                live_storage_floor = (3 if use_shared else 7)*1024**3
+                system_floor_gib = 7
+                if args.study == "wide-mixed-r19":
+                    # Use the newly vacated archive space for bounded batches.
+                    # Fall back to the recording partition only if it can hold the batch.
+                    system_floor_gib = 4
+                    use_shared = shutil.disk_usage(study).free < system_floor_gib*1024**3 + count*largest
+                    output_root = OUTPUT if use_shared else study/"recordings"
+                live_storage_floor = (3 if use_shared else system_floor_gib)*1024**3
                 if use_shared:
                     minimum_free_gib = (live_storage_floor + count*largest)/1024**3
                 else:
