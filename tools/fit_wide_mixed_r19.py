@@ -75,8 +75,8 @@ def fit_motion(key):
                 candidates=len(grid),rim_ratios=ratios[[0,best]].tolist(),cases=audits),observed
 
 
-def neck_rows():
-    with h5py.File(STUDY/"inputs/neck-startup.h5") as archive:
+def neck_rows(study=STUDY):
+    with h5py.File(study/"inputs/neck-startup.h5") as archive:
         for name,g in archive.items():
             revision,key=name.removeprefix("SA_A_wide_mixed_").split("_test_")
             c=sample("wide-mixed-"+revision,key)

@@ -16,6 +16,34 @@ from prepare_wide_mixed_r17 import identical
 TARGETS=("01_normal","06_swap","12_swap")
 
 
+def seal_layouts(plan,parents,replacements,targets,prefix,layout_seed,trial_seed,shard_size,scope):
+    def candidate(key):
+        spec=copy.deepcopy(parents[key])
+        spec["checkpoint"]=replacements.get(spec["checkpoint"],spec["checkpoint"])
+        return spec
+
+    rng=np.random.default_rng(layout_seed)
+    displacements=rng.uniform(.0011,.0025,(15,2,2))*rng.choice((-1.,1.),(15,2,2))
+    fresh=[]
+    for i,key in enumerate(parents):
+        spec=candidate(key)
+        offsets=displacements[spec["pair_index"]]
+        shift(spec,*(offsets[::-1] if spec["swapped"] else offsets))
+        spec.update(name=prefix+"_test_"+key,seed=trial_seed+i)
+        fresh.append(spec)
+    dev=[]
+    for i,key in enumerate(targets):
+        spec=candidate(key)
+        spec.update(name=prefix+"_development_"+key,seed=trial_seed+100+i,study_split="development")
+        dev.append(spec)
+    assert len(fresh)==30 and sum(s["swapped"] for s in fresh)==15
+    assert set(plan["checkpoints"])=={s["checkpoint"] for s in fresh}
+    plan.update(development=dev,test=fresh,test_shards=[[s["name"] for s in fresh[i:i+shard_size]] for i in range(0,30,shard_size)],
+                shared_recording_shards=[],development_empty_lag_cases=[],
+                development_requires_strict_zero=True,development_recording_upper_bytes=plan["storage_recording_upper_bytes"],
+                controller_scope=scope)
+
+
 def main():
     torch.set_num_threads(2)
     plan=read(PARENT/"plan.json")
@@ -56,38 +84,15 @@ def main():
     save(STUDY/"frozen-controller.json",dict(passed=True,runtime_sources=sources,changed=proofs,
         unchanged_checkpoints=len(plan["checkpoints"])-len(proofs),parent_plan_sha256=sha(PARENT/"plan.json")))
 
-    def candidate(key):
-        spec=copy.deepcopy(parents[key])
-        spec["checkpoint"]=replacements.get(spec["checkpoint"],spec["checkpoint"])
-        return spec
-
-    rng=np.random.default_rng(2611201900)
-    displacements=rng.uniform(.0011,.0025,(15,2,2))*rng.choice((-1.,1.),(15,2,2))
-    fresh=[]
-    for i,key in enumerate(parents):
-        spec=candidate(key)
-        offsets=displacements[spec["pair_index"]]
-        shift(spec,*(offsets[::-1] if spec["swapped"] else offsets))
-        spec.update(name="SA_A_wide_mixed_r19_test_"+key,seed=2611209700+i)
-        fresh.append(spec)
-    dev=[]
-    for i,key in enumerate(TARGETS):
-        spec=candidate(key)
-        spec.update(name="SA_A_wide_mixed_r19_development_"+key,seed=2611209800+i,study_split="development")
-        dev.append(spec)
-    assert len(fresh)==30 and sum(s["swapped"] for s in fresh)==15
-    assert set(plan["checkpoints"])=={s["checkpoint"] for s in fresh}
-    plan.update(development=dev,test=fresh,test_shards=[[s["name"]] for s in fresh],
-                shared_recording_shards=[],development_empty_lag_cases=[],
-                development_requires_strict_zero=True,development_recording_upper_bytes=plan["storage_recording_upper_bytes"],
-                controller_scope="Geometry-specific startup neck fallback and two phase-local pouring trajectories")
+    seal_layouts(plan,parents,replacements,TARGETS,"SA_A_wide_mixed_r19",2611201900,2611209700,1,
+                 "Geometry-specific startup neck fallback and two phase-local pouring trajectories")
     for p in (PARENT/"plan.json",PARENT/"completion.json",STUDY/"neck-replay.json",STUDY/"stream-fit.json",
               STUDY/"spill-trace.json",STUDY/"frozen-controller.json"):
         plan["prerequisite_reports"][str(p)]=sha(p)
     for name in ("calibration.json","empty-replay.json"):
         shutil.copy2(PARENT/name,STUDY/name)
     save(STUDY/"plan.json",plan)
-    print("Sealed",len(dev),"development and",len(fresh),"fresh cases",flush=True)
+    print("Sealed",len(plan["development"]),"development and",len(plan["test"]),"fresh cases",flush=True)
 
 
 if __name__=="__main__":

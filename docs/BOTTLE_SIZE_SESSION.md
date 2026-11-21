@@ -1496,3 +1496,29 @@ After all three targeted pours pass, run `.venv/bin/python -u tools/run_wide_mix
 The 24 revision 13b archives previously on the system disk are in data/wide-mixed-r13b on the Mac. The immutable batch receipts still contain the original Ubuntu paths. From the Mac checkout run `.venv/bin/python tools/restore_r13b_archives.py` to verify all copies or add `--restore ARCHIVE_BASENAME` to restore one at its recorded path. A byte-verified round trip was completed before releasing the 2,301,361,893 archived bytes. [Restore inventory](../evidence/bottle-size-A/wide-mixed-r13b-mac-offload.json)
 
 Revision 19 closed on November 21 Pacific time with 26/30 strict passes, following 27/30 on different placements in revision 18. All 15 near-full trials and 11/15 empty targets passed. Of 28 actual pours, 26 spilled nothing and all 28 reached the intended stop and completed the return. Normal 01 and swapped 06 each delivered 28.00 mL without loss. Normal 01 used the new fallback in development and the primary detector on the fresh placement. Fresh swapped 12 and 14 confirmed the cup but failed to confirm the bottle within 2.05 simulated seconds and transferred 0 mL. Normal 11 and 13 each lost two particles during coarse pouring at 121.87° and 119.09°, respectively. Both 02 placements passed. All seven tall empty trials confirmed depletion within 1.10 simulated seconds. The 30 frozen RTX 4070 test batches took 6.33 elapsed evaluation hours. Personal working time was unmeasured. All 33 development and fresh recordings passed their native-content hash checks. [Audit](../evidence/bottle-size-A/wide-mixed-r19-completion.json) · [Startup readback](../evidence/bottle-size-A/wide-mixed-r19-fresh-startup.json) · [Particle traces and failed detections](../evidence/bottle-size-A/wide-mixed-r19-fresh-failures.json)
+
+## Revision 20 · Bottle confirmation and mid-pour spill
+
+In revision 19, swapped 12 and 14 timed out before grasp. Normal 11 and 13 reached the intended empty stop but each lost two simulated particles. The first losses appeared at 121.87° and 119.09° of bottle tilt. Their recordings supply development evidence for this revision.
+
+For each affected bottle detector, four startup frames from each of two previous trials supplied eight neck-outline templates. These complement the existing RGB proposal and refinement templates. Across 24 archived startup sequences, the two revised checkpoints found the bottle in all 72 original or translated views and rejected all 24 bottle-erased sequences. Maximum planar errors against the simulated fixture were 0.72 mm for the swapped 12 checkpoint and 0.62 mm for the swapped 14 checkpoint. The 72 views include the template-source sequences and translated versions of the same recordings. They measure replay robustness. [Neck replay](../evidence/bottle-size-A/wide-mixed-r20-neck-replay.json)
+
+For each spill, 321 bottle-mouth trajectories were scored on particle tracks from three archived pours and checked on three additional archived pours. The fit changes the mouth height and horizontal offset during coarse pouring and restores its prior terminal pose. Both profiles reduced the projected escape radius of each lost particle by at least 1 mm. The fitted projection still places both normal 11 particles beyond the rim. Only a live fluid run establishes whether they stay in the cup. All 141 runtime sources and ten of fourteen checkpoints retain their previous hashes. [Trajectory fit](../evidence/bottle-size-A/wide-mixed-r20-stream-fit.json) · [Checkpoint changes](../evidence/bottle-size-A/wide-mixed-r20-frozen-controller.json)
+
+To reproduce, run the extraction command in the Mac checkout. On Ubuntu, stage the tracked helpers in the study root listed under revision 19. Copy wide-mixed-r19/src to wide-mixed-r20/src in a new study directory and place the extracted neck-startup.h5 and verified revision 19 compressed HDF5 recordings for normal 11 and 13 under wide-mixed-r20/inputs. Keep the training and validation archives used by fit_wide_mixed_r14_stream.py available. The plan records all asset, runtime and checkpoint prerequisites.
+
+```sh
+# Mac
+.venv/bin/python tools/extract_r19_neck.py --study wide-mixed-r20
+
+# Ubuntu study root
+sed s/wide-mixed-r19/wide-mixed-r20/ wide_mixed_r19_checks.py > wide_mixed_r20_checks.py
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r20.py --label wide-r20-fit --seconds 1800 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r20.py --label wide-r20-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r20_checks.py --label wide-r20-checks --seconds 600 --minimum-free-gib 1
+cp wide-r20-checks/run.log wide-mixed-r20/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r20-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r20
+python3 run_sized_autonomy.py --study wide-mixed-r20 --part development --label wide-r20-dev --seconds 7200
+```
+
+The four development pours use the exact failed placements and new episode seeds. The sealed fresh benchmark has 15 normal and 15 swapped placements, with independent bottle and cup offsets for each matched pair. Each horizontal coordinate changes by 1.1–2.5 mm relative to the previous wide layout. The launcher requires four strict development passes before admitting any fresh trial. Native recordings go to the dedicated Ubuntu robot-training partition. [Sealed study plan](../evidence/bottle-size-A/wide-mixed-r20-plan.json)

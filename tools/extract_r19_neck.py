@@ -1,4 +1,5 @@
 """Extract losslessly recorded startup task views for the affected geometry on the Mac."""
+import argparse
 import json
 from pathlib import Path
 import subprocess
@@ -12,15 +13,21 @@ PROJECT=Path(__file__).resolve().parents[1]
 
 
 def main():
-    dest=PROJECT/"data/wide-mixed-r19"
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--study",choices=("wide-mixed-r19","wide-mixed-r20"),default="wide-mixed-r19")
+    study_id=parser.parse_args().study
+    latest=19 if study_id=="wide-mixed-r20" else 18
+    pairs={0,12,14} if study_id=="wide-mixed-r20" else {1}
+    dest=PROJECT/"data"/study_id
     dest.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(dir=dest) as work,h5py.File(dest/"neck-startup.partial","w") as out:
         raw=Path(work)/"episode.hdf5"
-        for study in ("wide-mixed-r15","wide-mixed-r16","wide-mixed-r17","wide-mixed-r18"):
+        for revision in range(latest-3,latest+1):
+            study=f"wide-mixed-r{revision}"
             report=PROJECT/"evidence/bottle-size-A"/(study+"-completion.json")
             cases=json.loads(report.read_text())["test_cases"]
             for case in cases:
-                if case["pair_index"]!=1:
+                if case["pair_index"] not in pairs:
                     continue
                 archive=PROJECT/"data"/study/(case["name"]+".hdf5.zst")
                 subprocess.run(["zstd","-qd","-f","-o",str(raw),"--",str(archive)],check=True)
