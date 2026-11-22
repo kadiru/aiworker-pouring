@@ -1524,3 +1524,17 @@ python3 run_sized_autonomy.py --study wide-mixed-r20 --part development --label 
 The four development pours use the exact failed placements and new episode seeds. The sealed fresh benchmark has 15 normal and 15 swapped placements, with independent bottle and cup offsets for each matched pair. Each horizontal coordinate changes by 1.1–2.5 mm relative to the previous wide layout. The launcher requires four strict development passes before admitting any fresh trial. Native recordings go to the dedicated Ubuntu robot-training partition. [Sealed study plan](../evidence/bottle-size-A/wide-mixed-r20-plan.json)
 
 All 34 placements passed the geometry screen. The first screen attempt ran out of system disk space during output. Its partial log was preserved and the complete screen ran again under label wide-r20-geometry-b with the same plan. All four development pours reached the intended empty stop and completed their return. Each delivered 28.00 mL and lost zero particles. All four native recording hashes verified. Development took 47.9 elapsed minutes. [Geometry](../evidence/bottle-size-A/wide-mixed-r20-geometry.json) · [Targeted outcomes](../evidence/bottle-size-A/wide-mixed-r20-development-results.json)
+
+After the four strict passes, run the following in the Ubuntu study root. Each simulator launch checks the development report against the sealed plan. Closure rehashes native HDF5 recordings and verifies all trials in their declared order.
+
+```sh
+set -e
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r20 --part test --shard "$shard" --label "wide-r20-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r20
+python3 audit_wide_mixed_failures.py wide-mixed-r20
+python3 audit_startup_localization.py wide-mixed-r20
+```
+
+Revision 20 closed on November 21, 2026 Pacific time. The frozen controller passed 27/30 fresh Isaac Sim trials, including all four repaired layouts. Each repaired layout again delivered 28.00 mL and stopped on empty with zero loss. The batch scored 13/15 normal, 14/15 swapped, 14/15 near-full and 13/15 empty. Normal 01 and 10 confirmed the cup but timed out waiting for the bottle, before grasp. Swapped 08 lost two particles during coarse pouring at 129.16°. Those three cases used previously unchanged checkpoints. All 28 actual pours reached the intended stop and returned the bottle. Two particles represent 0.011664 mL at the configured quantum. The fresh batches used 6.21 elapsed evaluation hours on the guarded RTX 4070. The four targeted and 30 fresh native HDF5 files total 6,713,985,307 bytes. Their original-content hashes verified on the Ubuntu robot-training partition. Personal working time was unmeasured. [Fresh results](../evidence/bottle-size-A/wide-mixed-r20-completion.json) · [Startup observations](../evidence/bottle-size-A/wide-mixed-r20-fresh-startup.json) · [Failure details](../evidence/bottle-size-A/wide-mixed-r20-fresh-failures.json)
