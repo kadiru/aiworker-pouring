@@ -144,6 +144,30 @@ def r11_archives():
     return archive
 
 
+def train_epoch(model, optimizer, images, uv, present, rng, xx, yy):
+    for ids in torch.randperm(len(images),device="cuda").split(16):
+        dx,dy = rng.integers(-10,11,size=2)
+        x = F.pad(images[ids].permute(0,3,1,2),(10,10,10,10),value=180)
+        x = x[:,:,10-dy:394-dy,10-dx:394-dx].permute(0,2,3,1).float()
+        x = (x*(.86+.28*torch.rand(len(x),1,1,1,device="cuda"))).clamp(0,255)
+        u = uv[ids]+uv.new_tensor([dx,dy])
+        has = present[ids]
+        cell = (u/4).floor().long()
+        gaussian = torch.exp(-((xx-cell[:,0,None,None]).square()+(yy-cell[:,1,None,None]).square())/4.5)*has[:,None,None]
+        output = model(x)
+        logits = output[:,0]
+        probability = logits.sigmoid()
+        pos = gaussian == 1
+        heat = (-(1-probability).square()*F.logsigmoid(logits)*pos
+                -probability.square()*F.logsigmoid(-logits)*(1-gaussian)**4*~pos).sum()/has.sum().clamp_min(1)
+        offset = output[torch.arange(len(x),device="cuda"),1:,cell[:,1],cell[:,0]].sigmoid()
+        offset_loss = F.smooth_l1_loss(offset[has],(u/4-cell)[has]) if has.any() else output.sum()*0
+        optimizer.zero_grad()
+        (heat+3*offset_loss).backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(),5.)
+        optimizer.step()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--study", choices=("wide-mixed-r7","wide-mixed-r8","wide-mixed-r10","wide-mixed-r10b",
@@ -202,27 +226,7 @@ def main():
         model.train()
         if epoch in (31,46):
             optimizer.param_groups[0]["lr"] /= 2.
-        for ids in torch.randperm(len(images),device="cuda").split(16):
-            dx,dy = rng.integers(-10,11,size=2)
-            x = F.pad(images[ids].permute(0,3,1,2),(10,10,10,10),value=180)
-            x = x[:,:,10-dy:394-dy,10-dx:394-dx].permute(0,2,3,1).float()
-            x = (x*(.86+.28*torch.rand(len(x),1,1,1,device="cuda"))).clamp(0,255)
-            u = uv[ids]+uv.new_tensor([dx,dy])
-            has = present[ids]
-            cell = (u/4).floor().long()
-            gaussian = torch.exp(-((xx-cell[:,0,None,None]).square()+(yy-cell[:,1,None,None]).square())/4.5)*has[:,None,None]
-            output = model(x)
-            logits = output[:,0]
-            probability = logits.sigmoid()
-            pos = gaussian == 1
-            heat = (-(1-probability).square()*F.logsigmoid(logits)*pos
-                    -probability.square()*F.logsigmoid(-logits)*(1-gaussian)**4*~pos).sum()/has.sum().clamp_min(1)
-            offset = output[torch.arange(len(x),device="cuda"),1:,cell[:,1],cell[:,0]].sigmoid()
-            offset_loss = F.smooth_l1_loss(offset[has],(u/4-cell)[has]) if has.any() else output.sum()*0
-            optimizer.zero_grad()
-            (heat+3*offset_loss).backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(),5.)
-            optimizer.step()
+        train_epoch(model, optimizer, images, uv, present, rng, xx, yy)
         if epoch not in (15, 30, 45, 60):
             continue
         model.eval()

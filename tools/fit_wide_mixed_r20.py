@@ -24,8 +24,8 @@ NECK = ("12_swap", "14_swap")
 MOTION = ("11_normal", "13_normal")
 
 
-def state_for(key):
-    case = sample(PARENT.name, key)
+def state_for(key, parent=PARENT):
+    case = sample(parent.name, key)
     path = read(folder(case)/"parameters.json")["checkpoint"]
     assert sha(path) == case["checkpoint_sha256"]
     return path, torch.load(path, map_location="cpu", weights_only=False)
@@ -38,16 +38,24 @@ def add_refinement(state, bank):
 
 
 @torch.inference_mode()
-def fit_neck(key, rows):
-    path, state = state_for(key)
-    target = next(r for r in rows if r["name"].endswith("r19_test_"+key))
+def fit_neck(key, rows, parent=PARENT, study=STUDY, template_revisions=("r18", "r19"), proposal=None):
+    path, state = state_for(key, parent)
+    target = next(r for r in rows if r["name"].endswith(parent.name.rsplit("-",1)[1]+"_test_"+key))
     assert replay(target["frames"], state)[0] is None
     indices = (0, 3, 6, 9)
-    templates = [r for r in rows if any(r["name"].endswith(rev+"_test_"+key) for rev in ("r18","r19"))]
+    templates = [r for r in rows if any(r["name"].endswith(rev+"_test_"+key) for rev in template_revisions)]
     bank = make_bank([r["frames"][i] for r in templates for i in indices],
                      [r["uv"] for r in templates for i in indices],
                      "source", aggregation="max", gradient_clip=.04, source_mask_box=(10,7,38,39))
-    candidate = add_refinement(state, bank)
+    field = "source_heatmap"
+    if proposal is None:
+        candidate = add_refinement(state, bank)
+    else:
+        field = "source_heatmap_fallback"
+        assert state.get(field) is None
+        primary = state["source_heatmap"]
+        bank = {**primary, "proposal": proposal, "refinement": bank}
+        candidate = dict(state, source_heatmap_fallback=bank)
     records = []
     for row in rows:
         for dx, dy in ((0,0),(-4,3),(3,-4)):
@@ -63,10 +71,10 @@ def fit_neck(key, rows):
         records.append(dict(name=row["name"],shift="erased",parent_accept=parent_hit,candidate_accept=candidate_hit))
     failures = [r for r in records if (r["candidate_accept"] if r["shift"]=="erased" else
                                          r["error_mm"] is None or r["error_mm"]>2.5)]
-    artifact = STUDY/("neck-"+key+".pt")
+    artifact = study/("neck-"+key+".pt")
     torch.save(bank,artifact)
     print(key,"neck replay failures",failures,flush=True)
-    return dict(passed=not failures,checkpoint=path,bank_sha256=sha(artifact),
+    return dict(passed=not failures,checkpoint=path,bank_sha256=sha(artifact),field=field,
                 template_trials=[r["name"] for r in templates],template_indices=indices,
                 trials={r["name"]:r["recording_sha256"] for r in rows},cases=records)
 

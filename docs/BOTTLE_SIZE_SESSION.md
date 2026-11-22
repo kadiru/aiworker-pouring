@@ -1538,3 +1538,33 @@ python3 audit_startup_localization.py wide-mixed-r20
 ```
 
 Revision 20 closed on November 21, 2026 Pacific time. The frozen controller passed 27/30 fresh Isaac Sim trials, including all four repaired layouts. Each repaired layout again delivered 28.00 mL and stopped on empty with zero loss. The batch scored 13/15 normal, 14/15 swapped, 14/15 near-full and 13/15 empty. Normal 01 and 10 confirmed the cup but timed out waiting for the bottle, before grasp. Swapped 08 lost two particles during coarse pouring at 129.16°. Those three cases used previously unchanged checkpoints. All 28 actual pours reached the intended stop and returned the bottle. Two particles represent 0.011664 mL at the configured quantum. The fresh batches used 6.21 elapsed evaluation hours on the guarded RTX 4070. The four targeted and 30 fresh native HDF5 files total 6,713,985,307 bytes. Their original-content hashes verified on the Ubuntu robot-training partition. Personal working time was unmeasured. [Fresh results](../evidence/bottle-size-A/wide-mixed-r20-completion.json) · [Startup observations](../evidence/bottle-size-A/wide-mixed-r20-fresh-startup.json) · [Failure details](../evidence/bottle-size-A/wide-mixed-r20-fresh-failures.json)
+
+## Revision 21 · Two bottle detections and a late-pour rebound
+
+The revision 20 recordings for normal 01 and 10 both ended before grasp, after 2.05 seconds without a confirmed bottle. For normal 01, eight new bottle-neck outline templates augment the primary RGB detector. For normal 10, an outline-only change still missed the original and translated views. A fallback convolutional heatmap detector was fine-tuned on the 4070 for 24 epochs using 56 positive images and 28 bottle-erased negatives from four normal/swapped trials. It uses AdamW at 0.0002, a focal heatmap objective, and a smooth L1 subpixel offset objective. Both detectors retain the existing confidence, outline-agreement, and temporal confirmation thresholds. The final candidates localized all 60 native or translated views from 20 archived sequences within 0.98 mm and rejected all 20 erased-bottle sequences. Replay includes the template and training sequences. Revisions 16–18 were held out of fitting. [Replay and split](../evidence/bottle-size-A/wide-mixed-r21-neck-replay.json)
+
+Swapped 08 lost two particles at 129.16° of tilt. Both rebounded outward with about 0.67 m/s horizontal velocity. Three archived pours supplied particle tracks for scoring 85 terminal mouth trajectories. Three separate pours checked the selected profile. Between 126° and 129°, the controller blends toward a final horizontal offset of −12 mm and a 9 mm drop relative to the nominal mouth path. This reduces the projected rebound range, but the predicted rebound still crosses the rim. Live pours measure the actual result. The source, grasp, stop and return code hashes match revision 20. [Trajectory fit](../evidence/bottle-size-A/wide-mixed-r21-stream-fit.json) · [Changed checkpoint fields](../evidence/bottle-size-A/wide-mixed-r21-frozen-controller.json)
+
+To reproduce, run the extractor on the Mac checkout, then copy data/wide-mixed-r21/neck-startup.h5 into wide-mixed-r21/inputs in the Ubuntu study root. Copy wide-mixed-r20/src to wide-mixed-r21/src, retain the revision 20 native recordings on the training partition, and stage the tracked helper scripts in the study root. The final fit includes the archived stream constraint and the trained normal 10 fallback. The plan fixes all three targeted placements and 15 fresh normal/swapped pairs before simulation. Each fresh vessel coordinate is displaced 1.1–2.5 mm from its previous wide placement. [Sealed plan](../evidence/bottle-size-A/wide-mixed-r21-plan.json)
+
+```sh
+# Mac checkout
+.venv/bin/python tools/extract_r19_neck.py --study wide-mixed-r21
+
+# Ubuntu study root
+set -e
+sed s/wide-mixed-r20/wide-mixed-r21/ wide_mixed_r20_checks.py > wide_mixed_r21_checks.py
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r21.py --label wide-r21-fit-b --seconds 2400 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r21.py --label wide-r21-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r21_checks.py --label wide-r21-checks --seconds 600 --minimum-free-gib 1
+cp wide-r21-checks/run.log wide-mixed-r21/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r21-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r21
+python3 run_sized_autonomy.py --study wide-mixed-r21 --part development --label wide-r21-dev --seconds 7200
+# Every fresh launch verifies that all three targeted pours were strict passes.
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r21 --part test --shard "$shard" --label "wide-r21-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r21
+python3 audit_wide_mixed_failures.py wide-mixed-r21
+python3 audit_startup_localization.py wide-mixed-r21
+```
