@@ -1568,3 +1568,5 @@ python3 close_wide_mixed_autonomy.py --study wide-mixed-r21
 python3 audit_wide_mixed_failures.py wide-mixed-r21
 python3 audit_startup_localization.py wide-mixed-r21
 ```
+
+All 33 planned placements passed the revised screen. All three targeted fluid trials passed on November 22 Pacific time. Normal 01 and swapped 08 each transferred 28.00 mL and stopped on empty. Normal 10 transferred 26.93 mL and stopped at 91.81% of measured rim height. All three verified the grasp, returned the bottle and recorded zero lost particles. The three native recordings verified before fresh testing. Elapsed evaluation time was 39.4 minutes. [Targeted outcomes](../evidence/bottle-size-A/wide-mixed-r21-development-results.json) · [Geometry](../evidence/bottle-size-A/wide-mixed-r21-geometry.json)

@@ -1,10 +1,10 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 21, 2026 (America/Los_Angeles).
+Updated: November 22, 2026 (America/Los_Angeles).
 
 For the illustrated pouring cycle, control architecture, study comparisons and a runnable offline example, start with the [project guide](README.md).
 
-**Revision 21 passed archived replay and has frozen its three targeted placements.** Normal 01 uses new bottle-neck outlines and normal 10 a supervised RGB fallback. The two detectors localized all 60 replay views and rejected all 20 bottle-erased controls. Swapped 08 uses a revised terminal bottle-mouth path. Its projected rebound still crosses the rim, so live fluid tests determine success. Fresh evaluation requires three strict, spill-free targeted pours. [Study and commands](docs/BOTTLE_SIZE_SESSION.md) · [Frozen plan](evidence/bottle-size-A/wide-mixed-r21-plan.json)
+**Revision 21 passed all three targeted simulated pours on the RTX 4070.** Normal 01 and swapped 08 each delivered 28.00 mL and stopped on empty. Normal 10 delivered 26.93 mL and stopped at 91.81% of cup rim height. All three returned the bottle and lost zero particles. The three targeted runs took 39.4 elapsed minutes. All 33 planned placements passed the corrected geometry screen. The 30 fresh tests are underway. [Targeted results](evidence/bottle-size-A/wide-mixed-r21-development-results.json) · [Geometry](evidence/bottle-size-A/wide-mixed-r21-geometry.json)
 
 **Revision 20 scored 27/30 strict zero-spill passes in fresh Isaac Sim tests on the RTX 4070.** Swapped 12 and 14 and normal 11 and 13 passed both on their original placements and on fresh placements. All 28 actual pours reached their intended stop and completed the return. Of these, 27 spilled nothing. Normal 01 and 10 located the cup but failed bottle confirmation before grasp. Swapped 08 lost two particles at 129.16° of tilt. Fresh evaluation took 6.21 elapsed hours. All 34 native recordings verified on Ubuntu’s robot-training partition. Next, replay those two startup failures and the late coarse-pour escape before changing further checkpoints. [Fresh outcomes](evidence/bottle-size-A/wide-mixed-r20-completion.json) · [Failure traces](evidence/bottle-size-A/wide-mixed-r20-fresh-failures.json) · [Targeted outcomes](evidence/bottle-size-A/wide-mixed-r20-development-results.json)
 
