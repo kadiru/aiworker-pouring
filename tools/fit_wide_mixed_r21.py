@@ -12,6 +12,7 @@ PARENT = ROOT / "wide-mixed-r20"
 STUDY = ROOT / "wide-mixed-r21"
 sys.path.insert(0, str(STUDY / "src"))
 
+from pour_wide_motion import MAX_TAIL_DROP_M
 from fit_wide_mixed_r20 import fit_neck, state_for
 from fit_wide_mixed_r19 import neck_rows
 from fit_wide_mixed_r14_stream import TRAIN, HOLDOUT, sample, scores, trace
@@ -58,7 +59,8 @@ def fit_terminal(key):
     # Vary only the final approach to full tilt, where the two droplets rebounded.
     candidates = [(*coarse, on, off, offset / 1000., down / 1000.)
                   for (on, off), offset, down in product(((122., 126.), (124., 128.), (126., 129.)),
-                                                        (-4, -6, -8, -10, -12, -14, -16), (3, 5, 7, 9))]
+                                                        (-4, -6, -8, -10), (3, 5, 7, 8))
+                  if down / 1000. <= MAX_TAIL_DROP_M]
     grid = torch.tensor([parent, *candidates], device="cuda", dtype=torch.float64)
     rebounds = []
     for particle in observed["particles"].values():
