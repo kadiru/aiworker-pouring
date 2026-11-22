@@ -1572,3 +1572,33 @@ python3 audit_startup_localization.py wide-mixed-r21
 All 33 planned placements passed the revised screen. All three targeted fluid trials passed on November 22 Pacific time. Normal 01 and swapped 08 each transferred 28.00 mL and stopped on empty. Normal 10 transferred 26.93 mL and stopped at 91.81% of measured rim height. All three verified the grasp, returned the bottle and recorded zero lost particles. The three native recordings verified before fresh testing. Elapsed evaluation time was 39.4 minutes. [Targeted outcomes](../evidence/bottle-size-A/wide-mixed-r21-development-results.json) · [Geometry](../evidence/bottle-size-A/wide-mixed-r21-geometry.json)
 
 The 30 fresh Isaac Sim tests closed at 06:59 Pacific time on November 22, 2026. Of 30 attempts, 29 grasped, poured, reached the intended stop and returned. All 29 actual pours lost zero particles. Normal 12 confirmed the bottle but lacked a cup confirmation after 2.05 simulated seconds. It transferred 0 mL. Strict success was 14/15 normal and 15/15 swapped, with 15/15 empty and 14/15 near-full targets passing. Fresh normal 01 and swapped 08 delivered 28.00 mL each. Fresh normal 10 delivered 27.36 mL and stopped at 92.35% of rim height. The 30 fresh tests took 6.21 elapsed evaluation hours on the isolated RTX 4070. Personal working time was unmeasured. The 33 native HDF5 files total 6,728,625,258 bytes and remain hash-verified on the Ubuntu robot-training partition. [Fresh results](../evidence/bottle-size-A/wide-mixed-r21-completion.json) · [Startup](../evidence/bottle-size-A/wide-mixed-r21-fresh-startup.json) · [Failure detail](../evidence/bottle-size-A/wide-mixed-r21-fresh-failures.json)
+
+## Revision 22 · Startup cup confirmation on normal 12
+
+The frozen revision 21 controller timed out on normal 12 after 2.05 simulated seconds. It confirmed the bottle but never grasped or transferred liquid. In the native 1024×1024 cup camera, the learned detector selected a point roughly 250–300 pixels from the labeled rim on the sampled frames. The cup-presence model correctly rejected that point. Other alignments of the same frame retained a response at the cup. [Frame-level diagnosis](../evidence/bottle-size-A/wide-mixed-r22-startup-diagnosis.json)
+
+The revised tracker retries after 12 startup frames when the existing procedure still lacks a confident cup. It evaluates a 3×3 grid of image translations, including the original frame, and checks the three strongest spatially separated peaks per view. A candidate needs a second view within the existing consensus radius, a high cup-presence score, and a photographed rim within six pixels of the agreed center. The existing temporal vote and reference-establishment checks still apply. The live detector uses the current RGB frame, camera calibration and declared cup geometry. Simulated cup position serves only as a replay accuracy label. The detector weights, bottle localization, grasp, pour trajectory, fill estimation, stop and return use the revision 21 checkpoints.
+
+On Ubuntu, use the study root and frozen Isaac Sim assets from revision 21. Copy wide-mixed-r21/src into a new wide-mixed-r22/src. Stage the tracked launch and replay helpers, including diagnose_r16_startup.py and replay_r16_startup.py. Diagnosis uses only original component outputs and records the parent tracker response. Run diagnosis with the revision 21 outline file before staging the revised outline for replay. The replay uses the complete native revision 21 test set, both orientations of 12 from revisions 11, 12 and 20, and the archived revision 15 normal 02 failure. Each frame sequence retains its original recording hash.
+
+```sh
+set -e
+sed s/wide-mixed-r21/wide-mixed-r22/ wide_mixed_r21_checks.py > wide_mixed_r22_checks.py
+python3 run_isolated_perception_job.py --helper diagnose_r22_startup.py --label wide-r22-diag --seconds 900 --minimum-free-gib 1
+# Stage the revised outline file here.
+python3 run_isolated_perception_job.py --helper replay_r22_startup.py --label wide-r22-replay-c --seconds 3600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r22.py --label wide-r22-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r22_checks.py --label wide-r22-checks --seconds 600 --minimum-free-gib 1
+cp wide-r22-checks/run.log wide-mixed-r22/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r22-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r22
+python3 run_sized_autonomy.py --study wide-mixed-r22 --part development --label wide-r22-dev --seconds 7200
+# The simulator launcher requires strict success on the targeted pour.
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r22 --part test --shard "$shard" --label "wide-r22-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r22
+python3 audit_wide_mixed_failures.py wide-mixed-r22
+python3 audit_startup_localization.py wide-mixed-r22
+```
+
+The original recording and its two translations all confirmed on the twentieth frame (zero-based index 19). Errors were 0.47 mm on the native view, 0.41 mm on the left translation, and 1.61 mm on the right translation. All 45 positive sequences passed the 2.5 mm limit and all 74 erased-cup controls were rejected. All 36 previously confirmed native sequences retained exactly the same result. The simulator plan fixes one development pour and 15 fresh matched normal/swapped pairs. Each fresh table coordinate is independently displaced by 1.1–2.5 mm from its previous wide placement, with matching offsets exchanged for the swapped orientation. [Replay](../evidence/bottle-size-A/wide-mixed-r22-cup-startup-replay.json) · [Plan](../evidence/bottle-size-A/wide-mixed-r22-plan.json)

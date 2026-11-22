@@ -1,8 +1,10 @@
 """Refine a neural cup proposal against the known Material A outline and band."""
 import numpy as np
+import torch
+from torch.nn.functional import max_pool2d
 
 from bottle_pour import CUP, SIDES, WALL
-from perception_followup import VerifiedCupTracker
+from perception_followup import VerifiedCupTracker, resize_coarse
 
 
 # The visual marker uses the nominal cup profile and fixed dimensions in
@@ -102,6 +104,43 @@ class OutlineCupTracker(VerifiedCupTracker):
             scores.append(score)
         return min(scores)
 
+    @torch.inference_mode()
+    def alternate_startup(self, image):
+        # A distractor can outrank the real cup. Seek separated heatmap peaks
+        # that agree across alignments before checking the photographed rim.
+        threshold = self.artifact["threshold"]
+        settings = self.artifact["consensus"]
+        shifts = [(dx,dy) for dy in (0,-4,4) for dx in (0,-4,4)]
+        h, w = image.shape[:2]
+        padded = np.pad(image, ((4,4),(4,4),(0,0)), mode="edge")
+        views = [resize_coarse(padded[4-dy:4-dy+h, 4-dx:4-dx+w]) for dx,dy in shifts]
+        output = self.coarse(torch.as_tensor(np.stack(views), device=self.device))
+        heat = output[:, :1].sigmoid()
+        peaks = heat.masked_fill(heat != max_pool2d(heat, 7, 1, 3), 0)
+        scores, locations = peaks.flatten(1).topk(3)
+        if float(scores.max()) < threshold:
+            return None
+        y, x = locations // heat.shape[-1], locations % heat.shape[-1]
+        batch = torch.arange(len(views), device=self.device)[:,None]
+        subpixel = output.permute(0,2,3,1)[batch,y,x,1:].sigmoid()
+        pixels = (torch.stack((x,y),dim=-1) + subpixel) * (w / heat.shape[-1])
+        points = pixels.cpu().numpy() - np.asarray(shifts)[:,None,:]
+        scores = scores.cpu().numpy()
+        for view, peak in np.argwhere(scores >= threshold):
+            point = points[view,peak]
+            support = (scores >= settings["score_floor"]) & (np.linalg.norm(points-point,axis=2) <= settings["radius_px"])
+            support[view] = False
+            if not support.any() or self.presence_score(image,point) < .90:
+                continue
+            center = np.median(np.vstack((point,points[support])),axis=0)
+            rim = refine_outline(image,center,self.artifact["calibration"],self.geometry)
+            if rim is None or np.linalg.norm(rim-center) > 6.:
+                continue
+            presence = self.presence_score(image,rim)
+            if presence >= .90:
+                return rim, min(float(scores[view,peak]),presence)
+        return None
+
     def detect(self, image, refine=True):
         point, score = super().detect(image, refine=refine)
         if refine and self.anchor is None:
@@ -109,6 +148,10 @@ class OutlineCupTracker(VerifiedCupTracker):
             if (self.startup_frames > 12 and
                     self.artifact["consensus"]["score_floor"] <= score < self.artifact["threshold"]):
                 score = max(score, self.shifted_startup_score(image, point))
+            if self.startup_frames > 12 and score < self.artifact["threshold"]:
+                alternate = self.alternate_startup(image)
+                if alternate is not None:
+                    return alternate
         if refine and score >= self.artifact["threshold"]:
             candidate = refine_outline(image, point, self.artifact["calibration"], self.geometry)
             if candidate is not None:
