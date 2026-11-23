@@ -1667,3 +1667,5 @@ python3 close_wide_mixed_autonomy.py --study wide-mixed-r24
 python3 audit_wide_mixed_failures.py wide-mixed-r24
 python3 audit_startup_localization.py wide-mixed-r24
 ```
+
+All 32 geometries passed. On November 23 at 12:29 Pacific time the two targeted Isaac Sim pours passed with zero spill. Swapped 04 and normal 13 each transferred 28.00 mL, reached the empty stop and returned the bottle. Confirmation followed empty by 1.95 s and 0.35 s respectively. Targeted simulation took 24.48 elapsed minutes. Both native recordings verified before the fresh tests began. [Targeted results](../evidence/bottle-size-A/wide-mixed-r24-development-results.json) · [Preflight](../evidence/bottle-size-A/wide-mixed-r24-geometry.json)
