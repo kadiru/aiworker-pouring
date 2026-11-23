@@ -1632,3 +1632,5 @@ python3 close_wide_mixed_autonomy.py --study wide-mixed-r23
 python3 audit_wide_mixed_failures.py wide-mixed-r23
 python3 audit_startup_localization.py wide-mixed-r23
 ```
+
+All 31 predeclared scenes passed the geometry screen. The normal 05 development pour closed at 01:25 Pacific time on November 23, 2026. On the original failed placement, AIWorker grasped, transferred 28.00 mL, confirmed the empty stop, and returned the bottle with zero particles lost. The native recording hash verified before fresh testing. Targeted evaluation took 11.75 elapsed minutes. [Targeted outcome](../evidence/bottle-size-A/wide-mixed-r23-development-results.json) · [Geometry](../evidence/bottle-size-A/wide-mixed-r23-geometry.json)
