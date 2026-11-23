@@ -18,9 +18,11 @@ def prepare(parent, study, neck_targets, motion_targets, losses, prefix, layout_
     assert previous["plan_sha256"]==sha(parent/"plan.json")
     assert {suffix(c):c["measured_loss_particles"] for c in previous["test_cases"] if not c["strict_pass"]}==losses
     parents = {suffix(s):s for s in plan["test"]}
-    motion, neck = (read(study/n) for n in ("stream-fit.json","neck-replay.json"))
-    assert motion["passed"] and neck["passed"]
-    assert set(motion["cases"])==set(motion_targets) and set(neck["cases"])==set(neck_targets)
+    motion = read(study/"stream-fit.json")
+    assert motion["passed"] and set(motion["cases"]) == set(motion_targets)
+    if neck_targets:
+        neck = read(study/"neck-replay.json")
+        assert neck["passed"] and set(neck["cases"]) == set(neck_targets)
     sources = {p.name:sha(p) for p in (study/"src").glob("*.py")}
     assert sources==read(parent/"geometry.json")["sources"]
     replacements, proofs = {}, []
@@ -60,7 +62,10 @@ def prepare(parent, study, neck_targets, motion_targets, losses, prefix, layout_
     save(study/"frozen-controller.json",dict(passed=True,runtime_sources=sources,changed=proofs,
          unchanged_checkpoints=len(plan["checkpoints"])-len(proofs),parent_plan_sha256=sha(parent/"plan.json")))
     seal_layouts(plan,parents,replacements,neck_targets+motion_targets,prefix,layout_seed,trial_seed,2,scope)
-    for path in (parent/"plan.json",parent/"completion.json",study/"neck-replay.json",study/"stream-fit.json",
+    if neck_targets:
+        path = study/"neck-replay.json"
+        plan["prerequisite_reports"][str(path)] = sha(path)
+    for path in (parent/"plan.json",parent/"completion.json",study/"stream-fit.json",
                  study/"spill-trace.json",study/"frozen-controller.json"):
         plan["prerequisite_reports"][str(path)] = sha(path)
     for name in ("calibration.json","empty-replay.json"):

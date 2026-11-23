@@ -1606,3 +1606,29 @@ The original recording and its two translations all confirmed on the twentieth f
 All 31 planned scenes passed the geometry screen. The targeted normal 12 trial completed at 13:30 Pacific time on November 22, 2026. AIWorker delivered 25.76 mL, stopped at 94.53% of cup rim height, returned the bottle and lost zero particles. The targeted simulation took 14.6 elapsed minutes. Its native recording hash verified before fresh testing began. [Targeted outcome](../evidence/bottle-size-A/wide-mixed-r22-development-results.json) · [Geometry](../evidence/bottle-size-A/wide-mixed-r22-geometry.json)
 
 Revision 22 closed on November 22, 2026 at 19:58 Pacific time. All 30 fresh Isaac Sim attempts localized both vessels, grasped, transferred liquid, reached their intended stop and returned the bottle. Strict zero-spill success was 29/30, including 14/15 normal, 15/15 swapped, 15/15 near-full and 14/15 empty targets. Fresh normal 12 delivered 26.11 mL and stopped at 95.02% of rim height with zero loss. Normal 05 delivered 27.99 mL and stopped on empty. Two particles escaped during coarse pouring at 118.72° of tilt, corresponding to 0.011664 mL at the simulated particle volume. Fresh evaluation took 6.47 elapsed hours on the isolated RTX 4070. All 31 native HDF5 recording hashes verified on Ubuntu, totaling 6,560,114,656 bytes. Personal working time was unmeasured. [Fresh outcomes](../evidence/bottle-size-A/wide-mixed-r22-completion.json) · [Startup audit](../evidence/bottle-size-A/wide-mixed-r22-fresh-startup.json) · [Normal 05 spill trace](../evidence/bottle-size-A/wide-mixed-r22-fresh-failures.json)
+
+## Revision 23 · Normal 05 mid-pour rebound
+
+Normal 05 in revision 22 reached the empty stop and returned the bottle. Two simulated particles escaped at 118.72° during coarse pouring, moving outward at 0.464 m/s along the pour axis and 0.206 m/s laterally. The camera localization and stop sequence passed that trial. [Measured trajectories](../evidence/bottle-size-A/wide-mixed-r23-spill-trace.json)
+
+The RTX 4070 fit scored 120 bottle-mouth profiles on 5,634 incoming-particle observations from four archived normal 05 pours. A separate set of four pours supplied 6,369 observations for validation. The selected profile removes the earlier 8 mm forward advance and starts blending to the final mouth pose at 119° instead of 116°. It reaches the same final pose at 123°. The projected rebound radii fall from 1.43 times the cup radius to 0.959 and 0.963 times the radius. These estimates use the observed rebound velocities. Only the live trials measure the result under the modified physics trajectory. All 141 runtime source hashes match revision 22. Within the affected checkpoint, all fields except late_mouth_shift_m and finish_mouth_pose compare equal, including bottle and cup localization. The other 13 checkpoints retain their original hashes. [Fit and holdouts](../evidence/bottle-size-A/wide-mixed-r23-stream-fit.json) · [Frozen fields](../evidence/bottle-size-A/wide-mixed-r23-frozen-controller.json)
+
+Use the Ubuntu study root, native archives, and Isaac Sim image from revision 22. In a new wide-mixed-r23 directory copy wide-mixed-r22/src to wide-mixed-r23/src and stage the tracked fit, preparation, screening, launch and closure helpers in the study root. The sealed plan uses one targeted pour at the prior failed placement with a new episode seed. Each of the 15 fresh normal/swapped pairs uses new episode seeds and displacement magnitudes of 1.1–2.5 mm per axis from the preceding wide layout. [Sealed placements](../evidence/bottle-size-A/wide-mixed-r23-plan.json)
+
+```sh
+set -e
+sed s/wide-mixed-r22/wide-mixed-r23/ wide_mixed_r22_checks.py > wide_mixed_r23_checks.py
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r23.py --label wide-r23-fit --seconds 1500 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r23.py --label wide-r23-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r23_checks.py --label wide-r23-checks --seconds 600 --minimum-free-gib 1
+cp wide-r23-checks/run.log wide-mixed-r23/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r23-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r23
+python3 run_sized_autonomy.py --study wide-mixed-r23 --part development --label wide-r23-dev --seconds 7200
+# Each fresh launch verifies a strict zero-spill targeted pass.
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r23 --part test --shard "$shard" --label "wide-r23-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r23
+python3 audit_wide_mixed_failures.py wide-mixed-r23
+python3 audit_startup_localization.py wide-mixed-r23
+```

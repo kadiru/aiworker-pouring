@@ -62,6 +62,12 @@ def fit_terminal(key):
                                                         (-4, -6, -8, -10), (3, 5, 7, 8))
                   if down / 1000. <= MAX_TAIL_DROP_M]
     grid = torch.tensor([parent, *candidates], device="cuda", dtype=torch.float64)
+    best, audit, ratios, passed = score_rebound_paths(grid, observed, train, holdout, focus)
+    return dict(passed=passed, checkpoint=path, candidates=len(grid), cases=audit,
+                rim_ratios=ratios, mouth_options={"finish_mouth_pose": grid[best, 5:].tolist()}), observed
+
+
+def score_rebound_paths(grid, observed, train, holdout, focus):
     rebounds = []
     for particle in observed["particles"].values():
         rebound = next(f for f in particle if f["velocity"][2] > .1 and f["xyz"][0] > 0)
@@ -89,8 +95,7 @@ def fit_terminal(key):
                               impact_p95_ratio=torch.quantile(impact / radii, .95, dim=1).tolist()))
     passed = (best > 0 and bool(((ratios[0] - ratios[best]) * radius >= .0015).all()) and
               all(a["outside"][1] <= a["outside"][0] and a["impact_p95_ratio"][1] < .85 for a in audit))
-    return dict(passed=passed, checkpoint=path, candidates=len(grid), cases=audit,
-                rim_ratios=ratios[[0, best]].tolist(), mouth_options={"finish_mouth_pose": grid[best, 5:].tolist()}), observed
+    return best, audit, ratios[[0, best]].tolist(), passed
 
 
 def fit_proposal(key, rows):
