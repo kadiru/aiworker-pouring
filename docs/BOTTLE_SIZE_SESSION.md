@@ -1636,3 +1636,34 @@ python3 audit_startup_localization.py wide-mixed-r23
 All 31 predeclared scenes passed the geometry screen. The normal 05 development pour closed at 01:25 Pacific time on November 23, 2026. On the original failed placement, AIWorker grasped, transferred 28.00 mL, confirmed the empty stop, and returned the bottle with zero particles lost. The native recording hash verified before fresh testing. Targeted evaluation took 11.75 elapsed minutes. [Targeted outcome](../evidence/bottle-size-A/wide-mixed-r23-development-results.json) · [Geometry](../evidence/bottle-size-A/wide-mixed-r23-geometry.json)
 
 The frozen benchmark closed at 07:39 Pacific time on November 23, 2026. Of 30 fresh attempts, 29 localized both vessels, grasped, poured, reached the intended stop and returned the bottle. Of those 29 pours, 28 lost zero particles. Fresh normal 05 delivered 28.00 mL with zero loss. Strict passes were 14/15 normal and 14/15 swapped, including 15/15 near-full and 13/15 empty targets. Swapped 04 confirmed the cup but timed out waiting for the bottle after 2.05 simulated seconds and transferred 0 mL. Normal 13 lost two particles at 119.60° during coarse pouring, corresponding to 0.011664 mL at the configured particle volume. Both cases used unchanged checkpoints. The 30 fresh tests took 6.24 elapsed evaluation hours on the guarded RTX 4070. Personal working time was unmeasured. The 31 native HDF5 recordings totaled 6,299,200,680 bytes and verified on the Ubuntu robot-training partition. [Fresh outcomes](../evidence/bottle-size-A/wide-mixed-r23-completion.json) · [Startup](../evidence/bottle-size-A/wide-mixed-r23-fresh-startup.json) · [Failure traces](../evidence/bottle-size-A/wide-mixed-r23-fresh-failures.json)
+
+## Revision 24 — swapped 04 bottle detection and normal 13 rim loss
+
+On November 23, the archived swapped 04 RGB views placed the primary bottle-neck proposal within two pixels of the calibrated label, but proposal scores of 0.650–0.689 fell below 0.700 and outline scores of 0.582–0.611 fell below 0.680 on the four inspected frames. The secondary detector also lacked confidence. The RTX 4070 fine-tuned the primary heatmap for 24 epochs with AdamW at 0.0002, using 56 positive and 28 erased images from four normal/swapped starts in revisions 22–23. Eight labeled views supplied additional neck-outline templates. The fallback, confidence floors, temporal voting and cup detector were preserved. Twelve native recordings supplied 36 positive replay sequences including shifted views, plus 12 erased sequences. Every positive localized within 1.93 mm and every erased sequence was rejected. Eight recordings were held out of fitting. [Diagnosis](../evidence/bottle-size-A/wide-mixed-r24-neck-diagnosis.json) · [Replay](../evidence/bottle-size-A/wide-mixed-r24-neck-replay.json)
+
+Both escaped normal 13 droplets crossed the near side of the cup during coarse pouring. A search over 196 profiles used 3,487 incoming-particle observations from four pours, with 4,423 observations from five held-out pours. The fitted motion increases setback from 4 to 5 mm and drop from 2 to 4 mm, and removes the 4 mm late forward shift. The two projected rim-crossing distances fell from 1.24 to 0.92 cup radii. The terminal pose and timing were preserved. These projections are offline estimates. [Spill trace](../evidence/bottle-size-A/wide-mixed-r24-spill-trace.json) · [Motion fit](../evidence/bottle-size-A/wide-mixed-r24-stream-fit.json)
+
+The plan covers the two original failed placements with new episode seeds and 15 new pairs of wide, swapped placements. Twelve other checkpoints and all 141 runtime source files matched the parent. Required assets are the revision 23 setup, original checksummed recordings listed in the two fits, the project Isaac Sim image, the stationary AIWorker model and the robot-training partition. Use the Ubuntu study root and helpers from this revision. [Sealed trials](../evidence/bottle-size-A/wide-mixed-r24-plan.json) · [Checkpoint changes](../evidence/bottle-size-A/wide-mixed-r24-frozen-controller.json)
+
+```sh
+set -e
+mkdir -p wide-mixed-r24/inputs
+cp -a wide-mixed-r23/src wide-mixed-r24/src
+sed s/wide-mixed-r23/wide-mixed-r24/ wide_mixed_r23_checks.py > wide_mixed_r24_checks.py
+for stage in diagnose motion; do
+    python3 run_isolated_perception_job.py --helper fit_wide_mixed_r24.py --label "wide-r24-$stage" --seconds 1200 --minimum-free-gib 1 -- "$stage"
+done
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r24.py --label wide-r24-neck --seconds 1800 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r24.py --label wide-r24-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r24_checks.py --label wide-r24-checks --seconds 600 --minimum-free-gib 1
+cp wide-r24-checks/run.log wide-mixed-r24/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r24-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r24
+python3 run_sized_autonomy.py --study wide-mixed-r24 --part development --label wide-r24-dev --seconds 7200
+# The launcher checks both targeted results before allowing fresh pours.
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r24 --part test --shard "$shard" --label "wide-r24-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r24
+python3 audit_wide_mixed_failures.py wide-mixed-r24
+python3 audit_startup_localization.py wide-mixed-r24
+```

@@ -41,6 +41,12 @@ def prepare(parent, study, neck_targets, motion_targets, losses, prefix, layout_
             if field == "source_heatmap":
                 candidate = add_refinement(state, bank)
                 assert all(identical(v,candidate[field][k]) for k,v in state[field].items() if k!="refinement")
+            elif field == "source_heatmap_proposal_and_refinement":
+                field = "source_heatmap"
+                candidate = add_refinement(state, bank["refinement"])
+                candidate[field]["proposal"] = bank["proposal"]
+                assert all(identical(v,candidate[field][k]) for k,v in state[field].items()
+                           if k not in ("proposal","refinement"))
             else:
                 assert field == "source_heatmap_fallback" and state.get(field) is None
                 candidate = dict(state, source_heatmap_fallback=bank)

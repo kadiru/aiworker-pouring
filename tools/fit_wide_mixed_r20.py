@@ -38,7 +38,7 @@ def add_refinement(state, bank):
 
 
 @torch.inference_mode()
-def fit_neck(key, rows, parent=PARENT, study=STUDY, template_revisions=("r18", "r19"), proposal=None):
+def fit_neck(key, rows, parent=PARENT, study=STUDY, template_revisions=("r18", "r19"), proposal=None, *, update_primary=False):
     path, state = state_for(key, parent)
     target = next(r for r in rows if r["name"].endswith(parent.name.rsplit("-",1)[1]+"_test_"+key))
     assert replay(target["frames"], state)[0] is None
@@ -50,6 +50,11 @@ def fit_neck(key, rows, parent=PARENT, study=STUDY, template_revisions=("r18", "
     field = "source_heatmap"
     if proposal is None:
         candidate = add_refinement(state, bank)
+    elif update_primary:
+        field = "source_heatmap_proposal_and_refinement"
+        candidate = add_refinement(state, bank)
+        candidate["source_heatmap"]["proposal"] = proposal
+        bank = {"proposal": proposal, "refinement": bank}
     else:
         field = "source_heatmap_fallback"
         assert state.get(field) is None

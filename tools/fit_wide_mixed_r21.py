@@ -67,11 +67,11 @@ def fit_terminal(key):
                 rim_ratios=ratios, mouth_options={"finish_mouth_pose": grid[best, 5:].tolist()}), observed
 
 
-def score_rebound_paths(grid, observed, train, holdout, focus):
-    rebounds = []
-    for particle in observed["particles"].values():
-        rebound = next(f for f in particle if f["velocity"][2] > .1 and f["xyz"][0] > 0)
-        rebounds.append([rebound["tilt"], *rebound["xyz"], *rebound["velocity"]])
+def score_rebound_paths(grid, observed, train, holdout, focus, *, events=None):
+    if events is None:
+        events = [next(f for f in track if f["velocity"][2] > .1 and f["xyz"][0] > 0)
+                  for track in observed["particles"].values()]
+    rebounds = [[f["tilt"], *f["xyz"], *f["velocity"]] for f in events]
     points = grid.new_tensor(rebounds).T
     zero = torch.zeros_like(points[0])
     old_x, old_z = counterfactual(points[0], zero, zero, grid[:1])
@@ -98,15 +98,14 @@ def score_rebound_paths(grid, observed, train, holdout, focus):
     return best, audit, ratios[[0, best]].tolist(), passed
 
 
-def fit_proposal(key, rows):
-    seed = 26112210
+def fit_proposal(key, rows, *, parent=PARENT, revisions=("r19", "r20"), seed=26112210):
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
-    # Hold out every startup from revisions 16–18; also keep those views out of template fitting.
-    training = [dict(r, validate=False) for r in rows if "_r19_test_" in r["name"] or "_r20_test_" in r["name"]]
+    # Train only on designated revisions. Other startups are reserved for replay.
+    training = [dict(r, validate=False) for r in rows if any(f"_{rev}_test_" in r["name"] for rev in revisions)]
     assert len(training) == 4
     images, uv, present = dataset(training)
-    _, state = state_for(key, PARENT)
+    _, state = state_for(key, parent)
     model = CupLocator().cuda()
     base = state["source_heatmap"]["proposal"]
     model.load_state_dict(base["state"])
