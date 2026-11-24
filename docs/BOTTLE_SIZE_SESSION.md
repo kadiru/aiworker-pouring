@@ -1707,3 +1707,5 @@ python3 close_wide_mixed_autonomy.py --study wide-mixed-r25
 python3 audit_wide_mixed_failures.py wide-mixed-r25
 python3 audit_startup_localization.py wide-mixed-r25
 ```
+
+All 34 planned scenes passed the geometry screen. On November 23 at 20:45 Pacific time, the four targeted Isaac Sim pours passed with zero loss and verified returns. Normal 12 and 14 stopped at 94.82% and 93.93% of rim height. Swapped 12 and normal 09 each delivered 28.00 mL and confirmed empty 1.90 s and 0.30 s after depletion. Targeted evaluation took 48.39 elapsed minutes. All four native recording SHA-256 hashes verified before the first fresh pair launched. [Targeted outcomes](../evidence/bottle-size-A/wide-mixed-r25-development-results.json) · [Geometry](../evidence/bottle-size-A/wide-mixed-r25-geometry.json)
