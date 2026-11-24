@@ -174,6 +174,18 @@ def scan(stage, spec, saved, opened, closed):
     return row
 
 
+def collision_meshes():
+    stage,_,base=geometry()
+    opened=base+finger_meshes(stage,[0.,0.,0.,0.])
+    variants=[finger_meshes(stage,v) for v in ((.64,.75,.64,.75),(.75,.95,.75,.95),(.64,.95,.64,.95),(.75,.75,.75,.75))]
+    closed=list(base)
+    for i in range(4):
+        vertices=np.concatenate([v[i][2] for v in variants])
+        hull=ConvexHull(vertices)
+        closed.append((6,variants[0][i][1],vertices[hull.vertices],hull.equations))
+    return stage, opened, closed
+
+
 def main():
     torch.set_num_threads(1)
     plan_path=STUDY/"plan.json"
@@ -203,14 +215,7 @@ def main():
             assert old_geometry["sources"]==sources
         old_specs={s["name"]:s for s in old_plan["development"]+old_plan["test"]}
         reusable={r["name"]:r for r in old_geometry["cases"] if r["passed"]}
-    stage,_,base=geometry()
-    opened=base+finger_meshes(stage,[0.,0.,0.,0.])
-    variants=[finger_meshes(stage,v) for v in ((.64,.75,.64,.75),(.75,.95,.75,.95),(.64,.95,.64,.95),(.75,.75,.75,.75))]
-    closed=list(base)
-    for i in range(4):
-        vertices=np.concatenate([v[i][2] for v in variants])
-        hull=ConvexHull(vertices)
-        closed.append((6,variants[0][i][1],vertices[hull.vertices],hull.equations))
+    stage, opened, closed = collision_meshes()
     cases=[]
     resume={}
     if ARGS.resume_screen:
