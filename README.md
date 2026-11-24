@@ -1,63 +1,58 @@
-# How the ROBOTIS AI Worker pours a drink
+# Pour a drink. Know when to stop.
 
-A stationary ROBOTIS FFW-BG2 uses its right arm to pick up a bottle, pour into a cup, and place the bottle back on the table in NVIDIA Isaac Sim. The controller must recognize two different endings from camera images. A nearly full cup calls for a stop even when liquid remains in the bottle. An empty bottle calls for a stop even when the cup is below the fill target.
+A robot must do more than tip a bottle. It must keep its grasp, recognize when the cup is full or the bottle is empty, and put the bottle back without spilling.
 
-![Four frames of one tall-bottle simulation showing the grasp and lift at 4.25 seconds, pour at 12.01 seconds, sideways return at 26.36 seconds and release at 33.30 seconds.](docs/figures/tall-bottle-cycle.webp)
+This project builds and evaluates that complete sequence for the **ROBOTIS FFW-BG2 in NVIDIA Isaac Sim**. It combines camera-based vessel estimates, supervised motion imitation, inverse kinematics and explicit stop-and-return logic.
 
-This tall, narrow bottle delivered 31.28 nominal mL. The liquid settled at 93.91% of the cup’s rim height with zero measured particle loss. [Four bottle-shape trial records](evidence/bottle-size-A/autonomy-r0-test-results.json)
+[![Four frames of a simulated tall-bottle trial: grasp, pour, return and release](docs/figures/tall-bottle-cycle.webp)](https://vimeo.com/kadiru/demo-semihumanoid-pouring)
 
-## How the controller works
+*A recorded simulation, not a physical-robot result. This example delivered 31.28 nominal mL with zero measured particle loss. [Trial evidence](evidence/bottle-size-A/autonomy-r0-test-results.json) · [Watch the development film](https://vimeo.com/kadiru/demo-semihumanoid-pouring). The film is an earlier development snapshot, not the revision 25 benchmark.*
 
-The arm receives joint targets every 50 ms. Three camera views share the work. The task view locates the vessels, the wrist view checks the bottle, and a close-up of the cup tracks its outline and liquid level. The experiments use calibrated cameras and known vessel dimensions.
+<a name="what-passed-in-simulation"></a>
 
-![Control diagram showing three RGB views and joint feedback driving vessel and liquid estimates, supervised motion and programmed stop logic, then seven right-arm and four finger-joint targets. The simulator measures contact and particles for scoring.](docs/figures/pouring-control.webp)
+## What works today
 
-Supervised motion imitation and inverse kinematics generate the pouring motion. Programmed logic checks the grasp, brakes and settles the pour, then controls the return. The simulator independently records fingertip contacts, liquid height and particle inventory to score the result. [Cup perception and control](docs/SIZED_AUTONOMY.md) · [Sideways return implementation](runtime/src/pour_side_return.py)
+**29 of 30 strict passes** in the published November 24 mixed-layout evaluation, revision 25. All 29 completed pours reached the intended stop and returned the bottle. No particles spilled; one attempt timed out while confirming the cup, before grasping. [Complete batch record](evidence/bottle-size-A/wide-mixed-r25-completion.json)
 
-## What passed in simulation?
+A strict pass requires a confirmed grasp, liquid transfer, the intended stop, zero measured particle loss, and an ordered return and release. Near-full means at least 90% of rim height. These are particle-based simulation measurements with calibrated cameras and known vessel dimensions; physical transfer remains untested.
 
-A strict pass requires a verified grasp, liquid transfer, the intended stop, zero measured particle loss, and an ordered return and release. The near-full target starts at 90% of rim height. Each row below identifies its own evaluation conditions.
+The distinction matters: the earlier **end-to-end behavior-cloning policy passed 0/6**. The stronger result belongs to the hybrid system described here. [Learning study](docs/LEARNING_A_STUDY.md) · [Full result history, including failures](docs/RESULTS_AND_REPRODUCTION.md#what-passed-in-simulation)
 
-| Evaluation | Strict passes | What happened |
-| --- | ---: | --- |
-| [End-to-end behavior cloning](docs/LEARNING_A_STUDY.md) | 0/6 | The policy grasped the bottle in five tests. None transferred liquid. |
-| [Sideways return with standard vessels](docs/SIDE_RETURN_STUDY.md) | 28/30 | Two empty-target pours each lost two particles. |
-| [Four bottle shapes, near-full target](evidence/bottle-size-A/autonomy-r0-completion.json) | 4/4 | One cup, two bottle heights and two diameters. Each shape passed one fresh trial. |
-| [Same four shapes, empty target](evidence/bottle-size-A/empty-r0-completion.json) | 4/4 | Each bottle stopped with zero source particles and zero measured spill. |
-| [Mixed layouts, revision 11](evidence/bottle-size-A/wide-mixed-r11-completion.json) | 29/30 | One particle escaped during coarse pouring. |
-| [Mixed layouts, revision 12, Nov. 17, 2026](evidence/bottle-size-A/wide-mixed-r12-completion.json) | 26/30 | All 30 completed the grasp, intended stop and return. All 15 near-full trials passed. Four empty-target trials each lost two particles. |
-| [Mixed layouts, revision 13b, Nov. 17, 2026](evidence/bottle-size-A/wide-mixed-r13b-completion.json) | 28/30 | All four prior spill layouts passed fresh. All 30 grasped, reached the intended stop and returned. Normal 00 lost two particles and normal 01 lost four. |
-| [Mixed layouts, revision 14, Nov. 18, 2026](evidence/bottle-size-A/wide-mixed-r14-completion.json) | 27/30 | Both targeted layouts passed fresh. Across the batch, 28/30 were spill-free. Two trials lost two particles each, and one spill-free trial stopped with its fill unconfirmed. |
-| [Mixed layouts, revision 15, Nov. 18, 2026](evidence/bottle-size-A/wide-mixed-r15-completion.json) | 29/30 | All 29 completed pours were spill-free, including all 15 swapped layouts. Normal 02 stopped before grasp when the cup could not be localized. |
-| [Mixed layouts, revision 16, Nov. 19, 2026](evidence/bottle-size-A/wide-mixed-r16-completion.json) | 26/30 | All 30 localized both vessels and normal 02 passed. Of 29 actual pours, 26 were spill-free. One attempt stopped at grasp confirmation. |
-| [Mixed layouts, revision 17, Nov. 19, 2026](evidence/bottle-size-A/wide-mixed-r17-completion.json) | 29/30 | All 30 grasped, poured, stopped as intended and returned. All four repaired layouts passed. Swapped 02 lost two particles during coarse pouring. |
-| [Mixed layouts, revision 18, Nov. 20, 2026](evidence/bottle-size-A/wide-mixed-r18-completion.json) | 27/30 | Both repaired 02 placements passed. Of 29 actual pours, 27 spilled nothing. One attempt stopped before grasp and two pours lost three particles total. |
-| [Mixed layouts, revision 19, Nov. 21, 2026](evidence/bottle-size-A/wide-mixed-r19-completion.json) | 26/30 | All 15 near-full targets passed. Two attempts stopped before grasp and two empty-target pours lost two particles each. |
-| [Mixed layouts, revision 20, Nov. 21, 2026](evidence/bottle-size-A/wide-mixed-r20-completion.json) | 27/30 | All four repaired layouts passed both targeted and fresh testing. Two other attempts stopped before grasp. Swapped 08 lost two particles. |
-| [Mixed layouts, revision 21, Nov. 22, 2026](evidence/bottle-size-A/wide-mixed-r21-completion.json) | 29/30 | Zero particles spilled. All 29 actual pours reached the intended stop and returned. Normal 12 stopped before grasp when cup confirmation timed out. |
-| [Mixed layouts, revision 22, Nov. 22, 2026](evidence/bottle-size-A/wide-mixed-r22-completion.json) | 29/30 | All 30 localized, poured, stopped as intended and returned. Normal 12 passed. Only normal 05 spilled, losing two particles during coarse pouring. |
-| [Mixed layouts, revision 23, Nov. 23, 2026](evidence/bottle-size-A/wide-mixed-r23-completion.json) | 28/30 | Normal 05 passed targeted and fresh with zero loss. Swapped 04 stopped before grasp. Normal 13 spilled two particles. |
-| [Mixed layouts, revision 24, Nov. 23, 2026](evidence/bottle-size-A/wide-mixed-r24-completion.json) | 26/30 | Both repaired placements passed targeted and fresh. Normal 09 lost four particles. Normal 12, swapped 12 and normal 14 stopped before grasp. |
-| [Mixed layouts, revision 25, Nov. 24, 2026](evidence/bottle-size-A/wide-mixed-r25-completion.json) | 29/30 | All four repairs passed targeted and fresh. Zero particles spilled. Normal 07 timed out before grasp while waiting for the cup. |
+<a name="how-the-controller-works"></a>
 
-The revision 12 change repaired the spill seen in revision 11. Fresh testing exposed spills in other layouts. Physical-robot transfer remains untested. [Bottle-size experiments and failure analysis](docs/BOTTLE_SIZE_SESSION.md) · [Dated experiment log](STATUS.md)
+## The central idea
 
-## Explore the repository
+![Three RGB views and joint feedback feed vessel estimates, supervised motion and programmed stop logic. Separate simulator measurements score the trial.](docs/figures/pouring-control.webp)
 
-| If you want to… | Start here |
+Three cameras divide the task: locate the vessels, inspect the bottle, and estimate liquid level in the cup. The controller sends joint targets every 50 ms. An independent simulator audit measures contacts, liquid height and particle inventory so a visually convincing pour can still fail the test.
+
+The project work spans the simulation testbed, perception and control integration, and trial-level evaluation. The robot platform and simulator are external dependencies; this is not a new robot design or a claim of end-to-end learned autonomy.
+
+<a name="explore-the-repository"></a>
+
+## Read the code
+
+| Question | Entry point |
 | --- | --- |
-| Trace a trial from simulation to control | [Simulator entry point](runtime/src/run_fountain.py), [size-aware perception and trial runner](runtime/src/pour_size_autonomy.py), [return controller](runtime/src/pour_side_return.py) |
-| Understand how the method evolved | [First learned policy](docs/LEARNING_A_STUDY.md), [wider layouts](docs/WORKSPACE_STUDY.md), [cup-size autonomy](docs/SIZED_AUTONOMY.md), [bottle-size and mixed-layout studies](docs/BOTTLE_SIZE_SESSION.md) |
-| Inspect the measurements | [Trial-level reports and audit files](evidence/bottle-size-A), [measurement and recording schema](docs/RECORDING_SCHEMA.md) |
-| Set up the simulator or inspect the earlier teleoperation setup | [Runtime profiles and prerequisites](runtime/README.md), [Quest runbook](docs/QUEST_RESTORE.md), [external robot assets, weights and recordings](docs/VERSION_CONTROL.md) |
-| Follow the historical inspiration | [Al-Jazari’s drink-serving automata](docs/HISTORY.md) |
+| How does a trial run? | [Simulation entry point](runtime/src/run_fountain.py) |
+| How does it find and handle different vessels? | [Size-aware trial controller](runtime/src/pour_size_autonomy.py) · [Perception and autonomy guide](docs/SIZED_AUTONOMY.md) |
+| How does the bottle return? | [Sideways return controller](runtime/src/pour_side_return.py) |
+| What makes a result credible? | [Recording schema](docs/RECORDING_SCHEMA.md) · [Per-trial evidence](evidence/bottle-size-A/) |
 
-## Try the offline trial logger
+<a name="try-the-offline-trial-logger"></a>
 
-From the repository root, validate the bundled synthetic example with Python 3.9 or newer. The command prints 50 g delivered, 1 g spilled and a passing result under the logger’s example protocol. The simulator benchmark above uses separate particle-based scoring.
+## Try the smallest example
+
+With Python 3.9 or newer, from the repository root:
 
 ```sh
 python3 tools/trial_log.py validate examples/synthetic-wet.json
 ```
 
-[Logger commands and record format](docs/TRIAL_LOG.md) · [Synthetic example](examples/synthetic-wet.json) · [Logger source](tools/trial_log.py)
+This validates a **synthetic logger fixture**: 50 g delivered and 1 g spilled under its example protocol. It does not reproduce the strict simulator benchmark. [Logger guide](docs/TRIAL_LOG.md) · [Simulator setup and assets](runtime/README.md)
+
+## Next milestone
+
+Make cup confirmation reliable across the remaining layouts, then repeat a prespecified mixed-layout evaluation while retaining every failed attempt. Physical testing requires a separate calibrated setup and evaluation.
+
+[Experiment history and reproduction](docs/RESULTS_AND_REPRODUCTION.md) · [Bottle-size study](docs/BOTTLE_SIZE_SESSION.md) · [Al-Jazari inspiration](docs/HISTORY.md) · [Current work log](STATUS.md)
