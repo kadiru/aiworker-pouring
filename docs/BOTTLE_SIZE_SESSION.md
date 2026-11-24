@@ -1711,3 +1711,32 @@ python3 audit_startup_localization.py wide-mixed-r25
 All 34 planned scenes passed the geometry screen. On November 23 at 20:45 Pacific time, the four targeted Isaac Sim pours passed with zero loss and verified returns. Normal 12 and 14 stopped at 94.82% and 93.93% of rim height. Swapped 12 and normal 09 each delivered 28.00 mL and confirmed empty 1.90 s and 0.30 s after depletion. Targeted evaluation took 48.39 elapsed minutes. All four native recording SHA-256 hashes verified before the first fresh pair launched. [Targeted outcomes](../evidence/bottle-size-A/wide-mixed-r25-development-results.json) · [Geometry](../evidence/bottle-size-A/wide-mixed-r25-geometry.json)
 
 The fresh batch closed at 03:22 Pacific time on November 24, 2026. Of 30 attempts, 29 localized, grasped, poured, reached the intended stop and returned the bottle. Zero particles were lost. The one failed attempt (normal 07) confirmed the bottle but lacked a confirmed cup at the 2.05 s deadline and transferred 0 mL. All four repaired layouts passed again. Normal 12 and 14 finished at 95.47% and 95.20% of rim height, while swapped 12 and normal 09 each transferred 28.00 mL. Strict passes were 14/15 normal, 15/15 swapped, 15/15 near-full targets and 14/15 empty targets. Fresh evaluation took 6.60 elapsed hours. Personal working time was unmeasured. All 34 native recordings (6,925,556,236 bytes) and their run reports verified. Next, replay normal 07's cup-detail frames against the prior successful placements with the pour controller frozen. [Outcomes](../evidence/bottle-size-A/wide-mixed-r25-completion.json) · [Startup audit](../evidence/bottle-size-A/wide-mixed-r25-fresh-startup.json) · [Failure evidence](../evidence/bottle-size-A/wide-mixed-r25-fresh-failures.json)
+
+## Revision 26 — normal 07 cup localization
+
+The previous fresh normal 07 attempt confirmed the bottle but never confirmed the cup. It timed out before grasping at 2.05 simulated seconds. On four sampled cup-detail frames, the coarse heatmap put the rim center about 9.1 pixels from its calibrated label. The score was 0.137–0.151 against an acceptance threshold of 0.397. On the paired swapped recording, the corresponding errors were 1.0–1.2 pixels and scores exceeded 0.99. [Camera diagnosis](../evidence/bottle-size-A/wide-mixed-r26-cup-diagnosis.json)
+
+From the Ubuntu study root, use the revision 25 checkpoints and Isaac Sim image, the stationary AIWorker and the native pair 07 recordings from revisions 11, 12 and 20–25. The fitting, geometry and simulation launchers isolate the RTX 4070. The launcher checks replay evidence and the targeted strict result before each fresh test shard.
+
+```sh
+set -e
+mkdir wide-mixed-r26
+cp -a wide-mixed-r25/src wide-mixed-r26/src
+sed s/wide-mixed-r25/wide-mixed-r26/ wide_mixed_r25_checks.py > wide_mixed_r26_checks.py
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r26_cup.py --label wide-r26-diag --seconds 600 --minimum-free-gib 1 -- diagnose
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r26_cup.py --label wide-r26-fit --seconds 2700 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r26_cup.py --label wide-r26-calibrate --seconds 3000 --minimum-free-gib 1 -- calibrate
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r26.py --label wide-r26-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r26_checks.py --label wide-r26-checks --seconds 600 --minimum-free-gib 1
+cp wide-r26-checks/run.log wide-mixed-r26/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r26-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r26
+python3 run_sized_autonomy.py --study wide-mixed-r26 --part development --label wide-r26-dev --seconds 7200
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r26 --part test --shard "$shard" --label "wide-r26-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r26
+python3 audit_wide_mixed_failures.py wide-mixed-r26
+python3 audit_startup_localization.py wide-mixed-r26
+```
+
+The coarse cup heatmap was fine-tuned with AdamW for 24 epochs at 0.0002, using 56 positive and 28 erased views from four normal/swapped starts in revisions 24–25. The full weight update recovered normal 07 but exceeded the 2.5 mm gate on nine swapped views. A calibration search on the four fitting starts chose 12.5% of that weight update. With this candidate the failed native sequence confirmed on frame 18 at 0.67 mm error. All 48 positive sequences (16 native and 32 translated) met the threshold, with a maximum error of 2.10 mm. All 32 missing-cup sequences were rejected. Twelve of the 16 recordings were outside the fit and blend selection. Each variant reused a recorded camera sequence. The simulator motion, gripper, bottle localization, fill and stop fields were checked for exact equality. All 141 runtime source files and 13 other checkpoints matched revision 25. [First fit](../evidence/bottle-size-A/wide-mixed-r26-cup-unblended-replay.json) · [Blend selection](../evidence/bottle-size-A/wide-mixed-r26-blend-selection.json) · [Accepted replay](../evidence/bottle-size-A/wide-mixed-r26-cup-startup-replay.json) · [Frozen fields](../evidence/bottle-size-A/wide-mixed-r26-frozen-controller.json)

@@ -19,12 +19,12 @@ KEY = "12_normal"
 SEED = 26112412
 
 
-def fit(cfg):
-    torch.manual_seed(SEED)
-    rng = np.random.default_rng(SEED)
+def fit(cfg, *, revisions=(23,24), pair=12, seed=SEED):
+    torch.manual_seed(seed)
+    rng = np.random.default_rng(seed)
     images, labels, present, sources = [], [], [], []
-    for revision in (23,24):
-        for case, frame in native_trials(ROOT / f"wide-mixed-r{revision}", {12}):
+    for revision in revisions:
+        for case, frame in native_trials(ROOT / f"wide-mixed-r{revision}", {pair}):
             _, _, cal, z, xy = setup(case)
             uv = project([*xy,z],cal)
             sources.append(case["name"])
@@ -47,7 +47,7 @@ def fit(cfg):
     for _ in range(24):
         train_epoch(model,optimizer,x,y,has,rng,xx,yy)
     weights = {k:v.detach().cpu() for k,v in model.state_dict().items()}
-    return weights, dict(seed=SEED,epochs=24,learning_rate=2e-4,positive=sum(present),negative=present.count(False),
+    return weights, dict(seed=seed,epochs=24,learning_rate=2e-4,positive=sum(present),negative=present.count(False),
                          sources=sources)
 
 
