@@ -25,16 +25,18 @@ def erased(frame, center, fill):
 
 
 @torch.inference_mode()
-def measure(case, frame, parent_type, study=STUDY, target_suffix="02_normal", frame_limit=42):
+def measure(case, frame, parent_type, study=STUDY, target_suffix="02_normal", frame_limit=42, *,
+            parent_config=None, candidate_config=None):
     cfg,geom,cal,z,xy = setup(case)
     truth_uv = project([*xy,z],cal)
     names = ["parent","candidate","flat","background"]
     target = case["name"].endswith(target_suffix)
     if target:
         names += ["translated_left","translated_right"]
-    trackers = {name:SizedCupPerception(cfg,geom) for name in names}
+    trackers = {name:SizedCupPerception((parent_config if name=="parent" else candidate_config) or cfg,geom)
+                for name in names}
     assert Path(inspect.getfile(type(trackers["candidate"].tracker))).resolve() == study/"src/pour_cup_outline.py"
-    trackers["parent"].tracker = parent_type(cfg["tracker"],geom,"cuda")
+    trackers["parent"].tracker = parent_type((parent_config or cfg)["tracker"],geom,"cuda")
     observed = {}
     for i in range(frame_limit):
         image = frame(i)

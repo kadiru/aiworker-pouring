@@ -1671,3 +1671,39 @@ python3 audit_startup_localization.py wide-mixed-r24
 All 32 geometries passed. On November 23 at 12:29 Pacific time the two targeted Isaac Sim pours passed with zero spill. Swapped 04 and normal 13 each transferred 28.00 mL, reached the empty stop and returned the bottle. Confirmation followed empty by 1.95 s and 0.35 s respectively. Targeted simulation took 24.48 elapsed minutes. Both native recordings verified before the fresh tests began. [Targeted results](../evidence/bottle-size-A/wide-mixed-r24-development-results.json) · [Preflight](../evidence/bottle-size-A/wide-mixed-r24-geometry.json)
 
 The 30 fresh tests closed at 18:40 Pacific time on November 23, 2026. Both repaired placements passed again, with 28.00 mL delivered and zero spill each. Of 30 attempts, 27 grasped, poured, reached the intended stop and returned the bottle. Of those 27, 26 completed with zero spill. Normal 09 lost four particles (0.0233 mL), two each at 113.34° and 117.47° during coarse pouring. Normal 12 confirmed neither vessel by the 2.05 s startup deadline. Swapped 12 and normal 14 confirmed the cup, but lacked a confirmed bottle. All three transferred zero. All four failures used the same checkpoints as the previous revision for those geometries. Overall strict passes were 12/15 normal, 14/15 swapped, 13/15 near-full targets and 13/15 empty targets. The fresh batch took 6.18 elapsed evaluation hours on the RTX 4070. Personal working time was unmeasured. The two targeted and 30 fresh native recordings totaled 6,158,484,844 bytes and verified on Ubuntu. [Outcome audit](../evidence/bottle-size-A/wide-mixed-r24-completion.json) · [Lost-particle traces](../evidence/bottle-size-A/wide-mixed-r24-fresh-failures.json) · [Startup audit](../evidence/bottle-size-A/wide-mixed-r24-fresh-startup.json)
+
+## Revision 25 — three startup timeouts and normal 09 coarse spill
+
+The task camera reproduced all three revision 24 bottle timeouts. On swapped 12 the primary neck proposal was 8.2 pixels from the labeled neck on the first frame. On normal 12 and 14 it had high confidence, but the photographed outline failed corroboration. The separate cup-detail camera also missed the rim on normal 12. On the first frame its learned proposal was about 254 pixels from the calibrated rim center, with a cup-presence score below 0.001. [Archived camera diagnosis](../evidence/bottle-size-A/wide-mixed-r25-startup-diagnosis.json)
+
+Two shared bottle heatmaps were fine-tuned with AdamW for 24 epochs at a learning rate of 0.0002 each. Each fit used 56 positive and 28 synthetic bottle-erased task images from four normal/swapped recordings at its geometry. Reference outlines came from both orientations of pair 12 and the normal orientation of pair 14. Replay included pair 00, which shares pair 14's checkpoint. The 66 native recordings included previously failed views and fitting views. All 198 native or translated positive sequences localized within 0.96 mm, and all 66 erased sequences rejected the bottle. [Bottle replay](../evidence/bottle-size-A/wide-mixed-r25-neck-replay.json)
+
+Normal 09 lost two particle pairs near 113.34° and 117.47°. The RTX 4070 scored 501 coarse-pour paths on 6,124 incoming observations from four recordings. Three other recordings supplied 4,532 held-out observations. The selected path draws the bottle mouth back 9 mm and down 8 mm over 110–115°, reduces its late forward shift to 2 mm, and rejoins the incumbent terminal position over 122–126°. Offline rim projections improved for all four particles, though two still projected outside the rim. The targeted simulated pour determines whether the repair transfers. [Trajectory fit](../evidence/bottle-size-A/wide-mixed-r25-stream-fit.json) · [Particle traces](../evidence/bottle-size-A/wide-mixed-r25-spill-trace.json)
+
+Ubuntu's system volume fell below the launcher's 2 GiB requirement during this work. With the user's approval, 287 closed study artifacts (3,482,275,641 bytes) and two archived evaluations (17,397,237,760 bytes) moved to the dedicated training partition. Each original path resolves to its verified copy. The 287 study artifacts were also read and hashed inside a read-only simulation container. Both evaluation archives matched their November 21 receipts. After relocation the system and training volumes had 17.64 and 77.25 GiB available, respectively. [Study archive verification](../evidence/bottle-size-A/wide-mixed-r25-archive-verification.json) · [Evaluation archive verification](../evidence/bottle-size-A/wide-mixed-r25-recovery-archives.json)
+
+The coarse cup heatmap shared by pair 12 was fine-tuned for 24 epochs on 56 positive and 28 erased cup-detail views from four revision 23–24 starts. Fine localization, cup-presence classification, tracking thresholds and level estimation retained the parent weights and settings. On 14 recorded starts, the candidate accepted all 42 native or translated positives (maximum 1.51 mm error) and rejected all 28 flat- or background-erased sequences. On the original normal 12 failure the estimate was 0.26 mm from the labeled center on frame eight. Three of 14 checkpoints changed. All 141 runtime sources matched revision 24. [Cup replay](../evidence/bottle-size-A/wide-mixed-r25-cup-startup-replay.json) · [Frozen fields](../evidence/bottle-size-A/wide-mixed-r25-frozen-controller.json) · [Sealed layouts and seeds](../evidence/bottle-size-A/wide-mixed-r25-plan.json)
+
+From the Ubuntu study root, use the revision 24 image, assets and recordings, plus the revision 20 neck startup archive referenced by the fitting helper. Each fit and simulation uses the GPU-priority guard. The test launcher verifies the targeted results before each fresh pair.
+
+```sh
+set -e
+mkdir -p wide-mixed-r25/inputs
+cp -a wide-mixed-r24/src wide-mixed-r25/src
+sed s/wide-mixed-r24/wide-mixed-r25/ wide_mixed_r24_checks.py > wide_mixed_r25_checks.py
+python3 run_isolated_perception_job.py --helper diagnose_wide_mixed_r25.py --label wide-r25-diag --seconds 1200 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r25.py --label wide-r25-neck-fit --seconds 2400 --minimum-free-gib 1 -- neck
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r25.py --label wide-r25-motion --seconds 1500 --minimum-free-gib 1 -- motion
+python3 run_isolated_perception_job.py --helper fit_wide_mixed_r25_cup.py --label wide-r25-cup --seconds 2000 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper prepare_wide_mixed_r25.py --label wide-r25-plan --seconds 600 --minimum-free-gib 1
+python3 run_isolated_perception_job.py --helper wide_mixed_r25_checks.py --label wide-r25-checks --seconds 600 --minimum-free-gib 1
+cp wide-r25-checks/run.log wide-mixed-r25/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label wide-r25-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r25
+python3 run_sized_autonomy.py --study wide-mixed-r25 --part development --label wide-r25-dev --seconds 7200
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r25 --part test --shard "$shard" --label "wide-r25-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r25
+python3 audit_wide_mixed_failures.py wide-mixed-r25
+python3 audit_startup_localization.py wide-mixed-r25
+```

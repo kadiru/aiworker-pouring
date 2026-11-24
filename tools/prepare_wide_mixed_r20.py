@@ -11,7 +11,7 @@ from prepare_wide_mixed_r17 import identical
 from prepare_wide_mixed_r19 import seal_layouts
 
 
-def prepare(parent, study, neck_targets, motion_targets, losses, prefix, layout_seed, trial_seed, scope):
+def prepare(parent, study, neck_targets, motion_targets, losses, prefix, layout_seed, trial_seed, scope, *, cup_key=None):
     torch.set_num_threads(2)
     plan = read(parent/"plan.json")
     previous = read(parent/"completion.json")
@@ -56,6 +56,17 @@ def prepare(parent, study, neck_targets, motion_targets, losses, prefix, layout_
             assert changes.keys()<={"tail_window_deg","tail_setback_m","tail_drop_m","finish_mouth_pose","late_mouth_shift_m"}
             candidate = dict(state,**changes)
             fields = sorted(changes)
+        if key == cup_key:
+            cup = read(study/"cup-startup-replay.json")
+            weights = study/"cup-coarse-12.pt"
+            assert cup["passed"] and cup["checkpoint"]==old and cup["artifact_sha256"]==sha(weights)
+            cfg = state["sized_cup_perception"]
+            coarse = torch.load(weights,map_location="cpu",weights_only=False)
+            tracker = dict(cfg["tracker"],coarse_state=coarse)
+            candidate["sized_cup_perception"] = dict(cfg,tracker=tracker)
+            fields.append("sized_cup_perception")
+            assert all(identical(v,tracker[k]) for k,v in cfg["tracker"].items() if k!="coarse_state")
+            assert all(identical(v,candidate["sized_cup_perception"][k]) for k,v in cfg.items() if k!="tracker")
         dest = study/Path(old).name
         torch.save(candidate,dest)
         actual = torch.load(dest,map_location="cpu",weights_only=False)
@@ -67,9 +78,13 @@ def prepare(parent, study, neck_targets, motion_targets, losses, prefix, layout_
     assert all(sha(p)==h for p,h in plan["checkpoints"].items())
     save(study/"frozen-controller.json",dict(passed=True,runtime_sources=sources,changed=proofs,
          unchanged_checkpoints=len(plan["checkpoints"])-len(proofs),parent_plan_sha256=sha(parent/"plan.json")))
-    seal_layouts(plan,parents,replacements,neck_targets+motion_targets,prefix,layout_seed,trial_seed,2,scope)
+    targets = tuple(losses) if cup_key is not None else neck_targets+motion_targets
+    seal_layouts(plan,parents,replacements,targets,prefix,layout_seed,trial_seed,2,scope)
     if neck_targets:
         path = study/"neck-replay.json"
+        plan["prerequisite_reports"][str(path)] = sha(path)
+    if cup_key is not None:
+        path = study/"cup-startup-replay.json"
         plan["prerequisite_reports"][str(path)] = sha(path)
     for path in (parent/"plan.json",parent/"completion.json",study/"stream-fit.json",
                  study/"spill-trace.json",study/"frozen-controller.json"):
