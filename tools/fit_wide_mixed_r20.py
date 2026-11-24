@@ -38,12 +38,13 @@ def add_refinement(state, bank):
 
 
 @torch.inference_mode()
-def fit_neck(key, rows, parent=PARENT, study=STUDY, template_revisions=("r18", "r19"), proposal=None, *, update_primary=False):
+def fit_neck(key, rows, parent=PARENT, study=STUDY, template_revisions=("r18", "r19"), proposal=None, *, update_primary=False, template_keys=None):
     path, state = state_for(key, parent)
     target = next(r for r in rows if r["name"].endswith(parent.name.rsplit("-",1)[1]+"_test_"+key))
     assert replay(target["frames"], state)[0] is None
     indices = (0, 3, 6, 9)
-    templates = [r for r in rows if any(r["name"].endswith(rev+"_test_"+key) for rev in template_revisions)]
+    suffixes = tuple(rev+"_test_"+layout for rev in template_revisions for layout in (template_keys or (key,)))
+    templates = [r for r in rows if r["name"].endswith(suffixes)]
     bank = make_bank([r["frames"][i] for r in templates for i in indices],
                      [r["uv"] for r in templates for i in indices],
                      "source", aggregation="max", gradient_clip=.04, source_mask_box=(10,7,38,39))
