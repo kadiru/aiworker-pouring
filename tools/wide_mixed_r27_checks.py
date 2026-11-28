@@ -5,7 +5,7 @@ import unittest
 import torch
 root = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
-parser.add_argument("--study", choices=("wide-mixed-r27","wide-mixed-r27b"), default="wide-mixed-r27")
+parser.add_argument("--study", choices=("wide-mixed-r27","wide-mixed-r27b", "wide-mixed-r28"), default="wide-mixed-r27")
 sys.path.insert(0,str(root/parser.parse_args().study/"src"))
 torch.set_num_threads(2)
 names = ("test_pour_size_autonomy","test_pour_temporal_localization",

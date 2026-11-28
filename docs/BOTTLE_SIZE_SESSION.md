@@ -1798,3 +1798,27 @@ python3 audit_wide_mixed_r27b_surface.py
 ```
 
 All four targeted trials passed without loss. The 30 fresh trials finished with 26 strict successes, 26 ordered returns and zero lost particles. Four attempts timed out at startup. Swapped 04, swapped 07 and normal 12 confirmed only the cup, and swapped 11 confirmed only the bottle. Swapped 09's targeted and fresh trials settled at 90.59% and 91.87% respectively, above the 90% scoring minimum. Normal 09 confirmed empty after 0.30 and 0.40 seconds respectively. The 34 native recordings totaled 6,289,189,090 bytes. The targeted batch used 51.8 elapsed minutes and the 15 fresh pairs used 5.82 elapsed hours on the 4070. [Fresh results](../evidence/bottle-size-A/wide-mixed-r27b-completion.json) · [Camera readings](../evidence/bottle-size-A/wide-mixed-r27b-pair-09-stops.json) · [Failed startup evidence](../evidence/bottle-size-A/wide-mixed-r27b-fresh-failures.json)
+
+## Revision 28 — startup localization with stop logic frozen
+
+The three bottle detectors address swapped 04, swapped 07 and normal 12. Each proposal heatmap is fine-tuned for 24 AdamW epochs on native and erased startup views from both orientations of revisions 26 and 27b. Bottle-neck templates corroborate the proposal. The cup fit adjusts pair 11's coarse heatmap using the same two revisions. Both fits use the existing 2.5 mm replay limit and missing-object rejection. Held-out recordings come from revisions 11, 12 and 20 through 25. The checkpoint audit restores only the fitted localization leaves and compares every other tensor and setting to revision 27b. The entire simulation runtime is hash-checked against revision 27b.
+
+Start in Ubuntu's existing `learning/A-scale-dynamic-20261109-v1` directory. Stage the versioned tools in the study root and copy the previous runtime snapshot into an unused `wide-mixed-r28/src` directory. The four development cases reproduce the original failure placements. The fresh tests use 15 matched normal/swapped pairs with independently drawn shifts relative to their parents and new episode seeds.
+
+```sh
+set -eu
+mkdir -p wide-mixed-r28/inputs
+for step in fit_wide_mixed_r28_bottles fit_wide_mixed_r28_cup prepare_wide_mixed_r28; do
+    python3 run_isolated_perception_job.py --helper "$step.py" --label "r28-$step" --seconds 2400 --minimum-free-gib 1
+done
+python3 run_isolated_perception_job.py --helper wide_mixed_r27_checks.py --label r28-checks --seconds 900 --minimum-free-gib 1 -- --study wide-mixed-r28
+cp r28-checks/run.log wide-mixed-r28/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label r28-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r28
+python3 run_sized_autonomy.py --study wide-mixed-r28 --part development --label r28-dev --seconds 7200
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r28 --part test --shard "$shard" --label "r28-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r28
+python3 audit_wide_mixed_failures.py wide-mixed-r28
+python3 audit_startup_localization.py wide-mixed-r28
+```
