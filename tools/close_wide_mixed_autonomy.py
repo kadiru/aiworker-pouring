@@ -111,7 +111,7 @@ def main():
     parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b",
                                           "wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10",
                                           "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12","wide-mixed-r13",
-                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18", "wide-mixed-r19", "wide-mixed-r20", "wide-mixed-r21", "wide-mixed-r22", "wide-mixed-r23", "wide-mixed-r24", "wide-mixed-r25", "wide-mixed-r26"),
+                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18", "wide-mixed-r19", "wide-mixed-r20", "wide-mixed-r21", "wide-mixed-r22", "wide-mixed-r23", "wide-mixed-r24", "wide-mixed-r25", "wide-mixed-r26", "wide-mixed-r27"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -234,6 +234,16 @@ def main():
             assert plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))] == digest
             report[filename.split(".")[0].replace("-","_")+"_sha256"] = digest
         report.update(development_cases=dev, controller_test_log_sha256=sha(STUDY/"controller-tests.log"))
+    if STUDY.name=="wide-mixed-r27":
+        parent = read(ROOT/"wide-mixed-r26"/"geometry.json")["sources"]
+        assert parent.keys()==geometry["sources"].keys()
+        assert [k for k in parent if parent[k]!=geometry["sources"][k]]==["pour_size_autonomy.py"]
+        for filename in ("neck-replay.json","stop-fit.json","frozen-controller.json"):
+            path = STUDY/filename
+            assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
+            report[filename.split(".")[0].replace("-","_")+"_sha256"] = sha(path)
+        assert len(dev)==4 and all(r["strict_pass"] and r["measured_loss_particles"]==0 for r in dev)
+        report.update(development_cases=dev,controller_test_log_sha256=sha(STUDY/"controller-tests.log"))
     with (STUDY/"completion.json").open("x") as file:
         json.dump(report,file,indent=2,allow_nan=False)
         file.write("\n")

@@ -1748,3 +1748,25 @@ The first geometry screen predicted contact between the arm and cup on the appro
 At 11:55 Pacific time on November 24, the targeted normal 07 pour passed on the original failure placement. The robot delivered 28.00 mL, confirmed empty 0.40 simulated seconds after depletion, and returned the bottle with zero measured particle loss. The targeted evaluation took 12.63 elapsed minutes. The native recording verified before fresh testing. [Targeted pour](../evidence/bottle-size-A/wide-mixed-r26-development-results.json) · [Final geometry screen](../evidence/bottle-size-A/wide-mixed-r26-geometry.json)
 
 The 30 fresh tests closed at 18:18 Pacific time on November 24, 2026. Normal 07 succeeded at its fresh position, transferring 28.00 mL and confirming empty 0.45 simulated seconds after depletion. Across the batch, 28 attempts grasped, poured and returned the bottle. There were 26 strict passes and zero lost particles. Swapped 04 and normal 14 localized the cup but timed out at 2.05 s waiting for the bottle. Neither attempted a grasp. Normal 09 delivered 28.00 mL and stopped on empty, but its filtered RGB and color level estimates differed by 3.64 percentage points, above the 3.50-point agreement limit. Swapped 09 stopped near full and settled at 89.46% of rim height, 0.54 points below the minimum. All four failures used unchanged checkpoints. Strict passes were 13/15 in each orientation and 13/15 for each stop target. The fresh batch took 6.37 elapsed evaluation hours. Personal working time was unmeasured. All 31 native recordings totaling 6,141,252,522 bytes verified. [Fresh results](../evidence/bottle-size-A/wide-mixed-r26-completion.json) · [Startup](../evidence/bottle-size-A/wide-mixed-r26-fresh-startup.json) · [Failure evidence](../evidence/bottle-size-A/wide-mixed-r26-fresh-failures.json)
+
+## Revision 27 — bottle startup and stop calibration
+
+Each of two bottle-proposal CNNs received 24 AdamW epochs at 0.0002 on 56 positive and 28 erased views from four r25/r26 starts. Native, translated and erased replays passed for swapped 04 and normal 14 across 18 and 52 archived trials respectively. The pair 09 stop fit used four training and five validation revisions, each with separate normal and swapped episodes. The draining RGB correction peaks at +0.030 of rim height. Both near-full thresholds are 0.949, fitted to the largest training overread plus a 0.002 reserve above 0.90. The 0.035 camera agreement limit, protective braking signal and movement trajectories were preserved. Simulator truth supplied labels for fitting and scoring. The robot receives camera estimates at runtime. [Startup replay](../evidence/bottle-size-A/wide-mixed-r27-neck-replay.json) · [Stop fit](../evidence/bottle-size-A/wide-mixed-r27-stop-fit.json) · [Parameter comparison](../evidence/bottle-size-A/wide-mixed-r27-frozen-controller.json)
+
+Run the following from Ubuntu's existing `learning/A-scale-dynamic-20261109-v1` study directory with the r27 source snapshot and r26 artifacts available. Begin with an unused output directory containing `src` and `inputs`. The sealed plan records trial seeds and source paths.
+
+```sh
+set -eu
+for step in fit_wide_mixed_r27_neck diagnose_wide_mixed_r27_stops fit_wide_mixed_r27_stops prepare_wide_mixed_r27 wide_mixed_r27_checks; do
+    python3 run_isolated_perception_job.py --helper "$step.py" --label "r27-$step" --seconds 2400 --minimum-free-gib 1
+done
+cp r27-wide_mixed_r27_checks/run.log wide-mixed-r27/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label r27-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r27
+python3 run_sized_autonomy.py --study wide-mixed-r27 --part development --label r27-development --seconds 7200
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r27 --part test --shard "$shard" --label "r27-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r27
+python3 audit_wide_mixed_failures.py wide-mixed-r27
+python3 audit_startup_localization.py wide-mixed-r27
+```

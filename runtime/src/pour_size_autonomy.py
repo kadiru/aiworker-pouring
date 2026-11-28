@@ -58,6 +58,9 @@ class SizedCupPerception:
         self.retry_initial_cup = config.get("retry_initial_cup", False)
         self.settled_rgb_calibration = config.get("settled_rgb_calibration")
         self.midfill_rgb_calibration = config.get("midfill_rgb_calibration")
+        self.draining_rgb_residual = config.get("draining_rgb_residual")
+        if self.draining_rgb_residual is not None:
+            validate_rgb_calibration(self.draining_rgb_residual, geometry)
         self.draining_color_calibration = config.get("draining_color_calibration")
         if self.draining_color_calibration is not None:
             validate_rgb_calibration(self.draining_color_calibration, geometry)
@@ -118,6 +121,12 @@ class SizedCupPerception:
                 filtered["rgb"], MIDFILL_RGB_KNOTS)
             diagnostic.update(guard_filtered=filtered.copy(), rgb_midfill_correction=correction)
             filtered["rgb"] -= correction
+        if valid and phase == "draining" and self.draining_rgb_residual is not None:
+            original = diagnostic.setdefault("guard_filtered", filtered.copy())
+            residual = self.draining_rgb_residual
+            delta = residual["bias"] * settled_rgb_weight(original["rgb"], residual["knots"])
+            filtered["rgb"] += delta
+            diagnostic["draining_rgb_correction"] = delta
         if valid and draining and self.draining_color_calibration is not None:
             diagnostic.setdefault("guard_filtered", filtered.copy())
             filtered["color"] = calibrated_rgb_height(filtered["color"], self.draining_color_calibration)

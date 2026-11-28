@@ -1,8 +1,10 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 24, 2026 (America/Los_Angeles).
+Updated: November 27, 2026 (America/Los_Angeles).
 
 For the illustrated pouring cycle, control architecture, study comparisons and a runnable offline example, start with the [project guide](README.md).
+
+**Revision 27 passed archived replay on the RTX 4070.** The two bottle detectors passed 280 startup checks from 70 archived trials. Pair 09's stop calibration passed replay on eight fitting and ten held-out episodes. The original normal 09 stop disagreement dropped from 3.64 to 0.64 percentage points. The revised threshold asks for another trim at swapped 09's original early stop. Four live targeted pours must pass with zero loss before the 30 fresh trials can run. [Bottle replay](evidence/bottle-size-A/wide-mixed-r27-neck-replay.json) · [Stop replay](evidence/bottle-size-A/wide-mixed-r27-stop-fit.json) · [Sealed plan](evidence/bottle-size-A/wide-mixed-r27-plan.json)
 
 **Revision 26 scored 26/30 strict passes in fresh wide/swapped Isaac Sim trials on the RTX 4070. Zero particles spilled.** Normal 07 passed both the original and fresh placements, transferring 28.00 mL and confirming empty each time with the pouring motion frozen. Swapped 04 and normal 14 timed out waiting for the bottle before grasp. Normal 09 emptied the bottle but the RGB and color level estimates disagreed by 3.64 percentage points at the stop. Swapped 09 finished at 89.46% of rim height, below the 90% minimum. All four failures used checkpoints unchanged since revision 25. The 28 completed pours returned the bottle. Fresh evaluation took 6.37 elapsed hours and all 31 native recordings verified. Next, replay the two bottle-localization timeouts and both pair 09 stop decisions. [Fresh outcomes](evidence/bottle-size-A/wide-mixed-r26-completion.json) · [Failure traces](evidence/bottle-size-A/wide-mixed-r26-fresh-failures.json) · [Normal 07 target](evidence/bottle-size-A/wide-mixed-r26-development-results.json)
 

@@ -1,0 +1,248 @@
+{
+  "checkpoint": "/workspace/learning/A-scale-dynamic-20261109-v1/wide-mixed-r25/cup-00-bottle-01-higher-settle.pt",
+  "calibrations": {
+    "rgb_height_calibration": {
+      "settling": {
+        "geometry": {
+          "bottom_z_m": 0.004,
+          "rim_z_m": 0.034600000000000006,
+          "rim_radius_m": 0.0216,
+          "profile": [
+            [
+              0.004,
+              0.018000000000000002
+            ],
+            [
+              0.034600000000000006,
+              0.0216
+            ]
+          ],
+          "capacity_geometric_ml": 37.173112813575884,
+          "legacy_brim_nominal_ml": 53.071200000000005,
+          "source": "declared_fixture_geometry_not_visual_estimation"
+        },
+        "knots": [
+          0.739,
+          0.787,
+          0.911,
+          0.95
+        ],
+        "bias": 0.033154557499080715
+      },
+      "draining": {
+        "bias": 0.030444971748381237,
+        "knots": [
+          0.739,
+          0.787,
+          0.85,
+          0.9
+        ],
+        "geometry": {
+          "bottom_z_m": 0.004,
+          "rim_z_m": 0.034600000000000006,
+          "rim_radius_m": 0.0216,
+          "profile": [
+            [
+              0.004,
+              0.018000000000000002
+            ],
+            [
+              0.034600000000000006,
+              0.0216
+            ]
+          ],
+          "capacity_geometric_ml": 37.173112813575884,
+          "legacy_brim_nominal_ml": 53.071200000000005,
+          "source": "declared_fixture_geometry_not_visual_estimation"
+        }
+      }
+    },
+    "draining_color_calibration": null,
+    "settled_rgb_calibration": null,
+    "midfill_rgb_calibration": null,
+    "agreement_limit": 0.035
+  },
+  "thresholds": {
+    "full_settled_target": 0.925,
+    "coarse_brake_target": 0.82,
+    "settle_seconds": 1.2,
+    "trim_increment": 0.005,
+    "trim_seconds": 0.0,
+    "trim_total_seconds": 2.5,
+    "max_pauses": 13,
+    "settled_geometry_tolerance": 0.1,
+    "settled_stability_std": 0.01,
+    "trim_min_phase": 95.0,
+    "adaptive_trim": true,
+    "trim_extra_deg": 0.5,
+    "trim_hard_cap_deg": 110.0,
+    "trim_fast_rate_deg_s": 18.0,
+    "trim_creep_rate_deg_s": 35.0,
+    "brake_rate_deg_s": 45.0,
+    "fitted_full_at_pulse_limit": 0.9219
+  },
+  "cases": [
+    {
+      "name": "SA_A_wide_mixed_r26_test_09_normal",
+      "recording_sha256": "6de7706a9f26157a7daea50b193e2055adecc8c9744563dd2679fb640a8d133e",
+      "windows": {
+        "0": {
+          "t": 22.454999998772916,
+          "stop": "bottle_empty",
+          "view": {
+            "track_valid": true,
+            "track_reason": "tracked",
+            "raw": {
+              "rgb": 0.7369819838414208,
+              "color": 0.7730347914695739
+            },
+            "filtered": {
+              "rgb": 0.735080905280537,
+              "color": 0.7714379438509219
+            },
+            "valid": true,
+            "disagreement": 0.03635703857038486,
+            "agreement": false,
+            "guard_filtered": {
+              "rgb": 0.735080905280537,
+              "color": 0.7714379438509219
+            },
+            "calibrated_brake_level": 0.7730347914695739,
+            "rgb_height_phase": "draining"
+          }
+        }
+      }
+    },
+    {
+      "name": "SA_A_wide_mixed_r26_test_09_swap",
+      "recording_sha256": "ddbd76b73d24e0f18a87528281977c356659f72a87964c890fc11b161425b3fc",
+      "windows": {
+        "1": {
+          "t": 13.65499999877008,
+          "stop": null,
+          "view": {
+            "track_valid": true,
+            "track_reason": "tracked",
+            "raw": {
+              "rgb": 0.8260889807110099,
+              "color": 0.7635330913822161
+            },
+            "filtered": {
+              "rgb": 0.7918707941332993,
+              "color": 0.762276472244849
+            },
+            "valid": true,
+            "disagreement": 0.029594321888450348,
+            "agreement": true,
+            "guard_filtered": {
+              "rgb": 0.82502535163238,
+              "color": 0.762276472244849
+            },
+            "calibrated_brake_level": 0.7929344232119292,
+            "rgb_height_phase": "settling"
+          }
+        },
+        "2": {
+          "t": 16.104999998769667,
+          "stop": null,
+          "view": {
+            "track_valid": true,
+            "track_reason": "tracked",
+            "raw": {
+              "rgb": 0.8539880343863289,
+              "color": 0.7949293350344948
+            },
+            "filtered": {
+              "rgb": 0.8208334768872482,
+              "color": 0.7949293350344948
+            },
+            "valid": true,
+            "disagreement": 0.02590414185275336,
+            "agreement": true,
+            "guard_filtered": {
+              "rgb": 0.8539880343863289,
+              "color": 0.7949293350344948
+            },
+            "calibrated_brake_level": 0.8208334768872482,
+            "rgb_height_phase": "settling"
+          }
+        },
+        "3": {
+          "t": 18.55499999877092,
+          "stop": null,
+          "view": {
+            "track_valid": true,
+            "track_reason": "tracked",
+            "raw": {
+              "rgb": 0.8954460783436005,
+              "color": 0.8370304897253815
+            },
+            "filtered": {
+              "rgb": 0.8624038155219927,
+              "color": 0.8371494700424631
+            },
+            "valid": true,
+            "disagreement": 0.02525434547952965,
+            "agreement": true,
+            "guard_filtered": {
+              "rgb": 0.8955583730210734,
+              "color": 0.8371494700424631
+            },
+            "calibrated_brake_level": 0.8624038155219927,
+            "rgb_height_phase": "settling"
+          }
+        },
+        "4": {
+          "t": 21.0549999987722,
+          "stop": null,
+          "view": {
+            "track_valid": true,
+            "track_reason": "tracked",
+            "raw": {
+              "rgb": 0.9333157421244698,
+              "color": 0.9011400065812244
+            },
+            "filtered": {
+              "rgb": 0.9184667976153339,
+              "color": 0.900706101112075
+            },
+            "valid": true,
+            "disagreement": 0.017760696503258844,
+            "agreement": true,
+            "guard_filtered": {
+              "rgb": 0.9329561023499084,
+              "color": 0.900706101112075
+            },
+            "calibrated_brake_level": 0.9191321732253991,
+            "rgb_height_phase": "settling"
+          }
+        },
+        "5": {
+          "t": 23.604999998773504,
+          "stop": "cup_near_full",
+          "view": {
+            "track_valid": true,
+            "track_reason": "tracked",
+            "raw": {
+              "rgb": 0.9462643514811844,
+              "color": 0.942539473698336
+            },
+            "filtered": {
+              "rgb": 0.9431630189669665,
+              "color": 0.9423112309109022
+            },
+            "valid": true,
+            "disagreement": 0.0008517880560643398,
+            "agreement": true,
+            "guard_filtered": {
+              "rgb": 0.946304568006093,
+              "color": 0.9423112309109022
+            },
+            "calibrated_brake_level": 0.9431630189669665,
+            "rgb_height_phase": "settling"
+          }
+        }
+      }
+    }
+  ]
+}
