@@ -1770,3 +1770,28 @@ python3 close_wide_mixed_autonomy.py --study wide-mixed-r27
 python3 audit_wide_mixed_failures.py wide-mixed-r27
 python3 audit_startup_localization.py wide-mixed-r27
 ```
+
+## Revision 27b — confirming a near-full cup from the settled liquid surface
+
+A ridge regression estimates liquid height from a rectified crop of the cup-detail RGB image. It averages two red color differences and brightness over four-pixel cells. Five archived swapped 09 episodes provided 264 fitting frames and five separate episodes provided 208 validation frames. Simulator surface height supervised fitting. At runtime the lower quartile of the last six stable predictions must reach 0.902 of rim height. The existing parallel RGB and color estimates must also confirm. A stable surface below that threshold can request a small additional tilt. A raw upper level of 0.98 retains the original brake angle. The two historical problem windows belong to the fitting set. Live tests assess generalization. [Fit](../evidence/bottle-size-A/wide-mixed-r27b-surface-fit.json) · [Runtime replay](../evidence/bottle-size-A/wide-mixed-r27b-surface-replay.json)
+
+The plan uses fresh seeds for every episode. Its four targeted placements reproduce the original failures. Its 15 normal/swapped pairs retain r27's previously unrun benchmark placements. All 34 undergo collision screening. Each pair runs with the unchanged 4070 isolation and storage checks.
+
+From the same Ubuntu study directory, start with the r27 source snapshot copied into an unused `wide-mixed-r27b/src`, then stage this revision's `pour_guard_actor.py` and `pour_size_autonomy.py` there. Stage the repository helpers in the study root. Cached frames and weights stay on Ubuntu.
+
+```sh
+set -eu
+for step in cache_wide_mixed_r27b_surface fit_wide_mixed_r27b_surface prepare_wide_mixed_r27b; do
+    python3 run_isolated_perception_job.py --helper "$step.py" --label "r27b-$step" --seconds 1800 --minimum-free-gib 1
+done
+python3 run_isolated_perception_job.py --helper wide_mixed_r27_checks.py --label r27b-checks --seconds 900 --minimum-free-gib 1 -- --study wide-mixed-r27b
+cp r27b-checks/run.log wide-mixed-r27b/controller-tests.log
+python3 run_isolated_perception_job.py --helper preflight_sized_autonomy.py --label r27b-geometry --seconds 5400 --minimum-free-gib 1 -- --study wide-mixed-r27b
+python3 run_sized_autonomy.py --study wide-mixed-r27b --part development --label r27b-dev --seconds 7200
+for shard in $(seq 1 15); do
+    python3 run_sized_autonomy.py --study wide-mixed-r27b --part test --shard "$shard" --label "r27b-test-$shard" --seconds 7200
+done
+python3 close_wide_mixed_autonomy.py --study wide-mixed-r27b
+python3 audit_wide_mixed_failures.py wide-mixed-r27b
+python3 audit_startup_localization.py wide-mixed-r27b
+```

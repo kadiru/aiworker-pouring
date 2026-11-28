@@ -111,7 +111,7 @@ def main():
     parser.add_argument("--study",choices=("wide-mixed-r5","wide-mixed-r6","wide-mixed-r7","wide-mixed-r7b",
                                           "wide-mixed-r8","wide-mixed-r9","wide-mixed-r9b","wide-mixed-r10",
                                           "wide-mixed-r10b","wide-mixed-r11","wide-mixed-r12","wide-mixed-r13",
-                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18", "wide-mixed-r19", "wide-mixed-r20", "wide-mixed-r21", "wide-mixed-r22", "wide-mixed-r23", "wide-mixed-r24", "wide-mixed-r25", "wide-mixed-r26", "wide-mixed-r27"),
+                                          "wide-mixed-r13b", "wide-mixed-r14", "wide-mixed-r15", "wide-mixed-r16", "wide-mixed-r17", "wide-mixed-r18", "wide-mixed-r19", "wide-mixed-r20", "wide-mixed-r21", "wide-mixed-r22", "wide-mixed-r23", "wide-mixed-r24", "wide-mixed-r25", "wide-mixed-r26", "wide-mixed-r27", "wide-mixed-r27b"),
                         default="wide-mixed-r5")
     STUDY=ROOT/parser.parse_args().study
     plan_path, geometry_path = STUDY/"plan.json", STUDY/"geometry.json"
@@ -234,11 +234,14 @@ def main():
             assert plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))] == digest
             report[filename.split(".")[0].replace("-","_")+"_sha256"] = digest
         report.update(development_cases=dev, controller_test_log_sha256=sha(STUDY/"controller-tests.log"))
-    if STUDY.name=="wide-mixed-r27":
-        parent = read(ROOT/"wide-mixed-r26"/"geometry.json")["sources"]
+    if STUDY.name in ("wide-mixed-r27","wide-mixed-r27b"):
+        surface = STUDY.name=="wide-mixed-r27b"
+        parent = read(ROOT/("wide-mixed-r27" if surface else "wide-mixed-r26")/"geometry.json")["sources"]
         assert parent.keys()==geometry["sources"].keys()
-        assert [k for k in parent if parent[k]!=geometry["sources"][k]]==["pour_size_autonomy.py"]
-        for filename in ("neck-replay.json","stop-fit.json","frozen-controller.json"):
+        expected = {"pour_size_autonomy.py","pour_guard_actor.py"} if surface else {"pour_size_autonomy.py"}
+        assert {k for k in parent if parent[k]!=geometry["sources"][k]}==expected
+        reports = ("surface-fit.json","surface-replay.json") if surface else ("neck-replay.json","stop-fit.json")
+        for filename in (*reports,"frozen-controller.json"):
             path = STUDY/filename
             assert read(path)["passed"] and plan["prerequisite_reports"]["/workspace/"+str(path.relative_to(HOST))]==sha(path)
             report[filename.split(".")[0].replace("-","_")+"_sha256"] = sha(path)

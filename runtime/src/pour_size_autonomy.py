@@ -41,6 +41,21 @@ def sha(path):
     return digest.hexdigest()
 
 
+def surface_features(crops, cell):
+    # Keep the liquid and rim in normalized cup coordinates. Discard the hand and table.
+    rgb = crops[:,12:60,16:80].permute(0,3,1,2).float()/255.
+    red,green,blue = rgb.unbind(1)
+    planes = torch.stack((red-green,red-blue,(red+green+blue)/3),dim=1)
+    return torch.nn.functional.avg_pool2d(planes,cell,cell).flatten(1)
+
+
+def settled_surface_bound(history):
+    recent = np.asarray(history[-6:])
+    if len(recent)<6 or not np.isfinite(recent).all() or np.std(recent)>=.01:
+        return None
+    return float(np.quantile(recent,.25))
+
+
 class SizedCupPerception:
     def __init__(self, config, geometry, device="cuda"):
         from perception_followup import LevelFilter, VerifiedCupTracker
@@ -75,6 +90,10 @@ class SizedCupPerception:
             if (calibration["geometry"] != geometry
                     or not 0. <= calibration["bias"] <= MAX_SETTLED_RGB_BIAS):
                 raise ValueError("RGB calibration does not match the declared cup or bias bounds")
+        self.surface_readout = config.get("settled_surface_readout")
+        self.surface_history = []
+        if self.surface_readout is not None:
+            self.surface_readout = dict(self.surface_readout,weights=self.surface_readout["weights"].to(device))
         self.track_result = None
 
     def track(self, image):
@@ -131,6 +150,15 @@ class SizedCupPerception:
             diagnostic.setdefault("guard_filtered", filtered.copy())
             filtered["color"] = calibrated_rgb_height(filtered["color"], self.draining_color_calibration)
             diagnostic["draining_color_correction"] = diagnostic["guard_filtered"]["color"] - filtered["color"]
+        if self.surface_readout is not None:
+            if valid and settling:
+                model = self.surface_readout
+                estimate = float(surface_features(crop,model["cell"])[0] @ model["weights"]) + model["intercept"]
+                self.surface_history = (self.surface_history + [estimate])[-8:]
+                diagnostic["settled_surface_estimate"] = estimate
+            else:
+                self.surface_history.clear()
+            diagnostic["settled_surface_lower"] = settled_surface_bound(self.surface_history)
         difference = abs(filtered["rgb"] - filtered["color"]) if valid else None
         return dict(track_valid=track["valid"], track_reason=track["reason"],
                     raw=raw, filtered=filtered, valid=valid,

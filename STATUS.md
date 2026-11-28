@@ -1,8 +1,10 @@
 # AIWorker — Pouring & Al-Jazari — Status
 
-Updated: November 27, 2026 (America/Los_Angeles).
+Updated: November 28, 2026 (America/Los_Angeles).
 
 For the illustrated pouring cycle, control architecture, study comparisons and a runnable offline example, start with the [project guide](README.md).
+
+**Revision 27b integrates the settled-surface estimate into pair 09's near-full decision.** It requires a stable six-frame surface reading of at least 90.2% and agreement from the existing RGB and color estimates. Replay passed 33 fitting and 26 held-out windows. The two historical problem windows measured 89.45% and 91.09% from pixels. The former requested more liquid and the latter confirmed near-full. The four live targeted trials gate the 30 unrun wide/swapped placements. [Replay](evidence/bottle-size-A/wide-mixed-r27b-surface-replay.json) · [Evaluation plan](evidence/bottle-size-A/wide-mixed-r27b-plan.json)
 
 **Revision 27 passed 3/4 targeted Isaac Sim pours on the RTX 4070, with zero particles lost.** Swapped 04 and normal 14 confirmed the bottle, grasped and returned it. Normal 09 confirmed empty, while swapped 09 reached 91.19% but exhausted its trim budget without near-full confirmation. The fresh benchmark stayed closed. [Targeted trials](evidence/bottle-size-A/wide-mixed-r27-development-results.json)
 

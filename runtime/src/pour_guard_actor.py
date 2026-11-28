@@ -107,6 +107,7 @@ class Actor:
         self.grasp_stage='initialize';self.stage_start=None;self.attempt=0;self.confirm_votes=0;self.grasp_confirmed=False
         self.qlift=None;self.lift_rotation=None;self.pour_phase=0.;self.peak_phase=0.;self.fill_mode='coarse'
         self.cup_xy=None;self.source_xy=None;self.filtered=None;self.level_history=[];self.empty_votes=0;self.lost_votes=0
+        self.surface_trim_guard_deg=90.
         self.full_votes=0;self.pause_count=0;self.pause_start=None;self.brake_phase=None
         self.trim_goal=None;self.trim_min_phase=None;self.trim_start=None;self.trim_entered=None
         self.outbound=[]
@@ -462,6 +463,21 @@ class Actor:
                                 settled=float(np.quantile([x[2] for x in last],.25))
                                 stable=np.std([x[2] for x in last])<.012
                                 full=settled>=self.threshold['full_settled_target'] and abs(other-settled)<.06 and stable and mass>1.
+                        surface_confirmed = True
+                        self.surface_trim_guard_deg = 90.
+                        if self.sized_perception is not None and "settled_surface_lower" in measured:
+                            minimum = self.sized_perception.surface_readout["minimum"]
+                            bound = measured["settled_surface_lower"]
+                            surface_confirmed = bound is not None and bound>=minimum
+                            if bound is None:
+                                stable = False
+                            elif stable and settled is not None and bound<minimum:
+                                if .88<=bound and settled>=self.threshold["full_settled_target"]:
+                                    # The two general estimators saturate near the rim. A stable,
+                                    # below-target surface supports one ordinary trim pulse.
+                                    self.surface_trim_guard_deg = 95.
+                                settled=min(settled,self.threshold["full_settled_target"]+bound-minimum)
+                            full = full and surface_confirmed
                         self.full_votes=self.full_votes+1 if full else 0
                         pulse_limit = self.pause_count>=self.threshold.get('max_pauses',3)
                         confirmed_at_limit = False
@@ -471,7 +487,7 @@ class Actor:
                             height = pulse_limit_level([(x[2],x[1]) for x in last],
                                                        self.sized_perception.agreement_limit,
                                                        self.threshold['settled_stability_std'])
-                            confirmed_at_limit = height is not None and height>=limit_target
+                            confirmed_at_limit = surface_confirmed and height is not None and height>=limit_target
                             measured['pulse_limit_confirmation'] = dict(level=height, target=limit_target,
                                                                         confirmed=confirmed_at_limit)
                         if self.full_votes>=3 or confirmed_at_limit:self.latch('cup_near_full',t,robot)
@@ -528,7 +544,8 @@ class Actor:
                             feedback=(calibrated if calibrated is not None and level_upper<.90
                                       else max(feedback,level_upper))
                         else:
-                            timed_brake=timed_brake or (self.pour_phase>=90. and level_upper>=.945)
+                            guard_deg = 90. if level_upper>=.98 else self.surface_trim_guard_deg
+                            timed_brake=timed_brake or (self.pour_phase>=guard_deg and level_upper>=.945)
                     if timed_brake or (use_level_for_pour and level_valid and eligible and feedback>.60
                                        and feedback+flow*self.threshold['runoff_seconds']>=goal):
                         self.fill_mode='brake';self.pause_count+=1;self.full_votes=0
