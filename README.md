@@ -12,7 +12,7 @@ This project builds and evaluates that complete sequence for the **ROBOTIS FFW-B
 
 ## What works today
 
-**26 of 30 strict passes** in the November 24 revision 26 mixed-layout evaluation, following 29/30 on revision 25's placements. Normal 07 passed on its original and fresh placements. Across the new batch 28 attempts grasped, poured and returned the bottle, with zero particles spilled. Two attempts timed out before grasp, one empty stop lacked visual agreement, and one cup finished at 89.46% of rim height. [Revision 26 outcomes](evidence/bottle-size-A/wide-mixed-r26-completion.json) · [Revision 25 outcomes](evidence/bottle-size-A/wide-mixed-r25-completion.json)
+**26 of 30 strict passes** on the November 28 revision 27b Isaac Sim benchmark, after all four targeted pours passed. All 26 completed pours stopped correctly, returned the bottle and lost zero particles. The other four attempts timed out before grasp. Swapped 09 confirmed near-full on its targeted and fresh placements, settling at 90.59% and 91.87% of rim height. Normal layouts passed 14/15 and swapped layouts passed 12/15. [Fresh results](evidence/bottle-size-A/wide-mixed-r27b-completion.json) · [Targeted trials](evidence/bottle-size-A/wide-mixed-r27b-development-results.json) · [Camera readings at the stop](evidence/bottle-size-A/wide-mixed-r27b-pair-09-stops.json)
 
 A strict pass requires a confirmed grasp, liquid transfer, the intended stop, zero measured particle loss, and an ordered return and release. Near-full means at least 90% of rim height. These are particle-based simulation measurements with calibrated cameras and known vessel dimensions; physical transfer remains untested.
 
@@ -53,6 +53,6 @@ This validates a **synthetic logger fixture**: 50 g delivered and 1 g spilled un
 
 ## Next milestone
 
-Replay bottle confirmation in swapped 04 and normal 14, and investigate the two stop decisions in pair 09 before the next mixed-layout evaluation. Physical testing requires a separate calibrated setup and evaluation.
+Replay bottle localization in swapped 04, swapped 07 and normal 12, and cup localization in swapped 11. Keep the verified stop logic fixed while evaluating startup repairs. Physical testing requires a separate calibrated setup and evaluation.
 
 [Experiment history and reproduction](docs/RESULTS_AND_REPRODUCTION.md) · [Bottle-size study](docs/BOTTLE_SIZE_SESSION.md) · [Al-Jazari inspiration](docs/HISTORY.md) · [Current work log](STATUS.md)

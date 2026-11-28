@@ -1794,4 +1794,7 @@ done
 python3 close_wide_mixed_autonomy.py --study wide-mixed-r27b
 python3 audit_wide_mixed_failures.py wide-mixed-r27b
 python3 audit_startup_localization.py wide-mixed-r27b
+python3 audit_wide_mixed_r27b_surface.py
 ```
+
+All four targeted trials passed without loss. The 30 fresh trials finished with 26 strict successes, 26 ordered returns and zero lost particles. Four attempts timed out at startup. Swapped 04, swapped 07 and normal 12 confirmed only the cup, and swapped 11 confirmed only the bottle. Swapped 09's targeted and fresh trials settled at 90.59% and 91.87% respectively, above the 90% scoring minimum. Normal 09 confirmed empty after 0.30 and 0.40 seconds respectively. The 34 native recordings totaled 6,289,189,090 bytes. The targeted batch used 51.8 elapsed minutes and the 15 fresh pairs used 5.82 elapsed hours on the 4070. [Fresh results](../evidence/bottle-size-A/wide-mixed-r27b-completion.json) · [Camera readings](../evidence/bottle-size-A/wide-mixed-r27b-pair-09-stops.json) · [Failed startup evidence](../evidence/bottle-size-A/wide-mixed-r27b-fresh-failures.json)
